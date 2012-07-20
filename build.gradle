@@ -1,0 +1,169 @@
+/*
+ * Copyright (c) 2011 Haulmont Technology Ltd. All Rights Reserved.
+ * Haulmont Technology proprietary and confidential.
+ * Use is subject to license terms.
+ */
+
+allprojects {
+    ext.artifactGroup = 'com.haulmont.reports'
+    ext.artifactVersion = '4.0.0'
+    ext.isSnapshot = true
+
+    configurations.all {
+        resolutionStrategy.cacheDynamicVersionsFor 1, 'minutes'
+        resolutionStrategy.cacheChangingModulesFor 1, 'minutes'
+    }
+}
+
+buildscript {
+    repositories {
+        mavenLocal()
+        maven {
+            credentials {
+                username System.getenv('HAULMONT_REPOSITORY_USER')
+                password System.getenv('HAULMONT_REPOSITORY_PASSWORD')
+            }
+            url "http://repository.haulmont.com:8587/nexus/content/groups/work"
+        }
+    }
+    dependencies {
+        classpath group: 'com.haulmont.gradle', name: 'cuba-plugin', version: '1.4.1' // see also cuba-plugin in global module dependencies
+    }
+}
+
+apply(plugin: 'idea')
+apply(plugin: 'cuba')
+
+def globalModule = project(':reports-global')
+def coreModule = project(':reports-core')
+def guiModule = project(':reports-gui')
+def webModule = project(':reports-web')
+
+def servletApi = [group: 'org.apache.tomcat', name: 'servlet-api', version: '6.0.20']
+def postgres = [group: 'postgresql', name: 'postgresql', version: '9.0-801.jdbc4']
+
+def groovyArtifact = [group: 'org.codehaus.groovy', name: 'groovy', version: '1.7.10']
+def asm = [group: 'asm', name: 'asm', version: '3.2']
+
+def baseVersion = artifactVersion + (isSnapshot ? '-SNAPSHOT' : '')
+
+configure([globalModule, coreModule, guiModule, webModule]) {
+    apply(plugin: 'java')
+    apply(plugin: 'idea')
+    apply(plugin: 'maven')
+    apply(plugin: 'cuba')
+
+    dependencies {
+        compile(group: 'com.haulmont.cuba', name: 'cuba-global', version: baseVersion)
+    }
+
+    task sourceJar(type: Jar) {
+        from file('src')
+        classifier = 'sources'
+    }
+
+    artifacts {
+        archives sourceJar
+    }
+}
+
+configure(globalModule) {
+    dependencies {
+        provided(group: 'com.haulmont.gradle', name: 'cuba-plugin', version: '1.4.1')
+    }
+    task enhance(type: CubaEnhancing) {
+        persistenceXml = "$projectDir/src/reports-persistence.xml"
+    }
+    compileJava << {
+        enhance.execute()
+    }
+}
+
+configure(coreModule) {
+    apply plugin: 'groovy'
+
+    sourceSets {
+        test {
+            groovy {
+                srcDir 'test'
+            }
+        }
+    }
+
+    configurations {
+        jdbc
+        dbscripts
+    }
+
+    dependencies {
+        compile(globalModule)
+        compile(group: 'com.haulmont.cuba', name: 'cuba-core', version: baseVersion)
+        testCompile(group: 'com.haulmont.cuba', name: 'cuba-core', version: baseVersion, classifier: 'tests')
+        provided(servletApi)
+        jdbc(postgres)
+
+        dbscripts(group: 'com.haulmont.cuba', name: 'cuba-core', version: baseVersion, classifier: 'db', ext: 'zip')
+
+        testRuntime postgres
+        testRuntime servletApi
+
+        groovy groovyArtifact
+        groovy asm
+    }
+
+    dbScriptsArchive {
+        exclude '10-cuba/**'
+    }
+
+    task deploy(dependsOn: assemble, type: CubaDeployment) {
+        appName = 'app-core'
+        appJars('cuba-global', 'cuba-core',
+                'reports-global', 'reports-core')
+    }
+
+    task createDb(dependsOn: assemble, description: 'Creates local Postgres database', type: CubaDbCreation) {
+        dbms = 'postgres'
+        dbName = rootProject.hasProperty('dbName') ? rootProject.dbName : 'cuba'
+        dbUser = rootProject.hasProperty('dbUser') ? rootProject.dbUser : 'root'
+        dbPassword = rootProject.hasProperty('dbPass') ? rootProject.dbPass : 'root'
+        host = rootProject.hasProperty('dbHost') ? rootProject.dbHost : 'localhost'
+    }
+}
+
+configure(guiModule) {
+    dependencies {
+        compile(globalModule)
+        compile(group: 'com.haulmont.cuba', name: 'cuba-gui', version: baseVersion)
+        provided(servletApi)
+    }
+
+}
+
+configure(webModule) {
+    configurations {
+        webcontent
+    }
+
+    dependencies {
+        compile(globalModule)
+        compile(guiModule)
+        compile(group: 'com.haulmont.cuba', name: 'cuba-web', version: baseVersion)
+        webcontent(group: 'com.haulmont.cuba', name: 'cuba-web', version: baseVersion, classifier: 'web', ext: 'zip')
+    }
+
+    task deploy(dependsOn: assemble, type: CubaDeployment) {
+        appName = 'app'
+        appJars('cuba-global', 'cuba-client', 'cuba-gui', 'cuba-web',
+                'reports-global', 'reports-gui', 'reports-web')
+    }
+}
+
+task restart(dependsOn: ['stop', ':reports-core:deploy', ':reports-web:deploy'],
+        description: 'Redeploys applications and restarts local Tomcat') << {
+    ant.waitfor(maxwait: 6, maxwaitunit: 'second', checkevery: 2, checkeveryunit: 'second') {
+        not {
+            socket(server: 'localhost', port: '8787')
+        }
+    }
+    start.execute()
+}

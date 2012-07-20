@@ -1,0 +1,14 @@
+/*
+ * Copyright (c) 2011 Haulmont Technology Ltd. All Rights Reserved.
+ * Haulmont Technology proprietary and confidential.
+ * Use is subject to license terms.
+ */
+
+rootProject.name = 'reports'
+
+include(':reports-global', ':reports-core', ':reports-gui', ':reports-web')
+
+project(':reports-global').projectDir = new File(settingsDir, 'modules/global')
+project(':reports-core').projectDir = new File(settingsDir, 'modules/core')
+project(':reports-gui').projectDir = new File(settingsDir, 'modules/gui')
+project(':reports-web').projectDir = new File(settingsDir, 'modules/web')
