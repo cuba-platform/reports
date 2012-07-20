@@ -6,8 +6,8 @@
 package com.haulmont.cuba.report.formatters.oo;
 
 import com.haulmont.cuba.core.Locator;
-import com.haulmont.cuba.core.app.ServerConfig;
 import com.haulmont.cuba.core.global.ConfigProvider;
+import com.haulmont.cuba.report.ReportingConfig;
 import com.haulmont.cuba.report.exception.FailedToConnectToOpenOfficeException;
 import com.sun.star.frame.XComponentLoader;
 import com.sun.star.io.IOException;
@@ -28,7 +28,7 @@ public class XlsToPdfConverter {
     }
 
     private void connectToOffice() {
-        String openOfficePath = ConfigProvider.getConfig(ServerConfig.class).getOpenOfficePath();
+        String openOfficePath = ConfigProvider.getConfig(ReportingConfig.class).getOpenOfficePath();
         try {
             OOOConnectorAPI connectorAPI = Locator.lookup(OOOConnectorAPI.NAME);
             connection = connectorAPI.createConnection(openOfficePath);
