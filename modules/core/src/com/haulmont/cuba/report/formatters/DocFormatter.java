@@ -16,6 +16,7 @@ import com.haulmont.cuba.core.global.ConfigProvider;
 import com.haulmont.cuba.report.Band;
 import com.haulmont.cuba.report.ReportOutputType;
 import com.haulmont.cuba.report.ReportValueFormat;
+import com.haulmont.cuba.report.ReportingConfig;
 import com.haulmont.cuba.report.exception.FailedToConnectToOpenOfficeException;
 import com.haulmont.cuba.report.exception.ReportingException;
 import com.haulmont.cuba.report.formatters.doctags.BitmapTagHandler;
@@ -94,7 +95,7 @@ public class DocFormatter extends AbstractFormatter {
     }
 
     private void connectToOffice() {
-        String openOfficePath = ConfigProvider.getConfig(ServerConfig.class).getOpenOfficePath();
+        String openOfficePath = ConfigProvider.getConfig(ReportingConfig.class).getOpenOfficePath();
         try {
             OOOConnectorAPI connectorAPI = Locator.lookup(OOOConnectorAPI.NAME);
             connection = connectorAPI.createConnection(openOfficePath);
@@ -193,7 +194,7 @@ public class DocFormatter extends AbstractFormatter {
 
     private void fillTable(String name, Band parentBand, XTextTable xTextTable, XDispatchHelper xDispatchHelper)
             throws com.sun.star.uno.Exception {
-        boolean displayDeviceUnavailable = ConfigProvider.getConfig(ServerConfig.class).getDisplayDeviceUnavailable();
+        boolean displayDeviceUnavailable = ConfigProvider.getConfig(ReportingConfig.class).getDisplayDeviceUnavailable();
         if (!displayDeviceUnavailable) {
             ClipBoardHelper.clear();
         }

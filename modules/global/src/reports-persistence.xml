@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+
+<persistence xmlns="http://java.sun.com/xml/ns/persistence" version="1.0">
+    <persistence-unit name="cuba" transaction-type="RESOURCE_LOCAL">
+
+        <class>com.haulmont.cuba.report.HardDeleteEntity</class>
+        <class>com.haulmont.cuba.report.DataSet</class>
+        <class>com.haulmont.cuba.report.BandDefinition</class>
+        <class>com.haulmont.cuba.report.ReportTemplate</class>
+        <class>com.haulmont.cuba.report.ReportInputParameter</class>
+        <class>com.haulmont.cuba.report.ReportScreen</class>
+        <class>com.haulmont.cuba.report.ReportValueFormat</class>
+        <class>com.haulmont.cuba.report.Report</class>
+        <class>com.haulmont.cuba.report.ReportGroup</class>
+
+        <properties/>
+    </persistence-unit>
+</persistence>

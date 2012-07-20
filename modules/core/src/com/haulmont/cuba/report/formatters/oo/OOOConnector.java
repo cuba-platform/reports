@@ -13,6 +13,7 @@ package com.haulmont.cuba.report.formatters.oo;
 import com.haulmont.cuba.core.app.ServerConfig;
 import com.haulmont.cuba.core.global.ConfigProvider;
 import com.haulmont.cuba.core.global.Configuration;
+import com.haulmont.cuba.report.ReportingConfig;
 import com.sun.star.comp.helper.BootstrapException;
 import com.sun.star.uno.XComponentContext;
 import ooo.connector.BootstrapSocketConnector;
@@ -28,7 +29,7 @@ public class OOOConnector implements OOOConnectorAPI, OOOConnectorMBean {
 
     @Inject
     public void setConfig(Configuration configuration) {
-        String ports = configuration.getConfig(ServerConfig.class).getOpenOfficePorts();
+        String ports = configuration.getConfig(ReportingConfig.class).getOpenOfficePorts();
         for (String port : ports.split("\\|")) {
             this.freePorts.add(Integer.valueOf(port));
         }
@@ -117,7 +118,7 @@ public class OOOConnector implements OOOConnectorAPI, OOOConnectorMBean {
 
     @Override
     public void hardReloadAccessPorts() {
-        String ports = ConfigProvider.getConfig(ServerConfig.class).getOpenOfficePorts();
+        String ports = ConfigProvider.getConfig(ReportingConfig.class).getOpenOfficePorts();
         synchronized (freePorts) {
             freePorts.clear();
             for (String port : ports.split("\\|")) {

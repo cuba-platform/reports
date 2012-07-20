@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2012 Haulmont Technology Ltd. All Rights Reserved.
+  ~ Haulmont Technology proprietary and confidential.
+  ~ Use is subject to license terms.
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd"
+        >
+
+    <!-- Remote stubs -->
+
+    <bean id="reports_proxyCreator" class="com.haulmont.cuba.web.sys.remoting.WebRemoteProxyBeanCreator">
+        <property name="clusterInvocationSupport" ref="cuba_clusterInvocationSupport"/>
+        <property name="remoteServices">
+            <map>
+                <entry key="report_ReportService" value="com.haulmont.cuba.report.app.ReportService"/>
+            </map>
+        </property>
+    </bean>
+
+    <!-- Exception handlers -->
+
+    <bean id="reports_exceptionHandlersConf" class="com.haulmont.cuba.web.exception.ExceptionHandlersConfiguration">
+        <property name="handlerClasses">
+            <list>
+                <value>com.haulmont.cuba.web.exception.ReportExceptionHandler</value>
+            </list>
+        </property>
+    </bean>
+
+</beans>

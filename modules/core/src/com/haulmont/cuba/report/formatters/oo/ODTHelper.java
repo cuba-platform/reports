@@ -16,6 +16,7 @@ import com.haulmont.cuba.core.app.ServerConfig;
 import com.haulmont.cuba.core.entity.FileDescriptor;
 import com.haulmont.cuba.core.global.ConfigProvider;
 import com.haulmont.cuba.core.global.FileStorageException;
+import com.haulmont.cuba.report.ReportingConfig;
 import com.sun.star.beans.PropertyValue;
 import com.sun.star.frame.XComponentLoader;
 import com.sun.star.frame.XDispatchHelper;
@@ -101,7 +102,7 @@ public final class ODTHelper {
         try {
             OOOConnectorAPI connectorAPI = Locator.lookup(OOOConnectorAPI.NAME);
             Future future = connectorAPI.getExecutor().submit(runnable);
-            future.get(ConfigProvider.getConfig(ServerConfig.class).getDocFormatterTimeout(), TimeUnit.SECONDS);
+            future.get(ConfigProvider.getConfig(ReportingConfig.class).getDocFormatterTimeout(), TimeUnit.SECONDS);
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         } finally {

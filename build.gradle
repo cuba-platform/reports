@@ -38,6 +38,7 @@ def globalModule = project(':reports-global')
 def coreModule = project(':reports-core')
 def guiModule = project(':reports-gui')
 def webModule = project(':reports-web')
+def desktopModule = project(':reports-desktop')
 
 def servletApi = [group: 'org.apache.tomcat', name: 'servlet-api', version: '6.0.20']
 def postgres = [group: 'postgresql', name: 'postgresql', version: '9.0-801.jdbc4']
@@ -47,7 +48,7 @@ def asm = [group: 'asm', name: 'asm', version: '3.2']
 
 def baseVersion = artifactVersion + (isSnapshot ? '-SNAPSHOT' : '')
 
-configure([globalModule, coreModule, guiModule, webModule]) {
+configure([globalModule, coreModule, guiModule, webModule, desktopModule]) {
     apply(plugin: 'java')
     apply(plugin: 'idea')
     apply(plugin: 'maven')
@@ -98,6 +99,15 @@ configure(coreModule) {
     dependencies {
         compile(globalModule)
         compile(group: 'com.haulmont.cuba', name: 'cuba-core', version: baseVersion)
+        compile(group: 'com.lowagie', name: 'itext', version: '2.1.0') {
+            exclude(group: 'bouncycastle', module: 'bcmail-jdk14')
+            exclude(group: 'bouncycastle', module: 'bcprov-jdk14')
+        }
+        compile(group: 'com.haulmont.thirdparty', name: 'ooo-bootstrapconnector', version: '3.0.0')
+        compile(group: 'com.haulmont.thirdparty', name: 'core-renderer', version: 'R8')
+        compile(group: 'org.openoffice', name: 'juh', version: '3.0.0')
+        compile(group: 'org.openoffice', name: 'ridl', version: '3.0.0')
+        compile(group: 'org.openoffice', name: 'unoil', version: '3.0.0')
         testCompile(group: 'com.haulmont.cuba', name: 'cuba-core', version: baseVersion, classifier: 'tests')
         provided(servletApi)
         jdbc(postgres)
@@ -113,20 +123,6 @@ configure(coreModule) {
 
     dbScriptsArchive {
         exclude '10-cuba/**'
-    }
-
-    task deploy(dependsOn: assemble, type: CubaDeployment) {
-        appName = 'app-core'
-        appJars('cuba-global', 'cuba-core',
-                'reports-global', 'reports-core')
-    }
-
-    task createDb(dependsOn: assemble, description: 'Creates local Postgres database', type: CubaDbCreation) {
-        dbms = 'postgres'
-        dbName = rootProject.hasProperty('dbName') ? rootProject.dbName : 'cuba'
-        dbUser = rootProject.hasProperty('dbUser') ? rootProject.dbUser : 'root'
-        dbPassword = rootProject.hasProperty('dbPass') ? rootProject.dbPass : 'root'
-        host = rootProject.hasProperty('dbHost') ? rootProject.dbHost : 'localhost'
     }
 }
 
@@ -155,6 +151,14 @@ configure(webModule) {
         appName = 'app'
         appJars('cuba-global', 'cuba-client', 'cuba-gui', 'cuba-web',
                 'reports-global', 'reports-gui', 'reports-web')
+    }
+}
+
+configure(desktopModule) {
+    dependencies {
+        compile(globalModule)
+        compile(guiModule)
+        compile(group: 'com.haulmont.cuba', name: 'cuba-desktop', version: baseVersion)
     }
 }
 

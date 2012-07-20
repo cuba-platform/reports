@@ -1,4 +1,4 @@
-<views xmlns="http://www.haulmont.com/schema/cuba/view.xsd">
+<views xmlns="http://schemas.haulmont.com/cuba/4.0/view.xsd">
 
     <view entity="report$BandDefinition" name="report.edit" extends="_local">
         <property name="parentBandDefinition" view="_local"/>
