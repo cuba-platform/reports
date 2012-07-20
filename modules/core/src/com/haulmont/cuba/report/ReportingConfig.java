@@ -8,6 +8,8 @@ package com.haulmont.cuba.report;
 
 import com.haulmont.cuba.core.config.Config;
 import com.haulmont.cuba.core.config.Property;
+import com.haulmont.cuba.core.config.Source;
+import com.haulmont.cuba.core.config.SourceType;
 import com.haulmont.cuba.core.config.defaults.DefaultBoolean;
 import com.haulmont.cuba.core.config.defaults.DefaultInteger;
 import com.haulmont.cuba.core.config.defaults.DefaultString;
@@ -16,6 +18,7 @@ import com.haulmont.cuba.core.config.defaults.DefaultString;
  * @author krivopustov
  * @version $Id$
  */
+@Source(type = SourceType.APP)
 public interface ReportingConfig extends Config {
 
     /**

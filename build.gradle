@@ -132,7 +132,6 @@ configure(guiModule) {
         compile(group: 'com.haulmont.cuba', name: 'cuba-gui', version: baseVersion)
         provided(servletApi)
     }
-
 }
 
 configure(webModule) {

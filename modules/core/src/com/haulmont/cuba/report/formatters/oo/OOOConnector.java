@@ -10,7 +10,6 @@
  */
 package com.haulmont.cuba.report.formatters.oo;
 
-import com.haulmont.cuba.core.app.ServerConfig;
 import com.haulmont.cuba.core.global.ConfigProvider;
 import com.haulmont.cuba.core.global.Configuration;
 import com.haulmont.cuba.report.ReportingConfig;
