@@ -9,4 +9,23 @@
         http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
         http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-3.0.xsd">
 
+    <!-- MBeans registration -->
+
+    <bean id="reports_MBeanExporter" class="org.springframework.jmx.export.MBeanExporter" lazy-init="false">
+        <property name="beans">
+            <map>
+                <entry key="${cuba.webContextName}.cuba:service=OpenOfficeSupport" value-ref="report_OOOConnector"/>
+            </map>
+        </property>
+        <property name="assembler">
+            <bean class="org.springframework.jmx.export.assembler.InterfaceBasedMBeanInfoAssembler">
+                <property name="interfaceMappings">
+                    <map>
+                        <entry key="report_OOOConnector" value="com.haulmont.cuba.report.formatters.oo.OOOConnectorMBean"/>
+                    </map>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
 </beans>
