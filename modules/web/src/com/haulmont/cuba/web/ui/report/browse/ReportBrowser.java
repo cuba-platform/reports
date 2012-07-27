@@ -26,9 +26,6 @@ import java.util.Map;
 import java.util.Set;
 
 public class ReportBrowser extends BasicBrowser {
-    public ReportBrowser(IFrame frame) {
-        super(frame);
-    }
 
     @Override
     public void init(Map<String, Object> params) {
