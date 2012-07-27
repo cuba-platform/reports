@@ -15,7 +15,7 @@
     </dsContext>
 
     <layout expand="table">
-        <table id="table">
+        <table id="table" width="100%">
             <buttonsPanel>
                 <button action="table.create" icon="icons/create.png"/>
                 <button action="table.edit" icon="icons/edit.png"/>

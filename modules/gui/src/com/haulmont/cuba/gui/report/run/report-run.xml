@@ -26,17 +26,15 @@
         </collectionDatasource>
     </dsContext>
 
-    <layout expand="table-panel">
-        <vbox id="table-panel" expand="reportsTable" spacing="true">
-            <table id="reportsTable" editable="false">
-                <buttonsPanel>
-                    <button id="runReport" action="reportsTable.runReport" icon="icons/run.png"/>
-                </buttonsPanel>
-                <columns>
-                    <column id="name"/>
-                </columns>
-                <rows datasource="reportDs"/>
-            </table>
-        </vbox>
+    <layout>
+        <table id="reportsTable" editable="false" width="100%" height="100%">
+            <buttonsPanel>
+                <button id="runReport" action="reportsTable.runReport" icon="icons/run.png"/>
+            </buttonsPanel>
+            <columns>
+                <column id="name"/>
+            </columns>
+            <rows datasource="reportDs"/>
+        </table>
     </layout>
 </window>

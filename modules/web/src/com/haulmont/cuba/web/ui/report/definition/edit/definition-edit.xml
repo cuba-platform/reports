@@ -21,8 +21,8 @@
     <#assign paramWidth = 260>
     <layout expand="box">
 
-        <vbox id="box" margin="true" stylename="edit-area" spacing="true" expand="split">
-            <grid spacing="true" expandable="false">
+        <vbox id="box" margin="true" stylename="edit-area" spacing="true" expand="split" width="100%">
+            <grid spacing="true">
                 <columns>
                     <column flex="1"/>
                     <column flex="1"/>
@@ -51,9 +51,9 @@
                 <!--<button action="dataSets.edit" icon="icons/edit.png"/>-->
                 <button action="dataSets.remove" icon="icons/remove.png"/>
             </hbox>
-            <split id="split" orientation="horizontal" pos="40">
-                <vbox margin="false;true;false;false">
-                    <table id="dataSets" editable="true">
+            <split id="split" orientation="horizontal" pos="40" width="100%">
+                <vbox margin="false;true;false;false" width="100%" height="100%">
+                    <table id="dataSets" editable="true" width="100%" height="100%">
                         <columns>
                             <column id="name" caption="msg://dataSet.name"/>
                             <column id="type" caption="msg://dataSet.type"/>
@@ -63,7 +63,7 @@
                     </table>
                 </vbox>
                 <!-- Split -->
-                <vbox margin="false;false;false;true" expand="text" spacing="true">
+                <vbox margin="false;false;false;true" expand="text" spacing="true" width="100%" height="100%">
                     <label value="msg://dataSet.name"/>
                     <textField id="datasetName" datasource="dataSetsDs" property="name"
                                required="true" requiredMessage="msg://dataSet.nameMsg"/>

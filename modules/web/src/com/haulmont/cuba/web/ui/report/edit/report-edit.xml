@@ -30,15 +30,15 @@
 
     </dsContext>
     <layout expand="tabsheet">
-        <tabsheet id="tabsheet">
+        <tabsheet id="tabsheet" width="100%">
             <tab id="generalTab" caption="msg://generalTab">
-                <iframe src="/com/haulmont/cuba/web/ui/report/edit/tabs/general.xml" id="generalFrame"/>
+                <iframe src="/com/haulmont/cuba/web/ui/report/edit/tabs/general.xml" id="generalFrame" width="100%" height="100%"/>
             </tab>
             <tab id="securityTab" caption="msg://securityTab">
-                <iframe src="/com/haulmont/cuba/web/ui/report/edit/tabs/security.xml" id="securityFrame"/>
+                <iframe src="/com/haulmont/cuba/web/ui/report/edit/tabs/security.xml" id="securityFrame" width="100%" height="100%"/>
             </tab>
             <tab id="localesTab" caption="msg://localesTab">
-                <iframe src="/com/haulmont/cuba/web/ui/report/edit/tabs/locales.xml" id="localesFrame"/>
+                <iframe src="/com/haulmont/cuba/web/ui/report/edit/tabs/locales.xml" id="localesFrame" width="100%" height="100%"/>
             </tab>
         </tabsheet>
         <iframe id="windowActions" src="/com/haulmont/cuba/gui/edit-window.actions.xml"/>
