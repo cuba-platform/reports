@@ -110,7 +110,7 @@ public class XLSFormatter extends AbstractFormatter {
     private void cloneWorkbookDataFormats() {
     }
 
-     private void outputDocument(ReportOutputType outputType, OutputStream outputStream) {
+    private void outputDocument(ReportOutputType outputType, OutputStream outputStream) {
         if (ReportOutputType.XLS == outputType) {
             try {
                 resultWorkbook.write(outputStream);
@@ -185,6 +185,8 @@ public class XLSFormatter extends AbstractFormatter {
         CellReference topLeft, bottomRight;
         AreaReference resultRange;
 
+        int rowsAddedByHorizontalBandBackup = rowsAddedByHorizontalBand;
+
         if (crefs != null) {
             addRangeBounds(band, crefs);
 
@@ -196,8 +198,11 @@ public class XLSFormatter extends AbstractFormatter {
             int offset = 0;
 
             topLeft = new CellReference(rownum, 0);
-            copyMergeRegions(resultSheet, rangeName, rownum + rowsAddedByHorizontalBand,
-                    getCellFromReference(crefs[0], templateSheet).getColumnIndex());
+            // no child bands - merge regions now
+            if (band.getChildrenList().isEmpty()) {
+                copyMergeRegions(resultSheet, rangeName, rownum + rowsAddedByHorizontalBand,
+                        getCellFromReference(crefs[0], templateSheet).getColumnIndex());
+            }
 
             for (CellReference cellRef : crefs) {
                 HSSFCell templateCell = getCellFromReference(cellRef, templateSheet);
@@ -237,6 +242,12 @@ public class XLSFormatter extends AbstractFormatter {
 
         for (Band child : band.getChildrenList()) {
             writeBand(child);
+        }
+
+        // scheduled merge regions
+        if (!band.getChildrenList().isEmpty() && crefs != null) {
+            copyMergeRegions(resultSheet, rangeName, rownum + rowsAddedByHorizontalBandBackup,
+                    getCellFromReference(crefs[0], templateSheet).getColumnIndex());
         }
 
         rownum += rowsAddedByHorizontalBand;
@@ -453,7 +464,7 @@ public class XLSFormatter extends AbstractFormatter {
             int cellType = templateCell.getCellType();
             if (cellType == HSSFCell.CELL_TYPE_STRING && isOneValueCell(templateCell))
                 updateValueCell(rootBand, band, templateCell, resultCell,
-                         drawingPatriarchsMap.get(resultCell.getSheet()));
+                        drawingPatriarchsMap.get(resultCell.getSheet()));
             else if (cellType == HSSFCell.CELL_TYPE_FORMULA)
                 resultCell.setCellFormula(inlineBandDataToCellString(templateCell, band));
             else if (cellType == HSSFCell.CELL_TYPE_STRING)
@@ -509,17 +520,42 @@ public class XLSFormatter extends AbstractFormatter {
                         int regionVOffset = cra.getFirstRow() - row;
                         int regionHOffset = cra.getFirstColumn() - column;
 
-                        CellRangeAddress cra2 = cra.copy();
-                        cra2.setFirstColumn(regionHOffset + firstTargetRangeColumn);
-                        cra2.setLastColumn(regionHOffset + regionWidth - 1 + firstTargetRangeColumn);
+                        CellRangeAddress newRegion = cra.copy();
+                        newRegion.setFirstColumn(regionHOffset + firstTargetRangeColumn);
+                        newRegion.setLastColumn(regionHOffset + regionWidth - 1 + firstTargetRangeColumn);
 
-                        cra2.setFirstRow(regionVOffset + firstTargetRangeRow);
-                        cra2.setLastRow(regionVOffset + regionHeight - 1 + firstTargetRangeRow);
+                        newRegion.setFirstRow(regionVOffset + firstTargetRangeRow);
+                        newRegion.setLastRow(regionVOffset + regionHeight - 1 + firstTargetRangeRow);
 
-                        resultSheet.addMergedRegion(cra2);
+                        boolean skipRegion = false;
+
+                        for (int mergedIndex = 0; mergedIndex < resultSheet.getNumMergedRegions(); mergedIndex++) {
+                            CellRangeAddress mergedRegion = resultSheet.getMergedRegion(mergedIndex);
+
+                            if (!isIntersectedRegions(newRegion, mergedRegion))
+                                continue;
+
+                            skipRegion = true;
+                        }
+
+                        if (!skipRegion) {
+                            resultSheet.addMergedRegion(newRegion);
+                        }
                     }
                 }
             }
+    }
+
+    private boolean isIntersectedRegions(CellRangeAddress x, CellRangeAddress y) {
+        return (x.getFirstColumn() <= y.getLastColumn() &&
+                x.getLastColumn() >= y.getFirstColumn() &&
+                x.getLastRow() >= y.getFirstRow() &&
+                x.getFirstRow() <= y.getLastRow())
+            // or
+            || (y.getFirstColumn() <= x.getLastColumn() &&
+                y.getLastColumn() >= x.getFirstColumn() &&
+                y.getLastRow() >= x.getFirstRow() &&
+                y.getFirstRow() <= x.getLastRow());
     }
 
     /**
@@ -603,7 +639,7 @@ public class XLSFormatter extends AbstractFormatter {
             anchor.setCol2(bottomRight.getCol());
             anchor.setRow2(bottomRight.getRow());
 
-             drawingPatriarchsMap.get(resultSheet).createPicture(anchor, orderedPicturesId.get(i++));
+            drawingPatriarchsMap.get(resultSheet).createPicture(anchor, orderedPicturesId.get(i++));
         }
     }
 
