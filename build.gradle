@@ -28,11 +28,13 @@ buildscript {
     }
     dependencies {
         classpath group: 'com.haulmont.gradle', name: 'cuba-plugin', version: '1.4.1' // see also cuba-plugin in global module dependencies
+		classpath group: 'com.haulmont.gradle', name: 'doc-plugin', version: '1.1.0'
     }
 }
 
 apply(plugin: 'idea')
 apply(plugin: 'cuba')
+apply(plugin: 'doc')
 
 def globalModule = project(':reports-global')
 def coreModule = project(':reports-core')
@@ -170,3 +172,103 @@ task restart(dependsOn: ['stop', ':reports-core:deploy', ':reports-web:deploy'],
     }
     start.execute()
 }
+
+/***************************** Documentation  *****************************/
+
+// These variables must be the project properties
+ext.docSrcDir = file('doc/content')
+ext.docToolsDir = file('doc/tools')
+ext.docCssDir = new File(docToolsDir, 'css')
+ext.docDstDir = new File("$buildDir/doc")
+ext.docTmpDir = new File("$buildDir/tmp/doc")
+
+task transformReporting(type: TransformDocbook) {
+    sourceDir = new File(docSrcDir, 'reporting/ru')
+    sourceFile = new File(sourceDir, 'reporting.xml')
+    destFile = new File(docTmpDir, 'reporting/ru/reporting.xml')
+    classpath = configurations.buildDoc
+}
+
+task transformReportingEng(type: TransformDocbook) {
+	sourceDir = new File(docSrcDir, 'reporting/eng')
+    sourceFile = new File(sourceDir, 'reporting.xml')
+    destFile = new File(docTmpDir, 'reporting/eng/reporting.xml')
+    classpath = configurations.buildDoc
+}
+
+task buildReportingXhtml(type: Docbook2Xhtml, dependsOn: transformReporting) {
+    source transformReporting.destFile
+    destFile = new File(docTmpDir, 'reporting-pdf/reporting-pdf.html')
+    stylesheetName = 'pdf.xsl'
+    resources = fileTree(new File(docSrcDir, 'reporting/ru')) {
+        include 'img/*.png'
+        include 'img/*.jpg'
+    }
+    resources += fileTree(docCssDir) {
+        include '*.css'
+    }
+}
+
+task buildReportingXhtmlEng(type: Docbook2Xhtml, dependsOn: transformReportingEng) {
+    source transformReportingEng.destFile
+    destFile = new File(docTmpDir, 'reporting-pdf/reporting-pdf.html')
+    stylesheetName = 'pdf.xsl'
+    resources = fileTree(new File(docSrcDir, 'reporting/eng')) {
+        include 'img/*.png'
+        include 'img/*.jpg'
+    }
+    resources += fileTree(docCssDir) {
+        include '*.css'
+    }
+}
+task buildReportingPdf(type: Xhtml2Pdf, dependsOn: buildReportingXhtml) {
+    inputs.dir docCssDir
+    sourceFile = buildReportingXhtml.destFile
+    destFile = new File(docDstDir, 'reporting/ru/pdf/reporting.pdf')
+    classpath = configurations.buildDoc
+    fonts = zipTree(configurations.docFonts.singleFile)
+}
+
+task buildReportingPdfEng(type: Xhtml2Pdf, dependsOn: buildReportingXhtmlEng) {
+    inputs.dir docCssDir
+    sourceFile = buildReportingXhtmlEng.destFile
+    destFile = new File(docDstDir, 'reporting/eng/pdf/reporting.pdf')
+    classpath = configurations.buildDoc
+    fonts = zipTree(configurations.docFonts.singleFile)
+}
+
+task buildReportingSingleHtml(type: Docbook2Xhtml, dependsOn: transformReporting) {
+    source transformReporting.destFile
+    destFile = new File(docDstDir, 'reporting/ru/html-single/reporting.html')
+    stylesheetName = 'html-single.xsl'
+    resources = fileTree(new File(docSrcDir, 'reporting/ru')) {
+        include 'img/**/*.png'
+        include 'img/**/*.jpg'
+    }
+    resources += fileTree(docCssDir) {
+        include '*.css'
+    }
+}
+
+task buildReportingSingleHtmlEng(type: Docbook2Xhtml, dependsOn: transformReportingEng) {
+    source transformReportingEng.destFile
+    destFile = new File(docDstDir, 'reporting/eng/html-single/reporting.html')
+    stylesheetName = 'html-single.xsl'
+    resources = fileTree(new File(docSrcDir, 'reporting/eng')) {
+        include 'img/**/*.png'
+        include 'img/**/*.jpg'
+    }
+    resources += fileTree(docCssDir) {
+        include '*.css'
+    }
+}
+
+task buildDoc(type: Zip, description: 'Build documentation',
+        //dependsOn: [buildPlatformSingleHtml]) {
+        dependsOn: [buildReportingSingleHtml,buildReportingSingleHtmlEng, buildReportingPdf,buildReportingPdfEng]) {
+    from 'build/doc'
+    destinationDir = file('build/distributions')
+    baseName = 'cuba-doc'
+    version = artifactVersion + (isSnapshot ? '-SNAPSHOT' : '')
+}
+
