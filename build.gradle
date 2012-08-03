@@ -265,11 +265,10 @@ task buildReportingSingleHtmlEng(type: Docbook2Xhtml, dependsOn: transformReport
 }
 
 task buildDoc(type: Zip, description: 'Build documentation',
-        //dependsOn: [buildPlatformSingleHtml]) {
-        dependsOn: [buildReportingSingleHtml,buildReportingSingleHtmlEng, buildReportingPdf,buildReportingPdfEng]) {
+        dependsOn: [buildReportingSingleHtml, /*buildReportingSingleHtmlEng,*/ buildReportingPdf/*, buildReportingPdfEng*/]) {
     from 'build/doc'
     destinationDir = file('build/distributions')
-    baseName = 'cuba-doc'
+    baseName = 'reports-doc'
     version = baseVersion
 }
 
