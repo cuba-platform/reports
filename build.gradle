@@ -269,6 +269,9 @@ task buildDoc(type: Zip, description: 'Build documentation',
     from 'build/doc'
     destinationDir = file('build/distributions')
     baseName = 'cuba-doc'
-    version = artifactVersion + (isSnapshot ? '-SNAPSHOT' : '')
+    version = baseVersion
 }
 
+artifacts {
+    archives buildDoc
+}
