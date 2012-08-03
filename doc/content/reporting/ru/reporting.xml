@@ -3,9 +3,9 @@
   <bookinfo>
     <copyright>
       <year>2012</year>
-      <holder>Haulmont (<ulink url="www.haulmont.ru">www.haulmont.ru</ulink>)</holder>
+      <holder>Haulmont (<ulink url="http://www.haulmont.ru/">www.haulmont.ru</ulink>)</holder>
     </copyright>
-    <title>Руководство по созданию отчетов в системах, построенных на платформе CUBA</title>
+    <title>Платформа <trademark>CUBA</trademark>. Генератор отчетов</title>
   </bookinfo>
   <preface lang="ru">
     <title>Предисловие</title>
@@ -35,31 +35,43 @@
     </section>
     <section>
       <title>Соглашения</title>
-      <para>Для того чтобы текст руководства был более понятен, в дальнейшем будут использоваться следующие соглашения.</para>
-      <formalpara>
-        <title>Клавиши</title>
-        <para>Клавиши представляются в виде <emphasis role="bold">полужирного текста</emphasis> для того, чтобы выделяться среди остального текста. Комбинации клавиш, которые должны вводиться одновременно, разделяются символом &quot;+&quot;, например, <keycombo>
-            <keycap>Alt</keycap>
-            <keycap>Ins</keycap>
-          </keycombo>.
-
- Комбинации клавиш, которые должны вводиться последовательно, разделяются запятыми, например:
-
-<keycombo>
-            <keycap>Ctrl</keycap>
-            <keycap>X</keycap>
-          </keycombo>, <keycombo>
-            <keycap>Ctrl</keycap>
-            <keycap>S</keycap>
-          </keycombo>.</para>
-      </formalpara>
-      <formalpara>
-        <title>Код программ</title>
-        <para>Приведенные в тексте руководства листинги и отдельные части программного кода будут выделяться следующим образом:<programlisting>&lt;views xmlns=&quot;http://www.haulmont.com/schema/cuba/view.xsd&quot;&gt;</programlisting></para>
-      </formalpara>
-      <formalpara>
+      <para>Для привлечения внимания к определенной информации в Руководстве используется выделение текста различными шрифтами, стилями и размером.</para>
+      <section>
+        <title>Типографские соглашения</title>
+        <para>Далее приводятся примеры выделенных слов и пояснения, в каких случаях используется то или иное оформление.</para>
+        <formalpara>
+          <title>Переменные среды, команды, имена объектов Java, тексты ошибок, имена файлов, пакетов</title>
+          <para>Обозначены в Руководстве <classname>моноширинным шрифтом</classname>.</para>
+        </formalpara>
+        <formalpara>
+          <title>Элементы интерфейса</title>
+          <para>Пункты меню, названия окон, папок, вкладок выделяются в тексте <guimenu>полужирным текстом</guimenu>. Кнопки выглядят следующим образом: <guibutton>Кнопка</guibutton>.</para>
+        </formalpara>
+        <formalpara>
+          <title>Имена приложений, объекты базы данных, названия внешних документов</title>
+          <para>Обозначаются в тексте Руководства <emphasis role="bold">полужирным текстом</emphasis>.</para>
+        </formalpara>
+        <formalpara>
+          <title>Параметры и свойства</title>
+          <para><parameter>Параметры</parameter> и <property>свойства</property> также выделяются в тексте Руководства.</para>
+        </formalpara>
+        <formalpara>
+          <title>Роль пользователя</title>
+          <para>Роль пользователя выделяется в тексте следующим образом: <authorinitials>Администратор</authorinitials>.</para>
+        </formalpara>
+      </section>
+      <section>
+        <title>Врезки</title>
+        <para>Листинг исходного кода, а также содержимое файлов визуально отделяются от окружающего текста следующим образом:</para>
+        <para><programlisting>[appdefaults]
+autologin = true
+forward = true
+forwardable = true
+encrypt = true </programlisting></para>
+      </section>
+      <section>
         <title>Замечания и предупреждения</title>
-        <para>В тексте руководства будут встречаться сообщения,  используемые для привлечения внимания к информации. <tip>
+        <para>В тексте Руководства будут встречаться сообщения,  используемые для привлечения внимания к информации. <tip>
             <title>Совет</title>
             <para>Это сообщение, содержащее информацию о способах упрощения работы.</para>
           </tip><caution>
@@ -69,35 +81,7 @@
             <title>Внимание</title>
             <para>Данные сообщения  акцентируют внимание на вещах, которые легко упустить из виду.</para>
           </warning></para>
-      </formalpara>
-      <formalpara>
-        <title>Переменные среды, команды, имена классов, интерфейсов, объектов, методов, переменных, тексты ошибок</title>
-        <para>Обозначены в руководстве <classname>специальным моноширинным шрифтом</classname>.</para>
-      </formalpara>
-      <formalpara>
-        <title>Элементы интерфейса</title>
-        <para>Пункты меню, названия окон, папок, закладок выделяются в тексте <guimenu>полужирным текстом</guimenu>. Кнопки выглядят следующим образом: <guibutton>Кнопка</guibutton></para>
-      </formalpara>
-      <formalpara>
-        <title>Имена приложений, объекты базы данных, названия внешних документов</title>
-        <para>Обозначаются в тексте руководства <emphasis role="bold">полужирным текстом</emphasis>.</para>
-      </formalpara>
-      <formalpara>
-        <title>Имена файлов, каталогов, папок и расширений</title>
-        <para>Обозначены в руководстве следующим образом: <filename>C:\Program Files (x86)</filename>.</para>
-      </formalpara>
-      <formalpara>
-        <title>Имя пакета</title>
-        <para>Для имени пакета используется следующее обозначение: <package>com.haulmont.fts.core.app</package>.</para>
-      </formalpara>
-      <formalpara>
-        <title>Имя модуля</title>
-        <para>Имя модуля обозначается в тексте следующим образом: <structname>модуль</structname>.</para>
-      </formalpara>
-      <formalpara>
-        <title>Параметры и свойства</title>
-        <para><parameter>Параметры</parameter> и <property>свойства</property> также выделяются в тексте руководства.</para>
-      </formalpara>
+      </section>
     </section>
   </preface>
   <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="chapter2.xml" encoding="UTF-8"/>

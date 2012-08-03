@@ -188,7 +188,7 @@ p {
 }
 
 .figure .title {
-    text-align: left;
+    text-align: center;
     white-space: nowrap;
     color: #666666
 }
@@ -308,7 +308,6 @@ p {
 
 .glossterm {
 	font-style: italic;
-	color: #1a334c;
 }
 
 .ulink
@@ -317,24 +316,7 @@ p {
 }
 
 .literal{
-    color: #303000;
 	font-family: 'Courier New', Courier, monospace;
-}
-
-.filename {
-	color: #1b3914;
-}
-
-.structname {
-	color: #3b1245;
-}
-
-.varname {
-	color: #101b45;
-}
-
-.package {
-	color: #141f4e;
 }
 
 .informaltable {
