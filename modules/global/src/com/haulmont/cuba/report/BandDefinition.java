@@ -29,7 +29,7 @@ public class BandDefinition extends HardDeleteEntity {
     @Column(name = "NAME")
     private String name;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "PARENT_DEFINITION_ID")
     private BandDefinition parentBandDefinition;
 
@@ -37,7 +37,7 @@ public class BandDefinition extends HardDeleteEntity {
     @JoinColumn(name = "REPORT_ID")
     private Report report;
 
-    @OneToMany(mappedBy = "parentBandDefinition", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "parentBandDefinition")
     @Aggregation
     @OrderBy("position")
     @OnDelete(value = DeletePolicy.CASCADE)

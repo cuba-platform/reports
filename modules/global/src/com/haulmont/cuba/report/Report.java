@@ -56,7 +56,7 @@ public class Report extends HardDeleteEntity {
     @JoinColumn(name = "ROOT_DEFINITION_ID")
     private BandDefinition rootBandDefinition;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "report", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "report", cascade = CascadeType.REMOVE)
     @OnDelete(DeletePolicy.CASCADE)
     @Aggregation
     private Set<BandDefinition> bands;

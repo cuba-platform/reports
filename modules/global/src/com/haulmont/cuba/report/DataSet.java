@@ -37,7 +37,7 @@ public class DataSet extends HardDeleteEntity {
     @Column(name = "LIST_ENTITIES_PARAM_NAME")
     private String listEntitiesParamName;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "BAND_DEFINITION")
     private BandDefinition bandDefinition;
 
