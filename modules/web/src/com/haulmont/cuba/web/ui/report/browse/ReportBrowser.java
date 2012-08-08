@@ -12,6 +12,7 @@ package com.haulmont.cuba.web.ui.report.browse;
 
 import com.haulmont.cuba.gui.ServiceLocator;
 import com.haulmont.cuba.gui.WindowManager;
+import com.haulmont.cuba.gui.components.actions.ItemTrackingAction;
 import com.haulmont.cuba.gui.export.ByteArrayDataProvider;
 import com.haulmont.cuba.gui.export.ExportFormat;
 import com.haulmont.cuba.gui.report.ReportHelper;
@@ -33,7 +34,8 @@ public class ReportBrowser extends BasicBrowser {
 
         final Table reportsTable = getComponent("table");
         Button runReport = getComponent("runReport");
-        runReport.setAction(new AbstractAction("runReport") {
+        runReport.setAction(new ItemTrackingAction("runReport") {
+            @Override
             public void actionPerform(Component component) {
                 Report report = reportsTable.getSingleSelected();
                 if (report != null) {
@@ -49,9 +51,11 @@ public class ReportBrowser extends BasicBrowser {
 
         Button importReport = getComponent("import");
         importReport.setAction(new AbstractAction("import") {
+            @Override
             public void actionPerform(Component component) {
                 final ReportImportDialog dialog = openWindow("report$Report.fileUploadDialog", WindowManager.OpenType.DIALOG);
                 dialog.addListener(new CloseListener() {
+                    @Override
                     public void windowClosed(String actionId) {
                         if (Window.COMMIT_ACTION_ID.equals(actionId)) {
                             ReportService rs = ServiceLocator.lookup(ReportService.NAME);
@@ -68,18 +72,23 @@ public class ReportBrowser extends BasicBrowser {
         });
 
         Button exportReport = getComponent("export");
-        exportReport.setAction(new AbstractAction("export") {
+        exportReport.setAction(new ItemTrackingAction("export") {
+            @Override
             public void actionPerform(Component component) {
                 Set<Report> reports = reportsTable.getSelected();
                 if ((reports != null) && (!reports.isEmpty())) {
                     try {
                         ReportService rs = ServiceLocator.lookup(ReportService.NAME);
-                        new WebExportDisplay().show(new ByteArrayDataProvider(rs.exportReports(reports)), "Reports", ExportFormat.ZIP);
+                        new WebExportDisplay().show(
+                                new ByteArrayDataProvider(rs.exportReports(reports)), "Reports", ExportFormat.ZIP);
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
                 }
             }
         });
+
+        reportsTable.addAction(exportReport.getAction());
+        reportsTable.addAction(runReport.getAction());
     }
 }

@@ -7,11 +7,11 @@
             <split orientation="horizontal" id="split" width="100%" height="100%">
                 <vbox spacing="true" margin="true" align="TOP_LEFT" expand="templatesTable" height="100%" width="100%">
                     <label value="msg://report.properties" stylename="h2"/>
-                    <fieldGroup id="propertiesFieldGroup" border="hidden"
-                                datasource="reportDs">
+                    <fieldGroup id="propertiesFieldGroup" border="hidden" datasource="reportDs">
                         <field id="name" required="true" requiredMessage="msg://report.nameMsg" width="${width}"/>
                         <field id="code" width="${width}"/>
-                        <field id="reportType" required="true" requiredMessage="msg://report.reportTypeMsg" width="${width}"/>
+                        <field id="reportType" required="true" requiredMessage="msg://report.reportTypeMsg"
+                               width="${width}"/>
                         <field id="group" required="true" optionsDatasource="groupsDs"
                                requiredMessage="msg://report.reportTypeMsg" width="${width}"/>
                     </fieldGroup>
@@ -52,8 +52,10 @@
             </split>
             <!-- Horizontal Splitter -->
             <hbox width="100%" height="100%" spacing="true" margin="false;true;true;true">
-                <iframe src="/com/haulmont/cuba/web/ui/report/edit/tabs/parameters.xml" id="parametersFrame" height="100%" width="100%"/>
-                <iframe src="/com/haulmont/cuba/web/ui/report/edit/tabs/formats.xml" id="formatsFrame" height="100%" width="100%"/>
+                <iframe src="/com/haulmont/cuba/web/ui/report/edit/tabs/parameters.xml" id="parametersFrame"
+                        height="100%" width="100%"/>
+                <iframe src="/com/haulmont/cuba/web/ui/report/edit/tabs/formats.xml" id="formatsFrame" height="100%"
+                        width="100%"/>
             </hbox>
         </split>
     </layout>
