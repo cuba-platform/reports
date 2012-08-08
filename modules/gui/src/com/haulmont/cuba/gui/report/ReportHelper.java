@@ -36,7 +36,10 @@ import org.apache.commons.lang.StringUtils;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 @SuppressWarnings({"serial"})
 public class ReportHelper {
@@ -178,7 +181,7 @@ public class ReportHelper {
             if (reportRoles == null || reportRoles.size() == 0) {
                 filter.add(report);
             } else {
-                Set<UserRole> userRoles = user.getUserRoles();
+                List<UserRole> userRoles = user.getUserRoles();
                 for (UserRole userRole : userRoles) {
                     if (reportRoles.contains(userRole.getRole()) ||
                             RoleType.SUPER.equals(userRole.getRole().getType())) {
