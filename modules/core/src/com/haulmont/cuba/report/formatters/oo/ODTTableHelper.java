@@ -15,6 +15,8 @@ import static com.haulmont.cuba.report.formatters.oo.ODTHelper.paste;
 import static com.haulmont.cuba.report.formatters.oo.ODTUnoConverter.*;
 
 import com.google.common.collect.Lists;
+import com.sun.star.beans.UnknownPropertyException;
+import com.sun.star.beans.XPropertySet;
 import com.sun.star.container.NoSuchElementException;
 import com.sun.star.container.XNameAccess;
 import com.sun.star.frame.XController;
@@ -24,19 +26,42 @@ import com.sun.star.lang.IllegalArgumentException;
 import com.sun.star.lang.IndexOutOfBoundsException;
 import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.lang.XComponent;
+import com.sun.star.style.XStyle;
 import com.sun.star.table.XCell;
 import com.sun.star.table.XCellRange;
 import com.sun.star.table.XTableRows;
+import com.sun.star.text.XText;
 import com.sun.star.text.XTextTable;
 import com.sun.star.text.XTextTableCursor;
 import com.sun.star.uno.Any;
 import com.sun.star.uno.Type;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public final class ODTTableHelper {
+
+    public static final String PAGE_STYLES = "PageStyles";
+    public static final String HEADER_TEXT = "HeaderText";
+
+    public static List<XText> getPageHeadersXText(XComponent xComponent) throws NoSuchElementException, UnknownPropertyException, WrappedTargetException {
+        List<XText> headersXText = new ArrayList<XText>();
+        XNameAccess pageHeaderStyles = getPageStyles(xComponent);
+        String[] pageHeaderStyleNames = pageHeaderStyles.getElementNames();
+        for (String pageHeaderStyleName : pageHeaderStyleNames) {
+            XStyle style = (XStyle) ((Any) pageHeaderStyles.getByName(pageHeaderStyleName)).getObject();
+            XPropertySet xPropertySet = asXPropertySet(style);
+            XText xHeaderText = asXText(xPropertySet.getPropertyValue(HEADER_TEXT));
+            if (xHeaderText != null)
+                headersXText.add(xHeaderText);
+        }
+        return headersXText;
+    }
+
+    public static XNameAccess getPageStyles(XComponent xComponent) throws NoSuchElementException, WrappedTargetException, UnknownPropertyException {
+        XNameAccess headers = asXTextStylesSupplier(xComponent).getStyleFamilies();
+        return (XNameAccess) ((Any) headers.getByName(PAGE_STYLES)).getObject();
+    }
 
     public static List<String> getTablesNames(XComponent xComponent) {
         XNameAccess tables = asXTextTablesSupplier(xComponent).getTextTables();

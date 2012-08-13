@@ -46,6 +46,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static com.haulmont.cuba.report.formatters.oo.ODTHelper.*;
 import static com.haulmont.cuba.report.formatters.oo.ODTTableHelper.*;
@@ -121,6 +122,9 @@ public class DocFormatter extends AbstractFormatter {
 
                     officeComponent = new OfficeComponent(connection, xComponentLoader, xComponent);
 
+                    // Process page styles
+                    replaceAllAliasesInPageStyles();
+
                     // Lock clipboard
                     synchronized (ClipBoardHelper.class) {
                         // Handling tables
@@ -137,6 +141,49 @@ public class DocFormatter extends AbstractFormatter {
         };
 
         runWithTimeoutAndCloseConnection(connection, runnable);
+    }
+
+    /**
+     *
+     * Replace all aliases in page styles
+     *
+     * @throws com.haulmont.cuba.report.exception.ReportingException If alias is bad or not found in bands
+     *
+     */
+    private void replaceAllAliasesInPageStyles() {
+        try {
+            List<XText> list = getPageHeadersXText(xComponent);
+            for (XText xText : list) {
+                String s = xText.getString();
+                if (StringUtils.isNotBlank(s)) {
+                    Pattern p = Pattern.compile(ALIAS_WITH_BAND_NAME_PATTERN);
+                    Matcher m = p.matcher(s);
+                    while (m.find()) {
+                        String fullParameterName = m.group();
+                        String alias = unwrapParameterName(fullParameterName);
+                        String[] parts = alias.split("\\.");
+
+                        if (parts == null || parts.length < 2)
+                            throw new ReportingException("Bad alias : " + alias);
+
+                        String bandName = parts[0];
+                        Band band = bandName.equals(ROOT_BAND_NAME) ? rootBand : rootBand.getChildByName(bandName);
+
+                        if (band == null)
+                            throw new ReportingException("No band for alias : " + alias);
+                        String parameterName = parts[1];
+                        int index = s.indexOf(fullParameterName) + 1;
+                        XTextCursor xTextCursor = xText.createTextCursor();
+                        xTextCursor.goRight((short) index, false);
+                        xTextCursor.goRight((short) (fullParameterName.length()), true);
+                        insertValue(xText, xTextCursor, band, parameterName);
+                        s = xText.getString();
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void saveAndClose(XComponent xComponent, ReportOutputType outputType, OutputStream outputStream)

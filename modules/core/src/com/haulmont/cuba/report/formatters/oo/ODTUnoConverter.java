@@ -28,6 +28,7 @@ import com.sun.star.lang.XMultiComponentFactory;
 import com.sun.star.lang.XMultiServiceFactory;
 import com.sun.star.lang.XServiceInfo;
 import com.sun.star.lang.XSingleServiceFactory;
+import com.sun.star.style.XStyleFamiliesSupplier;
 import com.sun.star.table.XCellRange;
 import com.sun.star.text.*;
 import com.sun.star.uno.Any;
@@ -38,6 +39,10 @@ import com.sun.star.util.XReplaceable;
 import com.sun.star.view.XSelectionSupplier;
 
 public final class ODTUnoConverter {
+
+    public static XStyleFamiliesSupplier asXTextStylesSupplier(Object o) {
+        return (XStyleFamiliesSupplier) UnoRuntime.queryInterface(XStyleFamiliesSupplier.class, o);
+    }
 
     public static XDesktop asXDesktop(Object o) {
         return (XDesktop) UnoRuntime.queryInterface(XDesktop.class, o);
