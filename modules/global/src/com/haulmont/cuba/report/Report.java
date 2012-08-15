@@ -10,7 +10,7 @@
  */
 package com.haulmont.cuba.report;
 
-import com.haulmont.chile.core.annotations.Aggregation;
+import com.haulmont.chile.core.annotations.Composition;
 import com.haulmont.chile.core.annotations.MetaProperty;
 import com.haulmont.chile.core.annotations.NamePattern;
 import com.haulmont.cuba.core.entity.annotation.OnDelete;
@@ -58,28 +58,28 @@ public class Report extends HardDeleteEntity {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "report", cascade = CascadeType.REMOVE)
     @OnDelete(DeletePolicy.CASCADE)
-    @Aggregation
+    @Composition
     private Set<BandDefinition> bands;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "report", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
     @OnDelete(value = DeletePolicy.CASCADE)
-    @Aggregation
+    @Composition
     private List<ReportTemplate> templates;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "report", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
     @OnDelete(value = DeletePolicy.CASCADE)
-    @Aggregation
+    @Composition
     @OrderBy("position")
     private List<ReportInputParameter> inputParameters;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "report", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
     @OnDelete(value = DeletePolicy.CASCADE)
-    @Aggregation
+    @Composition
     private List<ReportValueFormat> valuesFormats;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "report", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
     @OnDelete(value = DeletePolicy.CASCADE)
-    @Aggregation
+    @Composition
     private List<ReportScreen> reportScreens;
 
     @ManyToMany(fetch = FetchType.LAZY)
