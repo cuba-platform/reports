@@ -63,11 +63,11 @@
       <section>
         <title>Врезки</title>
         <para>Листинг исходного кода, а также содержимое файлов визуально отделяются от окружающего текста следующим образом:</para>
-        <para><programlisting>[appdefaults]
+        <programlisting>[appdefaults]
 autologin = true
 forward = true
 forwardable = true
-encrypt = true </programlisting></para>
+encrypt = true </programlisting>
       </section>
       <section>
         <title>Замечания и предупреждения</title>

@@ -9,9 +9,9 @@
     <xsl:import href="html-common.xsl"/>
 
     <xsl:param name="chunk.section.depth">0</xsl:param>
-    <xsl:param name="chunk.quietly">1</xsl:param>
-	
+    <xsl:param name="chunk.quietly">1</xsl:param>	
 	<xsl:param name="ignore.image.scaling">1</xsl:param>
+	
 
     <!-- HEADERS AND FOOTERS -->
 

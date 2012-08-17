@@ -37,11 +37,14 @@
     </listitem>
   </itemizedlist>
   <para>На диаграмме представлены виды отчетов.</para>
-  <mediaobject>
-    <imageobject>
-      <imagedata align="center" fileref="img/types.png"/>
-    </imageobject>
-  </mediaobject>
+  <figure>
+    <title>Диаграмма видов отчетов</title>
+    <mediaobject>
+      <imageobject>
+        <imagedata align="center" fileref="img/types.png" contentwidth="90%"/>
+      </imageobject>
+    </mediaobject>
+  </figure>
   <para>Рассмотрим их более подробно. </para>
   <para><emphasis role="bold">Печатная форма</emphasis>  используется для создания отчета, содержащего информацию о выбранном в данный момент экземпляре сущности системы.</para>
   <para><emphasis role="bold">Печатная форма списка</emphasis> используется для создания отчета с информацией о выбранных в данный момент экземплярах сущности системы.</para>
@@ -99,14 +102,14 @@
         </warning>
         <para>В запросе можно использовать входные параметры отчета и данные из родительских полос. К параметрам нужно обращаться по имени, заключенному в конструкцию <prompt>${}</prompt> (<prompt>${userName}</prompt>). К данным родительской полосы нужно обращаться аналогично, добавляя имя полосы перед именем параметра (<prompt>${Band1.param1}</prompt>)
 Пример запроса на SQL:</para>
-        <para><programlisting>select u.name as userName, u.login as userLogin 
+        <programlisting>select u.name as userName, u.login as userLogin 
 from sec_user u 
 where u.update_ts &gt; ${date1} and 
-      u.group_id = ${Group.id}</programlisting></para>
+      u.group_id = ${Group.id}</programlisting>
         <para>Пример запроса на <glossterm linkend="glossary_jpql_id">JPQL</glossterm>:</para>
-        <para><programlisting>select u.name as userName, u.login as userLogin 
+        <programlisting>select u.name as userName, u.login as userLogin 
 from sec$user u 
-where u.updateTs &gt; ${date1}</programlisting></para>
+where u.updateTs &gt; ${date1}</programlisting>
         <tip>
           <title>Совет</title>
           <para>В целях универсальности рекомендуется использовать язык запросов <glossterm linkend="glossary_jpql_id">JPQL</glossterm>.</para>
@@ -121,11 +124,11 @@ where u.updateTs &gt; ${date1}</programlisting></para>
         <para>Groovy-скрипт может использовать входные параметры отчета и данные родительских полос. В каждый скрипт передаются параметры <varname>Band parentBand</varname> и <varname>Map&lt;String, Object&gt; params</varname>. В отображении <varname>params</varname> содержатся входные параметры, а у <varname>parentBand</varname> можно вызвать метод <methodname>getParameter</methodname>, который принимает строку с именем параметра.</para>
         <para>Скрипты Groovy для загрузки данных могут напрямую вызывать методы <classname>Query</classname> и <classname>EntityManager</classname>.</para>
         <para>Пример скрипта:</para>
-        <para><programlisting>User user = parentBand.getParameter(&apos;entity&apos;)
+        <programlisting>User user = parentBand.getParameter(&apos;entity&apos;)
 Group group = params[[&apos;group&apos;]
 return [[&apos;userName&apos;: user.name,
          &apos;userLogin&apos;: user.login,
-         &apos;group&apos;: group]]</programlisting></para>
+         &apos;group&apos;: group]]</programlisting>
       </listitem>
       <listitem>
         <para><emphasis role="bold">Связанная сущность и Группа связанных сущностей</emphasis></para>
@@ -145,24 +148,33 @@ return [[&apos;userName&apos;: user.name,
         <para>Как задать именованный регион?</para>
         <para>Описанные ниже действия применены для <application>OpenOffice</application>.</para>
         <para>Откройте <application>OpenOffice.org Calc</application>.</para>
-        <mediaobject>
-          <imageobject>
-            <imagedata align="center" fileref="img/xls_region.png"/>
-          </imageobject>
-        </mediaobject>
+        <figure>
+          <title>Задание диапазона вывода данных</title>
+          <mediaobject>
+            <imageobject>
+              <imagedata align="center" fileref="img/xls_region.png" contentwidth="70%"/>
+            </imageobject>
+          </mediaobject>
+        </figure>
         <para>Далее выделите диапазон ячеек, куда будут выводиться данные. После этого можно задать имя этому диапазону в окне, где отображаются названия ячеек. Название диапазона должно совпадать с именем полосы отчета.</para>
         <para>Возможно управлять названиями диапазонов (удалять, изменять, добавлять). Для этого перейдите к подпункту меню <guimenu>Вставка</guimenu> −&gt; <guimenu>Названия</guimenu> −&gt; <guimenu>Определить</guimenu>.</para>
-        <mediaobject>
-          <imageobject>
-            <imagedata align="center" fileref="img/xls_menu.png"/>
-          </imageobject>
-        </mediaobject>
+        <figure>
+          <title>Переход к окну управления названиями диапазонов</title>
+          <mediaobject>
+            <imageobject>
+              <imagedata align="center" fileref="img/xls_menu.png" contentwidth="80%"/>
+            </imageobject>
+          </mediaobject>
+        </figure>
         <para>После этого откроется окно, представленное на рисунке ниже.</para>
-        <mediaobject>
-          <imageobject>
-            <imagedata align="center" fileref="img/xls_menu1.png"/>
-          </imageobject>
-        </mediaobject>
+        <figure>
+          <title>Окно управления названиями диапазонов</title>
+          <mediaobject>
+            <imageobject>
+              <imagedata align="center" fileref="img/xls_menu1.png" contentwidth="75%"/>
+            </imageobject>
+          </mediaobject>
+        </figure>
         <para>Именованные регионы можно удалять, назначать им другие диапазоны.</para>
       </tip>
       <para>Регионы в результирующем отчете отрисовываются в том порядке, в котором идут соответствующие им полосы.</para>
@@ -184,23 +196,32 @@ return [[&apos;userName&apos;: user.name,
         <para>Описанные ниже действия применены для <application>OpenOffice</application>.</para>
         <para>Откройте <application>OpenOffice.org Writer</application>.</para>
         <para>Создайте новую таблицу, перейдя к подпункту меню <guimenu>Таблица</guimenu> −&gt; <guimenu>Вставить</guimenu> −&gt; <guimenu>Таблицу</guimenu>.</para>
-        <mediaobject>
-          <imageobject>
-            <imagedata align="center" fileref="img/doc_menu.png" contentdepth="100%" width="100%"/>
-          </imageobject>
-        </mediaobject>
+        <figure>
+          <title>Переход к окну создания таблицы</title>
+          <mediaobject>
+            <imageobject>
+              <imagedata align="center" fileref="img/doc_menu.png" contentwidth="80%"/>
+            </imageobject>
+          </mediaobject>
+        </figure>
         <para>Далее в открывшемся окне в поле <guilabel>Название</guilabel> введите название таблицы. </para>
-        <mediaobject>
-          <imageobject>
-            <imagedata align="center" width="100%" fileref="img/doc_menu1.png"/>
-          </imageobject>
-        </mediaobject>
+        <figure>
+          <title>Окно создания таблицы</title>
+          <mediaobject>
+            <imageobject>
+              <imagedata align="center" fileref="img/doc_menu1.png" contentwidth="80%"/>
+            </imageobject>
+          </mediaobject>
+        </figure>
         <para>Задать или изменить имя уже созданной таблицы можно и другим образом. Нажмите правой кнопкой мыши на области таблицы и в контекстном меню выберите пункт <guilabel>Таблица</guilabel>. Перед Вами откроется окно, представленное на рисунке.</para>
-        <mediaobject>
-          <imageobject>
-            <imagedata align="center" fileref="img/doc_menu2.png"/>
-          </imageobject>
-        </mediaobject>
+        <figure>
+          <title>Окно изменения свойств таблицы</title>
+          <mediaobject>
+            <imageobject>
+              <imagedata align="center" fileref="img/doc_menu2.png" contentwidth="80%"/>
+            </imageobject>
+          </mediaobject>
+        </figure>
         <para>В поле <guilabel>Название</guilabel> можно ввести новое название таблицы.</para>
       </tip>
       <para><emphasis role="bold">Задание выходных параметров</emphasis></para>
@@ -216,7 +237,7 @@ return [[&apos;userName&apos;: user.name,
         </listitem>
         <listitem>
           <para>HTML блоки</para>
-          <para>Для вставки необходимо возвращать в выходном значении html разметку, а в формате значения указать формат <prompt>${html}</prompt>. В значении возвращается только содержимое <prompt>&lt;body&gt; Содержимое &lt;/body&gt;</prompt>, разметка дополняется до документа автоматически. Кодировка всех блоков <code>UTF-8</code>. CSS и атрибут <parameter>style</parameter> не поддерживаются.</para>
+          <para>Для вставки необходимо возвращать в выходном значении html разметку, а в формате значения указать формат <prompt>${html}</prompt>. В значении возвращается только содержимое <prompt>&lt;body&gt;Содержимое&lt;/body&gt;</prompt>, разметка дополняется до документа автоматически. Кодировка всех блоков <code>UTF-8</code>. CSS и атрибут <parameter>style</parameter> не поддерживаются.</para>
         </listitem>
       </orderedlist>
     </section>
@@ -224,16 +245,16 @@ return [[&apos;userName&apos;: user.name,
       <title>HTML шаблон</title>
       <para>HTML-шаблон должен быть простым текстовым файлом (html/htm/txt) в кодировке <code>UTF-8</code> (без <code>BOM</code>). Для форматирования в шаблоне можно использовать тэги <application>FreeMarker</application> (Более подробно о <application>FreeMarker</application> можно прочитать на сайте <ulink url="http://freemarker.org/">http://freemarker.org/</ulink>). 
 Модель документа имеет следующую структуру:</para>
-      <para><programlisting>Band { 
+      <programlisting>Band { 
       bands [ bandName : [ Band, .. ], .. ] 
       fields [ fieldName : fieldValue, .. ] 
-}</programlisting></para>
+}</programlisting>
       <para>Например, для доступа к полю <varname>name</varname> в полосе <varname>band1</varname> в нулевой строке выборки используется путь:</para>
-      <para><programlisting>Root.bands.band1[0].fields.name</programlisting></para>
+      <programlisting>Root.bands.band1[0].fields.name</programlisting>
       <para>Для удобства в шаблоне можно использовать присваивание <parameter>assign</parameter>:</para>
-      <para><programlisting>&lt;#assign Table1Header = Root.bands.HeaderBand&gt;</programlisting></para>
+      <programlisting>&lt;#assign Table1Header = Root.bands.HeaderBand&gt;</programlisting>
       <para><emphasis role="bold">Структура шаблона</emphasis></para>
-      <para><programlisting>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+      <programlisting>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
 &lt;!DOCTYPE html PUBLIC &quot;-//W3C//DTD XHTML 1.1//EN&quot; &quot;http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd&quot;&gt;
 &lt;html xmlns=&quot;http://www.w3.org/1999/xhtml&quot; xml:lang=&quot;ru&quot;&gt;
     &lt;head&gt;
@@ -245,10 +266,10 @@ return [[&apos;userName&apos;: user.name,
     &lt;body&gt;
         &lt;!-- Write your template here --&gt;
     &lt;/body&gt;
-&lt;/html&gt;</programlisting></para>
+&lt;/html&gt;</programlisting>
       <para><emphasis role="bold">Примеры</emphasis></para>
       <para>Имеем структуру полос следующего вида:</para>
-      <para><programlisting>Root {
+      <programlisting>Root {
     HeaderBand {
         query = return [[ &quot;name&quot; : &quot;Column1&quot; ],[ &quot;name&quot; : &quot;Column2&quot; ]]
     }
@@ -264,9 +285,9 @@ return [[&apos;userName&apos;: user.name,
             query = return [[&quot;header&quot; : &apos;SubHeader1&apos;] , [ &quot;header&quot; : &apos;SubHeader2&apos; ]]
         }
     }
-}</programlisting></para>
+}</programlisting>
       <para><emphasis role="bold">Обращение к полю</emphasis></para>
-      <para><programlisting>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+      <programlisting>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
 &lt;!DOCTYPE html PUBLIC &quot;-//W3C//DTD XHTML 1.1//EN&quot; &quot;http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd&quot;&gt;
 &lt;html xmlns=&quot;http://www.w3.org/1999/xhtml&quot; xml:lang=&quot;ru&quot;&gt;
     &lt;head&gt;
@@ -279,9 +300,9 @@ return [[&apos;userName&apos;: user.name,
             ${Tree1[1].bands.SubBand1[0].fields.header}
         &lt;/p&gt;
     &lt;/body&gt;
-&lt;/html&gt;</programlisting></para>
+&lt;/html&gt;</programlisting>
       <para><emphasis role="bold">Список</emphasis></para>
-      <para><programlisting>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+      <programlisting>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
 &lt;!DOCTYPE html PUBLIC &quot;-//W3C//DTD XHTML 1.1//EN&quot; &quot;http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd&quot;&gt;
 &lt;html xmlns=&quot;http://www.w3.org/1999/xhtml&quot; xml:lang=&quot;ru&quot;&gt;
     &lt;head&gt;
@@ -298,9 +319,9 @@ return [[&apos;userName&apos;: user.name,
         &lt;/ol&gt;
         &lt;/#if&gt; 
     &lt;/body&gt;
-&lt;/html&gt;</programlisting></para>
+&lt;/html&gt;</programlisting>
       <para><emphasis role="bold">Таблица</emphasis></para>
-      <para><programlisting>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+      <programlisting>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
 &lt;!DOCTYPE html PUBLIC &quot;-//W3C//DTD XHTML 1.1//EN&quot; &quot;http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd&quot;&gt;
 &lt;html xmlns=&quot;http://www.w3.org/1999/xhtml&quot; xml:lang=&quot;ru&quot;&gt;
     &lt;head&gt;
@@ -308,8 +329,7 @@ return [[&apos;userName&apos;: user.name,
     &lt;/head&gt;
     &lt;body&gt;
         &lt;#assign Table1Header = Root.bands.HeaderBand&gt;
-        &lt;#assign Table1 = Root.bands.Band1&gt;
-       
+        &lt;#assign Table1 = Root.bands.Band1&gt;       
         &lt;table border=&quot;1&quot; cellpadding=&quot;5&quot; cellspacing=&quot;0&quot; width=&quot;200&quot;&gt;
             &lt;thead&gt;
                 &lt;tr&gt;
@@ -332,17 +352,16 @@ return [[&apos;userName&apos;: user.name,
             &lt;/tbody&gt;
         &lt;/table&gt;  
     &lt;/body&gt;
-&lt;/html&gt;</programlisting></para>
+&lt;/html&gt;</programlisting>
       <para><emphasis role="bold">Многоуровневый список</emphasis></para>
-      <para><programlisting>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+      <programlisting>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
 &lt;!DOCTYPE html PUBLIC &quot;-//W3C//DTD XHTML 1.1//EN&quot; &quot;http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd&quot;&gt;
 &lt;html xmlns=&quot;http://www.w3.org/1999/xhtml&quot; xml:lang=&quot;ru&quot;&gt;
     &lt;head&gt;
         &lt;title&gt; Многоуровневый список &lt;/title&gt;
     &lt;/head&gt;
     &lt;body&gt;
-        &lt;#assign Tree1 = Root.bands.Band2&gt;
-        
+        &lt;#assign Tree1 = Root.bands.Band2&gt;        
         &lt;ul&gt;
             &lt;#list Tree1 as item&gt;
             &lt;li&gt;
@@ -360,7 +379,7 @@ return [[&apos;userName&apos;: user.name,
             &lt;/#list&gt;
         &lt;/ul&gt;  
     &lt;/body&gt;
-&lt;/html&gt;</programlisting></para>
+&lt;/html&gt;</programlisting>
     </section>
   </section>
   <section>
