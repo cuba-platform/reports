@@ -123,9 +123,21 @@ configure(coreModule) {
         groovy groovyArtifact
         groovy asm
     }
+    
+    test {
+        scanForTestClasses = false
+        includes = ['**/*Test.class']
+    }
 
     dbScriptsArchive {
         exclude '10-cuba/**'
+    }
+    
+    task createTestDb(dependsOn: assemble, description: 'Creates local Postgres database for tests', type: CubaDbCreation) {
+        dbms = 'postgres'
+        dbName = 'reports_test'
+        dbUser = 'root'
+        dbPassword = 'root'
     }
 }
 

@@ -4,12 +4,14 @@
  * Use is subject to license terms.
  */
 
-package com.haulmont.cuba.report;
+package com.haulmont.reports.core;
 
-import com.haulmont.cuba.core.CubaTestCase;
 import com.haulmont.cuba.core.Locator;
 import com.haulmont.cuba.core.global.FileStorageException;
+import com.haulmont.cuba.report.Report;
+import com.haulmont.cuba.report.ReportType;
 import com.haulmont.cuba.report.app.ReportService;
+import junit.framework.Assert;
 import org.apache.commons.io.IOUtils;
 
 import java.io.ByteArrayOutputStream;
@@ -21,13 +23,13 @@ import java.util.Collection;
  * @author artamonov
  * @version $Id$
  */
-public class ReportTest extends CubaTestCase {
+public class ImportExportTest extends ReportsTestCase {
 
     public void testImport() throws IOException, FileStorageException {
         ReportService reportService = Locator.lookup(ReportService.NAME);
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        InputStream reportsStream = getClass().getResourceAsStream("/com/haulmont/cuba/report/TestReport.zip");
+        InputStream reportsStream = getClass().getResourceAsStream("/com/haulmont/reports/core/TestReport.zip");
         IOUtils.copy(reportsStream, byteArrayOutputStream);
 
         Collection<Report> reports = reportService.importReports(byteArrayOutputStream.toByteArray());
@@ -37,7 +39,7 @@ public class ReportTest extends CubaTestCase {
         Report report = reports.iterator().next();
         assertEquals(report.getName(), "TestReport");
         assertEquals(report.getCode(), "TestReport");
-        assertEquals(report.getReportType(), ReportType.SIMPLE);
+        Assert.assertEquals(report.getReportType(), ReportType.SIMPLE);
         assertNotNull(report.getGroup());
 
         assertNotNull(report.getTemplates());
