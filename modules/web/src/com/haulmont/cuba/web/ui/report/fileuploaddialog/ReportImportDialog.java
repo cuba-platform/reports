@@ -2,11 +2,6 @@
  * Copyright (c) 2010 Haulmont Technology Ltd. All Rights Reserved.
  * Haulmont Technology proprietary and confidential.
  * Use is subject to license terms.
-
- * Author: Vasiliy Fontanenko
- * Created: 01.07.2010 14:03:06
- *
- * $Id$
  */
 package com.haulmont.cuba.web.ui.report.fileuploaddialog;
 
@@ -17,6 +12,10 @@ import com.haulmont.cuba.gui.components.Window;
 
 import java.util.Map;
 
+/**
+ * @author fontanenko
+ * @version $Id$
+ */
 public class ReportImportDialog extends AbstractWindow {
 
     private static final long serialVersionUID = -8624761668385369711L;
@@ -35,22 +34,11 @@ public class ReportImportDialog extends AbstractWindow {
     public void init(Map<String, Object> params) {
         super.init(params);
         final FileUploadField fileUploadField = getComponent("fileUpload");
-        fileUploadField.addListener(new FileUploadField.Listener() {
-            public void uploadStarted(Event event) {
-            }
-
-            public void uploadFinished(Event event) {
-            }
-
+        fileUploadField.addListener(new FileUploadField.ListenerAdapter() {
+            @Override
             public void uploadSucceeded(Event event) {
                 bytes = fileUploadField.getBytes();
                 close(Window.COMMIT_ACTION_ID);
-            }
-
-            public void uploadFailed(Event event) {
-            }
-
-            public void updateProgress(long readBytes, long contentLength) {
             }
         });
     }

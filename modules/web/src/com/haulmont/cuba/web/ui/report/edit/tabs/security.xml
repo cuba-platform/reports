@@ -1,14 +1,17 @@
 <window xmlns="http://schemas.haulmont.com/cuba/4.0/window.xsd">
-    <#assign width = 200>
-    <#assign treeHeight = 400>
-    <#assign treeWidth = 500>
     <layout>
         <split orientation="horizontal" width="100%" height="100%">
             <vbox margin="true" spacing="true" expand="rolesTable" width="100%" height="100%">
                 <label value="msg://securityFrame.roles" stylename="h2"/>
-                <table id="rolesTable" width="100%">
+                <groupBox width="100%">
+                    <caption label="msg://roles.addRole"/>
+                    <hbox expand="rolesLookup" spacing="true" width="100%">
+                        <lookupField id="rolesLookup" optionsDatasource="lookupRolesDs"/>
+                        <button id="addRoleBtn"/>
+                    </hbox>
+                </groupBox>
+                <table id="rolesTable" width="100%" multiselect="true">
                     <buttonsPanel>
-                        <button action="rolesTable.add" caption="msg://roles.addRole" icon="icons/add.png"/>
                         <button action="rolesTable.remove" caption="msg://roles.removeRole"
                                 icon="icons/remove.png"/>
                     </buttonsPanel>
@@ -20,10 +23,15 @@
             </vbox>
             <vbox margin="true" spacing="true" expand="screenTable" width="100%" height="100%">
                 <label value="msg://securityFrame.screens" stylename="h2"/>
-                <table id="screenTable" width="100%">
+                <groupBox width="100%">
+                    <caption label="msg://screens.createScreen"/>
+                    <hbox expand="screenIdLookup" spacing="true" width="100%">
+                        <lookupField id="screenIdLookup"/>
+                        <button id="addReportScreenBtn"/>
+                    </hbox>
+                </groupBox>
+                <table id="screenTable" width="100%" multiselect="true">
                     <buttonsPanel>
-                        <button action="screenTable.create" caption="msg://screens.createScreen"
-                                icon="icons/create.png"/>
                         <button action="screenTable.remove" caption="msg://screens.removeScreen"
                                 icon="icons/remove.png"/>
                     </buttonsPanel>

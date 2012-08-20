@@ -28,6 +28,11 @@
             </query>
         </collectionDatasource>
 
+        <collectionDatasource id="lookupRolesDs" class="com.haulmont.cuba.security.entity.Role" view="_local">
+            <query>
+                <![CDATA[ select r from sec$Role r order by r.name ]]>
+            </query>
+        </collectionDatasource>
     </dsContext>
     <layout expand="tabsheet">
         <tabsheet id="tabsheet" width="100%">

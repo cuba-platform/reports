@@ -2,17 +2,16 @@
  * Copyright (c) 2008 Haulmont Technology Ltd. All Rights Reserved.
  * Haulmont Technology proprietary and confidential.
  * Use is subject to license terms.
-
- * Author: Eugeniy Degtyarjov
- * Created: 12.05.2010 10:01:06
- *
- * $Id$
  */
 package com.haulmont.cuba.report;
 
 import com.haulmont.chile.core.datatypes.impl.EnumClass;
 import org.apache.commons.lang.ObjectUtils;
 
+/**
+ * @author degtyarjov
+ * @version $Id$
+ */
 public enum ReportType implements EnumClass<Integer> {
     SIMPLE(10),
     PRINT_FORM(20),
@@ -20,6 +19,7 @@ public enum ReportType implements EnumClass<Integer> {
 
     private Integer id;
 
+    @Override
     public Integer getId() {
         return id;
     }
@@ -36,5 +36,4 @@ public enum ReportType implements EnumClass<Integer> {
         }
         return null;
     }
-
 }

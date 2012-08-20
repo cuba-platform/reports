@@ -18,9 +18,6 @@
     <screen id="report$ReportValueFormat.edit"
             template="/com/haulmont/cuba/web/ui/report/valueformat/edit/format-edit.xml"/>
 
-    <screen id="report$ReportScreen.edit"
-            template="/com/haulmont/cuba/web/ui/report/screen/edit/report-screen-edit.xml"/>
-
     <screen id="report$ReportTemplate.edit"
             template="/com/haulmont/cuba/web/ui/report/template/edit/template-edit.xml"/>
 

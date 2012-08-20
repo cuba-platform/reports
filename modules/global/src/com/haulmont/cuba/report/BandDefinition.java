@@ -11,10 +11,8 @@
 package com.haulmont.cuba.report;
 
 import com.haulmont.chile.core.annotations.Composition;
-import com.haulmont.cuba.core.entity.annotation.OnDelete;
-import com.haulmont.cuba.core.entity.annotation.SystemLevel;
-import com.haulmont.cuba.core.global.DeletePolicy;
 import com.haulmont.chile.core.annotations.NamePattern;
+import com.haulmont.cuba.core.entity.annotation.SystemLevel;
 
 import javax.persistence.*;
 import java.util.List;
@@ -40,12 +38,10 @@ public class BandDefinition extends HardDeleteEntity {
     @OneToMany(mappedBy = "parentBandDefinition")
     @Composition
     @OrderBy("position")
-    @OnDelete(value = DeletePolicy.CASCADE)
     private List<BandDefinition> childrenBandDefinitions;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "bandDefinition", cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "bandDefinition")
     @Composition
-    @OnDelete(value = DeletePolicy.CASCADE)
     private List<DataSet> dataSets;
 
     @Column(name = "ORIENTATION")

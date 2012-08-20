@@ -15,15 +15,19 @@ import com.haulmont.cuba.core.app.FileStorageAPI;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.entity.FileDescriptor;
 import com.haulmont.cuba.core.global.FileStorageException;
-import com.haulmont.cuba.core.global.PersistenceHelper;
+import com.haulmont.cuba.core.global.MetadataProvider;
+import com.haulmont.cuba.core.global.UuidProvider;
+import com.haulmont.cuba.core.global.View;
 import com.haulmont.cuba.report.app.ReportService;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.reflection.ExternalizableConverter;
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
-import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
+import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -36,6 +40,8 @@ import java.util.zip.CRC32;
 
 public class ImportExportHelper {
     protected static final String ENCODING = "CP866";
+
+    private static Log log = LogFactory.getLog(ImportExportHelper.class);
 
     public static byte[] loadAndCompress(Collection<FileDescriptor> files) throws IOException, FileStorageException {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -77,7 +83,8 @@ public class ImportExportHelper {
     }
 
     /**
-     * Exports single report to ZIP archive whith name <report name>.zip. There are 2 files in archive: report.xml and a template file (odt, xls or other..)
+     * Exports single report to ZIP archive whith name <report name>.zip.
+     * There are 2 files in archive: report.xml and a template file (odt, xls or other..)
      *
      * @param report Report object that must be exported.
      * @return ZIP archive as a byte array.
@@ -226,8 +233,12 @@ public class ImportExportHelper {
                         FileStorageAPI mbean = Locator.lookup(FileStorageAPI.NAME);
                         try {
                             mbean.removeFile(fd);
-                        } catch (FileStorageException ignored) {//*Do nothing*//*
+                        } catch (FileStorageException ex) {
+                            if (ex.getType() != FileStorageException.Type.FILE_NOT_FOUND)
+                                log.warn("Could not remove old template file", ex);
                         }
+                        // use new Id for new FileDescriptor
+                        fd.setId(UuidProvider.createUuid());
                         mbean.saveFile(fd, readBytesFromEntry(archiveReader));
                     }
                     i++;
@@ -237,13 +248,20 @@ public class ImportExportHelper {
         byteArrayInputStream.close();
 
         if (report != null) {
+            View exportView = MetadataProvider.getViewRepository().getView(Report.class, "report.export");
+
+            Report existingReport;
+            // remove old report
             Transaction tx = PersistenceProvider.createTransaction();
             try {
                 EntityManager em = PersistenceProvider.getEntityManager();
-                Report exisitngReport = em.find(Report.class, report.getId());
+                em.setView(exportView);
+                existingReport = em.find(Report.class, report.getId());
 
-                if (exisitngReport != null) {
-                    em.remove(exisitngReport);
+                if (existingReport != null) {
+                    // remove old objects from db
+                    removeReportObjects(existingReport, em);
+
                     em.flush();
                 }
                 tx.commit();
@@ -273,16 +291,127 @@ public class ImportExportHelper {
                 }
                 report.setGroup(reportGroup);
 
-                if (PersistenceHelper.isNew(report)) {
+                persistReportObjects(report, em);
+
+                // persist report
+                if (existingReport == null) {
                     em.persist(report);
                 } else {
-                    em.merge(report);
+                    Report mergedReport = em.merge(report);
+                    // reattach objects
+                    reattachObjectsToMergedReport(report, mergedReport);
                 }
+
                 tx.commit();
             } finally {
                 tx.end();
             }
         }
+
         return report;
+    }
+
+    private static void removeReportObjects(Report report, EntityManager em) {
+        // remove templates
+        if (report.getTemplates() != null) {
+            for (ReportTemplate template : report.getTemplates()) {
+                em.remove(template);
+                if (template.getTemplateFileDescriptor() != null)
+                    em.remove(template.getTemplateFileDescriptor());
+            }
+        }
+
+        // remove parameters
+        if (report.getInputParameters() != null) {
+            for (ReportInputParameter parameter : report.getInputParameters())
+                em.remove(parameter);
+        }
+
+        // remove value formats
+        if (report.getValuesFormats() != null) {
+            for (ReportValueFormat valueFormat : report.getValuesFormats())
+                em.remove(valueFormat);
+        }
+
+        // remove report screens
+        if (report.getReportScreens() != null) {
+            for (ReportScreen screen : report.getReportScreens())
+                em.remove(screen);
+        }
+
+        // remove band definitions
+        if (report.getBands() != null) {
+            for (BandDefinition band : report.getBands()) {
+                if (band.getDataSets() != null) {
+                    for (DataSet ds : band.getDataSets())
+                        em.remove(ds);
+                }
+                em.remove(band);
+            }
+        }
+    }
+
+    private static void reattachObjectsToMergedReport(Report report, Report mergedReport) {
+        if (report.getTemplates() != null) {
+            for (ReportTemplate template : report.getTemplates())
+                template.setReport(mergedReport);
+        }
+        if (report.getBands() != null) {
+            for (BandDefinition band : report.getBands())
+                band.setReport(mergedReport);
+        }
+        if (report.getReportScreens() != null) {
+            for (ReportScreen screen : report.getReportScreens())
+                screen.setReport(mergedReport);
+        }
+        if (report.getValuesFormats() != null) {
+            for (ReportValueFormat valueFormat : report.getValuesFormats())
+                valueFormat.setReport(mergedReport);
+        }
+        if (report.getInputParameters() != null) {
+            for (ReportInputParameter parameter : report.getInputParameters())
+                parameter.setReport(mergedReport);
+        }
+    }
+
+    private static void persistReportObjects(Report report, EntityManager em) {
+        // persist templates
+        if (report.getTemplates() != null) {
+            for (ReportTemplate template : report.getTemplates()) {
+                if (template.getTemplateFileDescriptor() != null) {
+                    em.persist(template.getTemplateFileDescriptor());
+                }
+                em.persist(template);
+            }
+        }
+
+        // persist parameters
+        if (report.getInputParameters() != null) {
+            for (ReportInputParameter parameter : report.getInputParameters())
+                em.persist(parameter);
+        }
+
+        // persist value formats
+        if (report.getValuesFormats() != null) {
+            for (ReportValueFormat valueFormat : report.getValuesFormats())
+                em.persist(valueFormat);
+        }
+
+        // persist report screens
+        if (report.getReportScreens() != null) {
+            for (ReportScreen screen : report.getReportScreens())
+                em.persist(screen);
+        }
+
+        // persist band definitions
+        if (report.getBands() != null) {
+            for (BandDefinition band : report.getBands()) {
+                if (band.getDataSets() != null) {
+                    for (DataSet ds : band.getDataSets())
+                        em.persist(ds);
+                }
+                em.persist(band);
+            }
+        }
     }
 }

@@ -7,17 +7,15 @@
 package com.haulmont.cuba.report;
 
 import com.haulmont.cuba.core.entity.FileDescriptor;
-import com.haulmont.cuba.core.entity.annotation.OnDelete;
 import com.haulmont.cuba.core.entity.annotation.SystemLevel;
-import com.haulmont.cuba.core.global.DeletePolicy;
 
 import javax.persistence.*;
 
 /**
  * Template for {@link Report}
- * <p>$Id$</p>
  *
  * @author artamonov
+ * @version $Id$
  */
 @Entity(name = "report$ReportTemplate")
 @Table(name = "REPORT_TEMPLATE")
@@ -31,9 +29,8 @@ public class ReportTemplate extends HardDeleteEntity {
     @JoinColumn(name = "REPORT_ID")
     private Report report;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "TEMPLATE_FILE_ID")
-    @OnDelete(value = DeletePolicy.CASCADE)
     private FileDescriptor templateFileDescriptor;
 
     @Column(name = "OUTPUT_TYPE")

@@ -9,19 +9,31 @@ import com.haulmont.chile.core.model.MetaPropertyPath
 import com.haulmont.cuba.core.app.FileStorageService
 import com.haulmont.cuba.core.entity.Entity
 import com.haulmont.cuba.core.entity.FileDescriptor
+import com.haulmont.cuba.gui.AppConfig
 import com.haulmont.cuba.gui.ServiceLocator
 import com.haulmont.cuba.gui.WindowManager
 import com.haulmont.cuba.gui.WindowManager.OpenType
+import com.haulmont.cuba.gui.components.actions.CreateAction
+import com.haulmont.cuba.gui.components.actions.EditAction
+import com.haulmont.cuba.gui.components.actions.ItemTrackingAction
+import com.haulmont.cuba.gui.components.actions.RemoveAction
+import com.haulmont.cuba.gui.config.WindowConfig
+import com.haulmont.cuba.gui.config.WindowInfo
 import com.haulmont.cuba.gui.data.CollectionDatasource
 import com.haulmont.cuba.gui.data.Datasource
 import com.haulmont.cuba.gui.data.DsContext.CommitListener
+import com.haulmont.cuba.gui.data.impl.CollectionPropertyDatasourceImpl
 import com.haulmont.cuba.gui.data.impl.HierarchicalPropertyDatasourceImpl
+import javax.inject.Inject
 import org.apache.commons.lang.ObjectUtils
 import org.apache.commons.lang.StringUtils
 import com.haulmont.cuba.core.global.*
 import com.haulmont.cuba.gui.components.*
-import com.haulmont.cuba.gui.components.actions.*
 import com.haulmont.cuba.report.*
+import com.haulmont.cuba.gui.data.HierarchicalDatasource
+import com.haulmont.cuba.security.entity.Role
+import javax.inject.Named
+import com.haulmont.cuba.gui.data.impl.DatasourceImpl
 
 /**
  * @author degtyarjov
@@ -29,18 +41,53 @@ import com.haulmont.cuba.report.*
  */
 public class ReportEditor extends AbstractEditor {
 
+    protected Report report
+
+    protected deletedFiles = [:]
+
+    @Named('generalFrame.serviceTree')
+    protected Tree bandTree
+
+    @Inject
+    protected WindowConfig windowConfig;
+
+    @Inject
+    protected Datasource<Report> reportDs
+
+    @Inject
+    protected CollectionDatasource<ReportGroup, UUID> groupsDs
+
+    @Inject
+    protected CollectionDatasource<ReportInputParameter, UUID> parametersDs
+
+    @Inject
+    protected CollectionDatasource<ReportScreen, UUID> reportScreensDs
+
+    @Inject
+    protected CollectionDatasource<Role, UUID> rolesDs
+
+    @Inject
+    protected CollectionDatasource<Role, UUID> lookupRolesDs
+
+    @Inject
+    protected HierarchicalDatasource<BandDefinition, UUID> treeDs
+
+    def ReportEditor(IFrame frame) {
+        super(frame);
+    }
+
     @Override
     def void setItem(Entity item) {
         Report report = (Report) item;
         BandDefinition rootDefinition = null
 
         if (PersistenceHelper.isNew(item)) {
+            report.setReportType(ReportType.SIMPLE)
+
             rootDefinition = new BandDefinition()
             rootDefinition.setName('Root')
-            report.setRootBandDefinition(rootDefinition)
             report.setBands(new HashSet<BandDefinition>([rootDefinition]))
 
-            CollectionDatasource groupsDs = getDsContext().get('groupsDs')
             groupsDs.refresh()
             if (groupsDs.getItemIds() != null) {
                 def id = groupsDs.getItemIds().iterator().next()
@@ -57,15 +104,12 @@ public class ReportEditor extends AbstractEditor {
         if (PersistenceHelper.isNew(item))
             rootDefinition.setReport(report)
 
+        ((CollectionPropertyDatasourceImpl) treeDs).setModified(false)
+        ((DatasourceImpl) reportDs).setModified(false)
+
         bandTree.datasource.refresh()
         bandTree.expandTree()
     }
-
-    private Report report
-
-    private Tree bandTree
-    private CollectionDatasource treeDs
-    private deletedFiles = [:]
 
     @Override
     public void init(Map<String, Object> params) {
@@ -74,22 +118,27 @@ public class ReportEditor extends AbstractEditor {
         initTemplates()
         initParameters()
         initRoles()
+        initScreens()
         initValuesFormats()
 
-        getDsContext().get('reportDs').refresh()
         getDsContext().addListener(new CommitListener() {
-
             @Override
             void beforeCommit(CommitContext<Entity> context) {
+                List<FileDescriptor> fileDescriptors = new ArrayList<FileDescriptor>()
                 // delete descriptors from db
+                // persist related file descriptors
                 for (Entity entity: context.commitInstances) {
                     if (ReportTemplate.isInstance(entity)) {
                         java.util.List deletedFilesList = (java.util.List) deletedFiles.get(entity)
                         if ((deletedFilesList != null) && (deletedFilesList.size() > 0)) {
                             context.removeInstances.add((Entity) deletedFilesList.get(0))
                         }
+                        ReportTemplate template = (ReportTemplate) entity
+                        if (template.getTemplateFileDescriptor() != null)
+                            fileDescriptors.add(template.getTemplateFileDescriptor())
                     }
                 }
+                context.commitInstances.addAll(fileDescriptors)
             }
 
             @Override
@@ -128,8 +177,6 @@ public class ReportEditor extends AbstractEditor {
     private def initParameters() {
         com.haulmont.chile.core.model.MetaClass metaClass = MetadataProvider.getSession().getClass(ReportInputParameter.class)
         MetaPropertyPath mpp = new MetaPropertyPath(metaClass, metaClass.getProperty('position'))
-
-        final CollectionDatasource parametersDs = getDsContext().get('parametersDs')
 
         Table parametersTable = getComponent('generalFrame.parametersFrame.inputParametersTable')
         parametersTable.addAction(
@@ -250,33 +297,78 @@ public class ReportEditor extends AbstractEditor {
     }
 
     private def initRoles() {
-        final CollectionDatasource parametersDs = getDsContext().get('rolesDs')
         Table rolesTable = getComponent('securityFrame.rolesTable')
-        def handler = [
-                handleLookup: {Collection items ->
-                    if (items)
-                        items.each {Entity item -> parametersDs.addItem(item)}
-                }
-        ] as Window.Lookup.Handler
-        rolesTable.addAction(new AddAction(rolesTable, handler))
         rolesTable.addAction(new RemoveAction(rolesTable, false))
 
+        Button addRoleBtn = getComponent('securityFrame.addRoleBtn')
+        addRoleBtn.setAction(new AbstractAction('actions.Add') {
+            @Override
+            void actionPerform(Component component) {
+                if (lookupRolesDs.item) {
+                    def existingRole = rolesDs.itemIds.find(
+                            { id -> ObjectUtils.equals(lookupRolesDs.item, rolesDs.getItem(id)) }
+                    )
+                    if (!existingRole)
+                        rolesDs.addItem(lookupRolesDs.item)
+                }
+            }
+        })
+    }
+
+    private def initScreens() {
         Table screenTable = getComponent('securityFrame.screenTable')
-        screenTable.addAction(
-                new CreateAction(screenTable) {
-                    @Override
-                    public Map<String, Object> getInitialValues() {
-                        return new HashMap(['report': report])
+        screenTable.addAction(new RemoveAction(screenTable, false))
+
+        final LookupField screenIdLookup = getComponent('securityFrame.screenIdLookup')
+        List<WindowInfo> windowInfoCollection = new ArrayList<WindowInfo>(windowConfig.getWindows());
+        // sort by screenId
+        Collections.sort(windowInfoCollection, new Comparator<WindowInfo>() {
+            @Override
+            public int compare(WindowInfo w1, WindowInfo w2) {
+                int w1DollarIndex = w1.getId().indexOf('$');
+                int w2DollarIndex = w2.getId().indexOf('$');
+
+                if ((w1DollarIndex > 0 && w2DollarIndex > 0) || (w1DollarIndex < 0 && w2DollarIndex < 0)) {
+                    return w1.getId().compareTo(w2.getId());
+                } else if (w1DollarIndex > 0)
+                    return -1;
+                else
+                    return 1;
+            }
+        });
+
+        Map<String, Object> screens = new LinkedHashMap<String, Object>();
+        for (WindowInfo windowInfo: windowInfoCollection) {
+            String id = windowInfo.getId();
+            String menuId = 'menu-config.' + id;
+            String localeMsg = MessageProvider.getMessage(AppConfig.getMessagesPack(), menuId);
+            String title = menuId.equals(localeMsg) ? id : id + ' ( ' + localeMsg + ' )';
+            screens.put(title, id);
+        }
+        screenIdLookup.setOptionsMap(screens);
+
+        Button addReportScreenBtn = getComponent('securityFrame.addReportScreenBtn')
+        addReportScreenBtn.setAction(new AbstractAction('actions.Add') {
+            @Override
+            void actionPerform(Component component) {
+                if (screenIdLookup.getValue() != null) {
+                    def screenId = (String) screenIdLookup.getValue()
+
+                    def existingReportScreen = reportScreensDs.getItemIds().find(
+                            { id -> StringUtils.equals(reportScreensDs.getItem(id).screenId, screenId) }
+                    )
+                    if (!existingReportScreen) {
+                        ReportScreen reportScreen = new ReportScreen()
+                        reportScreen.setReport((Report) getItem())
+                        reportScreen.setScreenId(screenId)
+                        reportScreensDs.addItem(reportScreen)
                     }
                 }
-        )
-        screenTable.addAction(new RemoveAction(screenTable, false))
+            }
+        })
     }
 
     private def initGeneral() {
-        bandTree = (Tree) getComponent('generalFrame.serviceTree')
-        treeDs = getDsContext().get('treeDs')
-
         Button createBandDefinitionButton = getComponent('generalFrame.createBandDefinition')
         Button editBandDefinitionButton = getComponent('generalFrame.editBandDefinition')
         Button removeBandDefinitionButton = getComponent('generalFrame.removeBandDefinition')
@@ -460,8 +552,8 @@ public class ReportEditor extends AbstractEditor {
         });
         templatesTable.addAction(new RemoveAction(templatesTable, false));
 
-        Button defaultTemplateBtn = getComponent("generalFrame.defaultTemplateBtn")
-        defaultTemplateBtn.action = new ItemTrackingAction("report.defaultTemplate") {
+        Button defaultTemplateBtn = getComponent('generalFrame.defaultTemplateBtn')
+        defaultTemplateBtn.action = new ItemTrackingAction('report.defaultTemplate') {
 
             @Override
             void actionPerform(Component component) {
@@ -484,6 +576,9 @@ public class ReportEditor extends AbstractEditor {
 
     @Override
     public void commitAndClose() {
+        if (PersistenceHelper.isNew(report)) {
+            ((CollectionPropertyDatasourceImpl) treeDs).setModified(true)
+        }
         super.commitAndClose();
     }
 }

@@ -1,7 +1,7 @@
 <views xmlns="http://schemas.haulmont.com/cuba/4.0/view.xsd">
 
     <view entity="report$BandDefinition" name="report.edit" extends="_local">
-        <property name="parentBandDefinition" view="_local"/>
+        <property name="parentBandDefinition" view="_minimal"/>
         <property name="childrenBandDefinitions" view="_local"/>
         <property name="report" view="_minimal"/>
         <property name="dataSets" view="report.edit"/>
@@ -12,25 +12,24 @@
     </view>
 
     <view entity="report$ReportInputParameter" name="report.edit" extends="_local">
-        <property name="report" view="_local"/>
+        <property name="report" view="_minimal"/>
     </view>
 
     <view entity="report$ReportValueFormat" name="report.edit" extends="_local">
-        <property name="report" view="_local"/>
+        <property name="report" view="_minimal"/>
     </view>
 
     <view entity="report$DataSet" name="report.edit" extends="_local">
-        <property name="bandDefinition" view="_local"/>
+        <property name="bandDefinition" view="_minimal"/>
     </view>
 
     <view entity="report$Report" name="report.edit" extends="_local">
-        <property name="rootBandDefinition" view="report.edit"/>
         <property name="inputParameters" view="_local"/>
         <property name="valuesFormats" view="_local"/>
         <property name="roles" view="_local"/>
         <property name="reportScreens" view="_local"/>
         <property name="templates" view="template.edit"/>
-        <property name="group" view="_local"/>
+        <property name="group" view="_minimal"/>
         <property name="bands" view="report.edit"/>
     </view>
 
@@ -40,7 +39,7 @@
 
     <!--export-->
 
-    <view entity="report$ReportTemplate" name="template.export" extends="_local">
+    <view entity="report$ReportTemplate" name="report.export" extends="_local">
         <property name="templateFileDescriptor" view="_local"/>
     </view>
 
@@ -52,13 +51,12 @@
     </view>
 
     <view entity="report$Report" name="report.export" extends="_local">
-        <property name="rootBandDefinition" view="report.export"/>
         <property name="inputParameters" view="_local"/>
         <property name="valuesFormats" view="_local"/>
         <property name="roles" view="_local"/>
         <property name="reportScreens" view="_local"/>
-        <property name="templates" view="template.export"/>
-        <property name="group" view="_local"/>
+        <property name="templates" view="report.export"/>
+        <property name="group" view="_minimal"/>
         <property name="bands" view="report.export"/>
     </view>
 

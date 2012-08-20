@@ -11,13 +11,12 @@
 package com.haulmont.cuba.report;
 
 import com.haulmont.cuba.core.entity.BaseUuidEntity;
-import com.haulmont.cuba.core.entity.Versioned;
 import com.haulmont.cuba.core.entity.Updatable;
+import com.haulmont.cuba.core.entity.Versioned;
 
-import javax.persistence.MappedSuperclass;
 import javax.persistence.Column;
+import javax.persistence.MappedSuperclass;
 import javax.persistence.Version;
-import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -40,22 +39,27 @@ public class HardDeleteEntity
     @Column(name = "UPDATED_BY", length = LOGIN_FIELD_LEN)
     protected String updatedBy;
 
+    @Override
     public Integer getVersion() {
         return version;
     }
 
+    @Override
     public Date getUpdateTs() {
         return updateTs;
     }
 
+    @Override
     public void setUpdateTs(Date updateTs) {
         this.updateTs = updateTs;
     }
 
+    @Override
     public String getUpdatedBy() {
         return updatedBy;
     }
 
+    @Override
     public void setUpdatedBy(String updatedBy) {
         this.updatedBy = updatedBy;
     }

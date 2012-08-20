@@ -13,11 +13,11 @@ package com.haulmont.cuba.report;
 import com.haulmont.chile.core.annotations.Composition;
 import com.haulmont.chile.core.annotations.MetaProperty;
 import com.haulmont.chile.core.annotations.NamePattern;
-import com.haulmont.cuba.core.entity.annotation.OnDelete;
 import com.haulmont.cuba.core.entity.annotation.SystemLevel;
-import com.haulmont.cuba.core.global.DeletePolicy;
 import com.haulmont.cuba.locale.LocaleHelper;
 import com.haulmont.cuba.security.entity.Role;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.Predicate;
 import org.apache.commons.lang.StringUtils;
 
 import javax.persistence.*;
@@ -52,33 +52,27 @@ public class Report extends HardDeleteEntity {
     @Transient
     private String localeName;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "ROOT_DEFINITION_ID")
+    @Transient
     private BandDefinition rootBandDefinition;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "report", cascade = CascadeType.REMOVE)
-    @OnDelete(DeletePolicy.CASCADE)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "report")
     @Composition
     private Set<BandDefinition> bands;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "report", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
-    @OnDelete(value = DeletePolicy.CASCADE)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "report")
     @Composition
     private List<ReportTemplate> templates;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "report", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
-    @OnDelete(value = DeletePolicy.CASCADE)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "report")
     @Composition
     @OrderBy("position")
     private List<ReportInputParameter> inputParameters;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "report", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
-    @OnDelete(value = DeletePolicy.CASCADE)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "report")
     @Composition
     private List<ReportValueFormat> valuesFormats;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "report", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
-    @OnDelete(value = DeletePolicy.CASCADE)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "report")
     @Composition
     private List<ReportScreen> reportScreens;
 
@@ -89,12 +83,18 @@ public class Report extends HardDeleteEntity {
     )
     private List<Role> roles;
 
+    @MetaProperty
     public BandDefinition getRootBandDefinition() {
+        if (rootBandDefinition == null && bands != null && bands.size() > 0) {
+            rootBandDefinition = (BandDefinition) CollectionUtils.find(bands, new Predicate() {
+                @Override
+                public boolean evaluate(Object object) {
+                    BandDefinition band = (BandDefinition) object;
+                    return band.getParentBandDefinition() == null;
+                }
+            });
+        }
         return rootBandDefinition;
-    }
-
-    public void setRootBandDefinition(BandDefinition rootBandDefinition) {
-        this.rootBandDefinition = rootBandDefinition;
     }
 
     public String getName() {
@@ -158,6 +158,7 @@ public class Report extends HardDeleteEntity {
      *
      * @return Template
      */
+    @MetaProperty
     public ReportTemplate getDefaultTemplate() {
         ReportTemplate template = null;
         if (templates != null) {

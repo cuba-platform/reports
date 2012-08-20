@@ -1,27 +1,4 @@
 
-create table REPORT_BAND_DEFINITION
-(
-  ID uuid not null,
-  CREATE_TS timestamp,
-  CREATED_BY varchar(50),
-  VERSION integer,
-  UPDATE_TS timestamp,
-  UPDATED_BY varchar(50),
-  --
-  QUERY varchar(255),
-  PARENT_DEFINITION_ID uuid,
-  REPORT_ID uuid,
-  NAME varchar(255),
-  ORIENTATION integer default 0,
-  POSITION_ integer default 0,
-  --
-  primary key (ID),
-  constraint FK_REPORT_BAND_DEFINITION_TO_REPORT_BAND_DEFINITION foreign key (PARENT_DEFINITION_ID)
-      references REPORT_BAND_DEFINITION (ID)
-)^
-
---------------------------------------------------------------------------------------------------------------
-
 create table REPORT_GROUP (
   ID uuid not null,
   CREATE_TS timestamp,
@@ -52,18 +29,38 @@ create table REPORT_REPORT
   CODE varchar(255),
   LOCALE_NAMES text,
   GROUP_ID uuid not null,
-  ROOT_DEFINITION_ID uuid,
   REPORT_TYPE integer,
   --
   primary key (ID),
-  constraint FK_REPORT_REPORT_TO_REPORT_BAND_DEFINITION foreign key (ROOT_DEFINITION_ID)
-      references REPORT_BAND_DEFINITION (ID),
   constraint FK_REPORT_REPORT_TO_REPORT_GROUP foreign key (GROUP_ID)
       references REPORT_GROUP (ID)
 )^
 
-alter table REPORT_BAND_DEFINITION add constraint FK_REPORT_BAND_DEFINITION_TO_REPORT_REPORT
-foreign key (REPORT_ID) references REPORT_REPORT (ID)^
+create unique index UK_REPORT_REPORT_CODE on REPORT_REPORT (CODE) where CODE is not null^
+
+--------------------------------------------------------------------------------------------------------------
+
+create table REPORT_BAND_DEFINITION
+(
+  ID uuid not null,
+  CREATE_TS timestamp,
+  CREATED_BY varchar(50),
+  VERSION integer,
+  UPDATE_TS timestamp,
+  UPDATED_BY varchar(50),
+  --
+  PARENT_DEFINITION_ID uuid,
+  REPORT_ID uuid,
+  NAME varchar(255),
+  ORIENTATION integer default 0,
+  POSITION_ integer default 0,
+  --
+  primary key (ID),
+  constraint FK_REPORT_BAND_DEFINITION_TO_REPORT_REPORT foreign key (REPORT_ID)
+      references REPORT_REPORT (ID) on delete cascade,
+  constraint FK_REPORT_BAND_DEFINITION_TO_REPORT_BAND_DEFINITION foreign key (PARENT_DEFINITION_ID)
+      references REPORT_BAND_DEFINITION (ID)
+)^
 
 --------------------------------------------------------------------------------------------------------------
 
@@ -86,7 +83,7 @@ create table REPORT_TEMPLATE
   --
   primary key (ID),
   constraint FK_REPORT_TEMPLATE_TO_REPORT foreign key (REPORT_ID)
-      references REPORT_REPORT (ID)
+      references REPORT_REPORT (ID) on delete cascade
 )^
 
 --------------------------------------------------------------------------------------------------------------
@@ -113,8 +110,8 @@ create table REPORT_INPUT_PARAMETER
   ENUM_CLASS varchar(500),
   --
   primary key (ID),
-  constraint FK_REPOR_INPUT_PARAMETER_TO_REPORT_REPORT foreign key (REPORT_ID)
-      references REPORT_REPORT (ID)
+  constraint FK_REPORT_INPUT_PARAMETER_TO_REPORT_REPORT foreign key (REPORT_ID)
+      references REPORT_REPORT (ID) on delete cascade
 )^
 
 --------------------------------------------------------------------------------------------------------------
@@ -137,7 +134,7 @@ create table REPORT_DATA_SET
   --
   primary key (ID),
   constraint FK_REPORT_DATA_SET_TO_REPORT_BAND_DEFINITION foreign key (BAND_DEFINITION)
-      references REPORT_BAND_DEFINITION (ID)
+      references REPORT_BAND_DEFINITION (ID) on delete cascade
 )^
 
 --------------------------------------------------------------------------------------------------------------
@@ -147,7 +144,7 @@ create table REPORT_REPORTS_ROLES (
   ROLE_ID uuid not null,
   --
   constraint FK_REPORT_REPORTS_ROLES_TO_REPORT foreign key (REPORT_ID)
-      references REPORT_REPORT(ID),
+      references REPORT_REPORT(ID) on delete cascade,
   constraint FK_REPORT_REPORTS_ROLES_TO_ROLE foreign key (ROLE_ID)
       references SEC_ROLE(ID)
 )^
@@ -167,7 +164,7 @@ create table REPORT_REPORT_SCREEN (
   --
   primary key (ID),
   constraint FK_REPORT_REPORT_SCREEN_TO_REPORT_REPORT foreign key (REPORT_ID)
-      references REPORT_REPORT (ID)
+      references REPORT_REPORT (ID) on delete cascade
 )^
 
 --------------------------------------------------------------------------------------------------------------
@@ -186,7 +183,7 @@ create table REPORT_VALUE_FORMAT (
   --
   primary key (ID),
   constraint FK_REPORT_VALUE_FORMAT_TO_REPORT_REPORT foreign key (REPORT_ID)
-      references REPORT_REPORT (ID)
+      references REPORT_REPORT (ID) on delete cascade
 )^
 
 --------------------------------------------------------------------------------------------------------------
