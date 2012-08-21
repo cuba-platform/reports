@@ -1,5 +1,7 @@
 <screen-config xmlns="http://schemas.haulmont.com/cuba/4.0/screens.xsd">
 
+    <include file="/reports-screens.xml"/>
+
     <screen id="report$Report.browse"
             template="/com/haulmont/cuba/web/ui/report/browse/report-browse.xml"/>
 
