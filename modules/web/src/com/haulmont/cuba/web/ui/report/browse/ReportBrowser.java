@@ -12,6 +12,7 @@ package com.haulmont.cuba.web.ui.report.browse;
 
 import com.haulmont.cuba.gui.ServiceLocator;
 import com.haulmont.cuba.gui.WindowManager;
+import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.components.actions.ItemTrackingAction;
 import com.haulmont.cuba.gui.export.ByteArrayDataProvider;
 import com.haulmont.cuba.gui.export.ExportFormat;
@@ -19,14 +20,13 @@ import com.haulmont.cuba.gui.report.ReportHelper;
 import com.haulmont.cuba.report.Report;
 import com.haulmont.cuba.report.app.ReportService;
 import com.haulmont.cuba.web.filestorage.WebExportDisplay;
-import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.web.ui.report.fileuploaddialog.ReportImportDialog;
 
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
-public class ReportBrowser extends BasicBrowser {
+public class ReportBrowser extends AbstractLookup {
 
     @Override
     public void init(Map<String, Object> params) {

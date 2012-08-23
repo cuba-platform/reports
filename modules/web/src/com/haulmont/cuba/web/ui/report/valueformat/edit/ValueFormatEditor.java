@@ -11,15 +11,19 @@
 package com.haulmont.cuba.web.ui.report.valueformat.edit;
 
 import com.haulmont.cuba.core.entity.Entity;
-import com.haulmont.cuba.gui.components.*;
+import com.haulmont.cuba.gui.components.AbstractEditor;
+import com.haulmont.cuba.gui.components.Component;
+import com.haulmont.cuba.gui.components.FieldGroup;
+import com.haulmont.cuba.gui.components.IFrame;
 import com.haulmont.cuba.gui.data.Datasource;
-import com.haulmont.cuba.web.gui.components.*;
+import com.haulmont.cuba.web.gui.components.WebComponentsHelper;
+import com.haulmont.cuba.web.gui.components.WebLookupField;
 import com.haulmont.cuba.web.toolkit.ui.FilterSelect;
 import com.vaadin.ui.AbstractSelect;
 
 import java.util.Map;
 
-public class ValueFormatEditor extends BasicEditor {
+public class ValueFormatEditor extends AbstractEditor {
     private static String[] defaultFormats = new String[]{
             "#,##0",
             "##,##0",

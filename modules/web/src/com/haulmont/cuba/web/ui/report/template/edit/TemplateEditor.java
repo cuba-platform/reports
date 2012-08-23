@@ -32,7 +32,7 @@ import java.util.Map;
  *
  * @author artamonov
  */
-public class TemplateEditor extends BasicEditor {
+public class TemplateEditor extends AbstractEditor {
     private static final long serialVersionUID = 2000883633888106921L;
     private static final String DEFAULT_TEMPLATE_CODE = "DEFAULT";
 

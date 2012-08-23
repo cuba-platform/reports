@@ -28,6 +28,11 @@
 
     <layout expand="table-panel">
         <groupTable id="table" editable="false" multiselect="true" width="100%" height="100%">
+            <actions>
+                <action id="create"/>
+                <action id="edit"/>
+                <action id="remove"/>
+            </actions>
             <buttonsPanel>
                 <button action="table.create" icon="icons/create.png"/>
                 <button action="table.edit" icon="icons/edit.png"/>
