@@ -2,11 +2,6 @@
  * Copyright (c) 2008 Haulmont Technology Ltd. All Rights Reserved.
  * Haulmont Technology proprietary and confidential.
  * Use is subject to license terms.
-
- * Author: Eugeniy Degtyarjov
- * Created: 07.05.2010 18:34:07
- *
- * $Id$
  */
 package com.haulmont.cuba.report.formatters;
 
@@ -16,6 +11,7 @@ import com.haulmont.cuba.report.ReportOutputType;
 import com.haulmont.cuba.report.exception.ReportingException;
 import com.haulmont.cuba.report.formatters.oo.XlsToPdfConverter;
 import com.haulmont.cuba.report.formatters.xls.*;
+import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.model.HSSFFormulaParser;
 import org.apache.poi.hssf.record.EscherAggregate;
 import org.apache.poi.hssf.record.PaletteRecord;
@@ -38,6 +34,10 @@ import static com.haulmont.cuba.report.formatters.xls.HSSFCellHelper.*;
 import static com.haulmont.cuba.report.formatters.xls.HSSFPicturesHelper.getAllAnchors;
 import static com.haulmont.cuba.report.formatters.xls.HSSFRangeHelper.*;
 
+/**
+ * @author degtyarjov
+ * @version $Id$
+ */
 public class XLSFormatter extends AbstractFormatter {
     private HSSFWorkbook templateWorkbook;
     private HSSFSheet currentTemplateSheet = null;
@@ -51,18 +51,18 @@ public class XLSFormatter extends AbstractFormatter {
     private int rowsAddedByHorizontalBand = 0;
 
     private HSSFWorkbook resultWorkbook;
-    private Map<String, List<SheetRange>> mergeRegionsForRangeNames = new HashMap<String, List<SheetRange>>();
-    private Map<HSSFSheet, HSSFSheet> templateToResultSheetsMapping = new HashMap<HSSFSheet, HSSFSheet>();
-    private Map<String, Bounds> templateBounds = new HashMap<String, Bounds>();
+    private Map<String, List<SheetRange>> mergeRegionsForRangeNames = new HashMap<>();
+    private Map<HSSFSheet, HSSFSheet> templateToResultSheetsMapping = new HashMap<>();
+    private Map<String, Bounds> templateBounds = new HashMap<>();
 
-    private Map<Area, List<Area>> areasDependency = new LinkedHashMap<Area, List<Area>>();
-    private List<Integer> orderedPicturesId = new ArrayList<Integer>();
-    private Map<String, EscherAggregate> sheetToEscherAggregate = new HashMap<String, EscherAggregate>();
+    private Map<Area, List<Area>> areasDependency = new LinkedHashMap<>();
+    private List<Integer> orderedPicturesId = new ArrayList<>();
+    private Map<String, EscherAggregate> sheetToEscherAggregate = new HashMap<>();
 
     private AreaDependencyHelper areaDependencyHelper = new AreaDependencyHelper();
 
     private Band rootBand;
-    private Map<HSSFSheet, HSSFPatriarch> drawingPatriarchsMap = new HashMap<HSSFSheet, HSSFPatriarch>();
+    private Map<HSSFSheet, HSSFPatriarch> drawingPatriarchsMap = new HashMap<>();
 
     public XLSFormatter() {
         registerReportExtension("xls");
@@ -190,7 +190,7 @@ public class XLSFormatter extends AbstractFormatter {
         if (crefs != null) {
             addRangeBounds(band, crefs);
 
-            ArrayList<HSSFRow> resultRows = new ArrayList<HSSFRow>();
+            List<HSSFRow> resultRows = new ArrayList<>();
 
             int currentRowNum = -1;
             int currentRowCount = -1;
@@ -354,7 +354,7 @@ public class XLSFormatter extends AbstractFormatter {
                         String name = aNamedRange.getNameName();
                         SheetRange sheetRange = new SheetRange(mergedRegion, currentSheet.getSheetName());
                         if (mergeRegionsForRangeNames.get(name) == null) {
-                            ArrayList<SheetRange> list = new ArrayList<SheetRange>();
+                            List<SheetRange> list = new ArrayList<>();
                             list.add(sheetRange);
                             mergeRegionsForRangeNames.put(name, list);
                         } else {
@@ -437,6 +437,14 @@ public class XLSFormatter extends AbstractFormatter {
             }
         }
 
+        // remember named styles
+        for (short i = 0; i < templateWorkbook.getNumCellStyles(); i++) {
+            HSSFCellStyle cellStyle = templateWorkbook.getCellStyleAt(i);
+            if (StringUtils.isNotBlank(cellStyle.getUserStyleName())) {
+                styleCache.addNamedStyle(cellStyle);
+            }
+        }
+
         List<HSSFPictureData> pictures = templateWorkbook.getAllPictures();
         for (HSSFPictureData picture : pictures) {
             resultWorkbook.addPicture(picture.getData(), picture.getFormat());
@@ -466,12 +474,17 @@ public class XLSFormatter extends AbstractFormatter {
                 updateValueCell(rootBand, band, templateCell, resultCell,
                         drawingPatriarchsMap.get(resultCell.getSheet()));
             else if (cellType == HSSFCell.CELL_TYPE_FORMULA)
-                resultCell.setCellFormula(inlineBandDataToCellString(templateCell, band));
+                resultCell.setCellFormula(inlineDataToCellString(templateCell, resultCell, band));
             else if (cellType == HSSFCell.CELL_TYPE_STRING)
-                resultCell.setCellValue(new HSSFRichTextString(inlineBandDataToCellString(templateCell, band)));
+                resultCell.setCellValue(new HSSFRichTextString(inlineDataToCellString(templateCell, resultCell, band)));
             else
-                resultCell.setCellValue(inlineBandDataToCellString(templateCell, band));
+                resultCell.setCellValue(inlineDataToCellString(templateCell, resultCell, band));
         }
+    }
+
+    private String inlineDataToCellString(HSSFCell templateCell, HSSFCell resultCell, Band band) {
+        return inlineBandDataToCellString(templateCell, resultCell,
+                templateWorkbook, resultWorkbook, band, fontCache, styleCache);
     }
 
     private HSSFCellStyle copyCellStyle(HSSFCellStyle templateStyle) {
@@ -682,7 +695,7 @@ public class XLSFormatter extends AbstractFormatter {
             List<Area> set = areasDependency.get(main);
 
             if (set == null) {
-                set = new ArrayList<Area>();
+                set = new ArrayList<>();
                 areasDependency.put(main, set);
             }
             set.add(dependent);

@@ -14,13 +14,13 @@ import java.util.List;
 
 /**
  * Font cache for XlsFormatter
- * <p>$Id$</p>
  *
  * @author artamonov
+ * @version $Id$
  */
 public class XlsFontCache {
 
-    private List<HSSFFont> fonts = new ArrayList<HSSFFont>();
+    private List<HSSFFont> fonts = new ArrayList<>();
 
     public XlsFontCache() { }
 
@@ -70,18 +70,5 @@ public class XlsFontCache {
             return true;
         }
         return false;
-    }
-
-    private void fontClone(HSSFFont font, HSSFFont templateFont) {
-        font.setColor(templateFont.getColor());
-        font.setBoldweight(templateFont.getBoldweight());
-//        font.setCharSet(templateFont.getCharSet());
-        font.setFontHeight(templateFont.getFontHeight());
-        font.setFontHeightInPoints(templateFont.getFontHeightInPoints());
-        font.setFontName(templateFont.getFontName());
-        font.setItalic(templateFont.getItalic());
-        font.setUnderline(templateFont.getUnderline());
-        font.setTypeOffset(templateFont.getTypeOffset());
-        font.setStrikeout(templateFont.getStrikeout());
     }
 }

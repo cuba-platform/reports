@@ -2,11 +2,6 @@
  * Copyright (c) 2008 Haulmont Technology Ltd. All Rights Reserved.
  * Haulmont Technology proprietary and confidential.
  * Use is subject to license terms.
-
- * Author: Eugeniy Degtyarjov
- * Created: 18.01.2011 11:10:15
- *
- * $Id$
  */
 package com.haulmont.cuba.report.formatters.xls;
 
@@ -22,11 +17,19 @@ import org.apache.poi.ss.util.CellReference;
 import java.awt.Dimension;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 
 import static com.haulmont.cuba.report.formatters.AbstractFormatter.insertBandDataToString;
 import static com.haulmont.cuba.report.formatters.AbstractFormatter.unwrapParameterName;
 
+/**
+ * @author degtyarjov
+ * @version $Id$
+ */
 public final class HSSFCellHelper {
+
+    private static final String CELL_DYNAMIC_STYLE_SELECTOR = "##style=";
+
     private HSSFCellHelper() {
     }
 
@@ -41,17 +44,19 @@ public final class HSSFCellHelper {
      */
     public static void updateValueCell(Band rootBand, Band band, HSSFCell templateCell, HSSFCell resultCell,
                                        HSSFPatriarch patriarch) {
+        Map<String, Object> bandData = band.getData();
         String parameterName = templateCell.toString();
+
         parameterName = unwrapParameterName(parameterName);
 
         if (StringUtils.isEmpty(parameterName)) return;
 
-        if (!band.getData().containsKey(parameterName)) {
+        if (!bandData.containsKey(parameterName)) {
             resultCell.setCellValue(templateCell.getRichStringCellValue());
             return;
         }
 
-        Object parameterValue = band.getData().get(parameterName);
+        Object parameterValue = bandData.get(parameterName);
         HashMap<String, ReportValueFormat> valuesFormats = rootBand.getValuesFormats();
 
         if (parameterValue == null)
@@ -99,18 +104,46 @@ public final class HSSFCellHelper {
     /**
      * Inlines band data to cell.
      * No formatting supported now.
-     *
-     * @param cell - cell to inline data
-     * @param band - data source
-     * @return string with inlined band data
+     * <p>
+     * Applies named style to cell if it contains '##style=' mark
+     * </p>
+     * @param templateCell     Cell to inline data
+     * @param resultCell       Result cell
+     * @param workbook         Workbook
+     * @param templateWorkbook Template workbook
+     * @param band             Data source
+     * @param fontCache        Font cache
+     * @param styleCache       Styles   @return string with inlined band data
+     * @return Cell value
      */
-    public static String inlineBandDataToCellString(HSSFCell cell, Band band) {
+    public static String inlineBandDataToCellString(HSSFCell templateCell, HSSFCell resultCell,
+                                                    HSSFWorkbook templateWorkbook, HSSFWorkbook workbook,
+                                                    Band band,
+                                                    XlsFontCache fontCache,
+                                                    XlsStyleCache styleCache) {
         String resultStr = "";
-        if (cell.getCellType() == HSSFCell.CELL_TYPE_STRING) {
-            HSSFRichTextString richString = cell.getRichStringCellValue();
+        if (templateCell.getCellType() == HSSFCell.CELL_TYPE_STRING) {
+            HSSFRichTextString richString = templateCell.getRichStringCellValue();
             if (richString != null) resultStr = richString.getString();
         } else {
-            if (cell.toString() != null) resultStr = cell.toString();
+            if (templateCell.toString() != null) resultStr = templateCell.toString();
+        }
+
+        Map<String, Object> bandData = band.getData();
+
+        // apply dynamic style
+        int stylePosition = StringUtils.indexOf(resultStr, CELL_DYNAMIC_STYLE_SELECTOR);
+        if (stylePosition >= 0) {
+            String styleSelector = StringUtils.trimToNull(
+                    StringUtils.substring(resultStr, stylePosition + CELL_DYNAMIC_STYLE_SELECTOR.length()));
+            resultStr = StringUtils.substring(resultStr, 0, stylePosition - 1);
+            if (styleSelector != null && bandData.containsKey(styleSelector) && bandData.get(styleSelector) != null) {
+                HSSFCellStyle cellStyle = styleCache.getStyleByName((String) bandData.get(styleSelector));
+
+                if (cellStyle != null) {
+                    applyNamedStyle(resultCell, cellStyle, templateWorkbook, workbook, fontCache, styleCache);
+                }
+            }
         }
 
         if (!"".equals(resultStr)) return insertBandDataToString(band, resultStr);
@@ -118,8 +151,56 @@ public final class HSSFCellHelper {
         return "";
     }
 
+    private static void applyNamedStyle(HSSFCell resultCell, HSSFCellStyle cellStyle,
+                                        HSSFWorkbook templateWorkbook, HSSFWorkbook workbook,
+                                        XlsFontCache fontCache, XlsStyleCache styleCache) {
+        HSSFCellStyle newStyle = workbook.createCellStyle();
+        // color
+        newStyle.setFillBackgroundColor(cellStyle.getFillBackgroundColor());
+        newStyle.setFillForegroundColor(cellStyle.getFillForegroundColor());
+        newStyle.setFillPattern(cellStyle.getFillPattern());
+        // borders
+        newStyle.setBorderLeft(cellStyle.getBorderLeft());
+        newStyle.setBorderRight(cellStyle.getBorderRight());
+        newStyle.setBorderTop(cellStyle.getBorderTop());
+        newStyle.setBorderBottom(cellStyle.getBorderBottom());
+        // border colors
+        newStyle.setLeftBorderColor(cellStyle.getLeftBorderColor());
+        newStyle.setRightBorderColor(cellStyle.getRightBorderColor());
+        newStyle.setBottomBorderColor(cellStyle.getBottomBorderColor());
+        newStyle.setTopBorderColor(cellStyle.getTopBorderColor());
+        // alignment
+        newStyle.setAlignment(cellStyle.getAlignment());
+        newStyle.setVerticalAlignment(cellStyle.getVerticalAlignment());
+        // misc
+        newStyle.setDataFormat(cellStyle.getDataFormat());
+        newStyle.setHidden(cellStyle.getHidden());
+        newStyle.setLocked(cellStyle.getLocked());
+        newStyle.setIndention(cellStyle.getIndention());
+        newStyle.setRotation(cellStyle.getRotation());
+        newStyle.setWrapText(cellStyle.getWrapText());
+        // font
+        HSSFFont cellFont = cellStyle.getFont(templateWorkbook);
+        HSSFFont newFont = workbook.createFont();
+
+        newFont.setFontName(cellFont.getFontName());
+        newFont.setItalic(cellFont.getItalic());
+        newFont.setStrikeout(cellFont.getStrikeout());
+        newFont.setTypeOffset(cellFont.getTypeOffset());
+        newFont.setBoldweight(cellFont.getBoldweight());
+        newFont.setCharSet(cellFont.getCharSet());
+        newFont.setColor(cellFont.getColor());
+        newFont.setUnderline(cellFont.getUnderline());
+        newFont.setFontHeight(cellFont.getFontHeight());
+        newFont.setFontHeightInPoints(cellFont.getFontHeightInPoints());
+
+        newStyle.setFont(fontCache.processFont(newFont));
+
+        resultCell.setCellStyle(styleCache.processCellStyle(newStyle));
+    }
+
     /**
-     * Detects if cell contains only one template to inleine value
+     * Detects if cell contains only one template to inline value
      *
      * @param cell - cell
      * @return -
