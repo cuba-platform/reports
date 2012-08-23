@@ -10,10 +10,10 @@ import com.haulmont.bali.util.StringHelper;
 import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.cuba.core.*;
 import com.haulmont.cuba.core.app.ServerConfig;
+import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.ConfigProvider;
 import com.haulmont.cuba.core.global.MetadataProvider;
 import com.haulmont.cuba.core.global.View;
-import com.haulmont.cuba.core.sys.AppContext;
 import com.haulmont.cuba.report.exception.ReportingException;
 import com.haulmont.cuba.security.entity.EntityOp;
 import org.apache.commons.lang.StringUtils;
@@ -41,7 +41,7 @@ public class PrototypesLoader {
     public List loadData(ParameterPrototype parameterPrototype) {
         MetaClass metaClass = MetadataProvider.getSession().getClass(parameterPrototype.getMetaClassName());
 
-        PersistenceSecurity security = AppContext.getBean(PersistenceSecurity.NAME);
+        PersistenceSecurity security = AppBeans.get(PersistenceSecurity.NAME);
         if (parameterPrototype.isUseSecurityConstraints()) {
             if (!security.isEntityOpPermitted(metaClass, EntityOp.READ)) {
                 log.debug("reading of " + metaClass + " not permitted, returning empty list");
