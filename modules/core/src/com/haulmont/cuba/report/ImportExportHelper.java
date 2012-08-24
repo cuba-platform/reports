@@ -96,7 +96,7 @@ public class ImportExportHelper {
         ZipArchiveOutputStream zipOutputStream = new ZipArchiveOutputStream(byteArrayOutputStream);
         zipOutputStream.setMethod(ZipArchiveOutputStream.STORED);
         zipOutputStream.setEncoding(ENCODING);
-        report = ((ReportService) Locator.lookup(ReportService.NAME)).reloadReport(report);
+        report = ((ReportingApi) Locator.lookup(ReportingApi.NAME)).reloadReport(report);
         String xml = toXML(report);
         byte[] xmlBytes = xml.getBytes();
         ArchiveEntry zipEntryReportObject = newStoredEntry("report.xml", xmlBytes);
