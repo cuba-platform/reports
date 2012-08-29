@@ -2,21 +2,20 @@
  * Copyright (c) 2011 Haulmont Technology Ltd. All Rights Reserved.
  * Haulmont Technology proprietary and confidential.
  * Use is subject to license terms.
-
- * Author: Artamonov Yuryi
- * Created: 18.03.11 13:11
- *
- * $Id$
  */
 package com.haulmont.cuba.report.formatters;
 
 import com.haulmont.cuba.core.Locator;
 import com.haulmont.cuba.core.app.FileStorageAPI;
+import com.haulmont.cuba.core.global.ConfigProvider;
 import com.haulmont.cuba.core.global.FileStorageException;
+import com.haulmont.cuba.core.global.GlobalConfig;
 import com.haulmont.cuba.report.Band;
 import com.haulmont.cuba.report.ReportOutputType;
 import com.haulmont.cuba.report.exception.ReportingException;
 import com.haulmont.cuba.report.exception.UnsupportedFormatException;
+import com.lowagie.text.DocumentException;
+import com.lowagie.text.pdf.BaseFont;
 import freemarker.cache.StringTemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -35,8 +34,13 @@ import java.util.Map;
 
 /**
  * Engine for create reports with HTML templates and FreeMarker markup
+ *
+ * @author artamonov
+ * @version $Id$
  */
 public class HtmlFormatter extends AbstractFormatter {
+
+    private static final String CUBA_FONTS_DIR = "/cuba/fonts";
 
     private static Log log = LogFactory.getLog(HtmlFormatter.class);
 
@@ -66,6 +70,7 @@ public class HtmlFormatter extends AbstractFormatter {
                 writeHtmlDocument(rootBand, htmlOuputStream);
 
                 String htmlContent = new String(htmlOuputStream.toByteArray());
+
                 renderPdfDocument(htmlContent, outputStream);
                 break;
 
@@ -82,6 +87,8 @@ public class HtmlFormatter extends AbstractFormatter {
             dataOutputStream.write(htmlContent.getBytes(Charset.forName("UTF-8")));
             dataOutputStream.close();
 
+            loadFonts(renderer);
+
             String url = tmpFile.toURI().toURL().toString();
             renderer.setDocument(url);
 
@@ -91,6 +98,29 @@ public class HtmlFormatter extends AbstractFormatter {
             FileUtils.deleteQuietly(tmpFile);
         } catch (Exception e) {
             throw new ReportingException(e);
+        }
+    }
+
+    private void loadFonts(ITextRenderer renderer) throws DocumentException, IOException {
+        GlobalConfig config = ConfigProvider.getConfig(GlobalConfig.class);
+        String fontsPath = config.getConfDir() + CUBA_FONTS_DIR;
+
+        File fontsDir = new File(fontsPath);
+
+        if (fontsDir.exists()) {
+            log.debug("Use fonts from: " + fontsDir.getPath());
+            File[] files = fontsDir.listFiles(new FilenameFilter() {
+                @Override
+                public boolean accept(File dir, String name) {
+                    String lower = name.toLowerCase();
+                    return lower.endsWith(".otf") || lower.endsWith(".ttf");
+                }
+            });
+            for (File file : files) {
+                renderer.getFontResolver().addFont(file.getAbsolutePath(), BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
+            }
+        } else {
+            log.debug("Fonts directory does not exist: " + fontsDir.getPath());
         }
     }
 
