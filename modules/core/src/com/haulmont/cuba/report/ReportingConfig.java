@@ -47,4 +47,10 @@ public interface ReportingConfig extends Config {
     @Property("cuba.reporting.displayDeviceUnavailable")
     @DefaultBoolean(false)
     boolean getDisplayDeviceUnavailable();
+
+    /**
+     * @return Directory with fonts for generate PDF from HTML
+     */
+    @Property("cuba.reporting.fontsDir")
+    String getPdfFontsDirectory();
 }

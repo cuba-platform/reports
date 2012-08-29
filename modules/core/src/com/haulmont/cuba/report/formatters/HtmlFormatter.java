@@ -5,13 +5,13 @@
  */
 package com.haulmont.cuba.report.formatters;
 
-import com.haulmont.cuba.core.Locator;
 import com.haulmont.cuba.core.app.FileStorageAPI;
+import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.ConfigProvider;
 import com.haulmont.cuba.core.global.FileStorageException;
-import com.haulmont.cuba.core.global.GlobalConfig;
 import com.haulmont.cuba.report.Band;
 import com.haulmont.cuba.report.ReportOutputType;
+import com.haulmont.cuba.report.ReportingConfig;
 import com.haulmont.cuba.report.exception.ReportingException;
 import com.haulmont.cuba.report.exception.UnsupportedFormatException;
 import com.lowagie.text.DocumentException;
@@ -21,6 +21,7 @@ import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xhtmlrenderer.pdf.ITextRenderer;
@@ -39,9 +40,6 @@ import java.util.Map;
  * @version $Id$
  */
 public class HtmlFormatter extends AbstractFormatter {
-
-    private static final String CUBA_FONTS_DIR = "/cuba/fonts";
-
     private static Log log = LogFactory.getLog(HtmlFormatter.class);
 
     public HtmlFormatter() {
@@ -101,24 +99,35 @@ public class HtmlFormatter extends AbstractFormatter {
         }
     }
 
-    private void loadFonts(ITextRenderer renderer) throws DocumentException, IOException {
-        GlobalConfig config = ConfigProvider.getConfig(GlobalConfig.class);
-        String fontsPath = config.getConfDir() + CUBA_FONTS_DIR;
+    private void loadFonts(ITextRenderer renderer) {
+        ReportingConfig serverConfig = ConfigProvider.getConfig(ReportingConfig.class);
+        if (StringUtils.isNotBlank(serverConfig.getPdfFontsDirectory())) {
+            File systemFontsDir = new File(serverConfig.getPdfFontsDirectory());
+            loadFontsFromDirectory(renderer, systemFontsDir);
+        }
+    }
 
-        File fontsDir = new File(fontsPath);
-
+    private void loadFontsFromDirectory(ITextRenderer renderer, File fontsDir) {
         if (fontsDir.exists()) {
-            log.debug("Use fonts from: " + fontsDir.getPath());
-            File[] files = fontsDir.listFiles(new FilenameFilter() {
-                @Override
-                public boolean accept(File dir, String name) {
-                    String lower = name.toLowerCase();
-                    return lower.endsWith(".otf") || lower.endsWith(".ttf");
+            if (fontsDir.isDirectory()) {
+                log.debug("Use fonts from: " + fontsDir.getPath());
+                File[] files = fontsDir.listFiles(new FilenameFilter() {
+                    @Override
+                    public boolean accept(File dir, String name) {
+                        String lower = name.toLowerCase();
+                        return lower.endsWith(".otf") || lower.endsWith(".ttf");
+                    }
+                });
+                for (File file : files) {
+                    try {
+                        // Usage of some fonts may be not permitted
+                        renderer.getFontResolver().addFont(file.getAbsolutePath(), BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
+                    } catch (DocumentException | IOException e) {
+                        log.warn(e.getMessage());
+                    }
                 }
-            });
-            for (File file : files) {
-                renderer.getFontResolver().addFont(file.getAbsolutePath(), BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
-            }
+            } else
+                log.warn(String.format("File %s is not a directory", fontsDir.getAbsolutePath()));
         } else {
             log.debug("Fonts directory does not exist: " + fontsDir.getPath());
         }
@@ -144,18 +153,18 @@ public class HtmlFormatter extends AbstractFormatter {
     }
 
     private Map getTemplateModel(Band rootBand) {
-        Map<String, Object> model = new HashMap<String, Object>();
+        Map<String, Object> model = new HashMap<>();
         model.put(rootBand.getName(), getBandModel(rootBand));
         return model;
     }
 
     private Map getBandModel(Band band) {
-        Map<String, Object> model = new HashMap<String, Object>();
+        Map<String, Object> model = new HashMap<>();
 
-        Map<String, Object> bands = new HashMap<String, Object>();
+        Map<String, Object> bands = new HashMap<>();
         for (String bandName : band.getChildrenBands().keySet()) {
             List<Band> subBands = band.getChildrenBands().get(bandName);
-            List<Map> bandModels = new ArrayList<Map>();
+            List<Map> bandModels = new ArrayList<>();
             for (Band child : subBands)
                 bandModels.add(getBandModel(child));
 
@@ -173,7 +182,7 @@ public class HtmlFormatter extends AbstractFormatter {
             throw new NullPointerException();
 
         String templateContent;
-        FileStorageAPI storageAPI = Locator.lookup(FileStorageAPI.NAME);
+        FileStorageAPI storageAPI = AppBeans.get(FileStorageAPI.NAME);
         try {
             byte[] templateBytes = storageAPI.loadFile(templateFile);
             templateContent = new String(templateBytes);
