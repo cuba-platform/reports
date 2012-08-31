@@ -12,7 +12,7 @@ package com.haulmont.cuba.web.ui.report.parameter.edit;
 
 import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.cuba.core.entity.Entity;
-import com.haulmont.cuba.core.global.MetadataHelper;
+import com.haulmont.cuba.core.global.Metadata;
 import com.haulmont.cuba.gui.components.AbstractEditor;
 import com.haulmont.cuba.gui.components.CheckBox;
 import com.haulmont.cuba.gui.components.IFrame;
@@ -49,6 +49,9 @@ public class ParameterEditor extends AbstractEditor {
     @Inject
     private WindowConfig windowConfig;
 
+    @Inject
+    private Metadata metadata;
+
     @Override
     public void setItem(Entity item) {
         super.setItem(item);
@@ -72,7 +75,7 @@ public class ParameterEditor extends AbstractEditor {
         fromBrowser = getComponent("getFromBrowser");
 
         List metaClasses = new ArrayList();
-        Collection<MetaClass> classes = MetadataHelper.getAllMetaClasses();
+        Collection<MetaClass> classes = metadata.getSession().getClasses();
         for (MetaClass clazz : classes) {
             metaNamesToClassNames.put(clazz.getName(), clazz.getJavaClass().getSimpleName());
             classNamesToMetaNames.put(clazz.getJavaClass().getSimpleName(), clazz.getName());
@@ -88,7 +91,7 @@ public class ParameterEditor extends AbstractEditor {
         });
 
         List enums = new ArrayList();
-        for (Class enumClass : MetadataHelper.getAllEnums()) {
+        for (Class enumClass : metadata.getTools().getAllEnums()) {
             enums.add(enumClass.getSimpleName());
             enumNamesToEnumClass.put(enumClass.getSimpleName(), enumClass);
             enumClassToEnumNames.put(enumClass.getCanonicalName(), enumClass.getSimpleName());

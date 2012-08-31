@@ -7,7 +7,10 @@
 package com.haulmont.cuba.gui.report.actions;
 
 import com.haulmont.chile.core.model.MetaClass;
-import com.haulmont.cuba.core.global.*;
+import com.haulmont.cuba.core.global.LoadContext;
+import com.haulmont.cuba.core.global.MessageProvider;
+import com.haulmont.cuba.core.global.MetadataProvider;
+import com.haulmont.cuba.core.global.UserSessionProvider;
 import com.haulmont.cuba.gui.WindowManager;
 import com.haulmont.cuba.gui.components.AbstractAction;
 import com.haulmont.cuba.gui.components.IFrame;
@@ -100,7 +103,7 @@ abstract class AbstractPrintFormAction extends AbstractAction {
 
     protected boolean checkReportsForStart(final Window window, final String paramAlias, final Object paramValue,
                                            String javaClassName, ReportType reportType, @Nullable final String name) {
-        Collection<MetaClass> metaClasses = MetadataHelper.getAllMetaClasses();
+        Collection<MetaClass> metaClasses = MetadataProvider.getSession().getClasses();
         String metaClassName = "";
         Iterator<MetaClass> iterator = metaClasses.iterator();
         while (iterator.hasNext() && ("".equals(metaClassName))) {
