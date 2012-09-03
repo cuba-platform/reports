@@ -34,8 +34,8 @@ public class OOOConnector implements OOOConnectorAPI, OOOConnectorMBean {
         }
     }
 
-    private final BlockingQueue<Integer> freePorts = new LinkedBlockingDeque<Integer>();
-    private ExecutorService executor = Executors.newFixedThreadPool(1);
+    private final BlockingQueue<Integer> freePorts = new LinkedBlockingDeque<>();
+    private ExecutorService executor = Executors.newFixedThreadPool(10);
 
     //  todo: Think about connection pool - current implementation is too slow
     @Override
