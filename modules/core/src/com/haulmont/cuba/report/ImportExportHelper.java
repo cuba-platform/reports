@@ -2,11 +2,6 @@
  * Copyright (c) 2010 Haulmont Technology Ltd. All Rights Reserved.
  * Haulmont Technology proprietary and confidential.
  * Use is subject to license terms.
-
- * Author: Vasiliy Fontanenko
- * Created: 12.07.2010 9:04:06
- *
- * $Id$
  */
 package com.haulmont.cuba.report;
 
@@ -14,11 +9,7 @@ import com.haulmont.cuba.core.*;
 import com.haulmont.cuba.core.app.FileStorageAPI;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.entity.FileDescriptor;
-import com.haulmont.cuba.core.global.FileStorageException;
-import com.haulmont.cuba.core.global.MetadataProvider;
-import com.haulmont.cuba.core.global.UuidProvider;
-import com.haulmont.cuba.core.global.View;
-import com.haulmont.cuba.report.app.ReportService;
+import com.haulmont.cuba.core.global.*;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.reflection.ExternalizableConverter;
 import org.apache.commons.compress.archivers.ArchiveEntry;
@@ -38,6 +29,10 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.zip.CRC32;
 
+/**
+ * @author fontanenko
+ * @version $Id$
+ */
 public class ImportExportHelper {
     protected static final String ENCODING = "CP866";
 
@@ -49,7 +44,7 @@ public class ImportExportHelper {
         zipOutputStream.setMethod(ZipArchiveOutputStream.DEFLATED);
         zipOutputStream.setEncoding(ENCODING);
 
-        FileStorageAPI fileStorage = Locator.lookup(FileStorageAPI.NAME);
+        FileStorageAPI fileStorage = AppBeans.get(FileStorageAPI.NAME);
         for (FileDescriptor fileDescriptor : files) {
             byte[] bytes = fileStorage.loadFile(fileDescriptor);
             ArchiveEntry singleReportEntry = newStoredEntry(replaceForbiddenCharacters(fileDescriptor.getName()), bytes);
@@ -96,7 +91,7 @@ public class ImportExportHelper {
         ZipArchiveOutputStream zipOutputStream = new ZipArchiveOutputStream(byteArrayOutputStream);
         zipOutputStream.setMethod(ZipArchiveOutputStream.STORED);
         zipOutputStream.setEncoding(ENCODING);
-        report = ((ReportingApi) Locator.lookup(ReportingApi.NAME)).reloadReport(report);
+        report = ((ReportingApi) AppBeans.get(ReportingApi.NAME)).reloadReport(report);
         String xml = toXML(report);
         byte[] xmlBytes = xml.getBytes();
         ArchiveEntry zipEntryReportObject = newStoredEntry("report.xml", xmlBytes);
@@ -182,7 +177,7 @@ public class ImportExportHelper {
         archiveReader = new ZipArchiveInputStream(byteArrayInputStream);
         while (archiveReader.getNextZipEntry() != null) {
             if (reports == null) {
-                reports = new LinkedList<Report>();
+                reports = new LinkedList<>();
             }
             final byte[] buffer = readBytesFromEntry(archiveReader);
             Report report = importReport(buffer);
@@ -230,7 +225,7 @@ public class ImportExportHelper {
                     if (index >= 0) {
                         ReportTemplate template = report.getTemplates().get(index);
                         FileDescriptor fd = template.getTemplateFileDescriptor();
-                        FileStorageAPI mbean = Locator.lookup(FileStorageAPI.NAME);
+                        FileStorageAPI mbean = AppBeans.get(FileStorageAPI.NAME);
                         try {
                             mbean.removeFile(fd);
                         } catch (FileStorageException ex) {
