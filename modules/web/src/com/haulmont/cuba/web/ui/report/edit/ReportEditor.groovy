@@ -123,7 +123,7 @@ public class ReportEditor extends AbstractEditor {
 
         getDsContext().addListener(new CommitListener() {
             @Override
-            void beforeCommit(CommitContext<Entity> context) {
+            void beforeCommit(CommitContext context) {
                 List<FileDescriptor> fileDescriptors = new ArrayList<FileDescriptor>()
                 // delete descriptors from db
                 // persist related file descriptors
@@ -142,7 +142,7 @@ public class ReportEditor extends AbstractEditor {
             }
 
             @Override
-            void afterCommit(CommitContext<Entity> context, Set<Entity> result) {
+            void afterCommit(CommitContext context, Set<Entity> result) {
                 FileStorageService storageService = ServiceLocator.lookup(FileStorageService.NAME)
 
                 for (Entity entity: context.commitInstances) {
