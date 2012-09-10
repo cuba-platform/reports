@@ -59,11 +59,10 @@ public class CommonLookupController extends AbstractLookup {
 
         table.addGeneratedColumn(nameProperty.getMetaProperty().getName(), new Table.ColumnGenerator() {
             @Override
-            public Component generateCell(Table table, Object itemId) {
+            public Component generateCell(Entity entity) {
                 // noinspection unchecked
-                Entity item = cds.getItem(itemId);
                 Label label = cFactory.createComponent(Label.NAME);
-                label.setValue(item.getInstanceName());
+                label.setValue(entity.getInstanceName());
                 return label;
             }
         });

@@ -53,10 +53,9 @@ public class ValueFormatEditor extends AbstractEditor {
         // Add default format strings to combobox
         FieldGroup.Field f = fields.getField("formatString");
         fields.addCustomField(f, new FieldGroup.CustomFieldGenerator() {
-            private static final long serialVersionUID = -8103880026038352529L;
 
             @Override
-            public Component generateField(Datasource datasource, Object propertyId) {
+            public Component generateField(Datasource datasource, String propertyId) {
                 final WebLookupField lookupField = new WebLookupField();
                 fSelect = (FilterSelect) WebComponentsHelper.unwrap(lookupField);
                 final FilterSelect select = fSelect;
