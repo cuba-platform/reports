@@ -7,6 +7,9 @@ package com.haulmont.cuba.report.formatters.xls;
 
 import com.haulmont.cuba.report.Band;
 import com.haulmont.cuba.report.ReportValueFormat;
+import com.haulmont.cuba.report.formatters.xls.options.AutoWidthOption;
+import com.haulmont.cuba.report.formatters.xls.options.CopyColumnWidthOption;
+import com.haulmont.cuba.report.formatters.xls.options.CustomCellStyleOption;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.usermodel.ClientAnchor;
@@ -14,9 +17,10 @@ import org.apache.poi.ss.usermodel.CreationHelper;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellReference;
 
-import java.awt.Dimension;
+import java.awt.*;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.haulmont.cuba.report.formatters.AbstractFormatter.insertBandDataToString;
@@ -29,6 +33,8 @@ import static com.haulmont.cuba.report.formatters.AbstractFormatter.unwrapParame
 public final class HSSFCellHelper {
 
     private static final String CELL_DYNAMIC_STYLE_SELECTOR = "##style=";
+    private static final String COPY_COLUMN_WIDTH_SELECTOR = "##copyColumnWidth";
+    private static final String AUTO_WIDTH_SELECTOR = "##autoWidth";
 
     private HSSFCellHelper() {
     }
@@ -110,15 +116,19 @@ public final class HSSFCellHelper {
      * @param templateCell     Cell to inline data
      * @param resultCell       Result cell
      * @param workbook         Workbook
+     * @param templateSheet    Template Sheet
+     * @param resultSheet      Result Sheet
      * @param templateWorkbook Template workbook
      * @param band             Data source
+     * @param optionContainer  Style options
      * @param fontCache        Font cache
      * @param styleCache       Styles   @return string with inlined band data
      * @return Cell value
      */
     public static String inlineBandDataToCellString(HSSFCell templateCell, HSSFCell resultCell,
+                                                    HSSFSheet templateSheet, HSSFSheet resultSheet,
                                                     HSSFWorkbook templateWorkbook, HSSFWorkbook workbook,
-                                                    Band band,
+                                                    Band band, List<StyleOption> optionContainer,
                                                     XlsFontCache fontCache,
                                                     XlsStyleCache styleCache) {
         String resultStr = "";
@@ -134,69 +144,43 @@ public final class HSSFCellHelper {
         // apply dynamic style
         int stylePosition = StringUtils.indexOf(resultStr, CELL_DYNAMIC_STYLE_SELECTOR);
         if (stylePosition >= 0) {
-            String styleSelector = StringUtils.trimToNull(
-                    StringUtils.substring(resultStr, stylePosition + CELL_DYNAMIC_STYLE_SELECTOR.length()));
-            resultStr = StringUtils.substring(resultStr, 0, stylePosition - 1);
+            String stringTail = StringUtils.substring(resultStr, stylePosition + CELL_DYNAMIC_STYLE_SELECTOR.length());
+            int styleEndIndex = StringUtils.indexOf(stringTail, " ");
+            if (styleEndIndex < 0)
+                styleEndIndex = resultStr.length() - 1;
+
+            String styleSelector = StringUtils.substring(resultStr, stylePosition,
+                    styleEndIndex + CELL_DYNAMIC_STYLE_SELECTOR.length() + stylePosition);
+
+            resultStr = StringUtils.replace(resultStr, styleSelector, "");
+
+            styleSelector = StringUtils.substring(styleSelector, CELL_DYNAMIC_STYLE_SELECTOR.length());
+
             if (styleSelector != null && bandData.containsKey(styleSelector) && bandData.get(styleSelector) != null) {
                 HSSFCellStyle cellStyle = styleCache.getStyleByName((String) bandData.get(styleSelector));
 
                 if (cellStyle != null) {
-                    applyNamedStyle(resultCell, cellStyle, templateWorkbook, workbook, fontCache, styleCache);
+                    optionContainer.add(new CustomCellStyleOption(resultCell, cellStyle,
+                            templateWorkbook, workbook, fontCache, styleCache));
                 }
             }
+        }
+
+        // apply fixed width to column from template cell
+        if (StringUtils.contains(resultStr, COPY_COLUMN_WIDTH_SELECTOR)) {
+            resultStr = StringUtils.replace(resultStr, COPY_COLUMN_WIDTH_SELECTOR, "");
+            optionContainer.add(new CopyColumnWidthOption(resultSheet,
+                    resultCell.getColumnIndex(), templateSheet.getColumnWidth(templateCell.getColumnIndex())));
+        }
+
+        if (StringUtils.contains(resultStr, AUTO_WIDTH_SELECTOR)) {
+            resultStr = StringUtils.replace(resultStr, AUTO_WIDTH_SELECTOR, "");
+            optionContainer.add(new AutoWidthOption(resultSheet, resultCell.getColumnIndex()));
         }
 
         if (!"".equals(resultStr)) return insertBandDataToString(band, resultStr);
 
         return "";
-    }
-
-    private static void applyNamedStyle(HSSFCell resultCell, HSSFCellStyle cellStyle,
-                                        HSSFWorkbook templateWorkbook, HSSFWorkbook workbook,
-                                        XlsFontCache fontCache, XlsStyleCache styleCache) {
-        HSSFCellStyle newStyle = workbook.createCellStyle();
-        // color
-        newStyle.setFillBackgroundColor(cellStyle.getFillBackgroundColor());
-        newStyle.setFillForegroundColor(cellStyle.getFillForegroundColor());
-        newStyle.setFillPattern(cellStyle.getFillPattern());
-        // borders
-        newStyle.setBorderLeft(cellStyle.getBorderLeft());
-        newStyle.setBorderRight(cellStyle.getBorderRight());
-        newStyle.setBorderTop(cellStyle.getBorderTop());
-        newStyle.setBorderBottom(cellStyle.getBorderBottom());
-        // border colors
-        newStyle.setLeftBorderColor(cellStyle.getLeftBorderColor());
-        newStyle.setRightBorderColor(cellStyle.getRightBorderColor());
-        newStyle.setBottomBorderColor(cellStyle.getBottomBorderColor());
-        newStyle.setTopBorderColor(cellStyle.getTopBorderColor());
-        // alignment
-        newStyle.setAlignment(cellStyle.getAlignment());
-        newStyle.setVerticalAlignment(cellStyle.getVerticalAlignment());
-        // misc
-        newStyle.setDataFormat(cellStyle.getDataFormat());
-        newStyle.setHidden(cellStyle.getHidden());
-        newStyle.setLocked(cellStyle.getLocked());
-        newStyle.setIndention(cellStyle.getIndention());
-        newStyle.setRotation(cellStyle.getRotation());
-        newStyle.setWrapText(cellStyle.getWrapText());
-        // font
-        HSSFFont cellFont = cellStyle.getFont(templateWorkbook);
-        HSSFFont newFont = workbook.createFont();
-
-        newFont.setFontName(cellFont.getFontName());
-        newFont.setItalic(cellFont.getItalic());
-        newFont.setStrikeout(cellFont.getStrikeout());
-        newFont.setTypeOffset(cellFont.getTypeOffset());
-        newFont.setBoldweight(cellFont.getBoldweight());
-        newFont.setCharSet(cellFont.getCharSet());
-        newFont.setColor(cellFont.getColor());
-        newFont.setUnderline(cellFont.getUnderline());
-        newFont.setFontHeight(cellFont.getFontHeight());
-        newFont.setFontHeightInPoints(cellFont.getFontHeightInPoints());
-
-        newStyle.setFont(fontCache.processFont(newFont));
-
-        resultCell.setCellStyle(styleCache.processCellStyle(newStyle));
     }
 
     /**

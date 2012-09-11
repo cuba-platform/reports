@@ -39,6 +39,9 @@ import static com.haulmont.cuba.report.formatters.xls.HSSFRangeHelper.*;
  * @version $Id$
  */
 public class XLSFormatter extends AbstractFormatter {
+
+    private static final String DYNAMIC_HEIGHT_STYLE = "styleWithoutHeight";
+
     private HSSFWorkbook templateWorkbook;
     private HSSFSheet currentTemplateSheet = null;
 
@@ -64,6 +67,8 @@ public class XLSFormatter extends AbstractFormatter {
     private Band rootBand;
     private Map<HSSFSheet, HSSFPatriarch> drawingPatriarchsMap = new HashMap<>();
 
+    private List<StyleOption> optionContainer = new ArrayList<>();
+
     public XLSFormatter() {
         registerReportExtension("xls");
         registerReportExtension("xlt");
@@ -88,7 +93,17 @@ public class XLSFormatter extends AbstractFormatter {
         }
 
         processDocument(rootBand);
+
+        applyStyleOptions();
+
         outputDocument(outputType, outputStream);
+    }
+
+    private void applyStyleOptions() {
+        for (StyleOption option : optionContainer) {
+            option.apply();
+        }
+        optionContainer.clear();
     }
 
     private void initWorkbook() throws IOException {
@@ -213,10 +228,11 @@ public class XLSFormatter extends AbstractFormatter {
 
                     if (templateCell.getCellStyle().getParentStyle() != null
                             && templateCell.getCellStyle().getParentStyle().getUserStyleName() != null
-                            && templateCell.getCellStyle().getParentStyle().getUserStyleName().equals("styleWithoutHeight")
+                            && templateCell.getCellStyle().getParentStyle().getUserStyleName().equals(DYNAMIC_HEIGHT_STYLE)
                             ) {
                         //resultRow.setHeight(templateCell.getRow().getHeight());
                     } else {
+                        // todo do it lazy after render!
                         resultRow.setHeight(templateCell.getRow().getHeight());
                     }
                     resultRows.add(resultRow);
@@ -230,7 +246,8 @@ public class XLSFormatter extends AbstractFormatter {
                     currentColumnCount++;
                 }
 
-                copyCellFromTemplate(templateCell, resultRow, offset + currentColumnCount, band);
+                copyCellFromTemplate(templateCell, templateSheet, resultSheet,
+                        resultRow, offset + currentColumnCount, band);
             }
 
             bottomRight = new CellReference(rownum + rowsAddedByHorizontalBand - 1, offset + currentColumnCount);
@@ -297,7 +314,8 @@ public class XLSFormatter extends AbstractFormatter {
                 final int columnOffset = currentColumn - firstColumn;
 
                 HSSFCell templateCell = getCellFromReference(cref, templateSheet);
-                copyCellFromTemplate(templateCell, resultSheet.getRow(localRowNum + rowOffset), colnum + columnOffset, band);
+                copyCellFromTemplate(templateCell, templateSheet, resultSheet,
+                        resultSheet.getRow(localRowNum + rowOffset), colnum + columnOffset, band);
             }
 
             colnum += crefs[crefs.length - 1].getCol() - firstColumn + 1;
@@ -452,14 +470,17 @@ public class XLSFormatter extends AbstractFormatter {
     }
 
     /**
-     * copies template cell to result row into result column. Fills this cell with data from band
+     * Copies template cell to result row into result column. Fills this cell with data from band
      *
-     * @param templateCell - template cell
-     * @param resultRow    - result row
-     * @param resultColumn - result column
-     * @param band         - band
+     * @param templateCell Template cell
+     * @param templateSheet Template sheet
+     * @param resultSheet  Result sheet
+     * @param resultRow    Result row
+     * @param resultColumn Result column
+     * @param band         Band
      */
-    private void copyCellFromTemplate(HSSFCell templateCell, HSSFRow resultRow, int resultColumn, Band band) {
+    private void copyCellFromTemplate(HSSFCell templateCell, HSSFSheet templateSheet, HSSFSheet resultSheet,
+                                      HSSFRow resultRow, int resultColumn, Band band) {
         if (templateCell != null) {
             HSSFCell resultCell = resultRow.createCell(resultColumn);
 
@@ -473,18 +494,32 @@ public class XLSFormatter extends AbstractFormatter {
             if (cellType == HSSFCell.CELL_TYPE_STRING && isOneValueCell(templateCell))
                 updateValueCell(rootBand, band, templateCell, resultCell,
                         drawingPatriarchsMap.get(resultCell.getSheet()));
-            else if (cellType == HSSFCell.CELL_TYPE_FORMULA)
-                resultCell.setCellFormula(inlineDataToCellString(templateCell, resultCell, band));
-            else if (cellType == HSSFCell.CELL_TYPE_STRING)
-                resultCell.setCellValue(new HSSFRichTextString(inlineDataToCellString(templateCell, resultCell, band)));
-            else
-                resultCell.setCellValue(inlineDataToCellString(templateCell, resultCell, band));
+            else if (cellType == HSSFCell.CELL_TYPE_FORMULA) {
+                String cellValue = inlineDataToCellString(templateCell, resultCell, templateSheet, resultSheet, band);
+                if (StringUtils.isNotEmpty(cellValue))
+                    resultCell.setCellFormula(cellValue);
+                else
+                    resultCell.setCellType(HSSFCell.CELL_TYPE_BLANK);
+            } else if (cellType == HSSFCell.CELL_TYPE_STRING) {
+                String cellValue = inlineDataToCellString(templateCell, resultCell, templateSheet, resultSheet, band);
+                if (StringUtils.isNotEmpty(cellValue))
+                    resultCell.setCellValue(new HSSFRichTextString(cellValue));
+                else
+                    resultCell.setCellType(HSSFCell.CELL_TYPE_BLANK);
+            } else {
+                String cellValue = inlineDataToCellString(templateCell, resultCell, templateSheet, resultSheet, band);
+                if (StringUtils.isNotEmpty(cellValue))
+                    resultCell.setCellValue(cellValue);
+                else
+                    resultCell.setCellType(HSSFCell.CELL_TYPE_BLANK);
+            }
         }
     }
 
-    private String inlineDataToCellString(HSSFCell templateCell, HSSFCell resultCell, Band band) {
-        return inlineBandDataToCellString(templateCell, resultCell,
-                templateWorkbook, resultWorkbook, band, fontCache, styleCache);
+    private String inlineDataToCellString(HSSFCell templateCell, HSSFCell resultCell,
+                                          HSSFSheet templateSheet, HSSFSheet resultSheet, Band band) {
+        return inlineBandDataToCellString(templateCell, resultCell, templateSheet, resultSheet,
+                templateWorkbook, resultWorkbook, band, optionContainer, fontCache, styleCache);
     }
 
     private HSSFCellStyle copyCellStyle(HSSFCellStyle templateStyle) {
@@ -564,8 +599,8 @@ public class XLSFormatter extends AbstractFormatter {
                 x.getLastColumn() >= y.getFirstColumn() &&
                 x.getLastRow() >= y.getFirstRow() &&
                 x.getFirstRow() <= y.getLastRow())
-            // or
-            || (y.getFirstColumn() <= x.getLastColumn() &&
+                // or
+                || (y.getFirstColumn() <= x.getLastColumn() &&
                 y.getLastColumn() >= x.getFirstColumn() &&
                 y.getLastRow() >= x.getFirstRow() &&
                 y.getFirstRow() <= x.getLastRow());
