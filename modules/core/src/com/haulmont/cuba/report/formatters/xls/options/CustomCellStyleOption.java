@@ -13,6 +13,8 @@ import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 
 /**
+ * Apply custom style to target cell
+ *
  * @author artamonov
  * @version $Id$
  */
@@ -135,14 +137,16 @@ public class CustomCellStyleOption implements StyleOption {
     }
 
     private void fixLeftCell(int columnIndex) {
-        HSSFCellStyle newLeftStyle = workbook.createCellStyle();
         HSSFCell leftCell = resultCell.getRow().getCell(columnIndex);
-        HSSFCellStyle leftCellStyle = leftCell.getCellStyle();
-        newLeftStyle.cloneStyleRelationsFrom(leftCellStyle);
-        newLeftStyle.setBorderRight(cellStyle.getBorderLeft());
-        newLeftStyle.setRightBorderColor(cellStyle.getLeftBorderColor());
+        if (leftCell != null) {
+            HSSFCellStyle newLeftStyle = workbook.createCellStyle();
+            HSSFCellStyle leftCellStyle = leftCell.getCellStyle();
+            newLeftStyle.cloneStyleRelationsFrom(leftCellStyle);
+            newLeftStyle.setBorderRight(cellStyle.getBorderLeft());
+            newLeftStyle.setRightBorderColor(cellStyle.getLeftBorderColor());
 
-        leftCell.setCellStyle(newLeftStyle);
+            leftCell.setCellStyle(newLeftStyle);
+        }
     }
 
     private void fixRightBorder(HSSFSheet sheet, int columnIndex) {
@@ -163,14 +167,16 @@ public class CustomCellStyleOption implements StyleOption {
     }
 
     private void fixRightCell(int columnIndex) {
-        HSSFCellStyle newRightStyle = workbook.createCellStyle();
         HSSFCell rightCell = resultCell.getRow().getCell(columnIndex);
-        HSSFCellStyle rightCellStyle = rightCell.getCellStyle();
-        newRightStyle.cloneStyleRelationsFrom(rightCellStyle);
-        newRightStyle.setBorderLeft(cellStyle.getBorderRight());
-        newRightStyle.setLeftBorderColor(cellStyle.getRightBorderColor());
+        if (rightCell != null) {
+            HSSFCellStyle newRightStyle = workbook.createCellStyle();
+            HSSFCellStyle rightCellStyle = rightCell.getCellStyle();
+            newRightStyle.cloneStyleRelationsFrom(rightCellStyle);
+            newRightStyle.setBorderLeft(cellStyle.getBorderRight());
+            newRightStyle.setLeftBorderColor(cellStyle.getRightBorderColor());
 
-        rightCell.setCellStyle(newRightStyle);
+            rightCell.setCellStyle(newRightStyle);
+        }
     }
 
     private void fixUpBorder(HSSFSheet sheet, int columnIndex, int rowIndex) {
@@ -195,19 +201,21 @@ public class CustomCellStyleOption implements StyleOption {
 
     private void fixUpCell(HSSFSheet sheet, int rowIndex, int upIndex) {
         HSSFCell upCell = sheet.getRow(rowIndex - 1).getCell(upIndex);
-        HSSFCellStyle newUpStyle = workbook.createCellStyle();
-        HSSFCellStyle upCellStyle = upCell.getCellStyle();
-        newUpStyle.cloneStyleRelationsFrom(upCellStyle);
-        newUpStyle.setBorderBottom(cellStyle.getBorderTop());
-        newUpStyle.setBottomBorderColor(cellStyle.getTopBorderColor());
+        if (upCell != null) {
+            HSSFCellStyle newUpStyle = workbook.createCellStyle();
+            HSSFCellStyle upCellStyle = upCell.getCellStyle();
+            newUpStyle.cloneStyleRelationsFrom(upCellStyle);
+            newUpStyle.setBorderBottom(cellStyle.getBorderTop());
+            newUpStyle.setBottomBorderColor(cellStyle.getTopBorderColor());
 
-        upCell.setCellStyle(newUpStyle);
+            upCell.setCellStyle(newUpStyle);
+        }
     }
 
     private void fixDownBorder(HSSFSheet sheet, int columnIndex, int rowIndex) {
-        // fix simple up border
+        // fix simple down border
         fixDownCell(sheet, rowIndex, columnIndex);
-        // fix merged up border
+        // fix merged down border
         for (int i = 0; i < sheet.getNumMergedRegions(); i++) {
             CellRangeAddress mergedRegion = sheet.getMergedRegion(i);
             if (mergedRegion.isInRange(resultCell.getRowIndex(), resultCell.getColumnIndex())) {
@@ -224,12 +232,14 @@ public class CustomCellStyleOption implements StyleOption {
 
     private void fixDownCell(HSSFSheet sheet, int rowIndex, int upIndex) {
         HSSFCell downCell = sheet.getRow(rowIndex + 1).getCell(upIndex);
-        HSSFCellStyle newDownStyle = workbook.createCellStyle();
-        HSSFCellStyle downCellStyle = downCell.getCellStyle();
-        newDownStyle.cloneStyleRelationsFrom(downCellStyle);
-        newDownStyle.setBorderTop(cellStyle.getBorderBottom());
-        newDownStyle.setTopBorderColor(cellStyle.getBottomBorderColor());
+        if (downCell != null) {
+            HSSFCellStyle newDownStyle = workbook.createCellStyle();
+            HSSFCellStyle downCellStyle = downCell.getCellStyle();
+            newDownStyle.cloneStyleRelationsFrom(downCellStyle);
+            newDownStyle.setBorderTop(cellStyle.getBorderBottom());
+            newDownStyle.setTopBorderColor(cellStyle.getBottomBorderColor());
 
-        downCell.setCellStyle(newDownStyle);
+            downCell.setCellStyle(newDownStyle);
+        }
     }
 }
