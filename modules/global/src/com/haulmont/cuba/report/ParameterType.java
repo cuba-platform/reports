@@ -20,7 +20,9 @@ public enum ParameterType implements EnumClass<Integer> {
     BOOLEAN(40),
     NUMERIC(50),
     ENTITY_LIST(60),
-    ENUMERATION(70);
+    ENUMERATION(70),
+    DATETIME(80),
+    TIME(90);
 
     private Integer id;
 
