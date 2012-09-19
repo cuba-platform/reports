@@ -2,18 +2,14 @@
  * Copyright (c) 2008 Haulmont Technology Ltd. All Rights Reserved.
  * Haulmont Technology proprietary and confidential.
  * Use is subject to license terms.
-
- * Author: Eugeniy Degtyarjov
- * Created: 17.05.2010 11:56:57
- *
- * $Id$
  */
 package com.haulmont.cuba.gui.report.browse;
 
 import com.haulmont.chile.core.datatypes.Datatypes;
 import com.haulmont.cuba.core.entity.Entity;
-import com.haulmont.cuba.core.global.MessageProvider;
-import com.haulmont.cuba.core.global.MetadataProvider;
+import com.haulmont.cuba.core.global.AppBeans;
+import com.haulmont.cuba.core.global.Messages;
+import com.haulmont.cuba.core.global.Metadata;
 import com.haulmont.cuba.core.global.View;
 import com.haulmont.cuba.gui.AppConfig;
 import com.haulmont.cuba.gui.WindowManager;
@@ -32,6 +28,10 @@ import org.apache.commons.lang.StringUtils;
 import javax.inject.Inject;
 import java.util.*;
 
+/**
+ * @author degtyarjov
+ * @version $Id$
+ */
 public class InputParametersController extends AbstractWindow {
 
     private interface FieldCreator {
@@ -40,32 +40,37 @@ public class InputParametersController extends AbstractWindow {
 
     private ComponentsFactory cFactory = AppConfig.getFactory();
 
-    public InputParametersController(IFrame frame) {
-        super(frame);
-    }
-
     private Report report;
     private Entity linkedEntity;
 
+    private Messages messages;
+    private Metadata metadata;
+
     @Inject
     private GridLayout parametersGrid;
-    private int number = 0;
-    private HashMap<String, Field> parameterComponents = new HashMap<String, Field>();
-    private Map<ParameterType, FieldCreator> fieldCreationMapping = new HashMap<ParameterType, FieldCreator>();
+
+    private HashMap<String, Field> parameterComponents = new HashMap<>();
+    private Map<ParameterType, FieldCreator> fieldCreationMapping = new HashMap<>();
 
     {
         fieldCreationMapping.put(ParameterType.BOOLEAN, new CheckBoxCreator());
-        fieldCreationMapping.put(ParameterType.DATE, new DataFieldCreator());
+        fieldCreationMapping.put(ParameterType.DATE, new DateFieldCreator());
         fieldCreationMapping.put(ParameterType.ENTITY, new SingleFieldCreator());
         fieldCreationMapping.put(ParameterType.ENUMERATION, new EnumFieldCreator());
         fieldCreationMapping.put(ParameterType.TEXT, new TextFieldCreator());
         fieldCreationMapping.put(ParameterType.NUMERIC, new NumericFieldCreator());
         fieldCreationMapping.put(ParameterType.ENTITY_LIST, new MultiFieldCreator());
+        fieldCreationMapping.put(ParameterType.DATETIME, new DateTimeFieldCreator());
+        fieldCreationMapping.put(ParameterType.TIME, new TimeFieldCreator());
     }
 
     @Override
     public void init(Map<String, Object> params) {
         super.init(params);
+
+        messages = AppBeans.get(Messages.NAME);
+        metadata = AppBeans.get(Metadata.NAME);
+
         report = (Report) params.get("param$report");
         linkedEntity = (Entity) params.get("param$entity");
 
@@ -76,8 +81,10 @@ public class InputParametersController extends AbstractWindow {
             else
                 parametersGrid.setRows(0);
 
+            int currentGridRow = 0;
             for (ReportInputParameter parameter : report.getInputParameters()) {
-                createComponent(parameter);
+                createComponent(parameter, currentGridRow);
+                currentGridRow++;
             }
         }
     }
@@ -100,7 +107,7 @@ public class InputParametersController extends AbstractWindow {
     private Map<String, Object> collectParameters(HashMap<String, Field> parameterComponents)
             throws com.haulmont.cuba.gui.components.ValidationException {
 
-        Map<String, Object> parameters = new HashMap<String, Object>();
+        Map<String, Object> parameters = new HashMap<>();
         for (String paramName : parameterComponents.keySet()) {
             Field _field = parameterComponents.get(paramName);
             _field.validate();
@@ -112,7 +119,7 @@ public class InputParametersController extends AbstractWindow {
 
     //todo: reimplement this method
 
-    private void createComponent(ReportInputParameter parameter) {
+    private void createComponent(ReportInputParameter parameter, int currentGridRow) {
         Field field = fieldCreationMapping.get(parameter.getType()).createField(parameter);
         field.setId(parameter.getAlias());
         field.setWidth("250px");
@@ -126,18 +133,37 @@ public class InputParametersController extends AbstractWindow {
         label.setAlignment(Alignment.TOP_LEFT);
         label.setValue(parameter.getLocName());
 
-        parametersGrid.add(label, 0, number);
-        parametersGrid.add(field, 1, number);
-        number++;
+        parametersGrid.add(label, 0, currentGridRow);
+        parametersGrid.add(field, 1, currentGridRow);
     }
 
-    private class DataFieldCreator implements FieldCreator {
+    private class DateFieldCreator implements FieldCreator {
 
         @Override
         public Field createField(ReportInputParameter parameter) {
             DateField dateField = cFactory.createComponent(DateField.NAME);
             dateField.setResolution(Resolution.DAY);
+            dateField.setDateFormat(messages.getMessage(AppConfig.getMessagesPack(), "dateFormat"));
             return dateField;
+        }
+    }
+
+    private class DateTimeFieldCreator implements FieldCreator {
+
+        @Override
+        public Field createField(ReportInputParameter parameter) {
+            DateField dateField = cFactory.createComponent(DateField.NAME);
+            dateField.setResolution(Resolution.MIN);
+            dateField.setDateFormat(messages.getMessage(AppConfig.getMessagesPack(), "dateTimeFormat"));
+            return dateField;
+        }
+    }
+
+    private class TimeFieldCreator implements FieldCreator {
+
+        @Override
+        public Field createField(ReportInputParameter parameter) {
+            return cFactory.createComponent(TimeField.NAME);
         }
     }
 
@@ -184,7 +210,7 @@ public class InputParametersController extends AbstractWindow {
 
                 if (enumClass != null) {
                     Object[] constants = enumClass.getEnumConstants();
-                    List<Object> optionsList = new ArrayList<Object>();
+                    List<Object> optionsList = new ArrayList<>();
                     Collections.addAll(optionsList, constants);
 
                     lookupField.setOptionsList(optionsList);
@@ -201,7 +227,7 @@ public class InputParametersController extends AbstractWindow {
         public Field createField(ReportInputParameter parameter) {
             PickerField pickerField = cFactory.createComponent(PickerField.NAME);
             final com.haulmont.chile.core.model.MetaClass entityMetaClass =
-                    MetadataProvider.getSession().getClass(parameter.getEntityMetaClass());
+                    metadata.getSession().getClass(parameter.getEntityMetaClass());
             Class clazz = entityMetaClass.getJavaClass();
 
             pickerField.setMetaClass(entityMetaClass);
@@ -223,7 +249,7 @@ public class InputParametersController extends AbstractWindow {
                 pickerlookupAction.setLookupScreenParams(Collections.<String, Object>emptyMap());
             } else {
                 pickerlookupAction.setLookupScreen("report$commonLookup");
-                Map<String, Object> params = new HashMap<String, Object>();
+                Map<String, Object> params = new HashMap<>();
                 params.put("class", entityMetaClass);
 
                 pickerlookupAction.setLookupScreenParams(params);
@@ -242,7 +268,7 @@ public class InputParametersController extends AbstractWindow {
         public Field createField(ReportInputParameter parameter) {
             TokenList tokenList = cFactory.createComponent(TokenList.NAME);
             final com.haulmont.chile.core.model.MetaClass entityMetaClass =
-                    MetadataProvider.getSession().getClass(parameter.getEntityMetaClass());
+                    metadata.getSession().getClass(parameter.getEntityMetaClass());
 
             DsBuilder builder = new DsBuilder(getDsContext());
             CollectionDatasource cds = builder
@@ -266,12 +292,12 @@ public class InputParametersController extends AbstractWindow {
                 tokenList.setLookupScreenParams(Collections.<String, Object>emptyMap());
             } else {
                 tokenList.setLookupScreen("report$commonLookup");
-                Map<String, Object> params = new HashMap<String, Object>();
+                Map<String, Object> params = new HashMap<>();
                 params.put("class", entityMetaClass);
                 tokenList.setLookupScreenParams(params);
             }
 
-            tokenList.setAddButtonCaption(MessageProvider.getMessage(TokenList.class, "actions.Select"));
+            tokenList.setAddButtonCaption(messages.getMessage(TokenList.class, "actions.Select"));
             tokenList.setSimple(true);
 
             return tokenList;
