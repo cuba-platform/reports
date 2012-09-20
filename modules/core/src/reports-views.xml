@@ -43,10 +43,14 @@
         <property name="templateFileDescriptor" view="_local"/>
     </view>
 
+    <view entity="report$DataSet" name="report.export" extends="_local">
+        <property name="bandDefinition" view="_minimal"/>
+    </view>
+
     <view entity="report$BandDefinition" name="report.export" extends="_local">
-        <property name="parentBandDefinition" view="_local"/>
+        <property name="parentBandDefinition" view="_minimal"/>
         <property name="childrenBandDefinitions" view="_local"/>
-        <property name="dataSets" view="_local"/>
+        <property name="dataSets" view="report.export"/>
         <property name="report" view="_minimal"/>
     </view>
 
