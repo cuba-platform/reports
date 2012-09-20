@@ -119,7 +119,7 @@ public class CustomCellStyleOption implements StyleOption {
 
     private void fixLeftBorder(HSSFSheet sheet, int columnIndex) {
         if (columnIndex > 1) {
-            fixLeftCell(columnIndex - 1);
+            fixLeftCell(sheet, resultCell.getRowIndex(), columnIndex - 1);
             // fix merged left border
             for (int i = 0; i < sheet.getNumMergedRegions(); i++) {
                 CellRangeAddress mergedRegion = sheet.getMergedRegion(i);
@@ -128,7 +128,7 @@ public class CustomCellStyleOption implements StyleOption {
                     int lastRow = mergedRegion.getLastRow();
 
                     for (int leftIndex = firstRow; leftIndex <= lastRow; leftIndex++) {
-                        fixLeftCell(leftIndex);
+                        fixLeftCell(sheet, leftIndex, columnIndex - 1);
                     }
                     break;
                 }
@@ -136,8 +136,8 @@ public class CustomCellStyleOption implements StyleOption {
         }
     }
 
-    private void fixLeftCell(int columnIndex) {
-        HSSFCell leftCell = resultCell.getRow().getCell(columnIndex);
+    private void fixLeftCell(HSSFSheet sheet, int rowIndex, int columnIndex) {
+        HSSFCell leftCell = sheet.getRow(rowIndex).getCell(columnIndex);
         if (leftCell != null) {
             HSSFCellStyle newLeftStyle = workbook.createCellStyle();
             HSSFCellStyle leftCellStyle = leftCell.getCellStyle();
@@ -150,7 +150,7 @@ public class CustomCellStyleOption implements StyleOption {
     }
 
     private void fixRightBorder(HSSFSheet sheet, int columnIndex) {
-        fixRightCell(columnIndex + 1);
+        fixRightCell(sheet, resultCell.getRowIndex(), columnIndex + 1);
         // fix merged right border
         for (int i = 0; i < sheet.getNumMergedRegions(); i++) {
             CellRangeAddress mergedRegion = sheet.getMergedRegion(i);
@@ -159,15 +159,15 @@ public class CustomCellStyleOption implements StyleOption {
                 int lastRow = mergedRegion.getLastRow();
 
                 for (int rightIndex = firstRow; rightIndex <= lastRow; rightIndex++) {
-                    fixRightCell(rightIndex);
+                    fixRightCell(sheet, rightIndex, columnIndex + 1);
                 }
                 break;
             }
         }
     }
 
-    private void fixRightCell(int columnIndex) {
-        HSSFCell rightCell = resultCell.getRow().getCell(columnIndex);
+    private void fixRightCell(HSSFSheet sheet, int rowIndex, int columnIndex) {
+        HSSFCell rightCell = sheet.getRow(rowIndex).getCell(columnIndex);
         if (rightCell != null) {
             HSSFCellStyle newRightStyle = workbook.createCellStyle();
             HSSFCellStyle rightCellStyle = rightCell.getCellStyle();
@@ -199,8 +199,8 @@ public class CustomCellStyleOption implements StyleOption {
         }
     }
 
-    private void fixUpCell(HSSFSheet sheet, int rowIndex, int upIndex) {
-        HSSFCell upCell = sheet.getRow(rowIndex - 1).getCell(upIndex);
+    private void fixUpCell(HSSFSheet sheet, int rowIndex, int columnIndex) {
+        HSSFCell upCell = sheet.getRow(rowIndex - 1).getCell(columnIndex);
         if (upCell != null) {
             HSSFCellStyle newUpStyle = workbook.createCellStyle();
             HSSFCellStyle upCellStyle = upCell.getCellStyle();
@@ -222,16 +222,16 @@ public class CustomCellStyleOption implements StyleOption {
                 int firstColumn = mergedRegion.getFirstColumn();
                 int lastColumn = mergedRegion.getLastColumn();
 
-                for (int upIndex = firstColumn; upIndex <= lastColumn; upIndex++) {
-                    fixDownCell(sheet, rowIndex, upIndex);
+                for (int downIndex = firstColumn; downIndex <= lastColumn; downIndex++) {
+                    fixDownCell(sheet, rowIndex, downIndex);
                 }
                 break;
             }
         }
     }
 
-    private void fixDownCell(HSSFSheet sheet, int rowIndex, int upIndex) {
-        HSSFCell downCell = sheet.getRow(rowIndex + 1).getCell(upIndex);
+    private void fixDownCell(HSSFSheet sheet, int rowIndex, int columnIndex) {
+        HSSFCell downCell = sheet.getRow(rowIndex + 1).getCell(columnIndex);
         if (downCell != null) {
             HSSFCellStyle newDownStyle = workbook.createCellStyle();
             HSSFCellStyle downCellStyle = downCell.getCellStyle();
