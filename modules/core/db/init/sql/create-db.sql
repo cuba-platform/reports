@@ -25,11 +25,11 @@ create table REPORT_REPORT
   UPDATE_TS timestamp,
   UPDATED_BY varchar(50),
 
-  NAME varchar(255),
+  NAME varchar(255) not null,
   CODE varchar(255),
   LOCALE_NAMES varchar(7000),
   GROUP_ID varchar(36) not null,
-  REPORT_TYPE integer,
+  REPORT_TYPE integer not null,
 
   primary key (ID),
   constraint FK_REPORT_REPORT_TO_REPORT_GROUP foreign key (GROUP_ID)
@@ -48,10 +48,10 @@ create table REPORT_BAND_DEFINITION
   UPDATED_BY varchar(50),
 
   PARENT_DEFINITION_ID varchar(36),
-  NAME varchar(255),
-  REPORT_ID varchar(36),
-  ORIENTATION integer default 0,
-  POSITION_ integer default 0,
+  NAME varchar(255) not null,
+  REPORT_ID varchar(36) not null,
+  ORIENTATION integer default 0 not null,
+  POSITION_ integer default 0 not null,
 
   primary key (ID),
   constraint FK_REPORT_BAND_DEFINITION_TO_REPORT_REPORT foreign key (REPORT_ID)
@@ -71,10 +71,10 @@ create table REPORT_TEMPLATE
   UPDATE_TS timestamp,
   UPDATED_BY varchar(50),
 
-  REPORT_ID varchar(36),
+  REPORT_ID varchar(36) not null,
   CODE varchar(50),
-  TEMPLATE_FILE_ID varchar(36),
-  OUTPUT_TYPE integer default 0,
+  TEMPLATE_FILE_ID varchar(36) not null,
+  OUTPUT_TYPE integer default 0 not null,
   IS_DEFAULT smallint default false,
   IS_CUSTOM smallint default false,
   CUSTOM_CLASS varchar,
@@ -95,9 +95,9 @@ create table REPORT_INPUT_PARAMETER
   UPDATE_TS timestamp,
   UPDATED_BY varchar(50),
 
-  REPORT_ID varchar(36),
-  TYPE integer,
-  NAME varchar(255),
+  REPORT_ID varchar(36) not null,
+  TYPE integer not null,
+  NAME varchar(255) not null,
   LOCALE_NAMES varchar(7000),
   ALIAS varchar(100),
   SCREEN varchar(255),
@@ -123,10 +123,10 @@ create table REPORT_DATA_SET
   UPDATE_TS timestamp,
   UPDATED_BY varchar(50),
 
-  NAME varchar(255),
+  NAME varchar(255) not null,
   TEXT longvarchar,
-  TYPE integer,
-  BAND_DEFINITION varchar(36),
+  TYPE integer not null,
+  BAND_DEFINITION varchar(36) not null,
   ENTITY_PARAM_NAME varchar(255),
   LIST_ENTITIES_PARAM_NAME varchar(255),
 
@@ -159,8 +159,8 @@ create table REPORT_REPORT_SCREEN
   UPDATE_TS timestamp,
   UPDATED_BY varchar(50),
 
-  REPORT_ID varchar(36),
-  SCREEN_ID varchar(255),
+  REPORT_ID varchar(36) not null,
+  SCREEN_ID varchar(255) not null,
 
   primary key (ID),
   constraint FK_REPORT_REPORT_SCREEN_TO_REPORT_REPORT foreign key (REPORT_ID)
@@ -178,9 +178,9 @@ create table REPORT_VALUE_FORMAT
   UPDATE_TS timestamp,
   UPDATED_BY varchar(50),
 
-  REPORT_ID varchar(36),
-  NAME varchar(255),
-  FORMAT varchar(255),
+  REPORT_ID varchar(36) not null,
+  NAME varchar(255) not null,
+  FORMAT varchar(255) not null,
 
   primary key (ID),
   constraint FK_REPORT_VALUE_FORMAT_TO_REPORT_REPORT foreign key (REPORT_ID)

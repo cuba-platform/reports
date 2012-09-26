@@ -25,11 +25,11 @@ create table REPORT_REPORT
   UPDATE_TS datetime,
   UPDATED_BY varchar(50),
   --
-  NAME varchar(255),
+  NAME varchar(255) not null,
   CODE varchar(255),
   LOCALE_NAMES varchar(1000),
   GROUP_ID uniqueidentifier not null,
-  REPORT_TYPE integer,
+  REPORT_TYPE integer not null,
   --
   primary key (ID),
   constraint FK_REPORT_REPORT_TO_REPORT_GROUP foreign key (GROUP_ID)
@@ -50,10 +50,10 @@ create table REPORT_BAND_DEFINITION
   UPDATED_BY varchar(50),
   --
   PARENT_DEFINITION_ID uniqueidentifier,
-  REPORT_ID uniqueidentifier,
-  NAME varchar(255),
-  ORIENTATION integer default 0,
-  POSITION_ integer default 0,
+  REPORT_ID uniqueidentifier not null,
+  NAME varchar(255) not null,
+  ORIENTATION integer default 0 not null,
+  POSITION_ integer default 0 not null,
   --
   primary key (ID),
   constraint FK_REPORT_BAND_DEFINITION_TO_REPORT_REPORT foreign key (REPORT_ID)
@@ -73,10 +73,10 @@ create table REPORT_TEMPLATE
   UPDATE_TS datetime,
   UPDATED_BY varchar(50),
   --
-  REPORT_ID uniqueidentifier,
+  REPORT_ID uniqueidentifier not null,
   CODE varchar(50),
-  TEMPLATE_FILE_ID uniqueidentifier,
-  OUTPUT_TYPE integer default 0,
+  TEMPLATE_FILE_ID uniqueidentifier not null,
+  OUTPUT_TYPE integer default 0 not null,
   IS_DEFAULT tinyint default 0,
   IS_CUSTOM tinyint default 0,
   CUSTOM_CLASS varchar(max),
@@ -97,9 +97,9 @@ create table REPORT_INPUT_PARAMETER
   UPDATE_TS datetime,
   UPDATED_BY varchar(50),
   --
-  REPORT_ID uniqueidentifier,
-  TYPE integer,
-  NAME varchar(255),
+  REPORT_ID uniqueidentifier not null,
+  TYPE integer not null,
+  NAME varchar(255) not null,
   LOCALE_NAMES varchar(1000),
   ALIAS varchar(100),
   SCREEN varchar(255),
@@ -125,10 +125,10 @@ create table REPORT_DATA_SET
   UPDATE_TS datetime,
   UPDATED_BY varchar(50),
   --
-  NAME varchar(255),
+  NAME varchar(255) not null,
   TEXT varchar(max),
-  TYPE integer,
-  BAND_DEFINITION uniqueidentifier,
+  TYPE integer not null,
+  BAND_DEFINITION uniqueidentifier not null,
   ENTITY_PARAM_NAME varchar(255),
   LIST_ENTITIES_PARAM_NAME varchar(255),
   --
@@ -159,8 +159,8 @@ create table REPORT_REPORT_SCREEN (
   UPDATE_TS datetime,
   UPDATED_BY varchar(50),
   --
-  REPORT_ID uniqueidentifier,
-  SCREEN_ID varchar(255),
+  REPORT_ID uniqueidentifier not null,
+  SCREEN_ID varchar(255) not null,
   --
   primary key (ID),
   constraint FK_REPORT_REPORT_SCREEN_TO_REPORT_REPORT foreign key (REPORT_ID)
@@ -177,9 +177,9 @@ create table REPORT_VALUE_FORMAT (
   UPDATE_TS datetime,
   UPDATED_BY varchar(50),
   --
-  REPORT_ID uniqueidentifier,
-  NAME varchar(255),
-  FORMAT varchar(255),
+  REPORT_ID uniqueidentifier not null,
+  NAME varchar(255) not null,
+  FORMAT varchar(255) not null,
   --
   primary key (ID),
   constraint FK_REPORT_VALUE_FORMAT_TO_REPORT_REPORT foreign key (REPORT_ID)
