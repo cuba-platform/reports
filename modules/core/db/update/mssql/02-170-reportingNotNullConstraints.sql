@@ -17,20 +17,20 @@ alter table REPORT_TEMPLATE alter column TEMPLATE_FILE_ID uniqueidentifier not n
 alter table REPORT_TEMPLATE alter column OUTPUT_TYPE integer not null^
 
 -- REPORT_INPUT_PARAMETER
-alter table REPORT_INPUT_PARAMETER alter column REPORT_ID set not null^
-alter table REPORT_INPUT_PARAMETER alter column TYPE set not null^
-alter table REPORT_INPUT_PARAMETER alter column NAME set not null^
+alter table REPORT_INPUT_PARAMETER alter column REPORT_ID uniqueidentifier not null^
+alter table REPORT_INPUT_PARAMETER alter column TYPE integer not null^
+alter table REPORT_INPUT_PARAMETER alter column NAME varchar(255) not null^
 
 -- REPORT_DATA_SET
-alter table REPORT_DATA_SET alter column NAME set not null^
-alter table REPORT_DATA_SET alter column TYPE set not null^
-alter table REPORT_DATA_SET alter column BAND_DEFINITION set not null^
+alter table REPORT_DATA_SET alter column NAME varchar(255) not null^
+alter table REPORT_DATA_SET alter column TYPE integer not null^
+alter table REPORT_DATA_SET alter column BAND_DEFINITION uniqueidentifier not null^
 
 -- REPORT_REPORT_SCREEN
-alter table REPORT_REPORT_SCREEN alter column REPORT_ID set not null^
-alter table REPORT_REPORT_SCREEN alter column SCREEN_ID set not null^
+alter table REPORT_REPORT_SCREEN alter column REPORT_ID uniqueidentifier not null^
+alter table REPORT_REPORT_SCREEN alter column SCREEN_ID varchar(255) not null^
 
 -- REPORT_VALUE_FORMAT
-alter table REPORT_VALUE_FORMAT alter column REPORT_ID set not null^
-alter table REPORT_VALUE_FORMAT alter column NAME set not null^
-alter table REPORT_VALUE_FORMAT alter column FORMAT set not null^
+alter table REPORT_VALUE_FORMAT alter column REPORT_ID uniqueidentifier not null^
+alter table REPORT_VALUE_FORMAT alter column NAME varchar(255) not null^
+alter table REPORT_VALUE_FORMAT alter column FORMAT varchar(255) not null^
