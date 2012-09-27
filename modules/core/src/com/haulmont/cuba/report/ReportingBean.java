@@ -7,15 +7,15 @@
 package com.haulmont.cuba.report;
 
 import com.haulmont.cuba.core.EntityManager;
-import com.haulmont.cuba.core.Locator;
-import com.haulmont.cuba.core.PersistenceProvider;
+import com.haulmont.cuba.core.Persistence;
 import com.haulmont.cuba.core.Transaction;
 import com.haulmont.cuba.core.app.FileStorageAPI;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.entity.FileDescriptor;
 import com.haulmont.cuba.core.global.FileStorageException;
-import com.haulmont.cuba.core.global.MetadataProvider;
-import com.haulmont.cuba.core.global.TimeProvider;
+import com.haulmont.cuba.core.global.Metadata;
+import com.haulmont.cuba.core.global.TimeSource;
+import com.haulmont.cuba.core.global.View;
 import com.haulmont.cuba.report.exception.ReportingException;
 import com.haulmont.cuba.report.exception.UnsupportedFormatException;
 import com.haulmont.cuba.report.formatters.*;
@@ -24,6 +24,7 @@ import org.apache.commons.lang.StringUtils;
 
 import javax.annotation.ManagedBean;
 import javax.annotation.Nullable;
+import javax.inject.Inject;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.*;
@@ -39,10 +40,22 @@ public class ReportingBean implements ReportingApi {
     public static final String REPORT_EDIT_VIEW_NAME = "report.edit";
 
     // todo remove thread locals
-    private ThreadLocal<Map<String, Object>> params = new ThreadLocal<Map<String, Object>>();
-    private ThreadLocal<Set<String>> bandDefinitionNames = new ThreadLocal<Set<String>>();
+    private ThreadLocal<Map<String, Object>> params = new ThreadLocal<>();
+    private ThreadLocal<Set<String>> bandDefinitionNames = new ThreadLocal<>();
 
     private PrototypesLoader prototypesLoader = new PrototypesLoader();
+
+    @Inject
+    private Persistence persistence;
+
+    @Inject
+    private Metadata metadata;
+
+    @Inject
+    private FileStorageAPI fileStorageAPI;
+
+    @Inject
+    private TimeSource timeSource;
 
     @Override
     public ReportOutputDocument createReport(Report report, Map<String, Object> params) throws IOException {
@@ -70,12 +83,12 @@ public class ReportingBean implements ReportingApi {
 
         try {
             // Preprocess prototypes
-            List<String> prototypes = new LinkedList<String>();
+            List<String> prototypes = new LinkedList<>();
             for (Map.Entry<String, Object> param : params.entrySet()) {
                 if (param.getValue() instanceof ParameterPrototype)
                     prototypes.add(param.getKey());
             }
-            Map<String, Object> paramsMap = new HashMap<String, Object>(params);
+            Map<String, Object> paramsMap = new HashMap<>(params);
 
             for (String paramName : prototypes) {
                 ParameterPrototype prototype = (ParameterPrototype) params.get(paramName);
@@ -95,7 +108,7 @@ public class ReportingBean implements ReportingApi {
             List<BandDefinition> childrenBandDefinitions = rootBandDefinition.getChildrenBandDefinitions();
             Band rootBand = createRootBand(rootBandDefinition);
 
-            HashMap<String, ReportValueFormat> valuesFormats = new HashMap<String, ReportValueFormat>();
+            HashMap<String, ReportValueFormat> valuesFormats = new HashMap<>();
             for (ReportValueFormat valueFormat : report.getValuesFormats()) {
                 valuesFormats.put(valueFormat.getValueName(), valueFormat);
             }
@@ -141,12 +154,16 @@ public class ReportingBean implements ReportingApi {
 
     @Override
     public Report reloadReport(Report report) {
-        Transaction tx = PersistenceProvider.createTransaction();
+        Transaction tx = persistence.createTransaction();
         try {
-            EntityManager em = PersistenceProvider.getEntityManager();
-            em.setView(MetadataProvider.getViewRepository().getView(report.getClass(), "report.export"));
+            EntityManager em = persistence.getEntityManager();
+            View exportView = metadata.getViewRepository().getView(report.getClass(), "report.export");
+            em.setView(exportView);
             report = em.find(Report.class, report.getId());
-            reloadBandDefinitions(report.getRootBandDefinition());
+            if (report != null) {
+                em.setView(null);
+                em.fetch(report, exportView);
+            }
             tx.commit();
             return report;
         } finally {
@@ -191,21 +208,20 @@ public class ReportingBean implements ReportingApi {
 
     private FileDescriptor saveReport(byte[] reportData, String fileName, String ext) throws IOException {
         FileDescriptor file = new FileDescriptor();
-        file.setCreateDate(TimeProvider.currentTimestamp());
+        file.setCreateDate(timeSource.currentTimestamp());
         file.setName(fileName + "." + ext);
         file.setExtension(ext);
         file.setSize(reportData.length);
 
         try {
-            FileStorageAPI mbean = Locator.lookup(FileStorageAPI.NAME);
-            mbean.saveFile(file, reportData);
+            fileStorageAPI.saveFile(file, reportData);
         } catch (FileStorageException e) {
             throw new IOException(e);
         }
 
-        Transaction tx = PersistenceProvider.createTransaction();
+        Transaction tx = persistence.createTransaction();
         try {
-            EntityManager em = PersistenceProvider.getEntityManager();
+            EntityManager em = persistence.getEntityManager();
             em.persist(file);
             tx.commit();
         } finally {
@@ -217,14 +233,6 @@ public class ReportingBean implements ReportingApi {
     @Override
     public Collection<Report> importReports(byte[] zipBytes) throws IOException, FileStorageException {
         return ImportExportHelper.importReports(zipBytes);
-    }
-
-    private void reloadBandDefinitions(BandDefinition bd) {
-        if (bd.getChildrenBandDefinitions() != null) {
-            for (BandDefinition d : bd.getChildrenBandDefinitions()) {
-                reloadBandDefinitions(d);
-            }
-        }
     }
 
     private ReportEngine getReportEngine(ReportTemplate template) {
@@ -343,7 +351,7 @@ public class ReportingBean implements ReportingApi {
     }
 
     private List<Band> createBandsList(BandDefinition definition, Band parentBand, List<Map<String, Object>> outputData) {
-        List<Band> bandsList = new ArrayList<Band>();
+        List<Band> bandsList = new ArrayList<>();
         for (Map<String, Object> data : outputData) {
             Band band = new Band(definition.getName(), parentBand.getLevel() + 1, parentBand, definition.getOrientation());
             band.setData(data);
@@ -359,11 +367,16 @@ public class ReportingBean implements ReportingApi {
     }
 
     private <T extends Entity> T reloadEntity(T entity, String viewName) {
-        Transaction tx = PersistenceProvider.createTransaction();
+        Transaction tx = persistence.createTransaction();
         try {
-            EntityManager em = PersistenceProvider.getEntityManager();
-            em.setView(MetadataProvider.getViewRepository().getView(entity.getClass(), viewName));
+            EntityManager em = persistence.getEntityManager();
+            View targetView = metadata.getViewRepository().getView(entity.getClass(), viewName);
+            em.setView(targetView);
             entity = (T) em.find(entity.getClass(), entity.getId());
+            if (entity != null) {
+                em.setView(null);
+                em.fetch(entity, targetView);
+            }
             tx.commit();
             return entity;
         } finally {

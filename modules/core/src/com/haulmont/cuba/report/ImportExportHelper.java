@@ -30,6 +30,8 @@ import java.util.LinkedList;
 import java.util.zip.CRC32;
 
 /**
+ * TODO Rewrite as API without static methods
+ *
  * @author fontanenko
  * @version $Id$
  */

@@ -41,6 +41,10 @@ public interface ReportService {
     FileDescriptor createAndSaveReport(Report report, ReportTemplate template,
                                        Map<String, Object> params, String fileName) throws IOException;
 
+    /**
+     * @deprecated
+     */
+    @Deprecated
     Report reloadReport(Report report);
 
     /**
