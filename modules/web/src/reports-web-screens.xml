@@ -8,9 +8,6 @@
     <screen id="report$Report.edit"
             template="/com/haulmont/cuba/web/ui/report/edit/report-edit.xml"/>
 
-    <screen id="report$Report.fileUploadDialog"
-            template="/com/haulmont/cuba/web/ui/report/fileuploaddialog/file-upload-dialog.xml"/>
-
     <screen id="report$BandDefinition.edit"
             template="/com/haulmont/cuba/web/ui/report/definition/edit/definition-edit.xml"/>
 

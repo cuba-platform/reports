@@ -12,6 +12,7 @@ package com.haulmont.cuba.web.ui.report.browse;
 
 import com.haulmont.cuba.gui.ServiceLocator;
 import com.haulmont.cuba.gui.WindowManager;
+import com.haulmont.cuba.gui.app.core.file.FileUploadDialog;
 import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.components.actions.ItemTrackingAction;
 import com.haulmont.cuba.gui.export.ByteArrayDataProvider;
@@ -20,7 +21,7 @@ import com.haulmont.cuba.gui.report.ReportHelper;
 import com.haulmont.cuba.report.Report;
 import com.haulmont.cuba.report.app.ReportService;
 import com.haulmont.cuba.web.filestorage.WebExportDisplay;
-import com.haulmont.cuba.web.ui.report.fileuploaddialog.ReportImportDialog;
+import org.apache.commons.io.FileUtils;
 
 import java.util.Collections;
 import java.util.Map;
@@ -53,14 +54,14 @@ public class ReportBrowser extends AbstractLookup {
         importReport.setAction(new AbstractAction("import") {
             @Override
             public void actionPerform(Component component) {
-                final ReportImportDialog dialog = openWindow("report$Report.fileUploadDialog", WindowManager.OpenType.DIALOG);
+                final FileUploadDialog dialog = openWindow("fileUploadDialog", WindowManager.OpenType.DIALOG);
                 dialog.addListener(new CloseListener() {
                     @Override
                     public void windowClosed(String actionId) {
                         if (Window.COMMIT_ACTION_ID.equals(actionId)) {
                             ReportService rs = ServiceLocator.lookup(ReportService.NAME);
                             try {
-                                rs.importReports(dialog.getBytes());
+                                rs.importReports(FileUtils.readFileToByteArray(dialog.getFile()));
                             } catch (Exception ex) {
                                 throw new RuntimeException(ex);
                             }
