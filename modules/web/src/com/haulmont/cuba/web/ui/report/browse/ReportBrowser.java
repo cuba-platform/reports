@@ -18,16 +18,21 @@ import com.haulmont.cuba.gui.components.actions.ItemTrackingAction;
 import com.haulmont.cuba.gui.export.ByteArrayDataProvider;
 import com.haulmont.cuba.gui.export.ExportFormat;
 import com.haulmont.cuba.gui.report.ReportHelper;
+import com.haulmont.cuba.gui.upload.FileUploadingAPI;
 import com.haulmont.cuba.report.Report;
 import com.haulmont.cuba.report.app.ReportService;
 import com.haulmont.cuba.web.filestorage.WebExportDisplay;
 import org.apache.commons.io.FileUtils;
 
+import javax.inject.Inject;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
 public class ReportBrowser extends AbstractLookup {
+
+    @Inject
+    private FileUploadingAPI fileUpload;
 
     @Override
     public void init(Map<String, Object> params) {
@@ -61,7 +66,9 @@ public class ReportBrowser extends AbstractLookup {
                         if (Window.COMMIT_ACTION_ID.equals(actionId)) {
                             ReportService rs = ServiceLocator.lookup(ReportService.NAME);
                             try {
-                                rs.importReports(FileUtils.readFileToByteArray(dialog.getFile()));
+                                byte[] report = FileUtils.readFileToByteArray(fileUpload.getFile(dialog.getFileId()));
+                                fileUpload.deleteFile(dialog.getFileId());
+                                rs.importReports(report);
                             } catch (Exception ex) {
                                 throw new RuntimeException(ex);
                             }
