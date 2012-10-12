@@ -70,6 +70,9 @@ public class ReportEditor extends AbstractEditor {
     protected CollectionDatasource<Role, UUID> lookupRolesDs
 
     @Inject
+    protected CollectionDatasource<DataSet, UUID> dataSetsDs
+
+    @Inject
     protected HierarchicalDatasource<BandDefinition, UUID> treeDs
 
     def ReportEditor(IFrame frame) {
@@ -399,6 +402,7 @@ public class ReportEditor extends AbstractEditor {
             @Override
             protected void afterWindowClosed(Window window) {
                 treeDs.refresh()
+                tree.expandTree()
             }
         }
 
@@ -418,23 +422,25 @@ public class ReportEditor extends AbstractEditor {
             protected void doRemove(Set selected, boolean autocommit) {
                 if (selected) {
                     removeChildrenCascade(selected)
-
-                    if (this.autocommit) {
-                        try {
-                            treeDs.commit();
-                        } catch (RuntimeException e) {
-                            treeDs.refresh();
-                            throw e;
-                        }
-                    }
                 }
             }
 
             private void removeChildrenCascade(Collection selected) {
                 for (Object o: selected) {
                     BandDefinition definition = (BandDefinition) o;
-                    if (definition.childrenBandDefinitions) {
-                        removeChildrenCascade(definition.childrenBandDefinitions)
+                    def parentDefinition = definition.parentBandDefinition
+                    if (parentDefinition)
+                        definition.parentBandDefinition.childrenBandDefinitions.remove(definition)
+
+                    if (definition.childrenBandDefinitions)
+                        removeChildrenCascade(new ArrayList<BandDefinition>(definition.childrenBandDefinitions))
+
+                    if (definition.dataSets) {
+                        treeDs.setItem(definition)
+                        for (def dataset in new ArrayList<DataSet>(definition.dataSets)) {
+                            if (PersistenceHelper.isNew(dataset))
+                                dataSetsDs.removeItem(dataset)
+                        }
                     }
                     treeDs.removeItem(definition)
                 }
