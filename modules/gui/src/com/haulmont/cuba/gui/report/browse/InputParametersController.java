@@ -71,8 +71,8 @@ public class InputParametersController extends AbstractWindow {
         messages = AppBeans.get(Messages.NAME);
         metadata = AppBeans.get(Metadata.NAME);
 
-        report = (Report) params.get("param$report");
-        linkedEntity = (Entity) params.get("param$entity");
+        report = (Report) params.get("report");
+        linkedEntity = (Entity) params.get("entity");
 
         if (report != null) {
             report = getDsContext().getDataService().reload(report, "report.edit");
@@ -130,7 +130,7 @@ public class InputParametersController extends AbstractWindow {
         field.setRequired(parameter.getRequired());
 
         Label label = cFactory.createComponent(Label.NAME);
-        label.setAlignment(Alignment.TOP_LEFT);
+        label.setAlignment(Alignment.MIDDLE_LEFT);
         label.setValue(parameter.getLocName());
 
         parametersGrid.add(label, 0, currentGridRow);

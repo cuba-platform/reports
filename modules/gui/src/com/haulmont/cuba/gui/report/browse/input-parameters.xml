@@ -8,8 +8,8 @@
     <dsContext>
     </dsContext>
 
-    <layout expand="parametersGrid">
-        <vbox spacing="true">
+    <layout expand="parametersGridVBox">
+        <vbox spacing="true" id="parametersGridVBox">
             <grid id="parametersGrid" spacing="true">
                 <columns>
                     <column flex="1"/>
