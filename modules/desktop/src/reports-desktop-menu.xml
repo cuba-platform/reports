@@ -5,8 +5,10 @@
   ~ Use is subject to license terms.
   -->
 
-<screen-config xmlns="http://schemas.haulmont.com/cuba/4.0/screens.xsd">
+<menu-config xmlns="http://schemas.haulmont.com/cuba/4.0/menu.xsd">
 
-    <include file="/reports-screens.xml"/>
+    <menu id="reports" insertAfter="administration">
+        <item id="report$Report.run"/>
+    </menu>
 
-</screen-config>
+</menu-config>

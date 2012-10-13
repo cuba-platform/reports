@@ -1,7 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   ~ Copyright (c) 2012 Haulmont Technology Ltd. All Rights Reserved.
   ~ Haulmont Technology proprietary and confidential.
   ~ Use is subject to license terms.
   -->
 
-<credits/>
+<credits>
+
+    <items>
+
+        <item name="iText 2.1" web="http://itextpdf.com/" license="mpl-1.1"/>
+
+        <item name="OpenOffice.org" web="http://www.openoffice.org/" license="lgpl-3"/>
+
+    </items>
+
+</credits>
