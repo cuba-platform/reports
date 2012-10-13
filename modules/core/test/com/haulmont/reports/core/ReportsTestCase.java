@@ -30,7 +30,7 @@ public abstract class ReportsTestCase extends CubaTestCase {
     protected List<String> getTestAppProperties() {
         String[] files = {
                 "cuba-app.properties",
-                "reports-app.properties",
+                "reports-test-app.properties",
                 "test-app.properties",
         };
         return Arrays.asList(files);
