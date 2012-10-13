@@ -8,10 +8,7 @@ package com.haulmont.cuba.web.ui.report.template.edit;
 
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.entity.FileDescriptor;
-import com.haulmont.cuba.core.global.AppBeans;
-import com.haulmont.cuba.core.global.FileStorageException;
-import com.haulmont.cuba.core.global.MessageProvider;
-import com.haulmont.cuba.core.global.TimeProvider;
+import com.haulmont.cuba.core.global.*;
 import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.data.ValueListener;
 import com.haulmont.cuba.gui.upload.FileUploadingAPI;
@@ -28,12 +25,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * <p>$Id$</p>
- *
  * @author artamonov
+ * @version $Id$
  */
 public class TemplateEditor extends AbstractEditor {
-    private static final long serialVersionUID = 2000883633888106921L;
     private static final String DEFAULT_TEMPLATE_CODE = "DEFAULT";
 
     private ReportTemplate template;
@@ -47,8 +42,14 @@ public class TemplateEditor extends AbstractEditor {
     @Inject
     private FileUploadField uploadTemplate;
 
+    @Inject
+    private TimeSource timeSource;
+
+    @Inject
+    private Messages messages;
+
     private Map<ReportTemplate, ArrayList<FileDescriptor>> deletedContainer;
-    private List<FileDescriptor> deletedList = new ArrayList<FileDescriptor>();
+    private List<FileDescriptor> deletedList = new ArrayList<>();
 
     @Override
     public void setItem(Entity item) {
@@ -79,16 +80,12 @@ public class TemplateEditor extends AbstractEditor {
         customClass.setEnabled(customEnabled);
     }
 
-    public TemplateEditor(IFrame frame) {
-        super(frame);
-
-        getDialogParams().setWidth(490);
-    }
-
     @Override
     @SuppressWarnings({"serial", "unchecked"})
     public void init(Map<String, Object> params) {
         super.init(params);
+
+        getDialogParams().setWidth(490);
 
         deletedContainer = (java.util.Map) params.get("param$deletedContainer");
 
@@ -124,7 +121,7 @@ public class TemplateEditor extends AbstractEditor {
                 File file = fileUploading.getFile(uploadTemplate.getFileId());
                 templateDescriptor.setSize((int) file.length());
 
-                templateDescriptor.setCreateDate(TimeProvider.currentTimestamp());
+                templateDescriptor.setCreateDate(timeSource.currentTimestamp());
                 saveFile(fileUploading, templateDescriptor, uploadTemplate);
                 templatePath.setCaption(templateDescriptor.getName());
 
@@ -132,13 +129,13 @@ public class TemplateEditor extends AbstractEditor {
                     deletedList.add(template.getTemplateFileDescriptor());
                 template.setTemplateFileDescriptor(templateDescriptor);
 
-                showNotification(MessageProvider.getMessage(TemplateEditor.class,
+                showNotification(messages.getMessage(TemplateEditor.class,
                         "templateEditor.uploadSuccess"), IFrame.NotificationType.HUMANIZED);
             }
 
             @Override
             public void uploadFailed(Event event) {
-                showNotification(MessageProvider.getMessage(TemplateEditor.class,
+                showNotification(messages.getMessage(TemplateEditor.class,
                         "templateEditor.uploadUnsuccess"), IFrame.NotificationType.WARNING);
             }
 
@@ -182,6 +179,8 @@ public class TemplateEditor extends AbstractEditor {
 
     @Override
     public boolean commit(boolean validate) {
+        if (!validateTemplateFile()) return false;
+
         boolean result = super.commit(validate);
         if (result && (deletedList.size() > 0)) {
             if (deletedContainer.get(template) == null)
@@ -192,8 +191,20 @@ public class TemplateEditor extends AbstractEditor {
         return result;
     }
 
+    private boolean validateTemplateFile() {
+        if (template.getTemplateFileDescriptor() == null)  {
+            showNotification(getMessage("validationFail.caption"),
+                    getMessage("template.uploadTemplate"), NotificationType.TRAY);
+            return false;
+        }
+        return true;
+    }
+
     @Override
     public void commitAndClose() {
+        if (!validateTemplateFile())
+            return;
+
         if (!template.getCustomFlag()) {
             template.setCustomClass("");
         }
