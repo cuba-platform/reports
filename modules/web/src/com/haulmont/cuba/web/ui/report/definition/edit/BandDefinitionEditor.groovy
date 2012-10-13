@@ -85,11 +85,13 @@ public class BandDefinitionEditor extends AbstractEditor implements Suggester {
         if (commit()) {
             BandDefinition definition = (BandDefinition) getItem();
             BandDefinition parentDefinition = definition.parentBandDefinition
-            if (PersistenceHelper.isNew(definition)) {
-                if (parentDefinition.childrenBandDefinitions == null)
-                    parentDefinition.childrenBandDefinitions = new ArrayList<BandDefinition>()
+            if (parentDefinition) {
+                if (PersistenceHelper.isNew(definition)) {
+                    if (parentDefinition.childrenBandDefinitions == null)
+                        parentDefinition.childrenBandDefinitions = new ArrayList<BandDefinition>()
 
-                parentDefinition.childrenBandDefinitions.add(definition)
+                    parentDefinition.childrenBandDefinitions.add(definition)
+                }
             }
             close(COMMIT_ACTION_ID)
         }
