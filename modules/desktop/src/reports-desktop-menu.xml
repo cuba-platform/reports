@@ -8,6 +8,8 @@
 <menu-config xmlns="http://schemas.haulmont.com/cuba/4.0/menu.xsd">
 
     <menu id="reports" insertAfter="administration">
+        <item id="report$Report.browse"/>
+        <item id="report$ReportGroup.browse"/>
         <item id="report$Report.run"/>
     </menu>
 

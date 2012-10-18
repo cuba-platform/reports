@@ -1,0 +1,62 @@
+<window xmlns="http://schemas.haulmont.com/cuba/4.0/window.xsd">
+
+    <assign name="width" value="200"/>
+
+    <layout>
+        <split orientation="vertical" id="vSplit" pos="60" width="100%" height="100%">
+            <split orientation="horizontal" id="split" width="100%" height="100%">
+                <vbox spacing="true" margin="true" align="TOP_LEFT" expand="templatesTable" height="100%" width="100%">
+                    <label value="msg://report.properties" stylename="h2"/>
+                    <fieldGroup id="propertiesFieldGroup" border="hidden" datasource="reportDs">
+                        <field id="name" required="true" requiredMessage="msg://report.nameMsg" width="${width}"/>
+                        <field id="code" width="${width}"/>
+                        <field id="reportType" required="true" requiredMessage="msg://report.reportTypeMsg"
+                               width="${width}"/>
+                        <field id="group" required="true" optionsDatasource="groupsDs"
+                               requiredMessage="msg://report.reportTypeMsg" width="${width}"/>
+                    </fieldGroup>
+                    <label value="msg://report.templates" stylename="h2"/>
+                    <table id="templatesTable" sortable="false" height="100%" width="100%">
+                        <buttonsPanel>
+                            <button action="templatesTable.create" icon="icons/create.png"/>
+                            <button action="templatesTable.edit" icon="icons/edit.png"/>
+                            <button action="templatesTable.remove" icon="icons/remove.png"/>
+                            <button id="defaultTemplateBtn" icon="icons/ok.png"/>
+                        </buttonsPanel>
+                        <columns>
+                            <column id="code"/>
+                            <column id="templateFileDescriptor"/>
+                            <column id="reportOutputType"/>
+                            <column id="customClass"/>
+                            <column id="defaultFlag"/>
+                        </columns>
+                        <rows datasource="templatesDs"/>
+                    </table>
+                </vbox>
+                <!-- Vertical Splitter -->
+                <vbox id="treeBox" expand="serviceTree" spacing="true" margin="true" height="100%" width="100%">
+                    <label value="msg://report.bands" stylename="h2"/>
+
+                    <buttonsPanel>
+                        <button id="createBandDefinition" icon="icons/create.png"/>
+                        <button id="editBandDefinition" icon="icons/edit.png"/>
+                        <button id="removeBandDefinition" icon="icons/remove.png"/>
+                        <button id="up" icon="icons/up.png"/>
+                        <button id="down" icon="icons/down.png"/>
+                    </buttonsPanel>
+
+                    <tree id="serviceTree" width="100%" height="100%">
+                        <treechildren datasource="treeDs" captionProperty="name"/>
+                    </tree>
+                </vbox>
+            </split>
+            <!-- Horizontal Splitter -->
+            <hbox width="100%" height="100%" spacing="true" margin="false;true;true;true">
+                <iframe src="/com/haulmont/reports/gui/report/edit/tabs/parameters.xml" id="parametersFrame"
+                        height="100%" width="100%"/>
+                <iframe src="/com/haulmont/reports/gui/report/edit/tabs/formats.xml" id="formatsFrame" height="100%"
+                        width="100%"/>
+            </hbox>
+        </split>
+    </layout>
+</window>

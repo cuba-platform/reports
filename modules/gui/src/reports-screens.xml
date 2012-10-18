@@ -8,12 +8,36 @@
 <screen-config xmlns="http://schemas.haulmont.com/cuba/4.0/screens.xsd">
 
     <screen id="report$Report.run"
-            template="/com/haulmont/cuba/gui/report/run/report-run.xml"/>
+            template="/com/haulmont/reports/gui/report/run/report-run.xml"/>
 
     <screen id="report$inputParameters"
-            template="/com/haulmont/cuba/gui/report/browse/input-parameters.xml"/>
+            template="/com/haulmont/reports/gui/report/run/input-parameters.xml"/>
 
     <screen id="report$commonLookup"
-            template="/com/haulmont/cuba/gui/report/browse/common-lookup.xml"/>
+            template="/com/haulmont/reports/gui/report/run/common-lookup.xml"/>
+
+    <screen id="report$Report.browse"
+            template="/com/haulmont/reports/gui/report/browse/report-browse.xml"/>
+
+    <screen id="report$Report.edit"
+            template="/com/haulmont/reports/gui/report/edit/report-edit.xml"/>
+
+    <screen id="report$BandDefinition.edit"
+            template="/com/haulmont/reports/gui/definition/edit/definition-edit.xml"/>
+
+    <screen id="report$ReportInputParameter.edit"
+            template="/com/haulmont/reports/gui/parameter/edit/parameter-edit.xml"/>
+
+    <screen id="report$ReportValueFormat.edit"
+            template="/com/haulmont/reports/gui/valueformat/edit/format-edit.xml"/>
+
+    <screen id="report$ReportTemplate.edit"
+            template="/com/haulmont/reports/gui/template/edit/template-edit.xml"/>
+
+    <screen id="report$ReportGroup.browse"
+            template="/com/haulmont/reports/gui/group/browse/group-browse.xml"/>
+
+    <screen id="report$ReportGroup.edit"
+            template="/com/haulmont/reports/gui/group/edit/group-edit.xml"/>
 
 </screen-config>

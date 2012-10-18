@@ -6,7 +6,8 @@
 
 package com.haulmont.cuba.desktop.exception;
 
-import com.haulmont.cuba.core.global.MessageProvider;
+import com.haulmont.cuba.core.global.AppBeans;
+import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.desktop.App;
 import com.haulmont.cuba.gui.components.IFrame;
 import com.haulmont.cuba.report.exception.FailedToConnectToOpenOfficeException;
@@ -18,9 +19,8 @@ import javax.annotation.Nullable;
 /**
  * Handles reporting exceptions.
  *
- * <p>$Id: ReportExceptionHandler.java 7093 2012-02-15 13:04:46Z budarov $</p>
- *
  * @author devyatkin
+ * @version $Id$
  */
 public class ReportExceptionHandler extends AbstractExceptionHandler {
 
@@ -40,7 +40,7 @@ public class ReportExceptionHandler extends AbstractExceptionHandler {
         } else if (UnsupportedFormatException.class.getName().equals(className)) {
             messageCode = "reportException.unsupportedFileFormat";
         }
-        String msg = MessageProvider.getMessage(getClass(), messageCode);
+        String msg = AppBeans.get(Messages.class).getMessage(getClass(), messageCode);
         App.getInstance().getMainFrame().showNotification(msg, IFrame.NotificationType.ERROR);
     }
 }

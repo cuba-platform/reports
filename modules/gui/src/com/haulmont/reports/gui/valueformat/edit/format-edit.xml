@@ -1,0 +1,32 @@
+<window
+        xmlns="http://schemas.haulmont.com/cuba/4.0/window.xsd"
+        class="com.haulmont.reports.gui.valueformat.edit.ValueFormatEditor"
+        messagesPack="com.haulmont.reports.gui"
+        datasource="valuesFormatsDs"
+        caption="msg://formatsEdit"
+        focusComponent="formatFields"
+        >
+    <assign name="width" value="200"/>
+
+    <dsContext>
+        <datasource
+                id="valuesFormatsDs"
+                class="com.haulmont.cuba.report.ReportValueFormat"
+                view="report.edit">
+        </datasource>
+    </dsContext>
+
+    <layout expand="windowActions">
+        <vbox margin="true" stylename="edit-area">
+            <fieldGroup id="formatFields" datasource="valuesFormatsDs">
+                <column flex="1">
+                    <field id="valueName" required="true" caption="msg://valuesFormats.name" width="${width}"
+                           requiredMessage="msg://valueNameMsg"/>
+                    <field id="formatString" required="true"  caption="msg://valuesFormats.format" width="${width}"
+                           maxLength="255" custom="true" requiredMessage="msg://formatStringMsg"/>
+                </column>
+            </fieldGroup>
+        </vbox>
+        <iframe id="windowActions" screen="editWindowActions"/>
+    </layout>
+</window>

@@ -1,0 +1,28 @@
+<window
+        xmlns="http://schemas.haulmont.com/cuba/4.0/window.xsd"
+        class="com.haulmont.reports.gui.report.run.InputParametersController"
+        messagesPack="com.haulmont.reports.gui.report.run"
+        caption="msg://inputParameters"
+        >
+
+    <dsContext>
+    </dsContext>
+
+    <layout expand="parametersGridVBox">
+        <vbox spacing="true" id="parametersGridVBox">
+            <grid id="parametersGrid" spacing="true">
+                <columns>
+                    <column flex="1"/>
+                    <column flex="2"/>
+                </columns>
+                <rows>
+                    <row>
+                    </row>
+                </rows>
+            </grid>
+            <button id="printReportBtn" invoke="printReport"
+                    caption="msg://input.printReport" icon="icons/print.png"/>
+        </vbox>
+
+    </layout>
+</window>

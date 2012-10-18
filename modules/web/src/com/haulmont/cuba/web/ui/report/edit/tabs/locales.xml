@@ -1,7 +1,0 @@
-<window xmlns="http://schemas.haulmont.com/cuba/4.0/window.xsd">
-    <layout expand="spacer" margin="true">
-        <label value="msg://localeCaption" stylename="h2"/>
-        <textField id="localeTextField" datasource="reportDs" property="localeNames" rows="20" cols="30"/>
-        <hbox id="spacer"/>
-    </layout>
-</window>
