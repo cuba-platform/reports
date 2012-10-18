@@ -9,7 +9,7 @@
     <dsContext>
         <collectionDatasource
                 id="reportDs"
-                class="com.haulmont.cuba.report.Report"
+                class="com.haulmont.reports.entity.Report"
                 view="report.edit"
                 >
             <datasourceClass>com.haulmont.cuba.gui.report.run.RunReportDatasource</datasourceClass>

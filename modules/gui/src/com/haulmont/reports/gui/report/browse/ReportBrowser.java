@@ -14,8 +14,8 @@ import com.haulmont.cuba.gui.export.ByteArrayDataProvider;
 import com.haulmont.cuba.gui.export.ExportDisplay;
 import com.haulmont.cuba.gui.export.ExportFormat;
 import com.haulmont.cuba.gui.upload.FileUploadingAPI;
-import com.haulmont.cuba.report.Report;
-import com.haulmont.cuba.report.app.ReportService;
+import com.haulmont.reports.entity.Report;
+import com.haulmont.reports.app.service.ReportService;
 import com.haulmont.reports.gui.ReportHelper;
 import org.apache.commons.io.FileUtils;
 

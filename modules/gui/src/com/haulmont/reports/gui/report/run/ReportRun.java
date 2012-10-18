@@ -14,7 +14,7 @@ import com.haulmont.cuba.gui.components.Component;
 import com.haulmont.cuba.gui.components.Table;
 import com.haulmont.cuba.gui.components.actions.ItemTrackingAction;
 import com.haulmont.reports.gui.ReportHelper;
-import com.haulmont.cuba.report.Report;
+import com.haulmont.reports.entity.Report;
 
 import javax.inject.Inject;
 import java.util.Map;

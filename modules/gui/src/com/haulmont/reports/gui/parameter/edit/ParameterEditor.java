@@ -2,11 +2,6 @@
  * Copyright (c) 2008 Haulmont Technology Ltd. All Rights Reserved.
  * Haulmont Technology proprietary and confidential.
  * Use is subject to license terms.
-
- * Author: Eugeniy Degtyarjov
- * Created: 26.05.2010 16:07:12
- *
- * $Id$
  */
 package com.haulmont.reports.gui.parameter.edit;
 
@@ -15,36 +10,32 @@ import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.global.Metadata;
 import com.haulmont.cuba.gui.components.AbstractEditor;
 import com.haulmont.cuba.gui.components.CheckBox;
-import com.haulmont.cuba.gui.components.IFrame;
 import com.haulmont.cuba.gui.components.LookupField;
 import com.haulmont.cuba.gui.config.WindowConfig;
 import com.haulmont.cuba.gui.config.WindowInfo;
 import com.haulmont.cuba.gui.data.ValueListener;
-import com.haulmont.cuba.report.ParameterType;
-import com.haulmont.cuba.report.ReportInputParameter;
+import com.haulmont.reports.entity.ParameterType;
+import com.haulmont.reports.entity.ReportInputParameter;
 
 import javax.inject.Inject;
 import java.util.*;
 
+/**
+ * @author degtyarjov
+ * @version $Id$
+ */
 public class ParameterEditor extends AbstractEditor {
-    private static final long serialVersionUID = -8191035000453382462L;
-
-    public ParameterEditor(IFrame frame) {
-        super(frame);
-
-        getDialogParams().setWidth(450);
-    }
 
     private ReportInputParameter parameter;
     private LookupField metaClass;
     private LookupField screen;
     private LookupField enumLookup;
     private CheckBox fromBrowser;
-    private Map<String, String> metaNamesToClassNames = new HashMap<String, String>();
-    private Map<String, String> classNamesToMetaNames = new HashMap<String, String>();
+    private Map<String, String> metaNamesToClassNames = new HashMap<>();
+    private Map<String, String> classNamesToMetaNames = new HashMap<>();
 
-    private Map<String, Class> enumNamesToEnumClass = new HashMap<String, Class>();
-    private Map<String, String> enumClassToEnumNames = new HashMap<String, String>();
+    private Map<String, Class> enumNamesToEnumClass = new HashMap<>();
+    private Map<String, String> enumClassToEnumNames = new HashMap<>();
 
     @Inject
     private WindowConfig windowConfig;
@@ -98,6 +89,7 @@ public class ParameterEditor extends AbstractEditor {
         }
         enumLookup.setOptionsList(enums);
         enumLookup.addListener(new ValueListener() {
+            @Override
             public void valueChanged(Object source, String property, Object prevValue, Object value) {
                 if (value != null) {
                     Class enumClass = enumNamesToEnumClass.get(value.toString());
@@ -114,16 +106,20 @@ public class ParameterEditor extends AbstractEditor {
         }
         screen.setOptionsList(screensList);
         screen.addListener(new ValueListener() {
+            @Override
             public void valueChanged(Object source, String property, Object prevValue, Object value) {
                 parameter.setScreen(value != null ? value.toString() : null);
             }
         });
 
         type.addListener(new ValueListener() {
+            @Override
             public void valueChanged(Object source, String property, Object prevValue, Object value) {
                 enableControlsByParamType(value);
             }
         });
+
+        getDialogParams().setWidth(450);
     }
 
     private void enableControlsByParamType(Object value) {

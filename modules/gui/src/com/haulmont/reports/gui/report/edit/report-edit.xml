@@ -10,7 +10,7 @@
     <dsContext>
         <datasource
                 id="reportDs"
-                class="com.haulmont.cuba.report.Report"
+                class="com.haulmont.reports.entity.Report"
                 view="report.edit">
             <collectionDatasource id="parametersDs" property="inputParameters"/>
             <collectionDatasource id="valuesFormatsDs" property="valuesFormats"/>
@@ -22,7 +22,7 @@
             </hierarchicalDatasource>
         </datasource>
 
-        <collectionDatasource id="groupsDs" class="com.haulmont.cuba.report.ReportGroup" view="_local">
+        <collectionDatasource id="groupsDs" class="com.haulmont.reports.entity.ReportGroup" view="_local">
             <query>
                 <![CDATA[ select rg from report$ReportGroup rg order by rg.createTs asc ]]>
             </query>

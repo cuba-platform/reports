@@ -14,7 +14,7 @@
     <dsContext>
         <datasource
                 id="bandDefinitionDs"
-                class="com.haulmont.cuba.report.BandDefinition"
+                class="com.haulmont.reports.entity.BandDefinition"
                 view="report.edit">
             <collectionDatasource id="dataSetsDs" property="dataSets"/>
         </datasource>

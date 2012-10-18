@@ -29,11 +29,19 @@ import org.apache.commons.lang.ObjectUtils
 import org.apache.commons.lang.StringUtils
 import com.haulmont.cuba.core.global.*
 import com.haulmont.cuba.gui.components.*
-import com.haulmont.cuba.report.*
+
 import com.haulmont.cuba.gui.data.HierarchicalDatasource
 import com.haulmont.cuba.security.entity.Role
 import javax.inject.Named
 import com.haulmont.cuba.gui.data.impl.DatasourceImpl
+import com.haulmont.reports.entity.ReportType
+import com.haulmont.reports.entity.ReportScreen
+import com.haulmont.reports.entity.BandDefinition
+import com.haulmont.reports.entity.ReportTemplate
+import com.haulmont.reports.entity.DataSet
+import com.haulmont.reports.entity.ReportGroup
+import com.haulmont.reports.entity.ReportInputParameter
+import com.haulmont.reports.entity.Report
 
 /**
  * @author degtyarjov

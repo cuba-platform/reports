@@ -7,14 +7,16 @@
 package com.haulmont.reports.gui.actions;
 
 import com.haulmont.chile.core.model.MetaClass;
+import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.LoadContext;
-import com.haulmont.cuba.core.global.MessageProvider;
+import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.gui.AppConfig;
 import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
 import com.haulmont.cuba.gui.data.Datasource;
+import com.haulmont.reports.app.ParameterPrototype;
+import com.haulmont.reports.entity.*;
 import com.haulmont.reports.gui.ReportHelper;
-import com.haulmont.cuba.report.*;
 
 import java.util.Collection;
 import java.util.List;
@@ -32,6 +34,8 @@ public class TablePrintFormAction extends AbstractPrintFormAction {
 
     protected final static String ENTITIES_LIST_SPECIAL_KEY = "entities_special_key";
 
+    protected Messages messages;
+
     public TablePrintFormAction(Window window, Table table, final boolean multiObjects) {
         this(DEFAULT_ACTION_ID, window, table, multiObjects);
     }
@@ -42,6 +46,8 @@ public class TablePrintFormAction extends AbstractPrintFormAction {
         this.window = window;
         this.table = table;
         this.multiObjects = multiObjects;
+
+        messages = AppBeans.get(Messages.class);
     }
 
     @Override
@@ -80,8 +86,8 @@ public class TablePrintFormAction extends AbstractPrintFormAction {
             if (multiObjects) {
                 actions = new Action[]{printAllAction, printSelectedAction, cancelAction};
 
-                window.showOptionDialog(MessageProvider.getMessage(ReportHelper.class, "notifications.confirmPrintSelectedheader"),
-                        MessageProvider.getMessage(ReportHelper.class, "notifications.confirmPrintSelected"),
+                window.showOptionDialog(messages.getMessage(ReportHelper.class, "notifications.confirmPrintSelectedheader"),
+                        messages.getMessage(ReportHelper.class, "notifications.confirmPrintSelected"),
                         IFrame.MessageType.CONFIRMATION,
                         actions);
             } else {
@@ -97,11 +103,11 @@ public class TablePrintFormAction extends AbstractPrintFormAction {
                     }
                 };
 
-                window.showOptionDialog(MessageProvider.getMessage(ReportHelper.class, "notifications.confirmPrintAllheader"),
-                        MessageProvider.getMessage(ReportHelper.class, "notifications.confirmPrintAll"),
+                window.showOptionDialog(messages.getMessage(ReportHelper.class, "notifications.confirmPrintAllheader"),
+                        messages.getMessage(ReportHelper.class, "notifications.confirmPrintAll"),
                         IFrame.MessageType.CONFIRMATION, new Action[]{yesAction, cancelAction});
             } else {
-                window.showNotification(MessageProvider.getMessage(ReportHelper.class, "notifications.noSelectedEntity"),
+                window.showNotification(messages.getMessage(ReportHelper.class, "notifications.noSelectedEntity"),
                         IFrame.NotificationType.HUMANIZED);
             }
         }
@@ -172,6 +178,6 @@ public class TablePrintFormAction extends AbstractPrintFormAction {
     @Override
     public String getCaption() {
         final String messagesPackage = AppConfig.getMessagesPack();
-        return MessageProvider.getMessage(messagesPackage, "actions.Report");
+        return messages.getMessage(messagesPackage, "actions.Report");
     }
 }

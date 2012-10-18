@@ -10,7 +10,7 @@
     <dsContext>
         <datasource
                 id="parameterDs"
-                class="com.haulmont.cuba.report.ReportInputParameter"
+                class="com.haulmont.reports.entity.ReportInputParameter"
                 view="report.edit">
         </datasource>
     </dsContext>

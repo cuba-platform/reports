@@ -10,7 +10,7 @@
     <dsContext>
         <groupDatasource
                 id="reportDs"
-                class="com.haulmont.cuba.report.Report"
+                class="com.haulmont.reports.entity.Report"
                 view="report.view"
                 >
             <query>

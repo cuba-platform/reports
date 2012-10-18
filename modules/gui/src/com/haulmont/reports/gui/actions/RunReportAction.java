@@ -11,7 +11,7 @@ import com.haulmont.cuba.gui.components.AbstractAction;
 import com.haulmont.cuba.gui.components.Component;
 import com.haulmont.cuba.gui.components.Window;
 import com.haulmont.reports.gui.ReportHelper;
-import com.haulmont.cuba.report.Report;
+import com.haulmont.reports.entity.Report;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -21,9 +21,8 @@ import java.util.Map;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * <p>$Id$</p>
- *
  * @author artamonov
+ * @version $Id$
  */
 public class RunReportAction extends AbstractAction {
 
@@ -39,7 +38,7 @@ public class RunReportAction extends AbstractAction {
 
     @Override
     public void actionPerform(Component component) {
-        final Map<String, Object> params = new HashMap<String, Object>();
+        final Map<String, Object> params = new HashMap<>();
         params.put("screen", window.getId());
 
         window.openLookup("report$Report.run", new Window.Lookup.Handler() {

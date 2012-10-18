@@ -11,7 +11,7 @@
     <dsContext>
         <datasource
                 id="valuesFormatsDs"
-                class="com.haulmont.cuba.report.ReportValueFormat"
+                class="com.haulmont.reports.entity.ReportValueFormat"
                 view="report.edit">
         </datasource>
     </dsContext>

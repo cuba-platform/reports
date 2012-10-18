@@ -20,9 +20,9 @@ import com.haulmont.cuba.gui.data.CollectionDatasource;
 import com.haulmont.cuba.gui.data.DsBuilder;
 import com.haulmont.reports.gui.ReportHelper;
 import com.haulmont.cuba.gui.xml.layout.ComponentsFactory;
-import com.haulmont.cuba.report.ParameterType;
-import com.haulmont.cuba.report.Report;
-import com.haulmont.cuba.report.ReportInputParameter;
+import com.haulmont.reports.entity.ParameterType;
+import com.haulmont.reports.entity.Report;
+import com.haulmont.reports.entity.ReportInputParameter;
 import org.apache.commons.lang.StringUtils;
 
 import javax.inject.Inject;

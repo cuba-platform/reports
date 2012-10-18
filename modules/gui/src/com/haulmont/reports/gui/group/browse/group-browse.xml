@@ -7,7 +7,7 @@
         >
 
     <dsContext>
-        <collectionDatasource id="groupsDs" class="com.haulmont.cuba.report.ReportGroup" view="_local">
+        <collectionDatasource id="groupsDs" class="com.haulmont.reports.entity.ReportGroup" view="_local">
             <query>
                 <![CDATA[select gr from report$ReportGroup gr]]>
             </query>

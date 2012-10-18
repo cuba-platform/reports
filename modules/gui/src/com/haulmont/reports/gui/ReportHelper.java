@@ -2,35 +2,25 @@
  * Copyright (c) 2008 Haulmont Technology Ltd. All Rights Reserved.
  * Haulmont Technology proprietary and confidential.
  * Use is subject to license terms.
-
- * Author: Eugeniy Degtyarjov
- * Created: 01.06.2010 13:16:03
- *
- * $Id$
  */
 package com.haulmont.reports.gui;
 
+import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.gui.AppConfig;
-import com.haulmont.cuba.gui.ServiceLocator;
 import com.haulmont.cuba.gui.WindowManager;
-import com.haulmont.cuba.gui.components.AbstractAction;
-import com.haulmont.cuba.gui.components.Table;
 import com.haulmont.cuba.gui.components.Window;
 import com.haulmont.cuba.gui.export.ByteArrayDataProvider;
 import com.haulmont.cuba.gui.export.ExportDisplay;
 import com.haulmont.cuba.gui.export.ExportFormat;
-import com.haulmont.reports.gui.actions.EditorPrintFormAction;
-import com.haulmont.reports.gui.actions.RunReportAction;
-import com.haulmont.cuba.report.Report;
-import com.haulmont.cuba.report.ReportInputParameter;
-import com.haulmont.cuba.report.ReportOutputDocument;
-import com.haulmont.cuba.report.ReportScreen;
-import com.haulmont.cuba.report.app.ReportService;
 import com.haulmont.cuba.security.entity.Role;
 import com.haulmont.cuba.security.entity.RoleType;
 import com.haulmont.cuba.security.entity.User;
 import com.haulmont.cuba.security.entity.UserRole;
-import com.haulmont.reports.gui.actions.TablePrintFormAction;
+import com.haulmont.reports.app.ReportOutputDocument;
+import com.haulmont.reports.app.service.ReportService;
+import com.haulmont.reports.entity.Report;
+import com.haulmont.reports.entity.ReportInputParameter;
+import com.haulmont.reports.entity.ReportScreen;
 import org.apache.commons.lang.StringUtils;
 
 import javax.annotation.Nullable;
@@ -40,6 +30,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author degtyarjov
+ * @version $Id$
+ */
 @SuppressWarnings({"serial"})
 public class ReportHelper {
 
@@ -100,7 +94,7 @@ public class ReportHelper {
             if (StringUtils.isBlank(defaultOutputFileName))
                 defaultOutputFileName = report.getName();
 
-            ReportService srv = ServiceLocator.lookup(ReportService.NAME);
+            ReportService srv = AppBeans.get(ReportService.NAME);
 
             ReportOutputDocument document;
             if (StringUtils.isEmpty(templateCode))
@@ -120,61 +114,8 @@ public class ReportHelper {
         }
     }
 
-    /**
-     * Create RunReport action
-     * @deprecated Use directly {@link RunReportAction}
-     * @param captionId Action id
-     * @param window Window
-     * @return Action
-     */
-    @Deprecated
-    public static AbstractAction createRunReportButton(String captionId, final Window window) {
-        return new RunReportAction(window, captionId);
-    }
-
-    /**
-     * Create Printform action for editor
-     * @deprecated Use directly {@link EditorPrintFormAction}
-     * @param captionId Action id
-     * @param editor Editor window
-     * @return Action
-     */
-    @Deprecated
-    public static AbstractAction createPrintformFromEditorAction(String captionId, final Window.Editor editor) {
-        return createPrintformFromEditorAction(captionId, editor, null);
-    }
-
-    /**
-     * Create PrintForm action for editor
-     * @deprecated Use directly {@link EditorPrintFormAction}
-     * @param captionId Action id
-     * @param editor Editor window
-     * @param name Report name
-     * @return Action
-     */
-    @Deprecated
-    public static AbstractAction createPrintformFromEditorAction(String captionId, final Window.Editor editor,
-                                                                 @Nullable final String name) {
-        return new EditorPrintFormAction(captionId, editor, name);
-    }
-
-    /**
-     * Create PrintForm action for table
-     * @deprecated Use directly {@link TablePrintFormAction}
-     * @param captionId Action id
-     * @param window Window
-     * @param table Table
-     * @param multiObjects Multiple objects support
-     * @return Action
-     */
-    @Deprecated
-    public static AbstractAction createPrintformFromTableAction(String captionId, final Window window,
-                                                                final Table table, final boolean multiObjects) {
-        return new TablePrintFormAction(captionId, window, table, multiObjects);
-    }
-
     private static List<Report> checkRoles(User user, List<Report> reports) {
-        List<Report> filter = new ArrayList<Report>();
+        List<Report> filter = new ArrayList<>();
         for (Report report : reports) {
             List<Role> reportRoles = report.getRoles();
             if (reportRoles == null || reportRoles.size() == 0) {
@@ -193,11 +134,11 @@ public class ReportHelper {
         return filter;
     }
 
-    private static List<Report> checkScreens(User user, List<Report> reports, String screen) {
-        List<Report> filter = new ArrayList<Report>();
+    private static List<Report> checkScreens(List<Report> reports, String screen) {
+        List<Report> filter = new ArrayList<>();
         for (Report report : reports) {
             List<ReportScreen> reportScreens = report.getReportScreens();
-            List<String> reportScreensAliases = new ArrayList<String>();
+            List<String> reportScreensAliases = new ArrayList<>();
             for (ReportScreen reportScreen : reportScreens) {
                 reportScreensAliases.add(reportScreen.getScreenId());
             }
@@ -210,7 +151,7 @@ public class ReportHelper {
 
     public static List<Report> applySecurityPolicies(User user, String screen, List<Report> reports) {
         List<Report> filter = checkRoles(user, reports);
-        filter = checkScreens(user, filter, screen);
+        filter = checkScreens(filter, screen);
         return filter;
     }
 }

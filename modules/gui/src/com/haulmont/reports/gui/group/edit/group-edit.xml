@@ -8,7 +8,7 @@
         >
 
     <dsContext>
-        <datasource id="groupDs" class="com.haulmont.cuba.report.ReportGroup" view="_local"/>
+        <datasource id="groupDs" class="com.haulmont.reports.entity.ReportGroup" view="_local"/>
     </dsContext>
 
     <layout expand="windowActions">

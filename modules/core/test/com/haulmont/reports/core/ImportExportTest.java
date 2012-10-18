@@ -6,11 +6,11 @@
 
 package com.haulmont.reports.core;
 
-import com.haulmont.cuba.core.Locator;
+import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.FileStorageException;
-import com.haulmont.cuba.report.Report;
-import com.haulmont.cuba.report.ReportType;
-import com.haulmont.cuba.report.app.ReportService;
+import com.haulmont.reports.app.service.ReportService;
+import com.haulmont.reports.entity.Report;
+import com.haulmont.reports.entity.ReportType;
 import junit.framework.Assert;
 import org.apache.commons.io.IOUtils;
 
@@ -26,7 +26,7 @@ import java.util.Collection;
 public class ImportExportTest extends ReportsTestCase {
 
     public void testImport() throws IOException, FileStorageException {
-        ReportService reportService = Locator.lookup(ReportService.NAME);
+        ReportService reportService = AppBeans.get(ReportService.NAME);
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         InputStream reportsStream = getClass().getResourceAsStream("/com/haulmont/reports/core/TestReport.zip");

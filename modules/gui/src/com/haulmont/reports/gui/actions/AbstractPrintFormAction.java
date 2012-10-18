@@ -7,25 +7,22 @@
 package com.haulmont.reports.gui.actions;
 
 import com.haulmont.chile.core.model.MetaClass;
-import com.haulmont.cuba.core.global.LoadContext;
-import com.haulmont.cuba.core.global.MessageProvider;
-import com.haulmont.cuba.core.global.MetadataProvider;
-import com.haulmont.cuba.core.global.UserSessionProvider;
+import com.haulmont.cuba.core.global.*;
 import com.haulmont.cuba.gui.WindowManager;
 import com.haulmont.cuba.gui.components.AbstractAction;
 import com.haulmont.cuba.gui.components.IFrame;
 import com.haulmont.cuba.gui.components.Window;
 import com.haulmont.cuba.gui.data.DsContext;
+import com.haulmont.cuba.security.entity.User;
+import com.haulmont.reports.entity.*;
 import com.haulmont.reports.gui.ReportHelper;
-import com.haulmont.cuba.report.*;
 
 import javax.annotation.Nullable;
 import java.util.*;
 
 /**
- * <p>$Id$</p>
- *
  * @author artamonov
+ * @version $Id$
  */
 abstract class AbstractPrintFormAction extends AbstractAction {
 
@@ -72,11 +69,12 @@ abstract class AbstractPrintFormAction extends AbstractAction {
 
     protected void openRunReportScreen(final Window window, final String paramAlias, final Object paramValue,
                                        String javaClassName, ReportType reportType, @Nullable final String name) {
-        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, Object> params = new HashMap<>();
 
         String metaClass;
         try {
-            metaClass = MetadataProvider.getSession().getClass(Class.forName(javaClassName)).getName();
+            Class<?> javaClass = Class.forName(javaClassName);
+            metaClass = AppBeans.get(Metadata.class).getSession().getClass(javaClass).getName();
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
@@ -103,7 +101,7 @@ abstract class AbstractPrintFormAction extends AbstractAction {
 
     protected boolean checkReportsForStart(final Window window, final String paramAlias, final Object paramValue,
                                            String javaClassName, ReportType reportType, @Nullable final String name) {
-        Collection<MetaClass> metaClasses = MetadataProvider.getSession().getClasses();
+        Collection<MetaClass> metaClasses = AppBeans.get(Metadata.class).getSession().getClasses();
         String metaClassName = "";
         Iterator<MetaClass> iterator = metaClasses.iterator();
         while (iterator.hasNext() && ("".equals(metaClassName))) {
@@ -125,14 +123,15 @@ abstract class AbstractPrintFormAction extends AbstractAction {
 
         DsContext dsContext = window.getDsContext();
         List<Report> reports = dsContext.getDataService().loadList(lContext);
-        reports = ReportHelper.applySecurityPolicies(UserSessionProvider.getUserSession().getUser(), window.getId(), reports);
+        User user = AppBeans.get(UserSessionSource.class).getUserSession().getUser();
+        reports = ReportHelper.applySecurityPolicies(user, window.getId(), reports);
         if (reports.size() == 1) {
             Report report = reports.get(0);
             window.getDsContext().getDataService().reload(report, "report.edit");
             String inputParamAlias = preprocessParams(report, paramAlias, paramValue);
             ReportHelper.runReport(report, window, inputParamAlias, paramValue, name);
         } else if (reports.size() == 0) {
-            String msg = MessageProvider.getMessage(ReportHelper.class, "report.notFoundReports");
+            String msg = AppBeans.get(Messages.class).getMessage(ReportHelper.class, "report.notFoundReports");
             window.showNotification(msg, IFrame.NotificationType.HUMANIZED);
         } else
             result = true;

@@ -18,7 +18,7 @@
         <property name="clusterInvocationSupport" ref="cuba_clusterInvocationSupport"/>
         <property name="remoteServices">
             <map>
-                <entry key="report_ReportService" value="com.haulmont.cuba.report.app.ReportService"/>
+                <entry key="report_ReportService" value="com.haulmont.reports.app.service.ReportService"/>
             </map>
         </property>
     </bean>
@@ -28,7 +28,7 @@
     <bean id="reports_exceptionHandlersConf" class="com.haulmont.cuba.web.exception.ExceptionHandlersConfiguration">
         <property name="handlerClasses">
             <list>
-                <value>com.haulmont.cuba.web.exception.ReportExceptionHandler</value>
+                <value>com.haulmont.reports.web.exception.ReportExceptionHandler</value>
             </list>
         </property>
     </bean>

@@ -7,21 +7,22 @@
 package com.haulmont.reports.gui.actions;
 
 import com.haulmont.cuba.core.entity.Entity;
-import com.haulmont.cuba.core.global.MessageProvider;
+import com.haulmont.cuba.core.global.AppBeans;
+import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.gui.AppConfig;
 import com.haulmont.cuba.gui.components.Component;
 import com.haulmont.cuba.gui.components.IFrame;
 import com.haulmont.cuba.gui.components.Window;
+import com.haulmont.reports.app.ParameterPrototype;
+import com.haulmont.reports.entity.*;
 import com.haulmont.reports.gui.ReportHelper;
-import com.haulmont.cuba.report.*;
 
 import javax.annotation.Nullable;
 import java.util.List;
 
 /**
- * <p>$Id$</p>
- *
  * @author artamonov
+ * @author $Id$
  */
 public class EditorPrintFormAction extends AbstractPrintFormAction {
 
@@ -47,7 +48,7 @@ public class EditorPrintFormAction extends AbstractPrintFormAction {
             final String javaClassName = entity.getClass().getCanonicalName();
             openRunReportScreen(editor, ENTITY_SPECIAL_KEY, entity, javaClassName, ReportType.PRINT_FORM, name);
         } else
-            editor.showNotification(MessageProvider.getMessage(ReportHelper.class, "notifications.noSelectedEntity"),
+            editor.showNotification(AppBeans.get(Messages.class).getMessage(ReportHelper.class, "notifications.noSelectedEntity"),
                     IFrame.NotificationType.HUMANIZED);
 
     }
@@ -74,6 +75,6 @@ public class EditorPrintFormAction extends AbstractPrintFormAction {
     @Override
     public String getCaption() {
         final String messagesPackage = AppConfig.getMessagesPack();
-        return MessageProvider.getMessage(messagesPackage, "actions.Report");
+        return AppBeans.get(Messages.class).getMessage(messagesPackage, "actions.Report");
     }
 }

@@ -17,8 +17,8 @@ import com.haulmont.cuba.gui.components.actions.CreateAction
 import com.haulmont.cuba.gui.components.actions.EditAction
 import com.haulmont.cuba.gui.components.actions.RemoveAction
 import com.haulmont.cuba.gui.data.DataService
-import com.haulmont.cuba.report.Report
-import com.haulmont.cuba.report.ReportGroup
+import com.haulmont.reports.entity.Report
+import com.haulmont.reports.entity.ReportGroup
 
 /**
  * @author artamonov

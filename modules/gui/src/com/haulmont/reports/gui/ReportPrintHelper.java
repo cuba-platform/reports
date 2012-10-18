@@ -7,7 +7,7 @@
 package com.haulmont.reports.gui;
 
 import com.haulmont.cuba.gui.export.ExportFormat;
-import com.haulmont.cuba.report.ReportOutputType;
+import com.haulmont.reports.entity.ReportOutputType;
 
 import java.util.HashMap;
 
@@ -17,7 +17,7 @@ import java.util.HashMap;
  */
 public class ReportPrintHelper {
 
-    private static HashMap<ReportOutputType, ExportFormat> exportFormats = new HashMap<ReportOutputType, ExportFormat>();
+    private static HashMap<ReportOutputType, ExportFormat> exportFormats = new HashMap<>();
 
     static {
         exportFormats.put(ReportOutputType.XLS, ExportFormat.XLS);

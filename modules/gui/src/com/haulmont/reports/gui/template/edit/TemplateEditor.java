@@ -14,8 +14,8 @@ import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.data.ValueListener;
 import com.haulmont.cuba.gui.export.ExportDisplay;
 import com.haulmont.cuba.gui.upload.FileUploadingAPI;
-import com.haulmont.cuba.report.Report;
-import com.haulmont.cuba.report.ReportTemplate;
+import com.haulmont.reports.entity.Report;
+import com.haulmont.reports.entity.ReportTemplate;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 

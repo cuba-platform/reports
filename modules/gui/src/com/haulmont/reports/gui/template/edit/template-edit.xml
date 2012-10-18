@@ -16,7 +16,7 @@
     <dsContext>
         <datasource
                 id="templateDs"
-                class="com.haulmont.cuba.report.ReportTemplate"
+                class="com.haulmont.reports.entity.ReportTemplate"
                 view="template.edit"/>
     </dsContext>
     <#assign width = 300>

@@ -16,10 +16,10 @@ import com.haulmont.cuba.gui.data.CollectionDatasource
 import com.haulmont.cuba.gui.data.Datasource
 import com.haulmont.cuba.gui.data.ValueListener
 import com.haulmont.cuba.gui.data.impl.DsListenerAdapter
-import com.haulmont.cuba.report.BandDefinition
-import com.haulmont.cuba.report.DataSet
-import com.haulmont.cuba.report.DataSetType
-import com.haulmont.cuba.report.Orientation
+import com.haulmont.reports.entity.BandDefinition
+import com.haulmont.reports.entity.DataSet
+import com.haulmont.reports.entity.DataSetType
+import com.haulmont.reports.entity.Orientation
 import com.haulmont.cuba.gui.components.*
 import com.haulmont.cuba.gui.components.actions.CreateAction
 

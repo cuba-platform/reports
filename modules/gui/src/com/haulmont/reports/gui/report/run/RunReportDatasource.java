@@ -11,7 +11,7 @@ import com.haulmont.cuba.gui.data.DataService;
 import com.haulmont.cuba.gui.data.DsContext;
 import com.haulmont.cuba.gui.data.impl.CollectionDatasourceImpl;
 import com.haulmont.reports.gui.ReportHelper;
-import com.haulmont.cuba.report.Report;
+import com.haulmont.reports.entity.Report;
 import com.haulmont.cuba.security.entity.User;
 
 import java.util.ArrayList;
@@ -21,7 +21,7 @@ import java.util.UUID;
 
 /**
  * @author degtyarjov
- * @version $id$
+ * @version $Id$
  */
 public class RunReportDatasource extends CollectionDatasourceImpl<Report, UUID> {
     public RunReportDatasource(DsContext context, DataService dataservice, String id, MetaClass metaClass, String viewName) {
