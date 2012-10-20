@@ -9,7 +9,8 @@
                         <button id="addRoleBtn"/>
                     </hbox>
                 </groupBox>
-                <table id="rolesTable" width="100%" multiselect="true">
+                <table id="rolesTable" width="100%" multiselect="true"
+                       reorderingAllowed="false" columnControlVisible="false">
                     <buttonsPanel>
                         <button action="rolesTable.remove" caption="msg://roles.removeRole"
                                 icon="icons/remove.png"/>
@@ -28,7 +29,8 @@
                         <button id="addReportScreenBtn"/>
                     </hbox>
                 </groupBox>
-                <table id="screenTable" width="100%" multiselect="true">
+                <table id="screenTable" width="100%" multiselect="true"
+                        reorderingAllowed="false" columnControlVisible="false">
                     <buttonsPanel>
                         <button action="screenTable.remove" caption="msg://screens.removeScreen"
                                 icon="icons/remove.png"/>

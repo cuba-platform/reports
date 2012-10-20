@@ -16,7 +16,8 @@
                                requiredMessage="msg://report.reportTypeMsg" width="${width}"/>
                     </fieldGroup>
                     <label value="msg://report.templates" stylename="h2"/>
-                    <table id="templatesTable" sortable="false" height="100%" width="100%">
+                    <table id="templatesTable" sortable="false" height="100%" width="100%"
+                            reorderingAllowed="false" columnControlVisible="false">
                         <buttonsPanel>
                             <button action="templatesTable.create" icon="icons/create.png"/>
                             <button action="templatesTable.edit" icon="icons/edit.png"/>

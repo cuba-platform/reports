@@ -2,14 +2,15 @@
 
     <layout spacing="true" expand="inputParametersTable">
         <label value="msg://report.parameters" stylename="h2"/>
-        <hbox spacing="true">
-            <button action="inputParametersTable.create" icon="icons/create.png"/>
-            <button action="inputParametersTable.edit" icon="icons/edit.png"/>
-            <button action="inputParametersTable.remove" icon="icons/remove.png"/>
-            <button id="up" icon="icons/up.png"/>
-            <button id="down" icon="icons/down.png"/>
-        </hbox>
-        <table id="inputParametersTable" sortable="true" width="100%">
+        <table id="inputParametersTable" sortable="true" width="100%"
+               reorderingAllowed="false" columnControlVisible="false">
+            <buttonsPanel>
+                <button action="inputParametersTable.create" icon="icons/create.png"/>
+                <button action="inputParametersTable.edit" icon="icons/edit.png"/>
+                <button action="inputParametersTable.remove" icon="icons/remove.png"/>
+                <button id="up" icon="icons/up.png"/>
+                <button id="down" icon="icons/down.png"/>
+            </buttonsPanel>
             <columns>
                 <column id="locName" caption="msg://parameters.name"/>
                 <column id="alias" caption="msg://parameters.alias"/>
