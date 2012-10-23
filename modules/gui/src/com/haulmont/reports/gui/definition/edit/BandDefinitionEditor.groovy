@@ -11,23 +11,28 @@ import com.haulmont.cuba.gui.autocomplete.AutoCompleteSupport
 import com.haulmont.cuba.gui.autocomplete.JpqlSuggestionFactory
 import com.haulmont.cuba.gui.autocomplete.Suggester
 import com.haulmont.cuba.gui.autocomplete.Suggestion
+import com.haulmont.cuba.gui.components.actions.CreateAction
 import com.haulmont.cuba.gui.components.actions.RemoveAction
 import com.haulmont.cuba.gui.data.CollectionDatasource
 import com.haulmont.cuba.gui.data.Datasource
 import com.haulmont.cuba.gui.data.ValueListener
+import com.haulmont.cuba.gui.data.impl.DatasourceImpl
 import com.haulmont.cuba.gui.data.impl.DsListenerAdapter
 import com.haulmont.reports.entity.BandDefinition
 import com.haulmont.reports.entity.DataSet
 import com.haulmont.reports.entity.DataSetType
 import com.haulmont.reports.entity.Orientation
+import javax.inject.Inject
 import com.haulmont.cuba.gui.components.*
-import com.haulmont.cuba.gui.components.actions.CreateAction
 
 /**
  * @author degtyarjov
  * @version $Id$
  */
 public class BandDefinitionEditor extends AbstractEditor implements Suggester {
+
+    @Inject
+    private Datasource<BandDefinition> bandDefinitionDs
 
     @Override
     protected void initItem(Entity item) {
@@ -69,14 +74,17 @@ public class BandDefinitionEditor extends AbstractEditor implements Suggester {
     @Override
     void commitAndClose() {
         if (commit()) {
-            BandDefinition definition = (BandDefinition) getItem();
+            CollectionDatasource<UUID, BandDefinition> parentDs = ((DatasourceImpl) bandDefinitionDs).getParent()
+            BandDefinition definition = parentDs.getItem(bandDefinitionDs.item.id)
+
             BandDefinition parentDefinition = definition.parentBandDefinition
             if (parentDefinition) {
                 if (PersistenceHelper.isNew(definition)) {
                     if (parentDefinition.childrenBandDefinitions == null)
                         parentDefinition.childrenBandDefinitions = new ArrayList<BandDefinition>()
 
-                    parentDefinition.childrenBandDefinitions.add(definition)
+                    if (!parentDefinition.childrenBandDefinitions.contains(definition))
+                        parentDefinition.childrenBandDefinitions.add(definition)
                 }
             }
             close(COMMIT_ACTION_ID)
