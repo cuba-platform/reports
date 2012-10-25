@@ -399,6 +399,8 @@ public class ReportEditor extends AbstractEditor {
                 // Use root band as parent if no items selected
                 if (parentDefinition == null)
                     parentDefinition = report.getRootBandDefinition()
+                //
+                numberBandDefinitions(parentDefinition)
                 return (Map<String, Object>) [
                         'parentBandDefinition': parentDefinition,
                         'position': parentDefinition.childrenBandDefinitions != null ?
@@ -430,6 +432,10 @@ public class ReportEditor extends AbstractEditor {
             protected void doRemove(Set selected, boolean autocommit) {
                 if (selected) {
                     removeChildrenCascade(selected)
+                    for (BandDefinition definition : selected) {
+                        if (definition.parentBandDefinition)
+                            numberBandDefinitions(definition.parentBandDefinition)
+                    }
                 }
             }
 
@@ -586,6 +592,13 @@ public class ReportEditor extends AbstractEditor {
         };
 
         templatesTable.addAction(defaultTemplateBtn.action)
+    }
+
+    private def numberBandDefinitions(BandDefinition parent) {
+        if (parent.childrenBandDefinitions) {
+            for (int i = 0; i < parent.childrenBandDefinitions.size(); i++)
+                parent.childrenBandDefinitions.get(i).position = i
+        }
     }
 
     @Override
