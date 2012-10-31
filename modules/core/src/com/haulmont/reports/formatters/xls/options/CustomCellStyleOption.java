@@ -231,15 +231,18 @@ public class CustomCellStyleOption implements StyleOption {
     }
 
     private void fixDownCell(HSSFSheet sheet, int rowIndex, int columnIndex) {
-        HSSFCell downCell = sheet.getRow(rowIndex + 1).getCell(columnIndex);
-        if (downCell != null) {
-            HSSFCellStyle newDownStyle = workbook.createCellStyle();
-            HSSFCellStyle downCellStyle = downCell.getCellStyle();
-            newDownStyle.cloneStyleRelationsFrom(downCellStyle);
-            newDownStyle.setBorderTop(cellStyle.getBorderBottom());
-            newDownStyle.setTopBorderColor(cellStyle.getBottomBorderColor());
+        HSSFRow nextRow = sheet.getRow(rowIndex + 1);
+        if (nextRow != null) {
+            HSSFCell downCell = nextRow.getCell(columnIndex);
+            if (downCell != null) {
+                HSSFCellStyle newDownStyle = workbook.createCellStyle();
+                HSSFCellStyle downCellStyle = downCell.getCellStyle();
+                newDownStyle.cloneStyleRelationsFrom(downCellStyle);
+                newDownStyle.setBorderTop(cellStyle.getBorderBottom());
+                newDownStyle.setTopBorderColor(cellStyle.getBottomBorderColor());
 
-            downCell.setCellStyle(newDownStyle);
+                downCell.setCellStyle(newDownStyle);
+            }
         }
     }
 }
