@@ -1,7 +1,7 @@
 <window
         xmlns="http://schemas.haulmont.com/cuba/4.0/window.xsd"
-        class="com.haulmont.cuba.gui.report.run.ReportRun"
-        messagesPack="com.haulmont.cuba.gui.report.run"
+        class="com.haulmont.reports.gui.report.run.ReportRun"
+        messagesPack="com.haulmont.reports.gui.report.run"
         lookupComponent="reportsTable"
         caption="msg://reportBrowser"
         >
@@ -12,7 +12,7 @@
                 class="com.haulmont.reports.entity.Report"
                 view="report.edit"
                 >
-            <datasourceClass>com.haulmont.cuba.gui.report.run.RunReportDatasource</datasourceClass>
+            <datasourceClass>com.haulmont.reports.gui.report.run.RunReportDatasource</datasourceClass>
             <query>
                 <![CDATA[select r from report$Report r]]>
                 <filter>

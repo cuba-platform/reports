@@ -21,6 +21,8 @@ import com.haulmont.reports.app.service.ReportService;
 import com.haulmont.reports.entity.Report;
 import com.haulmont.reports.entity.ReportInputParameter;
 import com.haulmont.reports.entity.ReportScreen;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.Predicate;
 import org.apache.commons.lang.StringUtils;
 
 import javax.annotation.Nullable;
@@ -117,34 +119,42 @@ public class ReportHelper {
     private static List<Report> checkRoles(User user, List<Report> reports) {
         List<Report> filter = new ArrayList<>();
         for (Report report : reports) {
-            List<Role> reportRoles = report.getRoles();
+            final List<Role> reportRoles = report.getRoles();
             if (reportRoles == null || reportRoles.size() == 0) {
                 filter.add(report);
             } else {
                 List<UserRole> userRoles = user.getUserRoles();
-                for (UserRole userRole : userRoles) {
-                    if (reportRoles.contains(userRole.getRole()) ||
-                            RoleType.SUPER.equals(userRole.getRole().getType())) {
-                        filter.add(report);
-                        break;
+                Object requiredUserRole = CollectionUtils.find(userRoles, new Predicate() {
+                    @Override
+                    public boolean evaluate(Object object) {
+                        UserRole userRole = (UserRole) object;
+                        return reportRoles.contains(userRole.getRole()) ||
+                            RoleType.SUPER.equals(userRole.getRole().getType());
                     }
-                }
+                });
+                if (requiredUserRole != null)
+                    filter.add(report);
             }
         }
         return filter;
     }
 
-    private static List<Report> checkScreens(List<Report> reports, String screen) {
+    private static List<Report> checkScreens(List<Report> reports, final String screen) {
         List<Report> filter = new ArrayList<>();
         for (Report report : reports) {
             List<ReportScreen> reportScreens = report.getReportScreens();
-            List<String> reportScreensAliases = new ArrayList<>();
-            for (ReportScreen reportScreen : reportScreens) {
-                reportScreensAliases.add(reportScreen.getScreenId());
-            }
-
-            if ((reportScreensAliases.contains(screen) || reportScreensAliases.size() == 0))
+            if (reportScreens == null || reportScreens.size() == 0)
                 filter.add(report);
+            else {
+                Object reportScreen = CollectionUtils.find(reportScreens, new Predicate() {
+                    @Override
+                    public boolean evaluate(Object item) {
+                        return StringUtils.equals(screen, ((ReportScreen)item).getScreenId());
+                    }
+                });
+                if (reportScreen != null)
+                    filter.add(report);
+            }
         }
         return filter;
     }

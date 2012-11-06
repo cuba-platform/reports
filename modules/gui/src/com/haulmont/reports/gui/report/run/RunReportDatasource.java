@@ -37,14 +37,12 @@ public class RunReportDatasource extends CollectionDatasourceImpl<Report, UUID> 
     }
 
     @Override
-    protected void loadData(Map params) {
+    protected void loadData(Map<String, Object> params) {
         User user = (User) params.get("user");
         String screen = (String) params.get("screen");
         super.loadData(params);
-        if (user != null && screen != null) {
+        if (user != null || screen != null) {
             applySecurityPolicies(user, screen);
-        } else {
-            //todo: if user is null???
         }
     }
 
