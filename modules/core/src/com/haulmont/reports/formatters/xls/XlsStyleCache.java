@@ -21,9 +21,6 @@ public class XlsStyleCache {
 
     private Map<String, HSSFCellStyle> styleMap = new HashMap<>();
 
-    public XlsStyleCache() {
-    }
-
     public HSSFCellStyle processCellStyle(HSSFCellStyle cellStyle) {
         HSSFCellStyle cachedCellStyle = cellStyles.get(new HSSFStyleCacheKey(cellStyle));
         if (cachedCellStyle == null)

@@ -65,20 +65,25 @@ public class CustomCellStyleOption implements StyleOption {
         newStyle.setWrapText(cellStyle.getWrapText());
         // font
         HSSFFont cellFont = cellStyle.getFont(templateWorkbook);
-        HSSFFont newFont = workbook.createFont();
 
-        newFont.setFontName(cellFont.getFontName());
-        newFont.setItalic(cellFont.getItalic());
-        newFont.setStrikeout(cellFont.getStrikeout());
-        newFont.setTypeOffset(cellFont.getTypeOffset());
-        newFont.setBoldweight(cellFont.getBoldweight());
-        newFont.setCharSet(cellFont.getCharSet());
-        newFont.setColor(cellFont.getColor());
-        newFont.setUnderline(cellFont.getUnderline());
-        newFont.setFontHeight(cellFont.getFontHeight());
-        newFont.setFontHeightInPoints(cellFont.getFontHeightInPoints());
+        HSSFFont newFont = fontCache.getFontByTemplate(cellFont);
 
-        newStyle.setFont(fontCache.processFont(newFont));
+        if (newFont == null) {
+            newFont = workbook.createFont();
+
+            newFont.setFontName(cellFont.getFontName());
+            newFont.setItalic(cellFont.getItalic());
+            newFont.setStrikeout(cellFont.getStrikeout());
+            newFont.setTypeOffset(cellFont.getTypeOffset());
+            newFont.setBoldweight(cellFont.getBoldweight());
+            newFont.setCharSet(cellFont.getCharSet());
+            newFont.setColor(cellFont.getColor());
+            newFont.setUnderline(cellFont.getUnderline());
+            newFont.setFontHeight(cellFont.getFontHeight());
+            newFont.setFontHeightInPoints(cellFont.getFontHeightInPoints());
+            fontCache.addCachedFont(cellFont, newFont);
+        }
+        newStyle.setFont(newFont);
 
         resultCell.setCellStyle(styleCache.processCellStyle(newStyle));
     }

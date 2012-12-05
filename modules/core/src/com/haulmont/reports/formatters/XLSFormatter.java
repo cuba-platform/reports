@@ -529,12 +529,13 @@ public class XLSFormatter extends AbstractFormatter {
             HSSFCellStyle newStyle = resultWorkbook.createCellStyle();
 
             newStyle.cloneStyleRelationsFrom(templateStyle);
-            HSSFFont font = fontCache.getFont(templateStyle.getFont(templateWorkbook));
+            HSSFFont templateFont = templateStyle.getFont(templateWorkbook);
+            HSSFFont font = fontCache.getFontByTemplate(templateFont);
             if (font != null)
-                newStyle.setFont(fontCache.processFont(font));
+                newStyle.setFont(font);
             else {
                 newStyle.cloneFontFrom(templateStyle);
-                fontCache.processFont(newStyle.getFont(resultWorkbook));
+                fontCache.addCachedFont(templateFont, newStyle.getFont(resultWorkbook));
             }
             styleCache.addCachedStyle(templateStyle, newStyle);
             style = newStyle;
