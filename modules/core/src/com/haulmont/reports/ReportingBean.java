@@ -91,12 +91,13 @@ public class ReportingBean implements ReportingApi {
             throw new NullPointerException("Report template is null");
 
         String watchName = "Report.";
+        Band rootBand;
         if (StringUtils.isNotEmpty(report.getCode()))
             watchName += report.getCode();
         else
             watchName += report.getId();
 
-        StopWatch watch = new Log4JStopWatch(watchName);
+        StopWatch loadDataWatch = new Log4JStopWatch(watchName + "#data");
         try {
             // Preprocess prototypes
             List<String> prototypes = new LinkedList<>();
@@ -122,7 +123,7 @@ public class ReportingBean implements ReportingApi {
             BandDefinition rootBandDefinition = report.getRootBandDefinition();
 
             List<BandDefinition> childrenBandDefinitions = rootBandDefinition.getChildrenBandDefinitions();
-            Band rootBand = createRootBand(rootBandDefinition);
+            rootBand = createRootBand(rootBandDefinition);
 
             HashMap<String, ReportValueFormat> valuesFormats = new HashMap<>();
             for (ReportValueFormat valueFormat : report.getValuesFormats()) {
@@ -136,7 +137,16 @@ public class ReportingBean implements ReportingApi {
                 rootBand.addChildren(bands);
             }
             rootBand.setBandDefinitionNames(bandDefinitionNames.get());
+        } catch (ReportingException ex) {
+            throw ex;
+        } catch (Exception e) {
+            throw new ReportingException(e);
+        } finally {
+            loadDataWatch.stop();
+        }
 
+        StopWatch processWatch = new Log4JStopWatch(watchName + "#process");
+        try {
             ByteArrayOutputStream resultStream = new ByteArrayOutputStream();
 
             ReportEngine reportEngine = getReportEngine(template);
@@ -150,7 +160,8 @@ public class ReportingBean implements ReportingApi {
                 throw new UnsupportedFormatException();
 
             byte[] result = resultStream.toByteArray();
-            ReportOutputDocument reportOutputDocument = new ReportOutputDocument(report, template.getReportOutputType(), result);
+            ReportOutputDocument reportOutputDocument = new ReportOutputDocument(report,
+                    template.getReportOutputType(), result);
             setNameToOutputFile(rootBand, reportOutputDocument);
 
             return reportOutputDocument;
@@ -159,7 +170,7 @@ public class ReportingBean implements ReportingApi {
         } catch (Exception e) {
             throw new ReportingException(e);
         } finally {
-            watch.stop();
+            processWatch.stop();
         }
     }
 
