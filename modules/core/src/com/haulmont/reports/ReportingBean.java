@@ -24,6 +24,8 @@ import com.haulmont.reports.exception.UnsupportedFormatException;
 import com.haulmont.reports.formatters.*;
 import com.haulmont.reports.loaders.*;
 import org.apache.commons.lang.StringUtils;
+import org.perf4j.StopWatch;
+import org.perf4j.log4j.Log4JStopWatch;
 
 import javax.annotation.ManagedBean;
 import javax.annotation.Nullable;
@@ -68,22 +70,33 @@ public class ReportingBean implements ReportingApi {
     }
 
     @Override
-    public ReportOutputDocument createReport(Report report, String templateCode, Map<String, Object> params) throws IOException {
+    public ReportOutputDocument createReport(Report report, String templateCode, Map<String, Object> params)
+            throws IOException {
         report = reloadEntity(report, REPORT_EDIT_VIEW_NAME);
         ReportTemplate template = report.getTemplateByCode(templateCode);
         return createReportDocument(report, template, params);
     }
 
     @Override
-    public ReportOutputDocument createReport(Report report, ReportTemplate template, Map<String, Object> params) throws IOException {
+    public ReportOutputDocument createReport(Report report, ReportTemplate template, Map<String, Object> params)
+            throws IOException {
         report = reloadEntity(report, REPORT_EDIT_VIEW_NAME);
         return createReportDocument(report, template, params);
     }
 
-    private ReportOutputDocument createReportDocument(Report report, ReportTemplate template, Map<String, Object> params) throws IOException {
+    private ReportOutputDocument createReportDocument(Report report, ReportTemplate template, Map<String, Object> params)
+            throws IOException {
+
         if (template == null)
             throw new NullPointerException("Report template is null");
 
+        String watchName = "Report: ";
+        if (StringUtils.isNotEmpty(report.getCode()))
+            watchName += report.getCode();
+        else
+            watchName += report.getId();
+
+        StopWatch watch = new Log4JStopWatch(watchName);
         try {
             // Preprocess prototypes
             List<String> prototypes = new LinkedList<>();
@@ -145,6 +158,8 @@ public class ReportingBean implements ReportingApi {
             throw ex;
         } catch (Exception e) {
             throw new ReportingException(e);
+        } finally {
+            watch.stop();
         }
     }
 
