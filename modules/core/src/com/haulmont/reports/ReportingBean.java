@@ -90,7 +90,7 @@ public class ReportingBean implements ReportingApi {
         if (template == null)
             throw new NullPointerException("Report template is null");
 
-        String watchName = "Report: ";
+        String watchName = "Report.";
         if (StringUtils.isNotEmpty(report.getCode()))
             watchName += report.getCode();
         else
