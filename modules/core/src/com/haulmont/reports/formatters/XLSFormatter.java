@@ -523,18 +523,24 @@ public class XLSFormatter extends AbstractFormatter {
     }
 
     private HSSFCellStyle copyCellStyle(HSSFCellStyle templateStyle) {
-        HSSFCellStyle resultStyle = resultWorkbook.createCellStyle();
+        HSSFCellStyle style = styleCache.getCellStyleByTemplate(templateStyle);
 
-        resultStyle.cloneStyleRelationsFrom(templateStyle);
-        HSSFFont font = fontCache.getFont(templateStyle.getFont(templateWorkbook));
-        if (font != null)
-            resultStyle.setFont(fontCache.processFont(font));
-        else {
-            resultStyle.cloneFontFrom(templateStyle);
-            fontCache.processFont(resultStyle.getFont(resultWorkbook));
+        if (style == null) {
+            HSSFCellStyle newStyle = resultWorkbook.createCellStyle();
+
+            newStyle.cloneStyleRelationsFrom(templateStyle);
+            HSSFFont font = fontCache.getFont(templateStyle.getFont(templateWorkbook));
+            if (font != null)
+                newStyle.setFont(fontCache.processFont(font));
+            else {
+                newStyle.cloneFontFrom(templateStyle);
+                fontCache.processFont(newStyle.getFont(resultWorkbook));
+            }
+            styleCache.addCachedStyle(templateStyle, newStyle);
+            style = newStyle;
         }
 
-        return styleCache.processCellStyle(resultStyle);
+        return style;
     }
 
     /**

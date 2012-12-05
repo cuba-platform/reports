@@ -8,9 +8,7 @@ package com.haulmont.reports.formatters.xls;
 
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -19,7 +17,7 @@ import java.util.Map;
  */
 public class XlsStyleCache {
 
-    private List<HSSFCellStyle> cellStyles = new ArrayList<>();
+    private Map<HSSFStyleCacheKey, HSSFCellStyle> cellStyles = new HashMap<>();
 
     private Map<String, HSSFCellStyle> styleMap = new HashMap<>();
 
@@ -27,12 +25,21 @@ public class XlsStyleCache {
     }
 
     public HSSFCellStyle processCellStyle(HSSFCellStyle cellStyle) {
-        for (HSSFCellStyle cacheStyle : cellStyles) {
-            if (cacheStyle.formatEquals(cellStyle))
-                return cacheStyle;
-        }
-        cellStyles.add(cellStyle);
+        HSSFCellStyle cachedCellStyle = cellStyles.get(new HSSFStyleCacheKey(cellStyle));
+        if (cachedCellStyle == null)
+            cellStyles.put(new HSSFStyleCacheKey(cellStyle), cellStyle);
+        else
+            cellStyle = cachedCellStyle;
+
         return cellStyle;
+    }
+
+    public HSSFCellStyle getCellStyleByTemplate(HSSFCellStyle templateCellStyle) {
+        return cellStyles.get(new HSSFStyleCacheKey(templateCellStyle));
+    }
+
+    public void addCachedStyle(HSSFCellStyle templateCellStyle, HSSFCellStyle cellStyle) {
+        cellStyles.put(new HSSFStyleCacheKey(templateCellStyle), cellStyle);
     }
 
     public void addNamedStyle(HSSFCellStyle cellStyle) {

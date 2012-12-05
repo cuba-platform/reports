@@ -145,6 +145,8 @@ public class CustomCellStyleOption implements StyleOption {
             newLeftStyle.setBorderRight(cellStyle.getBorderLeft());
             newLeftStyle.setRightBorderColor(cellStyle.getLeftBorderColor());
 
+            newLeftStyle = styleCache.processCellStyle(newLeftStyle);
+
             leftCell.setCellStyle(newLeftStyle);
         }
     }
@@ -174,6 +176,8 @@ public class CustomCellStyleOption implements StyleOption {
             newRightStyle.cloneStyleRelationsFrom(rightCellStyle);
             newRightStyle.setBorderLeft(cellStyle.getBorderRight());
             newRightStyle.setLeftBorderColor(cellStyle.getRightBorderColor());
+
+            newRightStyle = styleCache.processCellStyle(newRightStyle);
 
             rightCell.setCellStyle(newRightStyle);
         }
@@ -208,6 +212,8 @@ public class CustomCellStyleOption implements StyleOption {
             newUpStyle.setBorderBottom(cellStyle.getBorderTop());
             newUpStyle.setBottomBorderColor(cellStyle.getTopBorderColor());
 
+            newUpStyle = styleCache.processCellStyle(newUpStyle);
+
             upCell.setCellStyle(newUpStyle);
         }
     }
@@ -240,6 +246,8 @@ public class CustomCellStyleOption implements StyleOption {
                 newDownStyle.cloneStyleRelationsFrom(downCellStyle);
                 newDownStyle.setBorderTop(cellStyle.getBorderBottom());
                 newDownStyle.setTopBorderColor(cellStyle.getBottomBorderColor());
+
+                newDownStyle = styleCache.processCellStyle(newDownStyle);
 
                 downCell.setCellStyle(newDownStyle);
             }
