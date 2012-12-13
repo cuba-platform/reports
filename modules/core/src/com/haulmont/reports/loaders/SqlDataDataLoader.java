@@ -7,6 +7,7 @@ package com.haulmont.reports.loaders;
 
 import com.haulmont.bali.db.QueryRunner;
 import com.haulmont.bali.db.ResultSetHandler;
+import com.haulmont.chile.core.datatypes.impl.EnumClass;
 import com.haulmont.cuba.core.Persistence;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.global.AppBeans;
@@ -113,7 +114,11 @@ public class SqlDataDataLoader extends QueryDataLoader {
         for (ParamPosition paramEntry : paramPositions) {
             // Replace all params by ?
             query = query.replaceAll(paramEntry.getParamRegexp(), "?");
-            values.add(paramEntry.getValue());
+            Object value = paramEntry.getValue();
+            if (!(value instanceof EnumClass))
+                values.add(value);
+            else
+                values.add(((EnumClass) value).getId());
         }
 
         query = query.trim();
