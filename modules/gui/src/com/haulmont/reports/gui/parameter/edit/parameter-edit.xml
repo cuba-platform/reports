@@ -16,7 +16,7 @@
     </dsContext>
     <#assign width = 200>
     <layout expand="windowActions">
-        <tabsheet id="tabsheet">
+        <tabSheet id="tabsheet">
             <tab id="optionsTab" caption="msg://parameters.optionsTab">
                 <vbox margin="true" stylename="edit-area">
                     <grid spacing="true" expandable="false">
@@ -79,7 +79,7 @@
                     <hbox id="spacer"/>
                 </vbox>
             </tab>
-        </tabsheet>
+        </tabSheet>
         <iframe id="windowActions" screen="editWindowActions"/>
     </layout>
 </window>
