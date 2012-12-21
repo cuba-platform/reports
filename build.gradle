@@ -288,13 +288,3 @@ artifacts {
     if (Boolean.valueOf(System.getProperty("buildDoc")))
         archives buildDoc
 }
-
-uploadArchives.configure {
-    repositories.mavenDeployer {
-        name = 'httpDeployer'
-        configuration = configurations.deployerJars
-        repository(url: "$repositoryUrl/repositories/" + (isSnapshot ? 'snapshots' : 'releases')) {
-            authentication(userName: repositoryUser, password: repositoryPassword)
-        }
-    }
-}
