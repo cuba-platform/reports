@@ -8,7 +8,8 @@ package com.haulmont.reports.gui.template.edit;
 
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.entity.FileDescriptor;
-import com.haulmont.cuba.core.global.*;
+import com.haulmont.cuba.core.global.FileStorageException;
+import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.gui.AppConfig;
 import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.data.ValueListener;
@@ -16,11 +17,9 @@ import com.haulmont.cuba.gui.export.ExportDisplay;
 import com.haulmont.cuba.gui.upload.FileUploadingAPI;
 import com.haulmont.reports.entity.Report;
 import com.haulmont.reports.entity.ReportTemplate;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 
 import javax.inject.Inject;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -44,10 +43,10 @@ public class TemplateEditor extends AbstractEditor {
     private FileUploadField uploadTemplate;
 
     @Inject
-    private TimeSource timeSource;
+    private Messages messages;
 
     @Inject
-    private Messages messages;
+    private FileUploadingAPI fileUploading;
 
     private Map<ReportTemplate, ArrayList<FileDescriptor>> deletedContainer;
     private List<FileDescriptor> deletedList = new ArrayList<>();
@@ -99,7 +98,7 @@ public class TemplateEditor extends AbstractEditor {
             }
         });
 
-        FileUploadField.Listener uploadListener = new FileUploadField.Listener() {
+        FileUploadField.Listener uploadListener = new FileUploadField.ListenerAdapter() {
 
             @Override
             public void uploadStarted(Event event) {
@@ -113,17 +112,14 @@ public class TemplateEditor extends AbstractEditor {
 
             @Override
             public void uploadSucceeded(Event event) {
-                FileUploadingAPI fileUploading = AppBeans.get(FileUploadingAPI.NAME);
+                FileDescriptor templateDescriptor = uploadTemplate.getFileDescriptor();
 
-                FileDescriptor templateDescriptor = new com.haulmont.cuba.core.entity.FileDescriptor();
-                templateDescriptor.setName(uploadTemplate.getFileName());
-                templateDescriptor.setExtension(FilenameUtils.getExtension(uploadTemplate.getFileName()));
+                try {
+                    fileUploading.putFileIntoStorage(uploadTemplate.getFileId(), templateDescriptor);
+                } catch (FileStorageException e) {
+                    throw new RuntimeException(e);
+                }
 
-                File file = fileUploading.getFile(uploadTemplate.getFileId());
-                templateDescriptor.setSize((int) file.length());
-
-                templateDescriptor.setCreateDate(timeSource.currentTimestamp());
-                saveFile(fileUploading, templateDescriptor, uploadTemplate);
                 templatePath.setCaption(templateDescriptor.getName());
 
                 if (template.getTemplateFileDescriptor() != null)
@@ -139,10 +135,6 @@ public class TemplateEditor extends AbstractEditor {
                 showNotification(messages.getMessage(TemplateEditor.class,
                         "templateEditor.uploadUnsuccess"), IFrame.NotificationType.WARNING);
             }
-
-            @Override
-            public void updateProgress(long readBytes, long contentLength) {
-            }
         };
         uploadTemplate.addListener(uploadListener);
 
@@ -155,15 +147,6 @@ public class TemplateEditor extends AbstractEditor {
                 }
             }
         });
-    }
-
-    private void saveFile(FileUploadingAPI fileUploading, FileDescriptor templateDescriptor,
-                          FileUploadField uploadTemplate) {
-        try {
-            fileUploading.putFileIntoStorage(uploadTemplate.getFileId(), templateDescriptor);
-        } catch (FileStorageException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     @Override
