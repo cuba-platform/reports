@@ -7,9 +7,6 @@ package com.haulmont.reports.formatters.xls;
 
 import com.haulmont.reports.entity.Band;
 import com.haulmont.reports.entity.ReportValueFormat;
-import com.haulmont.reports.formatters.xls.options.AutoWidthOption;
-import com.haulmont.reports.formatters.xls.options.CopyColumnWidthOption;
-import com.haulmont.reports.formatters.xls.options.CustomCellStyleOption;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.usermodel.ClientAnchor;
@@ -20,7 +17,6 @@ import org.apache.poi.ss.util.CellReference;
 import java.awt.*;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static com.haulmont.reports.formatters.AbstractFormatter.insertBandDataToString;
@@ -32,33 +28,29 @@ import static com.haulmont.reports.formatters.AbstractFormatter.unwrapParameterN
  */
 public final class HSSFCellHelper {
 
-    private static final String CELL_DYNAMIC_STYLE_SELECTOR = "##style=";
-    private static final String COPY_COLUMN_WIDTH_SELECTOR = "##copyColumnWidth";
-    private static final String AUTO_WIDTH_SELECTOR = "##autoWidth";
-
     private HSSFCellHelper() {
     }
 
     /**
      * Copies template cell to result cell and fills it with band data
      *
-     * @param rootBand     Root band
-     * @param band         Band
-     * @param templateCell Template cell
-     * @param resultCell   Result cell
-     * @param patriarch    Toplevel container for shapes in a sheet
+     * @param rootBand     root band
+     * @param band         band
+     * @param templateCellValue preprocessed template cell value
+     * @param resultCell   result cell
+     * @param patriarch    toplevel container for shapes in a sheet
      */
-    public static void updateValueCell(Band rootBand, Band band, HSSFCell templateCell, HSSFCell resultCell,
+    public static void updateValueCell(Band rootBand, Band band, String templateCellValue, HSSFCell resultCell,
                                        HSSFPatriarch patriarch) {
         Map<String, Object> bandData = band.getData();
-        String parameterName = templateCell.toString();
+        String parameterName = templateCellValue;
 
         parameterName = unwrapParameterName(parameterName);
 
         if (StringUtils.isEmpty(parameterName)) return;
 
         if (!bandData.containsKey(parameterName)) {
-            resultCell.setCellValue(templateCell.getRichStringCellValue());
+            resultCell.setCellValue(templateCellValue);
             return;
         }
 
@@ -114,68 +106,15 @@ public final class HSSFCellHelper {
      * Applies named style to cell if it contains '##style=' mark
      * </p>
      * @param templateCell     Cell to inline data
-     * @param resultCell       Result cell
-     * @param workbook         Workbook
-     * @param templateSheet    Template Sheet
-     * @param resultSheet      Result Sheet
-     * @param templateWorkbook Template workbook
      * @param band             Data source
-     * @param optionContainer  Style options
-     * @param fontCache        Font cache
-     * @param styleCache       Styles   @return string with inlined band data
      * @return Cell value
      */
-    public static String inlineBandDataToCellString(HSSFCell templateCell, HSSFCell resultCell,
-                                                    HSSFSheet templateSheet, HSSFSheet resultSheet,
-                                                    HSSFWorkbook templateWorkbook, HSSFWorkbook workbook,
-                                                    Band band, List<StyleOption> optionContainer,
-                                                    XlsFontCache fontCache,
-                                                    XlsStyleCache styleCache) {
+    public static String inlineBandDataToCellString(HSSFCell templateCell, String templateCellValue, Band band) {
         String resultStr = "";
         if (templateCell.getCellType() == HSSFCell.CELL_TYPE_STRING) {
-            HSSFRichTextString richString = templateCell.getRichStringCellValue();
-            if (richString != null) resultStr = richString.getString();
+            if (templateCellValue != null) resultStr = templateCellValue;
         } else {
             if (templateCell.toString() != null) resultStr = templateCell.toString();
-        }
-
-        Map<String, Object> bandData = band.getData();
-
-        // apply dynamic style
-        int stylePosition = StringUtils.indexOf(resultStr, CELL_DYNAMIC_STYLE_SELECTOR);
-        if (stylePosition >= 0) {
-            String stringTail = StringUtils.substring(resultStr, stylePosition + CELL_DYNAMIC_STYLE_SELECTOR.length());
-            int styleEndIndex = StringUtils.indexOf(stringTail, " ");
-            if (styleEndIndex < 0)
-                styleEndIndex = resultStr.length() - 1;
-
-            String styleSelector = StringUtils.substring(resultStr, stylePosition,
-                    styleEndIndex + CELL_DYNAMIC_STYLE_SELECTOR.length() + stylePosition);
-
-            resultStr = StringUtils.replace(resultStr, styleSelector, "");
-
-            styleSelector = StringUtils.substring(styleSelector, CELL_DYNAMIC_STYLE_SELECTOR.length());
-
-            if (styleSelector != null && bandData.containsKey(styleSelector) && bandData.get(styleSelector) != null) {
-                HSSFCellStyle cellStyle = styleCache.getStyleByName((String) bandData.get(styleSelector));
-
-                if (cellStyle != null) {
-                    optionContainer.add(new CustomCellStyleOption(resultCell, cellStyle,
-                            templateWorkbook, workbook, fontCache, styleCache));
-                }
-            }
-        }
-
-        // apply fixed width to column from template cell
-        if (StringUtils.contains(resultStr, COPY_COLUMN_WIDTH_SELECTOR)) {
-            resultStr = StringUtils.replace(resultStr, COPY_COLUMN_WIDTH_SELECTOR, "");
-            optionContainer.add(new CopyColumnWidthOption(resultSheet,
-                    resultCell.getColumnIndex(), templateSheet.getColumnWidth(templateCell.getColumnIndex())));
-        }
-
-        if (StringUtils.contains(resultStr, AUTO_WIDTH_SELECTOR)) {
-            resultStr = StringUtils.replace(resultStr, AUTO_WIDTH_SELECTOR, "");
-            optionContainer.add(new AutoWidthOption(resultSheet, resultCell.getColumnIndex()));
         }
 
         if (!"".equals(resultStr)) return insertBandDataToString(band, resultStr);
@@ -184,16 +123,12 @@ public final class HSSFCellHelper {
     }
 
     /**
-     * Detects if cell contains only one template to inline value
-     *
      * @param cell - cell
-     * @return -
+     * @return true if cell contains only one template to inline value
      */
-    public static boolean isOneValueCell(HSSFCell cell) {
+    public static boolean isOneValueCell(HSSFCell cell, String value) {
         boolean result = true;
         if (cell.getCellType() == HSSFCell.CELL_TYPE_STRING) {
-            String value = cell.getRichStringCellValue().getString();
-
             if (value.lastIndexOf("${") != 0)
                 result = false;
             else

@@ -11,6 +11,9 @@ import com.haulmont.reports.entity.ReportOutputType;
 import com.haulmont.reports.exception.ReportingException;
 import com.haulmont.reports.formatters.oo.XlsToPdfConverter;
 import com.haulmont.reports.formatters.xls.*;
+import com.haulmont.reports.formatters.xls.options.AutoWidthOption;
+import com.haulmont.reports.formatters.xls.options.CopyColumnWidthOption;
+import com.haulmont.reports.formatters.xls.options.CustomCellStyleOption;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.model.HSSFFormulaParser;
 import org.apache.poi.hssf.record.EscherAggregate;
@@ -41,6 +44,10 @@ import static com.haulmont.reports.formatters.xls.HSSFRangeHelper.*;
 public class XLSFormatter extends AbstractFormatter {
 
     private static final String DYNAMIC_HEIGHT_STYLE = "styleWithoutHeight";
+
+    private static final String CELL_DYNAMIC_STYLE_SELECTOR = "##style=";
+    private static final String COPY_COLUMN_WIDTH_SELECTOR = "##copyColumnWidth";
+    private static final String AUTO_WIDTH_SELECTOR = "##autoWidth";
 
     private HSSFWorkbook templateWorkbook;
     private HSSFSheet currentTemplateSheet = null;
@@ -484,30 +491,35 @@ public class XLSFormatter extends AbstractFormatter {
         if (templateCell != null) {
             HSSFCell resultCell = resultRow.createCell(resultColumn);
 
-            // trouble with maximum font count
-            // try to use font cache
             HSSFCellStyle templateStyle = templateCell.getCellStyle();
             HSSFCellStyle resultStyle = copyCellStyle(templateStyle);
             resultCell.setCellStyle(resultStyle);
 
+            HSSFRichTextString richStringCellValue = templateCell.getRichStringCellValue();
+            String templateCellValue = richStringCellValue != null ? richStringCellValue.getString() : "";
+
+            Map<String, Object> bandData = band.getData();
+            templateCellValue = extractStyles(templateCell, templateSheet, resultSheet,
+                    resultCell, templateCellValue, bandData);
+
             int cellType = templateCell.getCellType();
-            if (cellType == HSSFCell.CELL_TYPE_STRING && isOneValueCell(templateCell))
-                updateValueCell(rootBand, band, templateCell, resultCell,
+            if (cellType == HSSFCell.CELL_TYPE_STRING && isOneValueCell(templateCell, templateCellValue))
+                updateValueCell(rootBand, band, templateCellValue, resultCell,
                         drawingPatriarchsMap.get(resultCell.getSheet()));
             else if (cellType == HSSFCell.CELL_TYPE_FORMULA) {
-                String cellValue = inlineDataToCellString(templateCell, resultCell, templateSheet, resultSheet, band);
+                String cellValue = inlineBandDataToCellString(templateCell, templateCellValue, band);
                 if (StringUtils.isNotEmpty(cellValue))
                     resultCell.setCellFormula(cellValue);
                 else
                     resultCell.setCellType(HSSFCell.CELL_TYPE_BLANK);
             } else if (cellType == HSSFCell.CELL_TYPE_STRING) {
-                String cellValue = inlineDataToCellString(templateCell, resultCell, templateSheet, resultSheet, band);
+                String cellValue = inlineBandDataToCellString(templateCell, templateCellValue, band);
                 if (StringUtils.isNotEmpty(cellValue))
                     resultCell.setCellValue(new HSSFRichTextString(cellValue));
                 else
                     resultCell.setCellType(HSSFCell.CELL_TYPE_BLANK);
             } else {
-                String cellValue = inlineDataToCellString(templateCell, resultCell, templateSheet, resultSheet, band);
+                String cellValue = inlineBandDataToCellString(templateCell, templateCellValue, band);
                 if (StringUtils.isNotEmpty(cellValue))
                     resultCell.setCellValue(cellValue);
                 else
@@ -516,10 +528,48 @@ public class XLSFormatter extends AbstractFormatter {
         }
     }
 
-    private String inlineDataToCellString(HSSFCell templateCell, HSSFCell resultCell,
-                                          HSSFSheet templateSheet, HSSFSheet resultSheet, Band band) {
-        return inlineBandDataToCellString(templateCell, resultCell, templateSheet, resultSheet,
-                templateWorkbook, resultWorkbook, band, optionContainer, fontCache, styleCache);
+    private String extractStyles(HSSFCell templateCell,
+                                 HSSFSheet templateSheet, HSSFSheet resultSheet,
+                                 HSSFCell resultCell, String templateCellValue, Map<String, Object> bandData) {
+        // apply dynamic style
+        int stylePosition = StringUtils.indexOf(templateCellValue, CELL_DYNAMIC_STYLE_SELECTOR);
+        if (stylePosition >= 0) {
+            String stringTail = StringUtils.substring(templateCellValue, stylePosition + CELL_DYNAMIC_STYLE_SELECTOR.length());
+            int styleEndIndex = StringUtils.indexOf(stringTail, " ");
+            if (styleEndIndex < 0)
+                styleEndIndex = templateCellValue.length() - 1;
+
+            String styleSelector = StringUtils.substring(templateCellValue, stylePosition,
+                    styleEndIndex + CELL_DYNAMIC_STYLE_SELECTOR.length() + stylePosition);
+
+            templateCellValue = StringUtils.replace(templateCellValue, styleSelector, "");
+
+            styleSelector = StringUtils.substring(styleSelector, CELL_DYNAMIC_STYLE_SELECTOR.length());
+
+            if (styleSelector != null && bandData.containsKey(styleSelector) && bandData.get(styleSelector) != null) {
+                HSSFCellStyle cellStyle = styleCache.getStyleByName((String) bandData.get(styleSelector));
+
+                if (cellStyle != null) {
+                    optionContainer.add(new CustomCellStyleOption(resultCell, cellStyle,
+                            templateWorkbook, resultWorkbook, fontCache, styleCache));
+                }
+            }
+        }
+
+        // apply fixed width to column from template cell
+        if (StringUtils.contains(templateCellValue, COPY_COLUMN_WIDTH_SELECTOR)) {
+            templateCellValue = StringUtils.replace(templateCellValue, COPY_COLUMN_WIDTH_SELECTOR, "");
+            optionContainer.add(new CopyColumnWidthOption(resultSheet,
+                    resultCell.getColumnIndex(), templateSheet.getColumnWidth(templateCell.getColumnIndex())));
+        }
+
+        if (StringUtils.contains(templateCellValue, AUTO_WIDTH_SELECTOR)) {
+            templateCellValue = StringUtils.replace(templateCellValue, AUTO_WIDTH_SELECTOR, "");
+            optionContainer.add(new AutoWidthOption(resultSheet, resultCell.getColumnIndex()));
+        }
+
+        templateCellValue = StringUtils.stripEnd(templateCellValue, null);
+        return templateCellValue;
     }
 
     private HSSFCellStyle copyCellStyle(HSSFCellStyle templateStyle) {
