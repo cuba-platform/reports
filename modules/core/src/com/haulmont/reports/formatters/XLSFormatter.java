@@ -495,14 +495,18 @@ public class XLSFormatter extends AbstractFormatter {
             HSSFCellStyle resultStyle = copyCellStyle(templateStyle);
             resultCell.setCellStyle(resultStyle);
 
-            HSSFRichTextString richStringCellValue = templateCell.getRichStringCellValue();
-            String templateCellValue = richStringCellValue != null ? richStringCellValue.getString() : "";
-
-            Map<String, Object> bandData = band.getData();
-            templateCellValue = extractStyles(templateCell, templateSheet, resultSheet,
-                    resultCell, templateCellValue, bandData);
-
+            String templateCellValue = "";
             int cellType = templateCell.getCellType();
+
+            if (cellType != HSSFCell.CELL_TYPE_FORMULA) {
+                HSSFRichTextString richStringCellValue = templateCell.getRichStringCellValue();
+                templateCellValue = richStringCellValue != null ? richStringCellValue.getString() : "";
+
+                Map<String, Object> bandData = band.getData();
+                templateCellValue = extractStyles(templateCell, templateSheet, resultSheet,
+                        resultCell, templateCellValue, bandData);
+            }
+
             if (cellType == HSSFCell.CELL_TYPE_STRING && isOneValueCell(templateCell, templateCellValue))
                 updateValueCell(rootBand, band, templateCellValue, resultCell,
                         drawingPatriarchsMap.get(resultCell.getSheet()));
