@@ -4,10 +4,16 @@
  * Use is subject to license terms.
  */
 
+def defaultVersion = '0.1.DEV'
+
+def BUILD_VERSION = 'buildVersion'
+def BUILD_RELEASE = 'buildRelease'
+def BUILD_VCS_NUMBER = 'buildVcsNumber'
+
 allprojects {
     ext.artifactGroup = 'com.haulmont.reports'
-    ext.artifactVersion = '4.0.0'
-    ext.isSnapshot = true
+    ext.artifactVersion = rootProject.hasProperty(BUILD_VERSION) ? rootProject[BUILD_VERSION] : defaultVersion
+    ext.isSnapshot = !rootProject.hasProperty(BUILD_RELEASE)
 
     configurations.all {
         resolutionStrategy.cacheDynamicVersionsFor 1, 'minutes'
