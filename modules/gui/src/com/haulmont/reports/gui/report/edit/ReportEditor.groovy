@@ -10,7 +10,6 @@ import com.haulmont.cuba.core.app.FileStorageService
 import com.haulmont.cuba.core.entity.Entity
 import com.haulmont.cuba.core.entity.FileDescriptor
 import com.haulmont.cuba.gui.AppConfig
-import com.haulmont.cuba.gui.ServiceLocator
 import com.haulmont.cuba.gui.WindowManager
 import com.haulmont.cuba.gui.WindowManager.OpenType
 import com.haulmont.cuba.gui.components.actions.CreateAction
@@ -83,9 +82,8 @@ public class ReportEditor extends AbstractEditor {
     @Inject
     protected HierarchicalDatasource<BandDefinition, UUID> treeDs
 
-    def ReportEditor(IFrame frame) {
-        super(frame);
-    }
+    @Inject
+    protected FileStorageService fileStorageService
 
     @Override
     def void setItem(Entity item) {
@@ -106,7 +104,7 @@ public class ReportEditor extends AbstractEditor {
             }
         }
         if (!StringUtils.isEmpty(report.name)) {
-            caption = MessageProvider.formatMessage(getClass(), 'reportEditor.format', report.name)
+            caption = AppBeans.get(Messages.class).formatMessage(getClass(), 'reportEditor.format', report.name)
         }
 
         super.setItem(item);
@@ -154,13 +152,11 @@ public class ReportEditor extends AbstractEditor {
 
             @Override
             void afterCommit(CommitContext context, Set<Entity> result) {
-                FileStorageService storageService = ServiceLocator.lookup(FileStorageService.NAME)
-
                 for (Entity entity: context.commitInstances) {
                     if (ReportTemplate.isInstance(entity) && result.contains(entity)) {
                         java.util.List deletedFilesList = (java.util.List) deletedFiles.get(entity)
                         for (FileDescriptor fileDescriptor: deletedFilesList) {
-                            removeQuietly(storageService, fileDescriptor)
+                            removeQuietly(fileDescriptor)
                         }
                     }
                 }
@@ -169,24 +165,24 @@ public class ReportEditor extends AbstractEditor {
                     if (ReportTemplate.isInstance(entity) && result.contains(entity)) {
                         java.util.List deletedFilesList = (java.util.List) deletedFiles.get(entity)
                         for (FileDescriptor fileDescriptor: deletedFilesList) {
-                            removeQuietly(storageService, fileDescriptor)
+                            removeQuietly(fileDescriptor)
                         }
                         ReportTemplate template = (ReportTemplate) entity
-                        removeQuietly(storageService, template.templateFileDescriptor)
+                        removeQuietly(template.templateFileDescriptor)
                     }
                 }
             }
 
-            private void removeQuietly(storageService, fileDescriptor) {
+            private void removeQuietly(FileDescriptor fileDescriptor) {
                 try {
-                    storageService.removeFile(fileDescriptor)
+                    fileStorageService.removeFile(fileDescriptor)
                 } catch (FileStorageException ignored) { }
             }
         })
     }
 
     private def initParameters() {
-        com.haulmont.chile.core.model.MetaClass metaClass = MetadataProvider.getSession().getClass(ReportInputParameter.class)
+        com.haulmont.chile.core.model.MetaClass metaClass = AppBeans.get(Metadata.class).getSession().getClass(ReportInputParameter.class)
         MetaPropertyPath mpp = new MetaPropertyPath(metaClass, metaClass.getProperty('position'))
 
         Table parametersTable = getComponent('generalFrame.parametersFrame.inputParametersTable')
@@ -196,9 +192,21 @@ public class ReportEditor extends AbstractEditor {
                     public Map<String, Object> getInitialValues() {
                         return new HashMap(['position': parametersDs.itemIds.size(), 'report': report])
                     }
+
+                    @Override
+                    void actionPerform(Component component) {
+                        numberParameters();
+                        super.actionPerform(component)
+                    }
                 }
         )
-        parametersTable.addAction(new RemoveAction(parametersTable, false));
+        parametersTable.addAction(new RemoveAction(parametersTable, false) {
+            @Override
+            protected void afterRemove(Set selected) {
+                super.afterRemove(selected)
+                numberParameters();
+            }
+        });
         parametersTable.addAction(new EditAction(parametersTable, WindowManager.OpenType.DIALOG));
 
         Button upButton = getComponent('generalFrame.parametersFrame.up')
@@ -352,7 +360,7 @@ public class ReportEditor extends AbstractEditor {
         for (WindowInfo windowInfo: windowInfoCollection) {
             String id = windowInfo.getId();
             String menuId = 'menu-config.' + id;
-            String localeMsg = MessageProvider.getMessage(AppConfig.getMessagesPack(), menuId);
+            String localeMsg = AppBeans.get(Messages.class).getMessage(AppConfig.getMessagesPack(), menuId);
             String title = menuId.equals(localeMsg) ? id : id + ' ( ' + localeMsg + ' )';
             screens.put(title, id);
         }
@@ -592,6 +600,15 @@ public class ReportEditor extends AbstractEditor {
         };
 
         templatesTable.addAction(defaultTemplateBtn.action)
+    }
+
+    protected def numberParameters() {
+        if (!report.inputParameters)
+            report.inputParameters = new ArrayList<ReportInputParameter>()
+
+        for (int i = 0; i < report.inputParameters.size(); i++) {
+            report.inputParameters.get(i).position = i
+        }
     }
 
     private def numberBandDefinitions(BandDefinition parent) {
