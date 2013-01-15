@@ -8,19 +8,17 @@ html {
 }
 
 body {
-    margin-top: 2cm;
-    margin-bottom: 2cm;
-    margin-left: 2cm;
-    margin-right: 2cm;
-    padding: 0;
     background-color: white;
-    line-height: 150%;
-	font-size: 12pt;
+    line-height: 140%;
+	font-size: 14px;
+	margin:0 auto;
+    max-width:100em;
+    padding:0em 2em;
 }
 
 body, td, div {
     font-family: 'Arial', 'Verdana', sans-serif;
-    font-size: 12pt;
+    font-size: 14px;
     color: #000000;
 }
 
@@ -30,171 +28,109 @@ div {
 }
 
 a {
-    color: blue;
+    color: #000000;
 }
 
 p {
-   /* ensure paragraphs remain close to their parent heading */
-   margin-top: 0;
-   margin-bottom: 1em;
-   text-align: justify; /* Выравнивание по ширине */
+   margin-top: 0.5em;
+   margin-bottom: 0.5em;
+   /*text-align: justify;*/
 }
 
-h1, h2, h3, h4, h5 {
+h1, h2, h3, h4, h5, h6{
     color: #0b6ec7;
-    line-height: 150%;
+    line-height: 130%;
     font-weight: bold;
     font-family: 'Arial', 'Verdana', sans-serif;
-    /* ensure paragraphs remain close to their parent heading */
-    margin-bottom: 0.2em;
 }
 
 h1 {
-	font-size: 40pt;
+	line-height:1.2em;
+    font-size:2em;
+    padding:1.5em;
 }
 
 h2 {
-	font-size: 18pt;
+	font-size:1.8em;
 }
 
 h3 {
-	font-size: 16pt;
+	font-size:1.6em;
 }
 
 h4 {
-	font-size: 14pt;
+	font-size:1.4em;
 }
 
 h5 {
-	font-size: 12pt;
+	font-size: 1.2em;
+}
+
+h6 {
+	font-size: 1em;
 }
 
 code, pre {
     font-family: 'Courier New', Courier, monospace;
 }
 
-h1 a, h2 a, h3 a, h4 a, h5 a {
+h1 a, h2 a, h3 a, h4 a, h5 a , h6 a{
     color: inherit;
 }
 
-h1 a:visited, h2 a:visited, h3 a:visited, h4 a:visited, h5 a:visited {
+h1 a:visited, h2 a:visited, h3 a:visited, h4 a:visited, h5 a:visited, h6 a:visited {
     color: inherit;
 }
+
 /**
  * TITLEPAGE
  */
 
 .book > .titlepage {
-    margin-top: 2.2em;
-    margin-bottom: 2em;
-}
-
-.book .titlepage div.title {
-    border: solid #d0d0d0 1px;
-    background-color: #f5f5f5;
-    margin-left: -1.8em;
-    margin-right: -1.8em;
-    padding-left: 1.8em;
-    padding-right: 1.8em;
-    margin-bottom: 2.2em;
+    margin-top: 1.2em;
+    margin-bottom: 1em;
 }
 
 .titlepage h1.title {
-    font-size: 40pt;
-    margin-bottom: 0;
+    font-size: 3.5em;
     color: #0b6ec7;
 	text-align: center; 
-}
-
-.titlepage h2.subtitle {
-    font-size: 24pt;
-    font-style: italic;
-    margin-top: 0;
-    margin-bottom: 0;
-    color: #0b6ec7;
-	text-align: center; 
-}
-
-.titlepage .releaseinfo {
-    color: #666666;
-    font-size: 120%;
-    margin-top: 2em;
-    margin-bottom: 2.6em;
-}
-
-.titlepage .author {
-    color: #666666;
 }
 
 .titlepage .copyright {
     color: #a2a2a2;
-    font-size: 90%;
+    font-size: .9em;
 }
 
 .titlepage .legalnotice {
     color: #a2a2a2;
-    font-size: 90%;
+    font-size: .9em;
 }
 
+/*
+ * Table of Contents
+ */
 
-/*Headings and titles*/
+.book .toc > dl > dt {
+	font-weight:normal;
+	text-decoration: none;
+}
 
-.heading {
-    font-family: 'Arial', 'Verdana', sans-serif;
+.book .toc {
+	margin-bottom: 1em;
 }
 
 .toc p{
-    /*font-size: 180%;*/
-	font-size: 18pt;
+	font-size: 1.8em;
 	color: #0b6ec7;
 }
 
-.chapter > .titlepage h1 {
-	font-size: 16pt;
+.toc > dl > dt {
+    margin-top: 1.2em;
 }
 
-.chapter > .titlepage h2 {
-	font-size: 18pt;
-}
-
-.preface > .titlepage h1 {
-	font-size: 16pt;
-}
-
-.preface > .titlepage h2 {
-	font-size: 18pt;
-}
-
-.chapter > .titlepage {
-    margin-bottom: 4em;
-}
-
-.appendix > .titlepage h1 {
-	font-size: 16pt;
-}
-
-.appendix > .titlepage h2 {
-	font-size: 18pt;
-}
-
-.section > .titlepage h2 {
-	font-size: 16pt;
-}
-
-.section > .titlepage h3 {
-	font-size: 14pt;
-}
-
-.section > .titlepage h4 {
-	font-size: 12pt;
-}
-
-.appendix > .titlepage {
-    margin-bottom: 4em;
-}
-
-.section .titlepage {
-    page-break-after: avoid;
+.toc > dl > dd > dl > dt {
+    margin-top: 0.5em;
 }
 
 /*
@@ -205,10 +141,35 @@ h1 a:visited, h2 a:visited, h3 a:visited, h4 a:visited, h5 a:visited {
     margin-bottom: 1.0em;
 }
 
-.appendix h1 {
+.appendix {
+    margin-top: 6em;
+}
+
+.appendix h2 {
     margin-bottom: 1.0em;
 }
 
+div.chapter, div.section {
+	padding-top:1em;
+}
+
+.book .chapter {
+    margin-top: 2em;
+}
+
+/*
+ * Links
+ */
+ 
+.link {
+}
+
+.ulink {
+}
+
+.glossterm {
+	font-style: normal;
+}
 
 /*
  * Lists
@@ -216,10 +177,32 @@ h1 a:visited, h2 a:visited, h3 a:visited, h4 a:visited, h5 a:visited {
 
 .variablelist dt {
     font-weight: bold;
+    margin-top: 1.5em;
+}
+
+.variablelist dt:first-child {
+    margin-top: 0em;
 }
 
 .variablelist dt a {
     font-weight: normal;
+}
+
+ol li, ul li {
+    padding-left:.2em;
+}
+
+ul {
+    padding-left:1.6em;
+    list-style-type:circle;
+}
+
+ul ul {
+    list-style-type:circle;
+}
+
+dd {
+    margin-left:2em;
 }
 
 /*
@@ -239,18 +222,15 @@ pre {
 
 .screen {
     border-left: solid #d4e3fa 0.5em;
-    /*overflow-x: auto;*/
 }
 
 .example, .figure {
-    margin-top: 0;
     margin-bottom: 1em;
 }
 
 .example .title, .figure .title {
     white-space: nowrap;
     text-align:center;
-    margin-top: 0;
     margin-bottom: 0.6em;
 	font-family: 'Arial', 'Verdana', sans-serif;
 	font-size: 10pt;
@@ -258,13 +238,11 @@ pre {
 }
 
 .example pre, .figure pre {
-    margin: 0;
     margin-bottom: 0.6em;
 }
 
 .example-contents > p {
     display: block;
-    margin: 0;
     margin-bottom: 0.2em;
 }
 
@@ -289,20 +267,98 @@ pre {
     font-weight: bold;
 }
 
-.cmdsynopsis {
-    font-family: 'Courier New', Courier, monospace;
-    margin-left: 2em;
+/*
+ * Footnotes, notes, tips
+ */
+
+.footnote sup {
+    vertical-align: baseline;
+    font-size: 100%;
 }
 
-.prompt {
-    font-family: 'Courier New', Courier, monospace;
-    margin-left: 1em;
+.programlisting {
+    border-left: solid #d4e3fa 0.5em;
+	width: 85%;
+	margin-left: 4.3em;
+	padding-left: 1.2em;
+	page-break-inside: auto ;
+    font-size: 90%;
+	white-space: pre-wrap;
 }
 
-.mediaobject {
-    align: center; /* Выравнивание по ширине 
-	padding-bottom: 1em;
-	padding-top: 1em;*/
+.note, .tip, .warning, .caution {
+    padding-top: 1em;
+    padding-left: 1.2em;
+    padding-right: 1.2em;
+    margin-bottom: 1em;
+	margin-left: 2em;
+	width: 85%;
+	margin-top: 1em;
+    margin-bottom: 1em;
+}
+
+.note {
+    background: #ebf4f7;
+    border: solid #c3d9e6 1px;
+}
+
+.note .title {
+    color: #5283a1;
+	font-size: 100%;
+}
+
+.tip {
+    background: #ecf2ff;
+    border: solid #4c72bf 1px;
+}
+.tip .title {
+    color: #80614D;
+	font-size: 100%;
+}
+
+.tip .figure .title, .warning .figure .title, .caution .figure .title {
+    color: #000000;
+	font-size: 13px;
+}
+
+.warning {
+    background: #f8e8e8;
+    border: solid #e59595 1px;
+}
+.warning .title {
+    color: #cc6666;
+	font-size: 100%;
+}
+
+.caution {
+    background: #ecf2ff;
+    border: solid #4c72bf 1px;
+}
+.caution .title {
+    color: #6699ff;
+	font-size: 100%;
+}
+
+/* Remove top margins on headings inside notes and tips */
+.tip h1, .note h1
+.tip h2, .note h2,
+.tip h3, .note h3,
+.tip h4, .note h4,
+.tip h5, .note h5,
+.tip h6, .note h6
+{
+   margin-top: 0;
+}
+
+/* Remove top margins on headings inside notes and tips */
+.caution h1, .warning h1, .IMPORTANT h1
+.caution h2, .warning h2, .IMPORTANT h2,
+.caution h3, .warning h3, .IMPORTANT h3,
+.caution h4, .warning h4, .IMPORTANT h4,
+.caution h5, .warning h5, .IMPORTANT h5,
+.caution h6, .warning h6, .IMPORTANT h6
+{
+   margin-top: 0;
 }
 
 /*
@@ -311,27 +367,30 @@ pre {
 
 .informaltable table {
     border-collapse: collapse;
-    font-size: 11pt;
+    font-size: 14px;
     min-width: 50%;
-    /*border: solid #2250bd 1px;*/
-	border: solid rgb(0,149,182) 1px;
 	page-break-inside: auto;
 }
 
 .informaltable table td {
-    text-align: center;
-    vertical-align: text-top;
     padding-left: 0.8em;
     padding-right: 0.8em;
     padding-top: 0.3em;
     padding-bottom: 0.3em;
-	font-size: 11pt;
+	font-size: 14px;
+}
+
+.informaltable th {
+    padding:.3em .5em;
+}
+
+.informaltable td {
+	padding:.15em .5em;
 }
 
 .informaltable table thead td {
     font-weight: bold;
-	font-size: 11pt;
-    /*border-bottom: solid #686868 2px;*/
+	font-size:  14px;
     background-color: #ffffff;
 }
 
@@ -358,132 +417,45 @@ td.right { background-color: rgb(157,197,232);
 			
 div.table  {
    text-align: center;
+   margin-bottom: 1em;
 }
 
 div.informaltable {
-  text-align: center
+  text-align: center;
+  margin-bottom: 1em;
 }
 
 .table {
-    margin-top: 0;
     margin-bottom: 1.8em;
+	padding-bottom: 2em;
 }
 
 .table .title {
     white-space: nowrap;
-    text-align:center;
-    margin-top: 0;
     margin-bottom: 0.6em;
 	font-family: 'Arial', 'Verdana', sans-serif;
-	font-size: 10pt;
+	font-size: 13px;
     color: #000000;
 }
 
-/*
- * Footnotes, notes, tips
- */
-
-.footnote sup {
-    vertical-align: baseline;
-    font-size: 100%;
-}
-
-.note, .tip, .warning, .caution, .important{
-    padding-top: 1em;
-    padding-bottom: 0;
-    padding-left: 1.2em;
-    padding-right: 1.2em;
-    margin-bottom: 1em;
-	margin-left: 2em;
-	width: 85%;
-	margin-top: 1em;
-    margin-bottom: 1em;
-}
-
-.programlisting {
-    border-left: solid #d4e3fa 0.5em;
-	width: 85%;
-	margin-left: 2em;
-	padding-left: 1.2em;
-    /*overflow-x: auto;*/
-}
-
-.note {
-    background: #ebf4f7;
-    border: solid #c3d9e6 1px;
-}
-
-.note .title {
-    color: #5283a1;
-	font-size: 100%;
-}
-
-.tip {
-    background: #FAF7F5;
-    border: solid #e2d2c9 1px;    
-}
-.tip .title {
-    color: #80614D;
-	font-size: 100%;
-}
-
-.important {
-    background: #f8e8e8;
-    border: solid #e59595 1px;
-}
-.important .title {
-    color: #cc6666;
-	font-size: 100%;
-}
-
-.warning {
-    background: #f8e8e8;
-    border: solid #e59595 1px;
-}
-.warning .title {
-    color: #cc6666;
-	font-size: 100%;
-}
-
-.caution {
-    background: #ecf2ff;
-    border: solid #4c72bf 1px;
-}
-.caution .title {
-    color: #6699ff;
-	font-size: 100%;
-}
-
-.tip .figure .title, .warning .figure .title, .caution .figure .title, .important .figure .title {
-    color: #000000;
-	font-size: 10pt;
-}
-
-/* Remove top margins on headings inside notes and tips */
-.tip h1, .note h1
-.tip h2, .note h2,
-.tip h3, .note h3,
-.tip h4, .note h4,
-.tip h5, .note h5,
-.tip h6, .note h6
-{
-   margin-top: 0;
-}
-
-/* Remove top margins on headings inside notes and tips */
-.caution h1, .warning h1, .important h1
-.caution h2, .warning h2, .important h2,
-.caution h3, .warning h3, .important h3,
-.caution h4, .warning h4, .important h4,
-.caution h5, .warning h5, .important h5,
-.caution h6, .warning h6, .important h6
-{
-   margin-top: 0;
+table .footnote {
+	margin:1em .5em;
 }
 
 /**
  * Inline content
  */
+ 
+ .cmdsynopsis {
+    font-family: 'Courier New', Courier, monospace;
+    margin-left: 2em;
+}
+
+.prompt {
+    font-family: 'Courier New', Courier, monospace;
+    margin-left: 1em;
+}
+
 .userinput{
     white-space: nowrap;
 }
@@ -494,6 +466,10 @@ div.informaltable {
 
 .guimenu, .guimenuitem, .guisubmenu,
 .guilabel {
+	font-weight: bold;
+}
+
+.structname {
 	font-weight: bold;
 }
 
@@ -512,11 +488,11 @@ div.informaltable {
 	font-weight: bold;
 }
 
-.authorinitials, .firstterm, .property  {
+.authorinitials, .firstterm {
 	font-style: italic;
 }
 
-.classname,.methodname,.interfacename,.errortext,.type, .varname, .envar {
+.property, .classname, .methodname, .interfacename, .errortext, .type, .varname, .envar {
 	font-family:  'Courier New', Courier, monospace;
 }
 
@@ -528,49 +504,3 @@ div.informaltable {
 	font-family: 'Courier New', Courier, monospace;
 	font-style: italic;
 }
-
-/*
- * Code highlighting
- */
-.hl-string, .hl-number, .hl-value { color: #336699; }
-
-.hl-keyword { font-weight: bold; }
-
-.hl-comment, .hl-doccomment { color: #929292; }
-
-.hl-annotation { color: #777744; }
-
-/***********************************************************/
-
-/*
- * Table of Contents
- */
-
-.toc dl, .list-of-examples dl {
-    margin-top: 0;
-    margin-bottom: 0;
-}
-
-.book .toc > dl > dt {
-    margin-top: 0.6em;
-}
-
-.book .toc, .book .list-of-examples {
-    margin-top: 2em;
-}
-
-/*
- * Single page html
- */
-.book .chapter {
-    margin-top: 4em;
-}
-
-
-
-
-
-
-
-
-

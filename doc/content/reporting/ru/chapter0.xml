@@ -398,6 +398,8 @@ return [[&apos;userName&apos;: user.name,
           </listitem>
         </varlistentry>
       </variablelist>
+      <para><emphasis role="bold">Использование рендеринга HTML в PDF</emphasis></para>
+      <para>Отчеты, имеющие формат шаблона HTML и формат вывода pdf, не всегда корректно отображают шрифты. Для решения этой проблемы добавьте в каталог <filename>conf</filename> приложения директорию <filename>/cuba/fonts/</filename> с необходимыми <filename>*.ttf</filename> шрифтами. Второй способ − использовать системные шрифты с помощью установки  свойства <property>cuba.reporting.fontsDir</property>=<literal>C:/Windows/Fonts</literal></para>
     </section>
   </section>
   <section>

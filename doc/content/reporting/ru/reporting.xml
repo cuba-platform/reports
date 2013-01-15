@@ -2,7 +2,7 @@
 <!-- This document was created with Syntext Serna Free. --><book lang="ru" id="reporting">
   <bookinfo>
     <copyright>
-      <year>2012</year>
+      <year>2013</year>
       <holder>Haulmont (<ulink url="http://www.haulmont.ru/">www.haulmont.ru</ulink>)</holder>
     </copyright>
     <title>Платформа <trademark>CUBA</trademark>. Генератор отчетов</title>
@@ -11,7 +11,7 @@
     <title>Предисловие</title>
     <section id="appointment_id">
       <title>Назначение</title>
-      <para>Документ является руководством по созданию отчетов в системах, разработанных на платформе <trademark>CUBA</trademark>.    Информация, представленная в руководстве, актуальна для платформы  версии 3.1.1.</para>
+      <para>Документ является руководством по созданию отчетов в системах, разработанных на платформе <trademark>CUBA</trademark>.    Информация, представленная в руководстве, актуальна для платформы  версии 4.0.</para>
     </section>
     <section>
       <title>Структура руководства</title>
