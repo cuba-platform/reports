@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- This document was created with Syntext Serna Free. --><chapter id="chapter0_theoretical_info" lang="ru">
   <title>Общие сведения</title>
-  <para>В платформе <application>CUBA</application> существует подсистема создания отчетов. Подсистема позволяет  добавлять в систему новые отчеты и изменять существующие. Подсистема позволяет:</para>
+  <para>В платформе <trademark>CUBA</trademark> существует подсистема создания отчетов. Подсистема позволяет  добавлять в систему новые отчеты и изменять существующие. Подсистема позволяет:</para>
   <itemizedlist>
     <listitem>
       <para>использовать  редактор  отчета для создания отчета пользователями, не имеющими навык программирования;</para>
@@ -49,7 +49,7 @@
   <para><emphasis role="bold">Печатная форма</emphasis>  используется для создания отчета, содержащего информацию о выбранном в данный момент экземпляре сущности системы.</para>
   <para><emphasis role="bold">Печатная форма списка</emphasis> используется для создания отчета с информацией о выбранных в данный момент экземплярах сущности системы.</para>
   <para><emphasis role="bold">Простая форма</emphasis> используется при создании остальных отчетов.</para>
-  <para><emphasis role="bold">Отчет, определенный классом</emphasis>, использует класс Java, созданный программистом. Для такого отчета необходимо определить класс и задать входные параметры. Класс должен реализовать интерфейс <classname>com.haulmont.cuba.report.CustomReport</classname>.</para>
+  <para><emphasis role="bold">Отчет, определенный классом</emphasis>, использует класс Java, созданный программистом. Для такого отчета необходимо определить класс и задать входные параметры. Класс должен реализовать интерфейс <code>com.haulmont.cuba.report.CustomReport</code>.</para>
   <para><emphasis role="bold">Алгоритм создания простого отчета</emphasis></para>
   <orderedlist>
     <listitem>
@@ -74,13 +74,13 @@
       <para>Создать шаблон отчета.</para>
     </listitem>
     <listitem>
-      <para>Указать тип отчета <type>Печатная форма</type> или <type>Печатная форма списка</type>.</para>
+      <para>Указать тип отчета <userinput>Печатная форма</userinput> или <userinput>Печатная форма списка</userinput>.</para>
     </listitem>
     <listitem>
-      <para>Задать параметр с типом <type>Объект</type> или <type>Список объектов</type>.</para>
+      <para>Задать параметр с типом <userinput>Объект</userinput> или <userinput>Список объектов</userinput>.</para>
     </listitem>
     <listitem>
-      <para>Создать полосу отчета, имеющую источник данных с типом <type>Связанная сущность</type> или <type>Группа связанных сущностей</type>. Имя параметра в источнике данных должность совпадать с <glossterm linkend="glossary_alias_id">алиасом</glossterm> параметра из <link linkend="inner_param">пункта 3</link>.</para>
+      <para>Создать полосу отчета, имеющую источник данных с типом <userinput>Связанная сущность</userinput> или <userinput>Группа связанных сущностей</userinput>. Имя параметра в источнике данных должность совпадать с <glossterm linkend="glossary_alias_id">алиасом</glossterm> параметра из <link linkend="inner_param">пункта 3</link>.</para>
     </listitem>
     <listitem>
       <para>Cоздать кнопку печатной формы или печатной формы списка на соответствующем экране, если необходимо.</para>
@@ -88,11 +88,11 @@
   </orderedlist>
   <section>
     <title>Создание структуры данных отчета</title>
-    <para>Структура данных отчета представляет собой  дерево определителей полос (band definition). Определитель полосы имеет имя, ориентацию и список источников данных.</para>
+    <para>Структура данных отчета представляет собой  <firstterm>дерево определителей полос</firstterm> (<firstterm>band definition</firstterm>). Определитель полосы имеет имя, ориентацию и список источников данных.</para>
     <warning>
       <para>Имена полос и извлекаемых параметров должны содержать только латинские буквы, цифры или символ подчеркивания.</para>
     </warning>
-    <para><firstterm>Источник данных</firstterm> − это объект, который описывает извлечение данных. Он может извлекать данные различными путями — SQL или <glossterm linkend="glossary_jpql_id">JPQL</glossterm> запросом, Groovy скриптом или брать данные из переданных в параметрах сущностей (типы <type>Связанная сущность</type>, <type>Группа связанных сущностей</type>). В подсистеме создания отчетов существуют следующие источники данных:</para>
+    <para><firstterm>Источник данных</firstterm> − это объект, который описывает извлечение данных. Он может извлекать данные различными путями — SQL или <glossterm linkend="glossary_jpql_id">JPQL</glossterm> запросом, Groovy скриптом или брать данные из переданных в параметрах сущностей (типы <userinput>Связанная сущность</userinput>, <userinput>Группа связанных сущностей</userinput>). В подсистеме создания отчетов существуют следующие источники данных:</para>
     <orderedlist>
       <listitem>
         <para><emphasis role="bold">SQL и JPQL</emphasis></para>
@@ -100,7 +100,7 @@
         <warning>
           <para>Данные <glossterm linkend="glossary_alias_id">алиасы</glossterm> далее будут  использованы в шаблоне отчета.</para>
         </warning>
-        <para>В запросе можно использовать входные параметры отчета и данные из родительских полос. К параметрам нужно обращаться по имени, заключенному в конструкцию <prompt>${}</prompt> (<prompt>${userName}</prompt>). К данным родительской полосы нужно обращаться аналогично, добавляя имя полосы перед именем параметра (<prompt>${Band1.param1}</prompt>)
+        <para>В запросе можно использовать входные параметры отчета и данные из родительских полос. К параметрам нужно обращаться по имени, заключенному в конструкцию <code>${}</code> (<code>${userName}</code>). К данным родительской полосы нужно обращаться аналогично, добавляя имя полосы перед именем параметра (<code>${Band1.param1}</code>)
 Пример запроса на SQL:</para>
         <programlisting>select u.name as userName, u.login as userLogin 
 from sec_user u 
@@ -117,12 +117,12 @@ where u.updateTs &gt; ${date1}</programlisting>
       </listitem>
       <listitem>
         <para><emphasis role="bold">Groovy</emphasis></para>
-        <para>Groovy скрипт должен возвращать объект типа <varname>List&lt;Map&lt;String, Object&gt;&gt;</varname>. Объект <varname>Map&lt;String, Object&gt;</varname> соответствует одной записи в SQL-запросе. Ключ в отображении должен содержать <glossterm linkend="glossary_alias_id">алиас</glossterm> параметра.</para>
+        <para>Groovy скрипт должен возвращать объект типа <code>List&lt;Map&lt;String, Object&gt;&gt;</code>. Объект <code>Map&lt;String, Object&gt;</code> соответствует одной записи в SQL-запросе. Ключ в отображении должен содержать <glossterm linkend="glossary_alias_id">алиас</glossterm> параметра.</para>
         <warning>
           <para>Данные <glossterm linkend="glossary_alias_id">алиасы</glossterm> далее будут  использованы в шаблоне отчета.</para>
         </warning>
-        <para>Groovy-скрипт может использовать входные параметры отчета и данные родительских полос. В каждый скрипт передаются параметры <varname>Band parentBand</varname> и <varname>Map&lt;String, Object&gt; params</varname>. В отображении <varname>params</varname> содержатся входные параметры, а у <varname>parentBand</varname> можно вызвать метод <methodname>getParameter</methodname>, который принимает строку с именем параметра.</para>
-        <para>Скрипты Groovy для загрузки данных могут напрямую вызывать методы <classname>Query</classname> и <classname>EntityManager</classname>.</para>
+        <para>Groovy-скрипт может использовать входные параметры отчета и данные родительских полос. В каждый скрипт передаются параметры <code>Band parentBand</code> и <code>Map&lt;String, Object&gt; params</code>. В отображении <code>params</code> содержатся входные параметры, а у <code>parentBand</code> можно вызвать метод <code>getParameter</code>, который принимает строку с именем параметра.</para>
+        <para>Скрипты Groovy для загрузки данных могут напрямую вызывать методы <code>Query</code> и <code>EntityManager</code>.</para>
         <para>Пример скрипта:</para>
         <programlisting>User user = parentBand.getParameter(&apos;entity&apos;)
 Group group = params[[&apos;group&apos;]
@@ -132,7 +132,7 @@ return [[&apos;userName&apos;: user.name,
       </listitem>
       <listitem>
         <para><emphasis role="bold">Связанная сущность и Группа связанных сущностей</emphasis></para>
-        <para>Чтобы использовать данные типы источников данных необходимо, чтобы в отчете типы параметров  были <type>Объект</type> и <type>Группа объектов</type> соответственно, а сам параметр был связанной сущностью. В этом случае в шаблоне будут использованы поля сущностей. <glossterm linkend="glossary_alias_id">Алиасы</glossterm> в шаблоне должны соответствовать именам выгружаемых полей сущности.</para>
+        <para>Чтобы использовать данные типы источников данных необходимо, чтобы в отчете типы параметров  были <userinput>Объект</userinput> и <userinput>Группа объектов</userinput> соответственно, а сам параметр был связанной сущностью. В этом случае в шаблоне будут использованы поля сущностей. <glossterm linkend="glossary_alias_id">Алиасы</glossterm> в шаблоне должны соответствовать именам выгружаемых полей сущности.</para>
       </listitem>
     </orderedlist>
   </section>
@@ -178,11 +178,11 @@ return [[&apos;userName&apos;: user.name,
         <para>Именованные регионы можно удалять, назначать им другие диапазоны.</para>
       </tip>
       <para>Регионы в результирующем отчете отрисовываются в том порядке, в котором идут соответствующие им полосы.</para>
-      <para>Полосы в xls-отчете могут быть двух видов: горизонтальные и вертикальные. Горизонтальные растут вниз, вертикальные — вправо.</para>
+      <para>Полосы в xls-отчете могут быть двух видов: горизонтальные и вертикальные. Горизонтальные растут вниз, вертикальные − вправо.</para>
       <para>Горизонтальные полосы могут содержать вложенные полосы. Поэтому необходимо для вложенных полос создавать именованные регионы непосредственно под регионами, соответствующими родительским полосам.</para>
       <para>Вертикальные полосы  вложенных полос иметь не могут.</para>
       <para><emphasis role="bold">Задание выходных параметров</emphasis></para>
-      <para>В каждом именованном регионе нужно задать <glossterm linkend="glossary_alias_id">алиасы</glossterm> параметров.  При формировании отчета эти алиасы будут заменены на значения параметров из полос. Алиасы должны иметь вид <prompt>${имя параметра}</prompt>. Имя параметра в алиасе должно совпадать с именем параметра из полосы. Ячейки могут содержать форматирование и несколько алиасов внутри.
+      <para>В каждом именованном регионе нужно задать <glossterm linkend="glossary_alias_id">алиасы</glossterm> параметров.  При формировании отчета эти алиасы будут заменены на значения параметров из полос. Алиасы должны иметь вид <code>${имя параметра}</code>. Имя параметра в алиасе должно совпадать с именем параметра из полосы. Ячейки могут содержать форматирование и несколько алиасов внутри.
 Шаблон может содержать картинки и формулы. Они должны целиком лежать в некотором именованном регионе.</para>
     </section>
     <section>
@@ -225,7 +225,7 @@ return [[&apos;userName&apos;: user.name,
         <para>В поле <guilabel>Название</guilabel> можно ввести новое название таблицы.</para>
       </tip>
       <para><emphasis role="bold">Задание выходных параметров</emphasis></para>
-      <para>В doc-шаблоне <glossterm linkend="glossary_alias_id">алиасы</glossterm> могут быть двух  видов − в таблицах и в тексте. В тексте алиас должен иметь вид <prompt>${имя полосы.имя параметра}</prompt>. В таблице алиас должен иметь вид <prompt>${имя параметра}</prompt>. Текст может содержать форматирование, а в ячейках таблиц может содержаться несколько алиасов.</para>
+      <para>В doc-шаблоне <glossterm linkend="glossary_alias_id">алиасы</glossterm> могут быть двух  видов − в таблицах и в тексте. В тексте алиас должен иметь вид <code>${имя полосы.имя параметра}</code>. В таблице алиас должен иметь вид <code>${имя параметра}</code>. Текст может содержать форматирование, а в ячейках таблиц может содержаться несколько алиасов.</para>
     </section>
     <section>
       <title>Специальные объекты в документе</title>
@@ -233,11 +233,11 @@ return [[&apos;userName&apos;: user.name,
       <orderedlist>
         <listitem>
           <para>Изображения</para>
-          <para>Форматы позволяют вставлять изображения в документы. Для этого выходное значение должно быть строкой URL для доступа к изображению, а в формате значения должен быть задан формат: <prompt>${image:&lt;Width&gt;x&lt;Height&gt;}</prompt> , например <prompt>${image:200x300}</prompt>.</para>
+          <para>Форматы позволяют вставлять изображения в документы. Для этого выходное значение должно быть строкой URL для доступа к изображению, а в формате значения должен быть задан формат: <code>${image:&lt;Width&gt;x&lt;Height&gt;}</code> , например <code>${image:200x300}</code>.</para>
         </listitem>
         <listitem>
           <para>HTML блоки</para>
-          <para>Для вставки необходимо возвращать в выходном значении html разметку, а в формате значения указать формат <prompt>${html}</prompt>. В значении возвращается только содержимое <prompt>&lt;body&gt;Содержимое&lt;/body&gt;</prompt>, разметка дополняется до документа автоматически. Кодировка всех блоков <code>UTF-8</code>. CSS и атрибут <parameter>style</parameter> не поддерживаются.</para>
+          <para>Для вставки необходимо возвращать в выходном значении html разметку, а в формате значения указать формат <code>${html}</code>. В значении возвращается только содержимое <code>&lt;body&gt;Содержимое&lt;/body&gt;</code>, разметка дополняется до документа автоматически. Кодировка всех блоков <code>UTF-8</code>. CSS и атрибут <literal>style</literal> не поддерживаются.</para>
         </listitem>
       </orderedlist>
     </section>
@@ -249,7 +249,7 @@ return [[&apos;userName&apos;: user.name,
       bands [ bandName : [ Band, .. ], .. ] 
       fields [ fieldName : fieldValue, .. ] 
 }</programlisting>
-      <para>Например, для доступа к полю <varname>name</varname> в полосе <varname>band1</varname> в нулевой строке выборки используется путь:</para>
+      <para>Например, для доступа к полю <code>name</code> в полосе <code>band1</code> в нулевой строке выборки используется путь:</para>
       <programlisting>Root.bands.band1[0].fields.name</programlisting>
       <para>Для удобства в шаблоне можно использовать присваивание <parameter>assign</parameter>:</para>
       <programlisting>&lt;#assign Table1Header = Root.bands.HeaderBand&gt;</programlisting>
@@ -286,8 +286,11 @@ return [[&apos;userName&apos;: user.name,
         }
     }
 }</programlisting>
-      <para><emphasis role="bold">Обращение к полю</emphasis></para>
-      <programlisting>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+      <variablelist>
+        <varlistentry>
+          <term>Обращение к полю</term>
+          <listitem>
+            <programlisting>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
 &lt;!DOCTYPE html PUBLIC &quot;-//W3C//DTD XHTML 1.1//EN&quot; &quot;http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd&quot;&gt;
 &lt;html xmlns=&quot;http://www.w3.org/1999/xhtml&quot; xml:lang=&quot;ru&quot;&gt;
     &lt;head&gt;
@@ -301,8 +304,12 @@ return [[&apos;userName&apos;: user.name,
         &lt;/p&gt;
     &lt;/body&gt;
 &lt;/html&gt;</programlisting>
-      <para><emphasis role="bold">Список</emphasis></para>
-      <programlisting>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>Список</term>
+          <listitem>
+            <programlisting>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
 &lt;!DOCTYPE html PUBLIC &quot;-//W3C//DTD XHTML 1.1//EN&quot; &quot;http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd&quot;&gt;
 &lt;html xmlns=&quot;http://www.w3.org/1999/xhtml&quot; xml:lang=&quot;ru&quot;&gt;
     &lt;head&gt;
@@ -320,8 +327,12 @@ return [[&apos;userName&apos;: user.name,
         &lt;/#if&gt; 
     &lt;/body&gt;
 &lt;/html&gt;</programlisting>
-      <para><emphasis role="bold">Таблица</emphasis></para>
-      <programlisting>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>Таблица</term>
+          <listitem>
+            <programlisting>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
 &lt;!DOCTYPE html PUBLIC &quot;-//W3C//DTD XHTML 1.1//EN&quot; &quot;http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd&quot;&gt;
 &lt;html xmlns=&quot;http://www.w3.org/1999/xhtml&quot; xml:lang=&quot;ru&quot;&gt;
     &lt;head&gt;
@@ -353,8 +364,12 @@ return [[&apos;userName&apos;: user.name,
         &lt;/table&gt;  
     &lt;/body&gt;
 &lt;/html&gt;</programlisting>
-      <para><emphasis role="bold">Многоуровневый список</emphasis></para>
-      <programlisting>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>Многоуровневый список</term>
+          <listitem>
+            <programlisting>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
 &lt;!DOCTYPE html PUBLIC &quot;-//W3C//DTD XHTML 1.1//EN&quot; &quot;http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd&quot;&gt;
 &lt;html xmlns=&quot;http://www.w3.org/1999/xhtml&quot; xml:lang=&quot;ru&quot;&gt;
     &lt;head&gt;
@@ -380,6 +395,9 @@ return [[&apos;userName&apos;: user.name,
         &lt;/ul&gt;  
     &lt;/body&gt;
 &lt;/html&gt;</programlisting>
+          </listitem>
+        </varlistentry>
+      </variablelist>
     </section>
   </section>
   <section>
@@ -388,10 +406,10 @@ return [[&apos;userName&apos;: user.name,
   </section>
   <section>
     <title>Задание форматирования значений выходных параметров отчета</title>
-    <para>Для каждого из выходных значений отчёта можно задать форматирование. Для этого нужно добавить элемент-форматтер, где указать полное имя выходного параметра (путь от корня, например <prompt>Test.name</prompt>, <prompt>Test</prompt> − имя полосы, <prompt>name</prompt> − имя параметра) и выбрать строку форматирования из списка часто используемых форматов для чисел и дат или задать этот формат самостоятельно.  Для чисел применяется <classname>DecimalFormat</classname> (более подробно о <classname>DecimalFormat</classname> можно прочитать на сайте <ulink url="http://docs.oracle.com/javase/6/docs/api/java/text/DecimalFormat.html">http://docs.oracle.com/javase/6/docs/api/java/text/DecimalFormat.html</ulink>), для дат − <classname>SimpleDateFormat</classname> (более подробно о <classname>DecimalFormat</classname> можно прочитать на сайте <ulink url="http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html">http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html).</ulink></para>
+    <para>Для каждого из выходных значений отчёта можно задать форматирование. Для этого нужно добавить элемент-форматтер, где указать полное имя выходного параметра (путь от корня, например <code>Test.name</code>, <code>Test</code> − имя полосы, <code>name</code> − имя параметра) и выбрать строку форматирования из списка часто используемых форматов для чисел и дат или задать этот формат самостоятельно.  Для чисел применяется <code>DecimalFormat</code> (более подробно о <code>DecimalFormat</code> можно прочитать на сайте <ulink url="http://docs.oracle.com/javase/6/docs/api/java/text/DecimalFormat.html">http://docs.oracle.com/javase/6/docs/api/java/text/DecimalFormat.html</ulink>), для дат − <code>SimpleDateFormat</code> (более подробно о <code>DecimalFormat</code> можно прочитать на сайте <ulink url="http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html">http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html).</ulink></para>
   </section>
   <section>
     <title>Разграничение прав доступа к отчетам</title>
-    <para>Отчеты можно привязывать к экранам и\или ролям пользователей. Для этого необходимо на закладке <guilabel>Экраны и роли</guilabel> добавить экраны, с которых можно вызывать отчет, и роли пользователей, которым позволено это делать. По умолчанию отчет может вызываться из любых экранов и любыми ролями. Если экран или роль заданы явно, то отчет может быть вызван только из этого экрана или только данной ролью.</para>
+    <para>Отчеты можно привязывать к экранам и\или ролям пользователей. Для этого необходимо на вкладке <guilabel>Экраны и роли</guilabel> добавить экраны, с которых можно вызывать отчет, и роли пользователей, которым позволено это делать. По умолчанию отчет может вызываться из любых экранов и любыми ролями. Если экран или роль заданы явно, то отчет может быть вызван только из этого экрана или только данной ролью.</para>
   </section>
 </chapter>

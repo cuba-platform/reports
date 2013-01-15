@@ -13,7 +13,7 @@
       <para><link linkend="report3_id">Отчет <guilabel>Информация о товаре</guilabel></link></para>
     </listitem>
     <listitem>
-      <para><link linkend="report4_id">Отчет <guilabel>По согласуемым документам</guilabel> (на примере системы <application>ТЕЗИС</application>)</link></para>
+      <para><link linkend="report4_id">Отчет <guilabel>По согласуемым документам</guilabel> (на примере системы <trademark>ТЕЗИС</trademark>)</link></para>
     </listitem>
   </orderedlist>
   <section id="report1_id">
@@ -31,7 +31,7 @@
       </mediaobject>
     </figure>
     <para>Далее зайдите в подсистему создания отчетов и нажмите на кнопку <guibutton>Создать</guibutton>.</para>
-    <para>В поле <guilabel>Имя</guilabel> введите имя отчета − <userinput>Sale invoice</userinput>, в качестве типа вывода отчета выберите значение <type>Простой отчет</type>. </para>
+    <para>В поле <guilabel>Имя</guilabel> введите имя отчета − <userinput>Sale invoice</userinput>, в качестве типа вывода отчета выберите значение <userinput>Простой отчет</userinput>. </para>
     <figure>
       <title>Окно создания отчета</title>
       <mediaobject>
@@ -49,7 +49,7 @@
         </imageobject>
       </mediaobject>
     </figure>
-    <para>В качестве кода шаблона оставьте значение по умолчанию, в поле <guilabel>Тип вывода</guilabel> выберите значение <type>Doc</type>. Далее нажмите на кнопку <guibutton>Загрузить</guibutton> и в открывшемся окне укажите путь к созданному ранее шаблону <filename>saleInvoice.odt</filename>.</para>
+    <para>В качестве кода шаблона оставьте значение по умолчанию, в поле <guilabel>Тип вывода</guilabel> выберите значение <userinput>Doc</userinput>. Далее нажмите на кнопку <guibutton>Загрузить</guibutton> и в открывшемся окне укажите путь к созданному ранее шаблону <filename>saleInvoice.odt</filename>.</para>
     <para>Далее создадим входной параметр отчета. Очевидно, входным параметром будет являться одна запись продажи, выбранная  из списка продаж. Для создания параметра нажмите на кнопку <guibutton>Создать</guibutton> на панели <guilabel>Параметры</guilabel>. </para>
     <figure>
       <title>Окно редактора параметров</title>
@@ -59,7 +59,7 @@
         </imageobject>
       </mediaobject>
     </figure>
-    <para>Заполните поля параметра. В поле <guilabel>Имя параметра</guilabel> введите <userinput>Sale</userinput>, в качестве <glossterm linkend="glossary_alias_id">алиаса</glossterm> параметра укажите <userinput>sale</userinput>. Выберите тип параметра <userinput>Объект</userinput> из списка типов. Далее установите флажок <guilabel>Обязательный параметр?</guilabel>. В качестве сущности выберите <userinput>Sale</userinput> из списка сущностей. В списке экранов выбора сущности найдите экран <userinput>shop$Sale.browse</userinput>. Далее перейдите на закладку <guilabel>Локализация</guilabel>.</para>
+    <para>Заполните поля параметра. В поле <guilabel>Имя параметра</guilabel> введите <userinput>Sale</userinput>, в качестве <glossterm linkend="glossary_alias_id">алиаса</glossterm> параметра укажите <userinput>sale</userinput>. Выберите тип параметра <userinput>Объект</userinput> из списка типов. Далее установите флажок <guilabel>Обязательный параметр?</guilabel>. В качестве сущности выберите <userinput>Sale</userinput> из списка сущностей. В списке экранов выбора сущности найдите экран <userinput>shop$Sale.browse</userinput>. Далее перейдите на вкладку <guilabel>Локализация</guilabel>.</para>
     <figure>
       <title>Локализация названия параметра</title>
       <mediaobject>
@@ -101,7 +101,7 @@ ss.id = ${sale}
 and sb.id = ss.buyer.id
 and sp.id = ss.salesPerson.id</programlisting>
     <warning>
-      <para>Обратите внимание, что <glossterm linkend="glossary_alias_id">алиасы</glossterm> в запросе называются так же, как в создаваемом шаблоне, а в качестве идентификатора сущности <classname>shop$Sale</classname> передается входной параметр <varname>sale</varname>, заключенный в конструкцию <code>${}</code> − <code>${sale}</code>.</para>
+      <para>Обратите внимание, что <glossterm linkend="glossary_alias_id">алиасы</glossterm> в запросе называются так же, как в создаваемом шаблоне, а в качестве идентификатора сущности <code>shop$Sale</code> передается входной параметр <code>sale</code>, заключенный в конструкцию <code>${}</code> − <code>${sale}</code>.</para>
     </warning>
     <para>После создания полосы отчета <guilabel>Sale</guilabel> создадим полосу отчета <guilabel>Product</guilabel>. Для этого выделите корневую полосу отчета <guilabel>Root</guilabel> и нажмите на кнопку <guibutton>Создать</guibutton>. Далее заполните поля источника данных в соответствии с рисунком.</para>
     <figure>
@@ -124,7 +124,7 @@ and  sp.id = ss.product.id</programlisting>
     <para>После создания полос перейдите на вкладку <guilabel>Локализация</guilabel> редактора отчетов и введите в поле <guilabel>Строки локализации </guilabel>следующее:</para>
     <para><userinput>ru=Накладная на продажу</userinput></para>
     <para>После этого нажмите на кнопку <guibutton>ОК</guibutton>. Новый отчет создан и сохранен в базе данных.</para>
-    <para>Запустим отчет на выполнение. Для этого вернитесь на закладку <guilabel>Список отчетов</guilabel> (<guimenu>Отчеты</guimenu> −&gt; <guimenu>Отчеты</guimenu>). </para>
+    <para>Запустим отчет на выполнение. Для этого вернитесь на вкладку <guilabel>Список отчетов</guilabel> (<guimenu>Отчеты</guimenu> −&gt; <guimenu>Отчеты</guimenu>). </para>
     <figure>
       <title>Запуск отчета</title>
       <mediaobject>
@@ -238,7 +238,7 @@ and  sp.id = ss.product.id</programlisting>
     </figure>
     <para>Сохраните шаблон отчета, назвав его <filename>saleForPeriod.xls</filename>.</para>
     <para>Далее зайдите в подсистему создания отчетов и нажмите на кнопку <guibutton>Создать</guibutton>.</para>
-    <para>В поле <guilabel>Имя</guilabel> введите имя отчета − <userinput>Sales for period</userinput>, в качестве типа вывода отчета выберите значение <type>Простой отчет</type>. </para>
+    <para>В поле <guilabel>Имя</guilabel> введите имя отчета − <userinput>Sales for period</userinput>, в качестве типа вывода отчета выберите значение <userinput>Простой отчет</userinput>. </para>
     <figure>
       <title>Окно создания отчета</title>
       <mediaobject>
@@ -256,7 +256,7 @@ and  sp.id = ss.product.id</programlisting>
         </imageobject>
       </mediaobject>
     </figure>
-    <para>В качестве кода шаблона оставьте значение по умолчанию, в поле <guilabel>Тип вывода</guilabel> выберите значение <type>Xls</type>. Далее нажмите на кнопку <guibutton>Загрузить</guibutton> и в открывшемся окне укажите путь к созданному ранее шаблону <filename>saleForPeriod.xls</filename>.</para>
+    <para>В качестве кода шаблона оставьте значение по умолчанию, в поле <guilabel>Тип вывода</guilabel> выберите значение <userinput>Xls</userinput>. Далее нажмите на кнопку <guibutton>Загрузить</guibutton> и в открывшемся окне укажите путь к созданному ранее шаблону <filename>saleForPeriod.xls</filename>.</para>
     <para>Далее создадим входные параметры отчета. Очевидно, входными параметрами будут являться дата начала периода и дата окончания периода. Для создания параметра нажмите на кнопку <guibutton>Создать</guibutton> на панели <guilabel>Параметры</guilabel>. </para>
     <figure>
       <title>Окно редатора параметра Period Start</title>
@@ -266,9 +266,9 @@ and  sp.id = ss.product.id</programlisting>
         </imageobject>
       </mediaobject>
     </figure>
-    <para>Заполните поля параметра. В поле <guilabel>Имя параметра</guilabel> введите <userinput>Period start</userinput>, в качестве <glossterm linkend="glossary_alias_id">алиаса</glossterm> параметра укажите <userinput>start</userinput>. Выберите тип параметра <userinput>Дата</userinput> из списка типов. Далее установите флажок <guilabel>Обязательный параметр?</guilabel>.  Далее перейдите на закладку <guilabel>Локализация</guilabel>.</para>
+    <para>Заполните поля параметра. В поле <guilabel>Имя параметра</guilabel> введите <userinput>Period start</userinput>, в качестве <glossterm linkend="glossary_alias_id">алиаса</glossterm> параметра укажите <userinput>start</userinput>. Выберите тип параметра <userinput>Дата</userinput> из списка типов. Далее установите флажок <guilabel>Обязательный параметр?</guilabel>.  Далее перейдите на вкладку <guilabel>Локализация</guilabel>.</para>
     <figure>
-      <title>Закладка локализации параметра</title>
+      <title>Вкладка локализации параметра</title>
       <mediaobject>
         <imageobject>
           <imagedata align="center" fileref="img/example2_8.png" contentwidth="80%"/>
@@ -339,7 +339,7 @@ and S.DELETE_TS is null</programlisting>
     <para>После создания полос перейдите на вкладку <guilabel>Локализация</guilabel> редактора отчетов и введите в поле <guilabel>Строки локализации </guilabel>следующее:</para>
     <para><userinput>ru=Список продаж за период</userinput></para>
     <para>После этого нажмите на кнопку <guibutton>ОК</guibutton>. Новый отчет создан и сохранен в базе данных.</para>
-    <para>Запустим отчет на выполнение. Для этого вернитесь на закладку <guilabel>Список отчетов</guilabel> (<guimenu>Отчеты</guimenu> −&gt; <guimenu>Отчеты</guimenu>). </para>
+    <para>Запустим отчет на выполнение. Для этого вернитесь на вкладку <guilabel>Список отчетов</guilabel> (<guimenu>Отчеты</guimenu> −&gt; <guimenu>Отчеты</guimenu>). </para>
     <figure>
       <title>Выполнение отчета</title>
       <mediaobject>
@@ -396,7 +396,7 @@ and S.DELETE_TS is null</programlisting>
     <para>Обратите внимание на название таблицы.</para>
     <para>Сохраните шаблон отчета, назвав его <filename>Product.odt</filename>.</para>
     <para>Далее зайдите в подсистему создания отчетов и нажмите на кнопку <guibutton>Создать</guibutton>.</para>
-    <para>В поле <guilabel>Имя</guilabel> введите имя отчета − <userinput>Product info</userinput>, в качестве типа вывода отчета выберите значение <type>Печатная форма</type>. </para>
+    <para>В поле <guilabel>Имя</guilabel> введите имя отчета − <userinput>Product info</userinput>, в качестве типа вывода отчета выберите значение <userinput>Печатная форма</userinput>. </para>
     <figure>
       <title>Окно создания отчета</title>
       <mediaobject>
@@ -414,7 +414,7 @@ and S.DELETE_TS is null</programlisting>
         </imageobject>
       </mediaobject>
     </figure>
-    <para>В качестве кода шаблона оставьте значение по умолчанию, в поле <guilabel>Тип вывода</guilabel> выберите значение <type>Doc</type>. Далее нажмите на кнопку <guibutton>Загрузить</guibutton> и в открывшемся окне укажите путь к созданному ранее шаблону <filename>Product.odt</filename>.</para>
+    <para>В качестве кода шаблона оставьте значение по умолчанию, в поле <guilabel>Тип вывода</guilabel> выберите значение <userinput>Doc</userinput>. Далее нажмите на кнопку <guibutton>Загрузить</guibutton> и в открывшемся окне укажите путь к созданному ранее шаблону <filename>Product.odt</filename>.</para>
     <para>Далее создадим входной параметр отчета. Очевидно, входным параметром будет являться одна запись товара, выбранная  из списка товаров. Для создания параметра нажмите на кнопку <guibutton>Создать</guibutton> на панели <guilabel>Параметры</guilabel>. </para>
     <figure>
       <title>Окно редактора параметра Product</title>
@@ -424,9 +424,9 @@ and S.DELETE_TS is null</programlisting>
         </imageobject>
       </mediaobject>
     </figure>
-    <para>Заполните поля параметра. В поле <guilabel>Имя параметра</guilabel> введите <userinput>Product</userinput>, в качестве <glossterm linkend="glossary_alias_id">алиаса</glossterm> параметра укажите <userinput>product</userinput>. Выберите тип параметра <userinput>Объект</userinput> из списка типов. Далее установите флажок  <guilabel>Связанная сущность?</guilabel> и <guilabel>Обязательный параметр?</guilabel>. В качестве сущности выберите <userinput>Product</userinput> из списка сущностей. В списке экранов выбора сущности найдите экран <userinput>shop$Product.browse</userinput>. Далее перейдите на закладку <guilabel>Локализация</guilabel>.</para>
+    <para>Заполните поля параметра. В поле <guilabel>Имя параметра</guilabel> введите <userinput>Product</userinput>, в качестве <glossterm linkend="glossary_alias_id">алиаса</glossterm> параметра укажите <userinput>product</userinput>. Выберите тип параметра <userinput>Объект</userinput> из списка типов. Далее установите флажок  <guilabel>Связанная сущность?</guilabel> и <guilabel>Обязательный параметр?</guilabel>. В качестве сущности выберите <userinput>Product</userinput> из списка сущностей. В списке экранов выбора сущности найдите экран <userinput>shop$Product.browse</userinput>. Далее перейдите на вкладку <guilabel>Локализация</guilabel>.</para>
     <figure>
-      <title>Закладка локализации параметра</title>
+      <title>Вкладка локализации параметра</title>
       <mediaobject>
         <imageobject>
           <imagedata align="center" fileref="img/example3_5.png" contentwidth="80%"/>
@@ -462,18 +462,18 @@ and S.DELETE_TS is null</programlisting>
     <para>Создавать кнопку нужно следующим образом:</para>
     <itemizedlist>
       <listitem>
-        <para>Для печатной формы, вызываемой из экрана редактирования сущности, необходимо создать кнопку и задать ей <parameter>action</parameter>, <classname>EditorPrintFormAction</classname>. В конструктор необходимо передать текущий <classname>Editor</classname>  и <classname>message id</classname> подписи кнопки.</para>
+        <para>Для печатной формы, вызываемой из экрана редактирования сущности, необходимо создать кнопку и задать ей <code>action</code> <code>EditorPrintFormAction</code>. В конструктор необходимо передать текущий <code>Editor</code>  и <code>message id</code> подписи кнопки.</para>
       </listitem>
       <listitem>
-        <para>Для печатной формы, вызываемой из браузера сущности, необходимо создать кнопку и задать ей <classname>action</classname><classname> TablePrintFormAction</classname>. В конструктор необходимо передать текущее окно,  таблицу, из которой будут выбираться сущности, и булевский параметр <varname>multiObjects</varname>, который определяет, является ли отчет печатной формой (<varname>false</varname>) или печатной формой списка (<varname>true</varname>). В первом случае берется один выбранный объект и передается в параметр типа <type>Объект</type>. Во втором случае берется <type>List</type> выбранных объектов и передается в параметр типа <type>Список объектов</type>.</para>
+        <para>Для печатной формы, вызываемой из браузера сущности, необходимо создать кнопку и задать ей <code>action</code> <code>TablePrintFormAction</code>. В конструктор необходимо передать текущее окно,  таблицу, из которой будут выбираться сущности, и булевский параметр <code>multiObjects</code>, который определяет, является ли отчет печатной формой (<code>false</code>) или печатной формой списка (<code>true</code>). В первом случае берется один выбранный объект и передается в параметр типа <code>Объект</code>. Во втором случае берется <code>List</code> выбранных объектов и передается в параметр типа <code>Список объектов</code>.</para>
       </listitem>
     </itemizedlist>
-    <para>В XML-дескрипторе браузера сущности <classname>Product</classname> определите кнопку следующим образом:</para>
+    <para>В XML-дескрипторе браузера сущности <code>Product</code> определите кнопку следующим образом:</para>
     <programlisting>&lt;buttonsPanel&gt;
     &lt;!--others buttons--&gt;
     &lt;button id=&quot;print&quot;/&gt;
 &lt;/buttonsPanel&gt;</programlisting>
-    <para>В контроллере браузера сущности создайте <classname>action</classname> и установите его для определенной ранее кнопки.</para>
+    <para>В контроллере браузера сущности создайте <code>action</code> и установите его для определенной ранее кнопки.</para>
     <programlisting>TablePrintFormAction tablePrintFormAction = new TablePrintFormAction(this, productsTable, false);
 print.setAction(tablePrintFormAction);</programlisting>
     <para>Пересоберите проект и зайдите на экран со списком сущностей.</para>
@@ -566,7 +566,7 @@ print.setAction(tablePrintFormAction);</programlisting>
     </figure>
     <para>Сохраните шаблон отчета, назвав его <filename>forEndorsement.xls</filename>.</para>
     <para>Далее зайдите в подсистему создания отчетов и нажмите на кнопку <guibutton>Создать</guibutton>.</para>
-    <para>В поле <guilabel>Имя</guilabel> введите имя отчета − <userinput>Отчет по согласуемым документам</userinput>, в качестве типа вывода отчета выберите значение <type>Простой отчет</type>. </para>
+    <para>В поле <guilabel>Имя</guilabel> введите имя отчета − <userinput>Отчет по согласуемым документам</userinput>, в качестве типа вывода отчета выберите значение <userinput>Простой отчет</userinput>. </para>
     <figure>
       <title>Окно создания отчета</title>
       <mediaobject>
@@ -584,7 +584,7 @@ print.setAction(tablePrintFormAction);</programlisting>
         </imageobject>
       </mediaobject>
     </figure>
-    <para>В качестве кода шаблона оставьте значение по умолчанию, в поле <guilabel>Тип вывода</guilabel> выберите значение <type>Xls</type>. Далее нажмите на кнопку <guibutton>Загрузить</guibutton> и в открывшемся окне укажите путь к созданному ранее шаблону <filename>forEndorsement.xls</filename>.</para>
+    <para>В качестве кода шаблона оставьте значение по умолчанию, в поле <guilabel>Тип вывода</guilabel> выберите значение <userinput>Xls</userinput>. Далее нажмите на кнопку <guibutton>Загрузить</guibutton> и в открывшемся окне укажите путь к созданному ранее шаблону <filename>forEndorsement.xls</filename>.</para>
     <para>Далее создадим входные параметры отчета. Очевидно, входным параметром будет являться пользователь, выбранный из списка пользователей. Для создания параметра нажмите на кнопку <guibutton>Создать</guibutton> на панели <guilabel>Параметры</guilabel>. </para>
     <figure>
       <title>Окно редактора параметра User</title>
@@ -594,7 +594,7 @@ print.setAction(tablePrintFormAction);</programlisting>
         </imageobject>
       </mediaobject>
     </figure>
-    <para>Заполните поля параметра. В поле <guilabel>Имя параметра</guilabel> введите <userinput>Пользователь</userinput>, в качестве <glossterm linkend="glossary_alias_id">алиаса</glossterm> параметра укажите <userinput>user</userinput>. Выберите тип параметра <userinput>Объект</userinput> из списка типов. Далее установите флажок  <guilabel>Обязательный параметр?</guilabel>. В качестве сущности выберите <type>User</type> из списка сущностей. В списке экранов выбора сущности найдите экран <type>sec$User.browse</type>.</para>
+    <para>Заполните поля параметра. В поле <guilabel>Имя параметра</guilabel> введите <userinput>Пользователь</userinput>, в качестве <glossterm linkend="glossary_alias_id">алиаса</glossterm> параметра укажите <userinput>user</userinput>. Выберите тип параметра <userinput>Объект</userinput> из списка типов. Далее установите флажок  <guilabel>Обязательный параметр?</guilabel>. В качестве сущности выберите <userinput>User</userinput> из списка сущностей. В списке экранов выбора сущности найдите экран <userinput>sec$User.browse</userinput>.</para>
     <para>Далее приступим к созданию полос отчета. Для создания новой полосы выделите корневую полосу отчета <guilabel>Root</guilabel> и нажмите на кнопку <guibutton>Создать</guibutton>.</para>
     <figure>
       <title>Создание полос отчета</title>
@@ -676,7 +676,7 @@ and WA.FINISHED is null and WA.DUE_DATE&lt;now()</programlisting>
     </figure>
     <para>Полосы отчета пустые, так как в соответствующие им именованные регионы шаблона не требуется выводить данные из базы данных.</para>
     <para>После этого нажмите на кнопку <guibutton>ОК</guibutton>. Новый отчет создан и сохранен в базе данных.</para>
-    <para>Запустим отчет на выполнение. Для этого вернитесь на закладку <guilabel>Список отчетов</guilabel> (<guimenu>Отчеты</guimenu> −&gt; <guimenu>Отчеты</guimenu>). </para>
+    <para>Запустим отчет на выполнение. Для этого вернитесь на вкладку <guilabel>Список отчетов</guilabel> (<guimenu>Отчеты</guimenu> −&gt; <guimenu>Отчеты</guimenu>). </para>
     <figure>
       <title>Выполнение отчета</title>
       <mediaobject>

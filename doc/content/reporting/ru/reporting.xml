@@ -11,7 +11,7 @@
     <title>Предисловие</title>
     <section id="appointment_id">
       <title>Назначение</title>
-      <para>Документ является руководством по созданию отчетов в системах, разработанных на платформе <application>CUBA</application>.    Информация, представленная в руководстве, актуальна для платформы  версии 3.1.1.</para>
+      <para>Документ является руководством по созданию отчетов в системах, разработанных на платформе <trademark>CUBA</trademark>.    Информация, представленная в руководстве, актуальна для платформы  версии 3.1.1.</para>
     </section>
     <section>
       <title>Структура руководства</title>
@@ -33,55 +33,14 @@
         </link></para>
       <para>В главе 4 приводится подробное описание создания основных видов отчетов.</para>
     </section>
+    <section id="additional_info">
+      <title>Дополнительные материалы</title>
+      <para>Настоящее Руководство, а также другая документация по платформе <trademark>CUBA</trademark>, доступны по адресу <ulink url="http://docs.haulmont.com/cuba/">http://docs.haulmont.com/cuba/</ulink></para>
+    </section>
     <section>
-      <title>Соглашения</title>
-      <para>Для привлечения внимания к определенной информации в Руководстве используется выделение текста различными шрифтами, стилями и размером.</para>
-      <section>
-        <title>Типографские соглашения</title>
-        <para>Далее приводятся примеры выделенных слов и пояснения, в каких случаях используется то или иное оформление.</para>
-        <formalpara>
-          <title>Переменные среды, команды, имена объектов Java, тексты ошибок, имена файлов, пакетов</title>
-          <para>Обозначены в Руководстве <classname>моноширинным шрифтом</classname>.</para>
-        </formalpara>
-        <formalpara>
-          <title>Элементы интерфейса</title>
-          <para>Пункты меню, названия окон, папок, вкладок выделяются в тексте <guimenu>полужирным текстом</guimenu>. Кнопки выглядят следующим образом: <guibutton>Кнопка</guibutton>.</para>
-        </formalpara>
-        <formalpara>
-          <title>Имена приложений, объекты базы данных, названия внешних документов</title>
-          <para>Обозначаются в тексте Руководства <emphasis role="bold">полужирным текстом</emphasis>.</para>
-        </formalpara>
-        <formalpara>
-          <title>Параметры и свойства</title>
-          <para><parameter>Параметры</parameter> и <property>свойства</property> также выделяются в тексте Руководства.</para>
-        </formalpara>
-        <formalpara>
-          <title>Роль пользователя</title>
-          <para>Роль пользователя выделяется в тексте следующим образом: <authorinitials>Администратор</authorinitials>.</para>
-        </formalpara>
-      </section>
-      <section>
-        <title>Врезки</title>
-        <para>Листинг исходного кода, а также содержимое файлов визуально отделяются от окружающего текста следующим образом:</para>
-        <programlisting>[appdefaults]
-autologin = true
-forward = true
-forwardable = true
-encrypt = true </programlisting>
-      </section>
-      <section>
-        <title>Замечания и предупреждения</title>
-        <para>В тексте Руководства будут встречаться сообщения,  используемые для привлечения внимания к информации. <tip>
-            <title>Совет</title>
-            <para>Это сообщение, содержащее информацию о способах упрощения работы.</para>
-          </tip><caution>
-            <title>Подсказка</title>
-            <para>Это дополнительная информация к задаче или проблеме, позволяющая найти правильное решение.</para>
-          </caution><warning>
-            <title>Внимание</title>
-            <para>Данные сообщения  акцентируют внимание на вещах, которые легко упустить из виду.</para>
-          </warning></para>
-      </section>
+      <title>Обратная связь</title>
+      <para>Если  у Вас имеются предложения по улучшению данного руководства, пожалуйста, обратитесь в службу поддержки по электронной почте <email>cuba@haulmont.com</email>. В теме письма укажите тег <code>[Documentation]</code>.</para>
+      <para>Если Вы обнаружили ошибку, укажите, пожалуйста, номер главы и приведите небольшой участок окружающего текста для облегчения поиска. </para>
     </section>
   </preface>
   <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="chapter2.xml" encoding="UTF-8"/>
