@@ -5,14 +5,10 @@
  */
 package com.haulmont.reports.gui.report.run;
 
-import com.haulmont.chile.core.model.MetaClass;
-import com.haulmont.cuba.core.global.View;
-import com.haulmont.cuba.gui.data.DataService;
-import com.haulmont.cuba.gui.data.DsContext;
 import com.haulmont.cuba.gui.data.impl.CollectionDatasourceImpl;
-import com.haulmont.reports.gui.ReportHelper;
-import com.haulmont.reports.entity.Report;
 import com.haulmont.cuba.security.entity.User;
+import com.haulmont.reports.entity.Report;
+import com.haulmont.reports.gui.ReportHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,17 +20,6 @@ import java.util.UUID;
  * @version $Id$
  */
 public class RunReportDatasource extends CollectionDatasourceImpl<Report, UUID> {
-    public RunReportDatasource(DsContext context, DataService dataservice, String id, MetaClass metaClass, String viewName) {
-        super(context, dataservice, id, metaClass, viewName);
-    }
-
-    public RunReportDatasource(DsContext context, DataService dataservice, String id, MetaClass metaClass, View view) {
-        super(context, dataservice, id, metaClass, view);
-    }
-
-    public RunReportDatasource(DsContext context, DataService dataservice, String id, MetaClass metaClass, String viewName, boolean softDeletion) {
-        super(context, dataservice, id, metaClass, viewName, softDeletion);
-    }
 
     @Override
     protected void loadData(Map<String, Object> params) {

@@ -9,9 +9,11 @@ import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.chile.core.model.MetaPropertyPath;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.global.Messages;
+import com.haulmont.cuba.core.global.View;
 import com.haulmont.cuba.gui.AppConfig;
 import com.haulmont.cuba.gui.components.*;
-import com.haulmont.cuba.gui.data.impl.CollectionDatasourceImpl;
+import com.haulmont.cuba.gui.data.CollectionDatasource;
+import com.haulmont.cuba.gui.data.DsBuilder;
 import com.haulmont.cuba.gui.xml.layout.ComponentsFactory;
 
 import javax.inject.Inject;
@@ -40,8 +42,11 @@ public class CommonLookupController extends AbstractLookup {
 
         this.setCaption(messages.getMessage(javaClass, javaClass.getSimpleName()));
 
-        final CollectionDatasourceImpl cds = new CollectionDatasourceImpl(
-                getDsContext(), getDsContext().getDataService(), "mainDs", metaClass, "_minimal");
+        CollectionDatasource cds = new DsBuilder(getDsContext())
+                .setId("mainDs")
+                .setMetaClass(metaClass)
+                .setViewName(View.MINIMAL)
+                .buildCollectionDatasource();
 
         final Table table = cFactory.createComponent(Table.NAME);
                 MetaPropertyPath nameProperty = new MetaPropertyPath(metaClass,

@@ -16,7 +16,7 @@ import com.haulmont.cuba.gui.components.Table
 import com.haulmont.cuba.gui.components.actions.CreateAction
 import com.haulmont.cuba.gui.components.actions.EditAction
 import com.haulmont.cuba.gui.components.actions.RemoveAction
-import com.haulmont.cuba.gui.data.DataService
+import com.haulmont.cuba.gui.data.DataSupplier
 import com.haulmont.reports.entity.Report
 import com.haulmont.reports.entity.ReportGroup
 
@@ -53,7 +53,7 @@ class ReportGroupBrowser extends AbstractLookup {
                         query.addParameter('groupId', group.getId())
                         loadContext.setQuery(query)
 
-                        DataService dataService = getDsContext().getDataService()
+                        DataSupplier dataService = getDsContext().getDataService()
                         Report report = dataService.load(loadContext)
                         if (report != null) {
                             showNotification(getMessage('unableToDeleteNotEmptyReportGroup'),
