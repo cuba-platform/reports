@@ -11,8 +11,7 @@
                 id="reportDs"
                 class="com.haulmont.reports.entity.Report"
                 view="report.edit"
-                >
-            <datasourceClass>com.haulmont.reports.gui.report.run.RunReportDatasource</datasourceClass>
+                datasourceClass="com.haulmont.reports.gui.report.run.RunReportDatasource">
             <query>
                 <![CDATA[select r from report$Report r]]>
                 <filter>
