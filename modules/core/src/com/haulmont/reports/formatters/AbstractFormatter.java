@@ -104,6 +104,6 @@ public abstract class AbstractFormatter implements Formatter, ReportEngine {
     }
 
     public static String inlineParameterValue(String template, String parameterName, String value) {
-        return template.replaceAll("\\$\\{" + parameterName + "\\}", value);
+        return template.replaceAll("\\$\\{" + parameterName + "\\}", Matcher.quoteReplacement(value));
     }
 }
