@@ -6,6 +6,8 @@
 
 package com.haulmont.reports.gui.actions;
 
+import com.haulmont.cuba.core.global.AppBeans;
+import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.gui.WindowManager;
 import com.haulmont.cuba.gui.components.AbstractAction;
 import com.haulmont.cuba.gui.components.Component;
@@ -27,6 +29,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class RunReportAction extends AbstractAction {
 
     private final Window window;
+
+    protected Messages messages = AppBeans.get(Messages.class);
 
     public RunReportAction(Window window, String captionId) {
         super(captionId);
@@ -62,7 +66,7 @@ public class RunReportAction extends AbstractAction {
 
     @Override
     public String getCaption() {
-        return window.getMessage(getId());
+        return messages.getMessage(window.getMessagesPack(), getId());
     }
 
     private void openReportParamsDialog(Report report, Window window) {
