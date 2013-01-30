@@ -10,6 +10,7 @@ import com.haulmont.reports.formatters.xls.StyleOption;
 import com.haulmont.reports.formatters.xls.XlsFontCache;
 import com.haulmont.reports.formatters.xls.XlsStyleCache;
 import org.apache.poi.hssf.usermodel.*;
+import org.apache.poi.ss.usermodel.DataFormat;
 import org.apache.poi.ss.util.CellRangeAddress;
 
 /**
@@ -57,7 +58,8 @@ public class CustomCellStyleOption implements StyleOption {
         newStyle.setAlignment(cellStyle.getAlignment());
         newStyle.setVerticalAlignment(cellStyle.getVerticalAlignment());
         // misc
-        newStyle.setDataFormat(cellStyle.getDataFormat());
+        DataFormat dataFormat = workbook.getCreationHelper().createDataFormat();
+        newStyle.setDataFormat(dataFormat.getFormat(cellStyle.getDataFormatString()));
         newStyle.setHidden(cellStyle.getHidden());
         newStyle.setLocked(cellStyle.getLocked());
         newStyle.setIndention(cellStyle.getIndention());
