@@ -8,7 +8,6 @@ package com.haulmont.reports.entity;
 import com.haulmont.chile.core.annotations.MetaProperty;
 import com.haulmont.chile.core.annotations.NamePattern;
 import com.haulmont.cuba.core.entity.annotation.SystemLevel;
-import com.haulmont.cuba.locale.LocaleHelper;
 
 import javax.persistence.*;
 
