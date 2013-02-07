@@ -50,7 +50,7 @@ public final class HSSFCellHelper {
         if (StringUtils.isEmpty(parameterName)) return;
 
         if (!bandData.containsKey(parameterName)) {
-            resultCell.setCellValue(templateCellValue);
+            resultCell.setCellValue((String) null);
             return;
         }
 
