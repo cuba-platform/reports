@@ -459,8 +459,8 @@ public class XLSFormatter extends AbstractFormatter {
 
         PaneInformation paneInformation = templateSheet.getPaneInformation();
         if (paneInformation != null) {
-            int colSplit = paneInformation.getHorizontalSplitPosition();
-            int rowSplit = paneInformation.getVerticalSplitLeftColumn();
+            int rowSplit = paneInformation.getHorizontalSplitPosition();
+            int colSplit = paneInformation.getVerticalSplitPosition();
             int topRow = paneInformation.getHorizontalSplitTopRow();
             int leftColumn = paneInformation.getVerticalSplitLeftColumn();
             if (paneInformation.isFreezePane()) {
