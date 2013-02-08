@@ -23,10 +23,13 @@ import org.apache.poi.hssf.record.formula.Ptg;
 import org.apache.poi.hssf.record.formula.RefPtg;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.hssf.util.PaneInformation;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.util.AreaReference;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.CellReference;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -42,6 +45,8 @@ import static com.haulmont.reports.formatters.xls.HSSFRangeHelper.*;
  * @version $Id$
  */
 public class XLSFormatter extends AbstractFormatter {
+
+    private Log log = LogFactory.getLog(getClass());
 
     private static final String DYNAMIC_HEIGHT_STYLE = "styleWithoutHeight";
 
@@ -202,6 +207,12 @@ public class XLSFormatter extends AbstractFormatter {
     private void writeHorizontalBand(Band band, HSSFSheet templateSheet, HSSFSheet resultSheet) {
         String rangeName = band.getName();
         AreaReference templateRange = getAreaForRange(templateWorkbook, rangeName);
+
+        if (templateRange == null) {
+            log.warn("Could not fount area with name " + rangeName);
+            return;
+        }
+
         CellReference[] crefs = templateRange.getAllReferencedCells();
 
         CellReference topLeft, bottomRight;
@@ -444,6 +455,23 @@ public class XLSFormatter extends AbstractFormatter {
 
         resultWorkbook.setSheetName(sheetNumber, templateWorkbook.getSheetName(sheetNumber));
 
+        // clone fixed and split panes
+
+        PaneInformation paneInformation = templateSheet.getPaneInformation();
+        if (paneInformation != null) {
+            int colSplit = paneInformation.getHorizontalSplitPosition();
+            int rowSplit = paneInformation.getVerticalSplitLeftColumn();
+            int topRow = paneInformation.getHorizontalSplitTopRow();
+            int leftColumn = paneInformation.getVerticalSplitLeftColumn();
+            if (paneInformation.isFreezePane()) {
+                if (topRow >= 0 && leftColumn >= 0)
+                    resultSheet.createFreezePane(colSplit, rowSplit, leftColumn, topRow);
+                else
+                    resultSheet.createFreezePane(colSplit, rowSplit);
+            } else
+                resultSheet.createSplitPane(colSplit, rowSplit, leftColumn, topRow, paneInformation.getActivePane());
+        }
+
         HSSFPatriarch drawingPatriarch = resultSheet.createDrawingPatriarch();
         drawingPatriarchsMap.put(resultSheet, drawingPatriarch);
     }
@@ -498,7 +526,7 @@ public class XLSFormatter extends AbstractFormatter {
             String templateCellValue = "";
             int cellType = templateCell.getCellType();
 
-            if (cellType != HSSFCell.CELL_TYPE_FORMULA) {
+            if (cellType != HSSFCell.CELL_TYPE_FORMULA && cellType != HSSFCell.CELL_TYPE_NUMERIC) {
                 HSSFRichTextString richStringCellValue = templateCell.getRichStringCellValue();
                 templateCellValue = richStringCellValue != null ? richStringCellValue.getString() : "";
 
