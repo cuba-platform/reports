@@ -166,9 +166,10 @@ public class CustomCellStyleOption implements StyleOption {
             if (mergedRegion.isInRange(resultCell.getRowIndex(), resultCell.getColumnIndex())) {
                 int firstRow = mergedRegion.getFirstRow();
                 int lastRow = mergedRegion.getLastRow();
+                int regionWidth = mergedRegion.getLastColumn() - mergedRegion.getFirstColumn() + 1;
 
                 for (int rightIndex = firstRow; rightIndex <= lastRow; rightIndex++) {
-                    fixRightCell(sheet, rightIndex, columnIndex + 1);
+                    fixRightCell(sheet, rightIndex, columnIndex + regionWidth);
                 }
                 break;
             }
@@ -193,7 +194,7 @@ public class CustomCellStyleOption implements StyleOption {
     private void fixUpBorder(HSSFSheet sheet, int columnIndex, int rowIndex) {
         if (rowIndex > 0) {
             // fix simple up border
-            fixUpCell(sheet, rowIndex, columnIndex);
+            fixUpCell(sheet, rowIndex - 1, columnIndex);
             // fix merged up border
             for (int i = 0; i < sheet.getNumMergedRegions(); i++) {
                 CellRangeAddress mergedRegion = sheet.getMergedRegion(i);
@@ -202,7 +203,7 @@ public class CustomCellStyleOption implements StyleOption {
                     int lastColumn = mergedRegion.getLastColumn();
 
                     for (int upIndex = firstColumn; upIndex <= lastColumn; upIndex++) {
-                        fixUpCell(sheet, rowIndex, upIndex);
+                        fixUpCell(sheet, rowIndex - 1, upIndex);
                     }
                     break;
                 }
@@ -211,7 +212,7 @@ public class CustomCellStyleOption implements StyleOption {
     }
 
     private void fixUpCell(HSSFSheet sheet, int rowIndex, int columnIndex) {
-        HSSFCell upCell = sheet.getRow(rowIndex - 1).getCell(columnIndex);
+        HSSFCell upCell = sheet.getRow(rowIndex).getCell(columnIndex);
         if (upCell != null) {
             HSSFCellStyle newUpStyle = workbook.createCellStyle();
             HSSFCellStyle upCellStyle = upCell.getCellStyle();
@@ -227,16 +228,17 @@ public class CustomCellStyleOption implements StyleOption {
 
     private void fixDownBorder(HSSFSheet sheet, int columnIndex, int rowIndex) {
         // fix simple down border
-        fixDownCell(sheet, rowIndex, columnIndex);
+        fixDownCell(sheet, rowIndex + 1, columnIndex);
         // fix merged down border
         for (int i = 0; i < sheet.getNumMergedRegions(); i++) {
             CellRangeAddress mergedRegion = sheet.getMergedRegion(i);
             if (mergedRegion.isInRange(resultCell.getRowIndex(), resultCell.getColumnIndex())) {
                 int firstColumn = mergedRegion.getFirstColumn();
                 int lastColumn = mergedRegion.getLastColumn();
+                int regionHeight = mergedRegion.getLastRow() - mergedRegion.getFirstRow() + 1;
 
                 for (int downIndex = firstColumn; downIndex <= lastColumn; downIndex++) {
-                    fixDownCell(sheet, rowIndex, downIndex);
+                    fixDownCell(sheet, rowIndex + regionHeight, downIndex);
                 }
                 break;
             }
@@ -244,7 +246,7 @@ public class CustomCellStyleOption implements StyleOption {
     }
 
     private void fixDownCell(HSSFSheet sheet, int rowIndex, int columnIndex) {
-        HSSFRow nextRow = sheet.getRow(rowIndex + 1);
+        HSSFRow nextRow = sheet.getRow(rowIndex);
         if (nextRow != null) {
             HSSFCell downCell = nextRow.getCell(columnIndex);
             if (downCell != null) {
