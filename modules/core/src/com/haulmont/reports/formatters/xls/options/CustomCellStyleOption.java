@@ -11,6 +11,7 @@ import com.haulmont.reports.formatters.xls.XlsFontCache;
 import com.haulmont.reports.formatters.xls.XlsStyleCache;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.usermodel.DataFormat;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.util.CellRangeAddress;
 
 /**
@@ -87,7 +88,27 @@ public class CustomCellStyleOption implements StyleOption {
         }
         newStyle.setFont(newFont);
 
-        resultCell.setCellStyle(styleCache.processCellStyle(newStyle));
+        newStyle = styleCache.processCellStyle(newStyle);
+        resultCell.setCellStyle(newStyle);
+
+        Sheet sheet = resultCell.getSheet();
+        for (int i = 0; i < sheet.getNumMergedRegions(); i++) {
+            CellRangeAddress mergedRegion = sheet.getMergedRegion(i);
+            if (mergedRegion.isInRange(resultCell.getRowIndex(), resultCell.getColumnIndex())) {
+
+                int firstRow = mergedRegion.getFirstRow();
+                int lastRow = mergedRegion.getLastRow();
+                int firstCol = mergedRegion.getFirstColumn();
+                int lastCol = mergedRegion.getLastColumn();
+
+                for (int row = firstRow; row <= lastRow; row++)
+                    for (int col = firstCol; col <= lastCol; col++)
+                        sheet.getRow(row).getCell(col).setCellStyle(newStyle);
+
+                // cell included only in one merged region
+                break;
+            }
+        }
     }
 
     private void applyBorders(HSSFCellStyle newStyle) {
