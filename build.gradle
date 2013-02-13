@@ -22,7 +22,7 @@ allprojects {
 }
 
 buildscript {
-	def cubaPluginVersion = '1.5.1-SNAPSHOT'
+	def cubaPluginVersion = '1.5-SNAPSHOT'
 	def docPluginVersion = '1.2.0-SNAPSHOT'
 	
 	def CUBA_PLUGIN_VERSION = 'cubaPluginVersion'
