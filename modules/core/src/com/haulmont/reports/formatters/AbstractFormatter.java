@@ -78,7 +78,7 @@ public abstract class AbstractFormatter implements Formatter, ReportEngine {
     protected InputStream getFileInputStream(FileDescriptor fd) {
         FileStorageAPI storageAPI = AppBeans.get(FileStorageAPI.NAME);
         try {
-            byte[] arr = IOUtils.toByteArray(storageAPI.openFileInputStream(fd));
+            byte[] arr = IOUtils.toByteArray(storageAPI.openStream(fd));
             return new ByteArrayInputStream(arr);
         } catch (FileStorageException | IOException e) {
             throw new RuntimeException(e);

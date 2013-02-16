@@ -2,18 +2,13 @@
  * Copyright (c) 2010 Haulmont Technology Ltd. All Rights Reserved.
  * Haulmont Technology proprietary and confidential.
  * Use is subject to license terms.
-
- * Author: Vasiliy Fontanenko
- * Created: 12.10.2010 19:21:36
- *
- * $Id$
  */
 package com.haulmont.reports.formatters.oo;
 
-import com.haulmont.cuba.core.Locator;
 import com.haulmont.cuba.core.app.FileStorageAPI;
 import com.haulmont.cuba.core.entity.FileDescriptor;
-import com.haulmont.cuba.core.global.ConfigProvider;
+import com.haulmont.cuba.core.global.AppBeans;
+import com.haulmont.cuba.core.global.Configuration;
 import com.haulmont.cuba.core.global.FileStorageException;
 import com.haulmont.reports.ReportingConfig;
 import com.sun.star.beans.PropertyValue;
@@ -31,15 +26,17 @@ import org.apache.commons.io.IOUtils;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * @author fontanenko
+ * @version $Id$
+ */
 public final class ODTHelper {
     public static XInputStream getXInputStream(FileDescriptor fileDescriptor) {
-        FileStorageAPI storageAPI = Locator.lookup(FileStorageAPI.NAME);
+        FileStorageAPI storageAPI = AppBeans.get(FileStorageAPI.NAME);
         try {
-            byte[] bytes = IOUtils.toByteArray(storageAPI.openFileInputStream(fileDescriptor));
+            byte[] bytes = IOUtils.toByteArray(storageAPI.openStream(fileDescriptor));
             return new OOInputStream(bytes);
-        } catch (FileStorageException e) {
-            throw new RuntimeException(e);
-        } catch (java.io.IOException e) {
+        } catch (FileStorageException | java.io.IOException e) {
             throw new RuntimeException(e);
         }
     }
@@ -96,9 +93,10 @@ public final class ODTHelper {
 
     public static void runWithTimeoutAndCloseConnection(OOOConnection connection, Runnable runnable) {
         try {
-            OOOConnectorAPI connectorAPI = Locator.lookup(OOOConnectorAPI.NAME);
+            OOOConnectorAPI connectorAPI = AppBeans.get(OOOConnectorAPI.NAME);
             Future future = connectorAPI.getExecutor().submit(runnable);
-            future.get(ConfigProvider.getConfig(ReportingConfig.class).getDocFormatterTimeout(), TimeUnit.SECONDS);
+            ReportingConfig reportingConfig = AppBeans.get(Configuration.class).getConfig(ReportingConfig.class);
+            future.get(reportingConfig.getDocFormatterTimeout(), TimeUnit.SECONDS);
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         } finally {
