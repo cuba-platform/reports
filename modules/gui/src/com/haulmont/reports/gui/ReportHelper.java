@@ -107,7 +107,7 @@ public class ReportHelper {
             byte[] byteArr = document.getContent();
             ExportFormat exportFormat = ReportPrintHelper.getExportFormat(document.getOutputType());
 
-            ExportDisplay exportDisplay = AppConfig.createExportDisplay();
+            ExportDisplay exportDisplay = AppConfig.createExportDisplay(null);
             String documentName = document.getDocumentName();
             exportDisplay.show(new ByteArrayDataProvider(byteArr), StringUtils.isNotBlank(documentName) ? documentName : defaultOutputFileName, exportFormat);
 

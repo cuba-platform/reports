@@ -87,7 +87,7 @@ public class ReportBrowser extends AbstractLookup {
                 Set<Report> reports = reportsTable.getSelected();
                 if ((reports != null) && (!reports.isEmpty())) {
                     try {
-                        ExportDisplay exportDisplay = AppConfig.createExportDisplay();
+                        ExportDisplay exportDisplay = AppConfig.createExportDisplay(ReportBrowser.this);
                         exportDisplay.show(
                                 new ByteArrayDataProvider(reportService.exportReports(reports)), "Reports", ExportFormat.ZIP);
                     } catch (Exception e) {

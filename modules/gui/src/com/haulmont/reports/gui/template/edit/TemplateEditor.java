@@ -142,7 +142,7 @@ public class TemplateEditor extends AbstractEditor {
             @Override
             public void actionPerform(Component component) {
                 if (template.getTemplateFileDescriptor() != null) {
-                    ExportDisplay display = AppConfig.createExportDisplay();
+                    ExportDisplay display = AppConfig.createExportDisplay(TemplateEditor.this);
                     display.show(template.getTemplateFileDescriptor());
                 }
             }
