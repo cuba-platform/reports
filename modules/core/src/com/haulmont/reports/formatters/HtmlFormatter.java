@@ -5,32 +5,40 @@
  */
 package com.haulmont.reports.formatters;
 
+import com.haulmont.cuba.core.app.DataWorker;
 import com.haulmont.cuba.core.app.FileStorageAPI;
 import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.FileStorageException;
+import com.haulmont.cuba.core.global.LoadContext;
+import com.haulmont.cuba.core.global.View;
 import com.haulmont.reports.ReportingConfig;
 import com.haulmont.reports.entity.Band;
 import com.haulmont.reports.entity.ReportOutputType;
 import com.haulmont.reports.exception.ReportingException;
 import com.haulmont.reports.exception.UnsupportedFormatException;
 import com.lowagie.text.DocumentException;
+import com.lowagie.text.Image;
 import com.lowagie.text.pdf.BaseFont;
 import freemarker.cache.StringTemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xhtmlrenderer.pdf.ITextFSImage;
+import org.xhtmlrenderer.pdf.ITextOutputDevice;
 import org.xhtmlrenderer.pdf.ITextRenderer;
+import org.xhtmlrenderer.pdf.ITextUserAgent;
+import org.xhtmlrenderer.resource.ImageResource;
+import org.xhtmlrenderer.util.XRLog;
 
 import java.io.*;
+import java.lang.reflect.Field;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Engine for create reports with HTML templates and FreeMarker markup
@@ -39,7 +47,9 @@ import java.util.Map;
  * @version $Id$
  */
 public class HtmlFormatter extends AbstractFormatter {
-    private static Log log = LogFactory.getLog(HtmlFormatter.class);
+    public static final String FS_PROTOCOL_PREFIX = "fs://";
+
+    private Log log = LogFactory.getLog(getClass());
 
     public HtmlFormatter() {
         registerReportExtension("htm");
@@ -88,6 +98,12 @@ public class HtmlFormatter extends AbstractFormatter {
 
             String url = tmpFile.toURI().toURL().toString();
             renderer.setDocument(url);
+
+            ResourcesITextUserAgentCallback userAgentCallback =
+                    new ResourcesITextUserAgentCallback(renderer.getOutputDevice());
+            userAgentCallback.setSharedContext(renderer.getSharedContext());
+
+            renderer.getSharedContext().setUserAgentCallback(userAgentCallback);
 
             renderer.layout();
             renderer.createPDF(outputStream);
@@ -204,5 +220,100 @@ public class HtmlFormatter extends AbstractFormatter {
             throw new ReportingException(e);
         }
         return htmlTemplate;
+    }
+
+    private class ResourcesITextUserAgentCallback extends ITextUserAgent {
+
+        public ResourcesITextUserAgentCallback(ITextOutputDevice outputDevice) {
+            super(outputDevice);
+        }
+
+        @Override
+        public ImageResource getImageResource(String uri) {
+            if (StringUtils.startsWith(uri, FS_PROTOCOL_PREFIX)) {
+                ImageResource resource;
+                resource = (ImageResource) _imageCache.get(uri);
+                if (resource == null) {
+                    InputStream is = resolveAndOpenStream(uri);
+                    if (is != null) {
+                        try {
+                            Image image = Image.getInstance(IOUtils.toByteArray(is));
+
+                            scaleToOutputResolution(image);
+                            resource = new ImageResource(new ITextFSImage(image));
+                            //noinspection unchecked
+                            _imageCache.put(uri, resource);
+                        } catch (Exception e) {
+                            XRLog.exception("Can't read image file; unexpected problem for URI '" + uri + "'", e);
+                        } finally {
+                            IOUtils.closeQuietly(is);
+                        }
+                    }
+                }
+
+                if (resource != null) {
+                    ITextFSImage image = (ITextFSImage) resource.getImage();
+
+                    com.lowagie.text.Image imageObject;
+                    // use reflection for access to internal image
+                    try {
+                        Field imagePrivateField = image.getClass().getDeclaredField("_image");
+                        imagePrivateField.setAccessible(true);
+
+                        imageObject = (Image) imagePrivateField.get(image);
+                    } catch (NoSuchFieldException|IllegalAccessException e) {
+                        throw new Error("Error while clone internal image in itext");
+                    }
+
+                    resource = new ImageResource(new ITextFSImage(imageObject));
+                } else {
+                    resource = new ImageResource(null);
+                }
+
+                return resource;
+            }
+
+            return super.getImageResource(uri);
+        }
+
+        private void scaleToOutputResolution(Image image) {
+            float factor = getSharedContext().getDotsPerPixel();
+            image.scaleAbsolute(image.getPlainWidth() * factor, image.getPlainHeight() * factor);
+        }
+
+        @Override
+        protected InputStream resolveAndOpenStream(String uri) {
+            if (StringUtils.startsWith(uri, FS_PROTOCOL_PREFIX)) {
+                String uuidString = StringUtils.substring(uri, FS_PROTOCOL_PREFIX.length());
+
+                DataWorker dataWorker = AppBeans.get(DataWorker.NAME);
+                LoadContext loadContext = new LoadContext(com.haulmont.cuba.core.entity.FileDescriptor.class);
+                loadContext.setView(View.LOCAL);
+
+                try {
+                    UUID id = UUID.fromString(uuidString);
+                    loadContext.setId(id);
+                } catch (IllegalArgumentException ignored) {
+                    log.warn("Invalid UUID for file storage reference: " + uri);
+                    return null;
+                }
+
+                com.haulmont.cuba.core.entity.FileDescriptor fd = dataWorker.load(loadContext);
+                if (fd == null) {
+                    log.warn("Not found file in file storage for UUID: " + uuidString);
+                    return null;
+                }
+
+                FileStorageAPI storageAPI = AppBeans.get(FileStorageAPI.NAME);
+                try {
+                    return storageAPI.openStream(fd);
+                } catch (FileStorageException e) {
+                    log.warn("Could not open stream for file in file storage: " + uuidString, e);
+                    return null;
+                }
+            }
+
+            return super.resolveAndOpenStream(uri);
+        }
     }
 }
