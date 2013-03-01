@@ -14,6 +14,7 @@ import com.haulmont.reports.formatters.xls.*;
 import com.haulmont.reports.formatters.xls.options.AutoWidthOption;
 import com.haulmont.reports.formatters.xls.options.CopyColumnWidthOption;
 import com.haulmont.reports.formatters.xls.options.CustomCellStyleOption;
+import com.haulmont.reports.formatters.xls.options.CustomWidthOption;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.model.HSSFFormulaParser;
 import org.apache.poi.hssf.record.EscherAggregate;
@@ -53,6 +54,7 @@ public class XLSFormatter extends AbstractFormatter {
     private static final String CELL_DYNAMIC_STYLE_SELECTOR = "##style=";
     private static final String COPY_COLUMN_WIDTH_SELECTOR = "##copyColumnWidth";
     private static final String AUTO_WIDTH_SELECTOR = "##autoWidth";
+    private static final String CUSTOM_WIDTH_SELECTOR = "##width=";
 
     private HSSFWorkbook templateWorkbook;
     private HSSFSheet currentTemplateSheet = null;
@@ -598,6 +600,30 @@ public class XLSFormatter extends AbstractFormatter {
         if (StringUtils.contains(templateCellValue, AUTO_WIDTH_SELECTOR)) {
             templateCellValue = StringUtils.replace(templateCellValue, AUTO_WIDTH_SELECTOR, "");
             optionContainer.add(new AutoWidthOption(resultSheet, resultCell.getColumnIndex()));
+        }
+
+
+        int widthPosition = StringUtils.indexOf(templateCellValue, CUSTOM_WIDTH_SELECTOR);
+        if (widthPosition >= 0) {
+            String stringTail = StringUtils.substring(templateCellValue, widthPosition + CUSTOM_WIDTH_SELECTOR.length());
+            int styleEndIndex = StringUtils.indexOf(stringTail, " ");
+            if (styleEndIndex < 0)
+                styleEndIndex = templateCellValue.length() - 1;
+
+            String widthLengthSelector = StringUtils.substring(templateCellValue, widthPosition,
+                    styleEndIndex + CUSTOM_WIDTH_SELECTOR.length() + widthPosition);
+
+            templateCellValue = StringUtils.replace(templateCellValue, widthLengthSelector, "");
+
+            widthLengthSelector = StringUtils.substring(widthLengthSelector, CUSTOM_WIDTH_SELECTOR.length());
+
+            if (widthLengthSelector != null && bandData.containsKey(widthLengthSelector) && bandData.get(widthLengthSelector) != null) {
+                Object width = bandData.get(widthLengthSelector);
+
+                if (width != null && width instanceof Integer) {
+                    optionContainer.add(new CustomWidthOption(resultSheet, resultCell.getColumnIndex(), (Integer) width));
+                }
+            }
         }
 
         templateCellValue = StringUtils.stripEnd(templateCellValue, null);
