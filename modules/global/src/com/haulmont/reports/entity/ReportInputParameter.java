@@ -27,7 +27,7 @@ public class ReportInputParameter extends HardDeleteEntity {
     @JoinColumn(name = "REPORT_ID")
     private Report report;
 
-    @Column(name = "TYPE")
+    @Column(name = "PARAMETER_TYPE")
     private Integer type;
 
     @Column(name = "NAME")

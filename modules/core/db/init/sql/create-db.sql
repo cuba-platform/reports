@@ -96,7 +96,7 @@ create table REPORT_INPUT_PARAMETER
   UPDATED_BY varchar(50),
 
   REPORT_ID varchar(36) not null,
-  TYPE integer not null,
+  PARAMETER_TYPE integer not null,
   NAME varchar(255) not null,
   LOCALE_NAMES varchar(7000),
   ALIAS varchar(100),
@@ -125,7 +125,7 @@ create table REPORT_DATA_SET
 
   NAME varchar(255) not null,
   TEXT longvarchar,
-  TYPE integer not null,
+  DATA_SET_TYPE integer not null,
   BAND_DEFINITION varchar(36) not null,
   ENTITY_PARAM_NAME varchar(255),
   LIST_ENTITIES_PARAM_NAME varchar(255),

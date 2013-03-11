@@ -27,7 +27,7 @@ public class DataSet extends HardDeleteEntity {
     @Column(name = "TEXT", length = 0)
     private String text;
 
-    @Column(name = "TYPE")
+    @Column(name = "DATA_SET_TYPE")
     private Integer type;
 
     @Column(name = "ENTITY_PARAM_NAME")
