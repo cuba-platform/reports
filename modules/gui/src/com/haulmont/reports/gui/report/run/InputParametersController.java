@@ -187,7 +187,7 @@ public class InputParametersController extends AbstractWindow {
         public Field createField(ReportInputParameter parameter) {
             TextField textField = cFactory.createComponent(TextField.NAME);
             textField.addValidator(new DoubleValidator());
-            textField.setDatatype(Datatypes.get(Double.class));
+            textField.setDatatype(Datatypes.getNN(Double.class));
             return textField;
         }
     }
