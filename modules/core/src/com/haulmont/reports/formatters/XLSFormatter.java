@@ -221,6 +221,7 @@ public class XLSFormatter extends AbstractFormatter {
         AreaReference resultRange;
 
         int rowsAddedByHorizontalBandBackup = rowsAddedByHorizontalBand;
+        int rownumBackup = rownum;
 
         if (crefs != null) {
             addRangeBounds(band, crefs);
@@ -283,7 +284,7 @@ public class XLSFormatter extends AbstractFormatter {
 
         // scheduled merge regions
         if (!band.getChildrenList().isEmpty() && crefs != null) {
-            copyMergeRegions(resultSheet, rangeName, rownum + rowsAddedByHorizontalBandBackup,
+            copyMergeRegions(resultSheet, rangeName, rownumBackup + rowsAddedByHorizontalBandBackup,
                     getCellFromReference(crefs[0], templateSheet).getColumnIndex());
         }
 
