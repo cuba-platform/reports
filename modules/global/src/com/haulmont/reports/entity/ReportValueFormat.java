@@ -16,7 +16,7 @@ import javax.persistence.*;
 @Entity(name = "report$ReportValueFormat")
 @Table(name = "REPORT_VALUE_FORMAT")
 @SystemLevel
-public class ReportValueFormat extends HardDeleteEntity {
+public class ReportValueFormat extends BaseReportEntity {
 
     private static final long serialVersionUID = 680180375698449946L;
 

@@ -21,7 +21,7 @@ import java.util.Date;
  * @version $Id$
  */
 @MappedSuperclass
-public class HardDeleteEntity
+public class BaseReportEntity
         extends BaseUuidEntity
         implements Versioned, Updatable
 {

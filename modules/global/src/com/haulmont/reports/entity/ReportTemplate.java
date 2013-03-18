@@ -21,7 +21,7 @@ import javax.persistence.*;
 @Table(name = "REPORT_TEMPLATE")
 @SystemLevel
 @SuppressWarnings("unused")
-public class ReportTemplate extends HardDeleteEntity {
+public class ReportTemplate extends BaseReportEntity {
 
     private static final long serialVersionUID = 3692751073234357754L;
 

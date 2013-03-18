@@ -23,7 +23,7 @@ import java.util.Set;
 @NamePattern("%s|locName")
 @SystemLevel
 @SuppressWarnings("unused")
-public class ReportGroup extends HardDeleteEntity {
+public class ReportGroup extends BaseReportEntity {
 
     private static final long serialVersionUID = 5399528790289039413L;
 

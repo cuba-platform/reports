@@ -16,7 +16,7 @@ import javax.persistence.*;
 @Entity(name = "report$ReportScreen")
 @Table(name = "REPORT_REPORT_SCREEN")
 @SystemLevel
-public class ReportScreen extends HardDeleteEntity {
+public class ReportScreen extends BaseReportEntity {
 
     private static final long serialVersionUID = -7416940515333599470L;
 

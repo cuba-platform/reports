@@ -20,7 +20,7 @@ import javax.persistence.*;
 @SystemLevel
 @NamePattern("%s|locName")
 @SuppressWarnings("unused")
-public class ReportInputParameter extends HardDeleteEntity {
+public class ReportInputParameter extends BaseReportEntity {
     private static final long serialVersionUID = 6231014880104406246L;
 
     @ManyToOne(fetch = FetchType.LAZY)
