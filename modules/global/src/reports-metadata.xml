@@ -7,7 +7,6 @@
 
 <metadata xmlns="http://schemas.haulmont.com/cuba/4.0/metadata.xsd">
 
-    <metadata-model>
-    </metadata-model>
+    <metadata-model root-package="com.haulmont.reports"/>
 
 </metadata>
