@@ -26,7 +26,6 @@ import java.util.Set;
 @Entity(name = "report$Report")
 @Table(name = "REPORT_REPORT")
 @NamePattern("%s|locName")
-@SystemLevel
 @SuppressWarnings("unused")
 public class Report extends BaseReportEntity {
     private static final long serialVersionUID = -2817764915661205093L;
