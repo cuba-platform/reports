@@ -13,7 +13,7 @@ allprojects {
     ext.artifactGroup = 'com.haulmont.reports'
     ext.artifactVersion = rootProject.hasProperty(BUILD_VERSION) ? 
                                     rootProject[BUILD_VERSION].replace('-SNAPSHOT', '') : defaultVersion
-    ext.isSnapshot = rootProject.hasProperty(BUILD_VERSION) && rootProject[BUILD_VERSION].endsWith('-SNAPSHOT')
+    ext.isSnapshot = !rootProject.hasProperty(BUILD_VERSION) || rootProject[BUILD_VERSION].endsWith('-SNAPSHOT')
 
     configurations.all {
         resolutionStrategy.cacheDynamicVersionsFor 1, 'minutes'
