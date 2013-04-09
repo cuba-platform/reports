@@ -92,12 +92,10 @@ configure(globalModule) {
     dependencies {
         provided(cubaPlugin)
     }
-    task enhance(type: CubaEnhancing) {
+    task enhance(type: CubaEnhancing, dependsOn: compileJava) {
         persistenceXml = "$projectDir/src/reports-persistence.xml"
     }
-    compileJava << {
-        enhance.execute()
-    }
+    classes.dependsOn += [enhance]
 }
 
 configure(coreModule) {
