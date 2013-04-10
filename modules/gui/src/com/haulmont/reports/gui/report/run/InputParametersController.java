@@ -234,6 +234,7 @@ public class InputParametersController extends AbstractWindow {
                 @Override
                 public void actionPerform(Component component) {
                     getDialogParams().setHeight(400);
+                    getDialogParams().setResizable(true);
                     super.actionPerform(component);
                 }
             };
