@@ -96,7 +96,6 @@ configure(globalModule) {
     task enhance(type: CubaEnhancing, dependsOn: compileJava) {
         persistenceXml = "$projectDir/src/reports-persistence.xml"
     }
-    classes.dependsOn += [enhance]
 }
 
 configure(coreModule) {
