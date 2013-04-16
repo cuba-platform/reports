@@ -72,6 +72,9 @@ public class SqlDataDataLoader extends QueryDataLoader {
 
         List<ParamPosition> paramPositions = new ArrayList<>();
         List<Object> values = new ArrayList<>();
+
+        Map<String, String> listParamValues = new HashMap<>();
+
         for (Map.Entry<String, Object> entry : currentParams.entrySet()) {
             // Remembers ${alias} positions
             String alias = "${" + entry.getKey() + "}";
@@ -93,11 +96,29 @@ public class SqlDataDataLoader extends QueryDataLoader {
                 if (value instanceof Entity)
                     value = ((Entity) entry.getValue()).getId();
 
+                if (value instanceof List) {
+                    List listValue = (List) value;
+
+                    List<Object> idsList = new ArrayList<>();
+                    for (Object item : listValue) {
+                        if (item != null && ((Entity) item).getId() != null)
+                            idsList.add("'" + ((Entity) item).getId() + "'");
+                        else
+                            idsList.add("null");
+                    }
+
+                    String listParameterString = "(" + StringUtils.join(idsList, ',') + ")";
+                    listParamValues.put(regexp, listParameterString);
+                }
+
                 while (matcher.find(subPosition)) {
-                    paramPositions.add(
-                            new ParamPosition(regexp, matcher.start(),
-                                    typeConverter.getSqlObject(value))
-                    );
+                    // if it's not list parameter
+                    if (!listParamValues.containsKey(regexp)) {
+                        paramPositions.add(
+                                new ParamPosition(regexp, matcher.start(),
+                                        typeConverter.getSqlObject(value))
+                        );
+                    }
                     subPosition = matcher.end();
                 }
             }
@@ -121,7 +142,12 @@ public class SqlDataDataLoader extends QueryDataLoader {
                 values.add(((EnumClass) value).getId());
         }
 
-        query = query.trim();
+        // Inline list parameters
+        for (Map.Entry<String, String> listParam : listParamValues.entrySet()) {
+            query = query.replaceAll(listParam.getKey(), listParam.getValue());
+        }
+
+        query = StringUtils.trim(query);
         if (query.endsWith("where")) query = query.replace("where", "");
 
         return new QueryPack(query, values.toArray());
