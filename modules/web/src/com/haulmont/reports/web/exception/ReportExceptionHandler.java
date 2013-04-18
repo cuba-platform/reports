@@ -7,6 +7,7 @@ package com.haulmont.reports.web.exception;
 
 import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.Messages;
+import com.haulmont.cuba.gui.components.IFrame;
 import com.haulmont.cuba.web.exception.AbstractExceptionHandler;
 import com.haulmont.reports.exception.FailedToConnectToOpenOfficeException;
 import com.haulmont.reports.exception.ReportingException;
@@ -41,6 +42,6 @@ public class ReportExceptionHandler extends AbstractExceptionHandler {
             messageCode = "reportException.unsupportedFileFormat";
         }
         String msg = AppBeans.get(Messages.class).getMessage(getClass(), messageCode);
-        app.getAppWindow().showNotification(msg, Window.Notification.TYPE_ERROR_MESSAGE);
+        app.getWindowManager().showNotification(msg, IFrame.NotificationType.ERROR);
     }
 }
