@@ -88,9 +88,6 @@ configure([globalModule, coreModule, guiModule, webModule, desktopModule]) {
 }
 
 configure(globalModule) {
-    dependencies {
-        provided(cubaPlugin)
-    }
     task enhance(type: CubaEnhancing, dependsOn: compileJava) {
         persistenceXml = "$projectDir/src/reports-persistence.xml"
     }
