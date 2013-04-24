@@ -47,49 +47,66 @@ public class CustomCellStyleOption implements StyleOption {
 
     @Override
     public void apply() {
-        HSSFCellStyle newStyle = workbook.createCellStyle();
-        // color
-        newStyle.setFillBackgroundColor(cellStyle.getFillBackgroundColor());
-        newStyle.setFillForegroundColor(cellStyle.getFillForegroundColor());
-        newStyle.setFillPattern(cellStyle.getFillPattern());
+        HSSFCellStyle resultStyle = styleCache.getNamedCachedStyle(cellStyle);
 
-        applyBorders(newStyle);
+        if (resultStyle == null) {
+            HSSFCellStyle newStyle = workbook.createCellStyle();
+            // color
+            newStyle.setFillBackgroundColor(cellStyle.getFillBackgroundColor());
+            newStyle.setFillForegroundColor(cellStyle.getFillForegroundColor());
+            newStyle.setFillPattern(cellStyle.getFillPattern());
 
-        // alignment
-        newStyle.setAlignment(cellStyle.getAlignment());
-        newStyle.setVerticalAlignment(cellStyle.getVerticalAlignment());
-        // misc
-        DataFormat dataFormat = workbook.getCreationHelper().createDataFormat();
-        newStyle.setDataFormat(dataFormat.getFormat(cellStyle.getDataFormatString()));
-        newStyle.setHidden(cellStyle.getHidden());
-        newStyle.setLocked(cellStyle.getLocked());
-        newStyle.setIndention(cellStyle.getIndention());
-        newStyle.setRotation(cellStyle.getRotation());
-        newStyle.setWrapText(cellStyle.getWrapText());
-        // font
-        HSSFFont cellFont = cellStyle.getFont(templateWorkbook);
+            // borders
+            newStyle.setBorderLeft(cellStyle.getBorderLeft());
+            newStyle.setBorderRight(cellStyle.getBorderRight());
+            newStyle.setBorderTop(cellStyle.getBorderTop());
+            newStyle.setBorderBottom(cellStyle.getBorderBottom());
 
-        HSSFFont newFont = fontCache.getFontByTemplate(cellFont);
+            // border colors
+            newStyle.setLeftBorderColor(cellStyle.getLeftBorderColor());
+            newStyle.setRightBorderColor(cellStyle.getRightBorderColor());
+            newStyle.setBottomBorderColor(cellStyle.getBottomBorderColor());
+            newStyle.setTopBorderColor(cellStyle.getTopBorderColor());
 
-        if (newFont == null) {
-            newFont = workbook.createFont();
+            // alignment
+            newStyle.setAlignment(cellStyle.getAlignment());
+            newStyle.setVerticalAlignment(cellStyle.getVerticalAlignment());
+            // misc
+            DataFormat dataFormat = workbook.getCreationHelper().createDataFormat();
+            newStyle.setDataFormat(dataFormat.getFormat(cellStyle.getDataFormatString()));
+            newStyle.setHidden(cellStyle.getHidden());
+            newStyle.setLocked(cellStyle.getLocked());
+            newStyle.setIndention(cellStyle.getIndention());
+            newStyle.setRotation(cellStyle.getRotation());
+            newStyle.setWrapText(cellStyle.getWrapText());
+            // font
+            HSSFFont cellFont = cellStyle.getFont(templateWorkbook);
+            HSSFFont newFont = fontCache.getFontByTemplate(cellFont);
 
-            newFont.setFontName(cellFont.getFontName());
-            newFont.setItalic(cellFont.getItalic());
-            newFont.setStrikeout(cellFont.getStrikeout());
-            newFont.setTypeOffset(cellFont.getTypeOffset());
-            newFont.setBoldweight(cellFont.getBoldweight());
-            newFont.setCharSet(cellFont.getCharSet());
-            newFont.setColor(cellFont.getColor());
-            newFont.setUnderline(cellFont.getUnderline());
-            newFont.setFontHeight(cellFont.getFontHeight());
-            newFont.setFontHeightInPoints(cellFont.getFontHeightInPoints());
-            fontCache.addCachedFont(cellFont, newFont);
+            if (newFont == null) {
+                newFont = workbook.createFont();
+
+                newFont.setFontName(cellFont.getFontName());
+                newFont.setItalic(cellFont.getItalic());
+                newFont.setStrikeout(cellFont.getStrikeout());
+                newFont.setTypeOffset(cellFont.getTypeOffset());
+                newFont.setBoldweight(cellFont.getBoldweight());
+                newFont.setCharSet(cellFont.getCharSet());
+                newFont.setColor(cellFont.getColor());
+                newFont.setUnderline(cellFont.getUnderline());
+                newFont.setFontHeight(cellFont.getFontHeight());
+                newFont.setFontHeightInPoints(cellFont.getFontHeightInPoints());
+                fontCache.addCachedFont(cellFont, newFont);
+            }
+            newStyle.setFont(newFont);
+
+            resultStyle = newStyle;
+            styleCache.addCachedNamedStyle(cellStyle, resultStyle);
         }
-        newStyle.setFont(newFont);
 
-        newStyle = styleCache.processCellStyle(newStyle);
-        resultCell.setCellStyle(newStyle);
+        fixNeighbourCellBorders();
+
+        resultCell.setCellStyle(resultStyle);
 
         Sheet sheet = resultCell.getSheet();
         for (int i = 0; i < sheet.getNumMergedRegions(); i++) {
@@ -103,28 +120,12 @@ public class CustomCellStyleOption implements StyleOption {
 
                 for (int row = firstRow; row <= lastRow; row++)
                     for (int col = firstCol; col <= lastCol; col++)
-                        sheet.getRow(row).getCell(col).setCellStyle(newStyle);
+                        sheet.getRow(row).getCell(col).setCellStyle(resultStyle);
 
-                // cell included only in one merged region
+                // cell includes only in one merged region
                 break;
             }
         }
-    }
-
-    private void applyBorders(HSSFCellStyle newStyle) {
-        fixNeighbourCellBorders();
-
-        // borders
-        newStyle.setBorderLeft(cellStyle.getBorderLeft());
-        newStyle.setBorderRight(cellStyle.getBorderRight());
-        newStyle.setBorderTop(cellStyle.getBorderTop());
-        newStyle.setBorderBottom(cellStyle.getBorderBottom());
-
-        // border colors
-        newStyle.setLeftBorderColor(cellStyle.getLeftBorderColor());
-        newStyle.setRightBorderColor(cellStyle.getRightBorderColor());
-        newStyle.setBottomBorderColor(cellStyle.getBottomBorderColor());
-        newStyle.setTopBorderColor(cellStyle.getTopBorderColor());
     }
 
     private void fixNeighbourCellBorders() {
@@ -167,15 +168,18 @@ public class CustomCellStyleOption implements StyleOption {
     private void fixLeftCell(HSSFSheet sheet, int rowIndex, int columnIndex) {
         HSSFCell leftCell = sheet.getRow(rowIndex).getCell(columnIndex);
         if (leftCell != null) {
-            HSSFCellStyle newLeftStyle = workbook.createCellStyle();
             HSSFCellStyle leftCellStyle = leftCell.getCellStyle();
-            newLeftStyle.cloneStyleRelationsFrom(leftCellStyle);
-            newLeftStyle.setBorderRight(cellStyle.getBorderLeft());
-            newLeftStyle.setRightBorderColor(cellStyle.getLeftBorderColor());
+            if (leftCellStyle.getBorderRight() != cellStyle.getBorderLeft() ||
+                    leftCellStyle.getRightBorderColor() != cellStyle.getLeftBorderColor()) {
+                HSSFCellStyle newLeftStyle = workbook.createCellStyle();
+                newLeftStyle.cloneStyleRelationsFrom(leftCellStyle);
+                newLeftStyle.setBorderRight(cellStyle.getBorderLeft());
+                newLeftStyle.setRightBorderColor(cellStyle.getLeftBorderColor());
 
-            newLeftStyle = styleCache.processCellStyle(newLeftStyle);
+                newLeftStyle = styleCache.processCellStyle(newLeftStyle);
 
-            leftCell.setCellStyle(newLeftStyle);
+                leftCell.setCellStyle(newLeftStyle);
+            }
         }
     }
 
@@ -200,15 +204,19 @@ public class CustomCellStyleOption implements StyleOption {
     private void fixRightCell(HSSFSheet sheet, int rowIndex, int columnIndex) {
         HSSFCell rightCell = sheet.getRow(rowIndex).getCell(columnIndex);
         if (rightCell != null) {
-            HSSFCellStyle newRightStyle = workbook.createCellStyle();
             HSSFCellStyle rightCellStyle = rightCell.getCellStyle();
-            newRightStyle.cloneStyleRelationsFrom(rightCellStyle);
-            newRightStyle.setBorderLeft(cellStyle.getBorderRight());
-            newRightStyle.setLeftBorderColor(cellStyle.getRightBorderColor());
 
-            newRightStyle = styleCache.processCellStyle(newRightStyle);
+            if (rightCellStyle.getBorderLeft() != cellStyle.getBorderRight() ||
+                    rightCellStyle.getLeftBorderColor() != cellStyle.getRightBorderColor()) {
+                HSSFCellStyle newRightStyle = workbook.createCellStyle();
+                newRightStyle.cloneStyleRelationsFrom(rightCellStyle);
+                newRightStyle.setBorderLeft(cellStyle.getBorderRight());
+                newRightStyle.setLeftBorderColor(cellStyle.getRightBorderColor());
 
-            rightCell.setCellStyle(newRightStyle);
+                newRightStyle = styleCache.processCellStyle(newRightStyle);
+
+                rightCell.setCellStyle(newRightStyle);
+            }
         }
     }
 
@@ -235,15 +243,19 @@ public class CustomCellStyleOption implements StyleOption {
     private void fixUpCell(HSSFSheet sheet, int rowIndex, int columnIndex) {
         HSSFCell upCell = sheet.getRow(rowIndex).getCell(columnIndex);
         if (upCell != null) {
-            HSSFCellStyle newUpStyle = workbook.createCellStyle();
             HSSFCellStyle upCellStyle = upCell.getCellStyle();
-            newUpStyle.cloneStyleRelationsFrom(upCellStyle);
-            newUpStyle.setBorderBottom(cellStyle.getBorderTop());
-            newUpStyle.setBottomBorderColor(cellStyle.getTopBorderColor());
 
-            newUpStyle = styleCache.processCellStyle(newUpStyle);
+            if (upCellStyle.getBorderBottom() != cellStyle.getBorderTop() ||
+                    upCellStyle.getBottomBorderColor() != cellStyle.getTopBorderColor()) {
+                HSSFCellStyle newUpStyle = workbook.createCellStyle();
+                newUpStyle.cloneStyleRelationsFrom(upCellStyle);
+                newUpStyle.setBorderBottom(cellStyle.getBorderTop());
+                newUpStyle.setBottomBorderColor(cellStyle.getTopBorderColor());
 
-            upCell.setCellStyle(newUpStyle);
+                newUpStyle = styleCache.processCellStyle(newUpStyle);
+
+                upCell.setCellStyle(newUpStyle);
+            }
         }
     }
 
@@ -271,15 +283,19 @@ public class CustomCellStyleOption implements StyleOption {
         if (nextRow != null) {
             HSSFCell downCell = nextRow.getCell(columnIndex);
             if (downCell != null) {
-                HSSFCellStyle newDownStyle = workbook.createCellStyle();
                 HSSFCellStyle downCellStyle = downCell.getCellStyle();
-                newDownStyle.cloneStyleRelationsFrom(downCellStyle);
-                newDownStyle.setBorderTop(cellStyle.getBorderBottom());
-                newDownStyle.setTopBorderColor(cellStyle.getBottomBorderColor());
 
-                newDownStyle = styleCache.processCellStyle(newDownStyle);
+                if (downCellStyle.getBorderTop() != cellStyle.getBorderBottom() ||
+                        downCellStyle.getTopBorderColor() != cellStyle.getBottomBorderColor()) {
+                    HSSFCellStyle newDownStyle = workbook.createCellStyle();
+                    newDownStyle.cloneStyleRelationsFrom(downCellStyle);
+                    newDownStyle.setBorderTop(cellStyle.getBorderBottom());
+                    newDownStyle.setTopBorderColor(cellStyle.getBottomBorderColor());
 
-                downCell.setCellStyle(newDownStyle);
+                    newDownStyle = styleCache.processCellStyle(newDownStyle);
+
+                    downCell.setCellStyle(newDownStyle);
+                }
             }
         }
     }

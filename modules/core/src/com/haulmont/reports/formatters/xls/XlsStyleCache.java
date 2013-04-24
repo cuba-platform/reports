@@ -19,6 +19,8 @@ public class XlsStyleCache {
 
     private Map<HSSFStyleCacheKey, HSSFCellStyle> cellStyles = new HashMap<>();
 
+    private Map<HSSFStyleCacheKey, HSSFCellStyle> namedCellStyles = new HashMap<>();
+
     private Map<String, HSSFCellStyle> styleMap = new HashMap<>();
 
     public HSSFCellStyle processCellStyle(HSSFCellStyle cellStyle) {
@@ -45,5 +47,13 @@ public class XlsStyleCache {
 
     public HSSFCellStyle getStyleByName(String styleName) {
         return styleMap.get(styleName);
+    }
+
+    public HSSFCellStyle getNamedCachedStyle(HSSFCellStyle namedCellStyle) {
+        return namedCellStyles.get(new HSSFStyleCacheKey(namedCellStyle));
+    }
+
+    public void addCachedNamedStyle(HSSFCellStyle namedCellStyle, HSSFCellStyle cellStyle) {
+        namedCellStyles.put(new HSSFStyleCacheKey(namedCellStyle), cellStyle);
     }
 }
