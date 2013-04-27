@@ -74,7 +74,7 @@
             <tab id="localesTab" caption="msg://parameters.localesTab">
                 <vbox expand="spacer" id="localesVBox" margin="true">
                     <label value="msg://localeCaption" stylename="h2"/>
-                    <textField id="localeTextField" datasource="parameterDs" property="localeNames"
+                    <textArea id="localeTextField" datasource="parameterDs" property="localeNames"
                                rows="10" cols="30"/>
                     <hbox id="spacer"/>
                 </vbox>
