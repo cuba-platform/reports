@@ -319,21 +319,26 @@ public class ReportingBean implements ReportingApi {
         List<Map<String, Object>> result;
 
         //gets data from first dataset
-        result = getDataSetData(parentBand, firstDataSet, paramsMap);
+        result = new LinkedList<>(getDataSetData(parentBand, firstDataSet, paramsMap));
 
         //adds data from second and following datasets to result
         for (int i = 1; i < dataSets.size(); i++) {
             List<Map<String, Object>> dataSetData = getDataSetData(parentBand, dataSets.get(i), paramsMap);
-            for (int j = 0; (j < result.size()) && (j < dataSetData.size()); j++) {
+            for (int j = 0; j < dataSetData.size(); j++) {
+                if (j == result.size()) {
+                    result.add(new HashMap<String, Object>());
+                }
+
                 result.get(j).putAll(dataSetData.get(j));
             }
         }
 
-        if (result != null)
+        if (!result.isEmpty()) {
             //add output params to band
             for (Map<String, Object> map : result) {
                 map.putAll(params.get());
             }
+        }
 
         return result;
     }
@@ -361,6 +366,9 @@ public class ReportingBean implements ReportingApi {
 
         if (loader != null)
             result = loader.loadData(dataSet, parentBand);
+
+        if (result == null)
+            return Collections.emptyList();
 
         return result;
     }
