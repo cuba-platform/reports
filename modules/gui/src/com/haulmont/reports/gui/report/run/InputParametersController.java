@@ -75,7 +75,7 @@ public class InputParametersController extends AbstractWindow {
         linkedEntity = (Entity) params.get("entity");
 
         if (report != null) {
-            report = getDsContext().getDataService().reload(report, "report.edit");
+            report = getDsContext().getDataSupplier().reload(report, "report.edit");
             if (report.getInputParameters() != null)
                 parametersGrid.setRows(report.getInputParameters().size());
             else

@@ -47,7 +47,7 @@ public class ReportBrowser extends AbstractLookup {
             public void actionPerform(Component component) {
                 Report report = reportsTable.getSingleSelected();
                 if (report != null) {
-                    report = getDsContext().getDataService().reload(report, "report.edit");
+                    report = getDsContext().getDataSupplier().reload(report, "report.edit");
                     if (report.getInputParameters() != null && report.getInputParameters().size() > 0) {
                         openWindow("report$inputParameters", WindowManager.OpenType.DIALOG, Collections.<String, Object>singletonMap("report", report));
                     } else {

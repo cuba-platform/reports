@@ -38,7 +38,7 @@ public class ReportRun extends AbstractLookup {
             public void actionPerform(Component component) {
                 Report report = reportsTable.getSingleSelected();
                 if (report != null) {
-                    report = getDsContext().getDataService().reload(report, "report.edit");
+                    report = getDsContext().getDataSupplier().reload(report, "report.edit");
                     ReportHelper.runReport(report, ReportRun.this);
                 }
             }

@@ -51,7 +51,7 @@ public class RunReportAction extends AbstractAction {
             public void handleLookup(Collection items) {
                 if (items != null && items.size() > 0) {
                     Report report = (Report) items.iterator().next();
-                    report = window.getDsContext().getDataService().reload(report, "report.edit");
+                    report = window.getDsContext().getDataSupplier().reload(report, "report.edit");
                     if (report != null) {
                         if (report.getInputParameters() != null && report.getInputParameters().size() > 0) {
                             openReportParamsDialog(report, window);

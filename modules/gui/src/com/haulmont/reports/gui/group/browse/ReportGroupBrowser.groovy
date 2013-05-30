@@ -53,7 +53,7 @@ class ReportGroupBrowser extends AbstractLookup {
                         query.addParameter('groupId', group.getId())
                         loadContext.setQuery(query)
 
-                        DataSupplier dataService = getDsContext().getDataService()
+                        DataSupplier dataService = getDsContext().getDataSupplier()
                         Report report = dataService.load(loadContext)
                         if (report != null) {
                             showNotification(getMessage('unableToDeleteNotEmptyReportGroup'),

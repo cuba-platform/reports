@@ -90,7 +90,7 @@ abstract class AbstractPrintFormAction extends AbstractAction {
                 public void handleLookup(Collection items) {
                     if (items != null && items.size() > 0) {
                         Report report = (Report) items.iterator().next();
-                        report = window.getDsContext().getDataService().reload(report, "report.edit");
+                        report = window.getDsContext().getDataSupplier().reload(report, "report.edit");
                         String inputParamAlias = preprocessParams(report, paramAlias, paramValue);
                         ReportHelper.runReport(report, window, inputParamAlias, paramValue, name);
                     }
@@ -122,12 +122,12 @@ abstract class AbstractPrintFormAction extends AbstractAction {
         lContext.setQuery(query);
 
         DsContext dsContext = window.getDsContext();
-        List<Report> reports = dsContext.getDataService().loadList(lContext);
+        List<Report> reports = dsContext.getDataSupplier().loadList(lContext);
         User user = AppBeans.get(UserSessionSource.class).getUserSession().getUser();
         reports = ReportHelper.applySecurityPolicies(user, window.getId(), reports);
         if (reports.size() == 1) {
             Report report = reports.get(0);
-            window.getDsContext().getDataService().reload(report, "report.edit");
+            window.getDsContext().getDataSupplier().reload(report, "report.edit");
             String inputParamAlias = preprocessParams(report, paramAlias, paramValue);
             ReportHelper.runReport(report, window, inputParamAlias, paramValue, name);
         } else if (reports.size() == 0) {
