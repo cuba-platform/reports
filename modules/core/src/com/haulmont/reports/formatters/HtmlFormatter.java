@@ -207,7 +207,7 @@ public class HtmlFormatter extends AbstractFormatter {
             throw new ReportingException(e);
         }
         StringTemplateLoader stringLoader = new StringTemplateLoader();
-        stringLoader.putTemplate(templateFile.getFileName(), templateContent);
+        stringLoader.putTemplate(templateFile.getId().toString(), templateContent);
 
         Configuration fmConfiguration = new Configuration();
         fmConfiguration.setTemplateLoader(stringLoader);
@@ -215,7 +215,7 @@ public class HtmlFormatter extends AbstractFormatter {
 
         Template htmlTemplate;
         try {
-            htmlTemplate = fmConfiguration.getTemplate(templateFile.getFileName());
+            htmlTemplate = fmConfiguration.getTemplate(templateFile.getId().toString());
         } catch (Exception e) {
             throw new ReportingException(e);
         }
