@@ -12,7 +12,7 @@ create table REPORT_GROUP (
   LOCALE_NAMES varchar(7000),
 
   primary key (ID)
-);
+)^
 
 ----------------------------------------------------------------------------------------------------------------
 
@@ -34,7 +34,7 @@ create table REPORT_REPORT
   primary key (ID),
   constraint FK_REPORT_REPORT_TO_REPORT_GROUP foreign key (GROUP_ID)
       references REPORT_GROUP (ID)
-);
+)^
 
 --------------------------------------------------------------------------------------------------------------
 
@@ -58,7 +58,7 @@ create table REPORT_BAND_DEFINITION
       references REPORT_REPORT (ID) on delete cascade,
   constraint FK_REPORT_BAND_DEFINITION_TO_REPORT_BAND_DEFINITION foreign key (PARENT_DEFINITION_ID)
       references REPORT_BAND_DEFINITION (ID)
-);
+)^
 
 --------------------------------------------------------------------------------------------------------------
 
@@ -75,14 +75,14 @@ create table REPORT_TEMPLATE
   CODE varchar(50),
   TEMPLATE_FILE_ID varchar(36) not null,
   OUTPUT_TYPE integer default 0 not null,
-  IS_DEFAULT smallint default false,
-  IS_CUSTOM smallint default false,
-  CUSTOM_CLASS varchar,
+  IS_DEFAULT boolean default false,
+  IS_CUSTOM boolean default false,
+  CUSTOM_CLASS varchar(4000),
 
   primary key (ID),
   constraint FK_REPORT_TEMPLATE_TO_REPORT foreign key (REPORT_ID)
       references REPORT_REPORT (ID) on delete cascade
-);
+)^
 
 --------------------------------------------------------------------------------------------------------------
 
@@ -101,8 +101,8 @@ create table REPORT_INPUT_PARAMETER
   LOCALE_NAMES varchar(7000),
   ALIAS varchar(100),
   SCREEN varchar(255),
-  FROM_BROWSER smallint,
-  REQUIRED smallint default 0,
+  FROM_BROWSER boolean,
+  REQUIRED boolean default false,
   POSITION_ integer default 0,
   META_CLASS varchar(255),
   ENUM_CLASS varchar(500),
@@ -110,7 +110,7 @@ create table REPORT_INPUT_PARAMETER
   primary key (ID),
   constraint FK_REPORT_INPUT_PARAMETER_TO_REPORT_REPORT foreign key (REPORT_ID)
       references REPORT_REPORT (ID) on delete cascade
-);
+)^
 
 --------------------------------------------------------------------------------------------------------------
 
@@ -133,7 +133,7 @@ create table REPORT_DATA_SET
   primary key (ID),
   constraint FK_REPORT_DATA_SET_TO_REPORT_BAND_DEFINITION foreign key (BAND_DEFINITION)
       references REPORT_BAND_DEFINITION (ID) on delete cascade
-);
+)^
 
 --------------------------------------------------------------------------------------------------------------
 
@@ -146,7 +146,7 @@ create table REPORT_REPORTS_ROLES (
 
   constraint FK_REPORT_REPORTS_ROLES_TO_ROLE foreign key (ROLE_ID)
       references SEC_ROLE(ID)
-);
+)^
 
 --------------------------------------------------------------------------------------------------------------
 
@@ -165,7 +165,7 @@ create table REPORT_REPORT_SCREEN
   primary key (ID),
   constraint FK_REPORT_REPORT_SCREEN_TO_REPORT_REPORT foreign key (REPORT_ID)
       references REPORT_REPORT (ID) on delete cascade
-);
+)^
 
 --------------------------------------------------------------------------------------------------------------
 
@@ -185,9 +185,9 @@ create table REPORT_VALUE_FORMAT
   primary key (ID),
   constraint FK_REPORT_VALUE_FORMAT_TO_REPORT_REPORT foreign key (REPORT_ID)
       references report_report (ID) on delete cascade
-);
+)^
 
 insert into REPORT_GROUP (ID, CREATE_TS, CREATED_BY, VERSION, TITLE, CODE, LOCALE_NAMES)
 values ('4e083530-0b9c-11e1-9b41-6bdaa41bff94', now(), 'admin', 0, 'General', 'ReportGroup.default',
 'en=General
-ru=Общие');
+ru=Общие')^

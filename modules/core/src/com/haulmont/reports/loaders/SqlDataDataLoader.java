@@ -12,7 +12,6 @@ import com.haulmont.cuba.core.Persistence;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.sys.persistence.DbTypeConverter;
-import com.haulmont.cuba.core.sys.persistence.DbmsType;
 import com.haulmont.reports.entity.Band;
 import com.haulmont.reports.entity.DataSet;
 import com.haulmont.reports.exception.ReportDataLoaderException;
@@ -29,6 +28,8 @@ import java.util.regex.Pattern;
  * @version $Id$
  */
 public class SqlDataDataLoader extends QueryDataLoader {
+
+    private final Persistence persistence = AppBeans.get(Persistence.NAME);
 
     public SqlDataDataLoader(Map<String, Object> params) {
         super(params);
@@ -68,7 +69,7 @@ public class SqlDataDataLoader extends QueryDataLoader {
             parentBand = parentBand.getParentBand();
         }
 
-        DbTypeConverter typeConverter = DbmsType.getCurrent().getTypeConverter();
+        DbTypeConverter typeConverter = persistence.getDbTypeConverter();
 
         List<ParamPosition> paramPositions = new ArrayList<>();
         List<Object> values = new ArrayList<>();
@@ -161,7 +162,6 @@ public class SqlDataDataLoader extends QueryDataLoader {
         String query = dataSet.getText();
         if (StringUtils.isBlank(query)) return Collections.emptyList();
 
-        Persistence persistence = AppBeans.get(Persistence.NAME);
         QueryRunner runner = new QueryRunner(persistence.getDataSource());
 
         try {
@@ -171,7 +171,7 @@ public class SqlDataDataLoader extends QueryDataLoader {
                 @Override
                 public List handle(ResultSet rs) throws SQLException {
                     List<Object[]> resList = new ArrayList<>();
-                    DbTypeConverter typeConverter = DbmsType.getCurrent().getTypeConverter();
+                    DbTypeConverter typeConverter = persistence.getDbTypeConverter();
 
                     while (rs.next()) {
                         Object[] values = new Object[rs.getMetaData().getColumnCount()];
