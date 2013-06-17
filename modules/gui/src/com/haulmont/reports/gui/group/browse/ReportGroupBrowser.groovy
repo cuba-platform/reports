@@ -50,7 +50,7 @@ class ReportGroupBrowser extends AbstractLookup {
                         LoadContext.Query query = new LoadContext.Query(
                                 'select r from report$Report r where r.group.id = :groupId')
                         query.setMaxResults(1)
-                        query.addParameter('groupId', group.getId())
+                        query.setParameter('groupId', group.getId())
                         loadContext.setQuery(query)
 
                         DataSupplier dataService = getDsContext().getDataSupplier()

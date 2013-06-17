@@ -117,8 +117,8 @@ abstract class AbstractPrintFormAction extends AbstractAction {
                 "(ip.entityMetaClass like :param$entityMetaClass or :param$entityMetaClass is null) " +
                 " and (r.reportType = :param$reportType)";
         LoadContext.Query query = new LoadContext.Query(queryStr);
-        query.addParameter("param$entityMetaClass", metaClassName);
-        query.addParameter("param$reportType", reportType);
+        query.setParameter("param$entityMetaClass", metaClassName);
+        query.setParameter("param$reportType", reportType);
         lContext.setQuery(query);
 
         DsContext dsContext = window.getDsContext();
