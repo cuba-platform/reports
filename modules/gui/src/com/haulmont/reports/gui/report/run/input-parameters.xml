@@ -21,8 +21,7 @@
                 </rows>
             </grid>
             <button id="printReportBtn" invoke="printReport"
-                    caption="msg://input.printReport" icon="icons/print.png"/>
+                    caption="msg://input.printReport" icon="icons/reports-print.png"/>
         </vbox>
-
     </layout>
 </window>
