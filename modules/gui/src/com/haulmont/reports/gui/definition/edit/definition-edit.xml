@@ -72,7 +72,7 @@
                                  required="true" requiredMessage="msg://dataSet.typeMsg"/>
 
                     <label id="dataSet_text" value="msg://dataSet.text"/>
-                    <autoCompleteTextField id="text" datasource="dataSetsDs" property="text" rows="25" cols="60"
+                    <textField id="text" datasource="dataSetsDs" property="text" rows="25" cols="60"
                                            width="100%"/>
 
                     <label id="entityParamLabel" value="msg://dataSet.entityParamName"/>

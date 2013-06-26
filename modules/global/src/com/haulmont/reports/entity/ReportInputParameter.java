@@ -8,6 +8,7 @@ package com.haulmont.reports.entity;
 import com.haulmont.chile.core.annotations.MetaProperty;
 import com.haulmont.chile.core.annotations.NamePattern;
 import com.haulmont.cuba.core.entity.annotation.SystemLevel;
+import com.haulmont.yarg.structure.ReportParameter;
 
 import javax.persistence.*;
 
@@ -20,7 +21,7 @@ import javax.persistence.*;
 @SystemLevel
 @NamePattern("%s|locName")
 @SuppressWarnings("unused")
-public class ReportInputParameter extends BaseReportEntity {
+public class ReportInputParameter extends BaseReportEntity implements ReportParameter {
     private static final long serialVersionUID = 6231014880104406246L;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -156,5 +157,10 @@ public class ReportInputParameter extends BaseReportEntity {
                 localeName = name;
         }
         return localeName;
+    }
+
+    @Override
+    public Class getParameterClass() {
+        return null;
     }
 }

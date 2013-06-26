@@ -6,8 +6,11 @@
 package com.haulmont.reports.entity;
 
 import com.haulmont.cuba.core.entity.annotation.SystemLevel;
+import com.haulmont.yarg.structure.ReportQuery;
 
 import javax.persistence.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author degtyarjov
@@ -16,10 +19,10 @@ import javax.persistence.*;
 @Entity(name = "report$DataSet")
 @Table(name = "REPORT_DATA_SET")
 @SystemLevel
-public class DataSet extends BaseReportEntity {
+public class DataSet extends BaseReportEntity implements ReportQuery {
     private static final long serialVersionUID = -3706206933129963303L;
-
-    public static final String QUERY_PARAMS_POSTFIX = ".params";
+    public static final String ENTITY_PARAM_NAME = "entityParamName";
+    public static final String LIST_ENTITIES_PARAM_NAME = "listEntitiesParamName";
 
     @Column(name = "NAME")
     private String name;
@@ -86,5 +89,23 @@ public class DataSet extends BaseReportEntity {
 
     public void setBandDefinition(BandDefinition bandDefinition) {
         this.bandDefinition = bandDefinition;
+    }
+
+    @Override
+    public String getScript() {
+        return text;
+    }
+
+    @Override
+    public String getLoaderType() {
+        return getType().getCode();
+    }
+
+    @Override
+    public Map<String, Object> getAdditionalParams() {
+        Map<String, Object> params = new HashMap<>();
+        params.put(ENTITY_PARAM_NAME, entityParamName);
+        params.put(LIST_ENTITIES_PARAM_NAME, listEntitiesParamName);
+        return params;
     }
 }

@@ -13,20 +13,28 @@ import org.apache.commons.lang.ObjectUtils;
  * @version $Id$
  */
 public enum ReportOutputType implements EnumClass<Integer> {
-    XLS(0),
-    DOC(10),
-    PDF(20),
-    HTML(30);
+    XLS(0, com.haulmont.yarg.structure.ReportOutputType.xls),
+    DOC(10, com.haulmont.yarg.structure.ReportOutputType.doc),
+    PDF(20, com.haulmont.yarg.structure.ReportOutputType.pdf),
+    HTML(30, com.haulmont.yarg.structure.ReportOutputType.html),
+    DOCX(40, com.haulmont.yarg.structure.ReportOutputType.docx);
 
     private Integer id;
+
+    private com.haulmont.yarg.structure.ReportOutputType outputType;
 
     @Override
     public Integer getId() {
         return id;
     }
 
-    ReportOutputType(Integer id) {
+    public com.haulmont.yarg.structure.ReportOutputType getOutputType() {
+        return outputType;
+    }
+
+    private ReportOutputType(Integer id, com.haulmont.yarg.structure.ReportOutputType outputType) {
         this.id = id;
+        this.outputType = outputType;
     }
 
     public static ReportOutputType fromId(Integer id) {

@@ -8,6 +8,9 @@ package com.haulmont.reports.entity;
 import com.haulmont.chile.core.annotations.Composition;
 import com.haulmont.chile.core.annotations.NamePattern;
 import com.haulmont.cuba.core.entity.annotation.SystemLevel;
+import com.haulmont.yarg.structure.ReportBand;
+import com.haulmont.yarg.structure.ReportQuery;
+import com.haulmont.yarg.structure.impl.BandOrientation;
 
 import javax.persistence.*;
 import java.util.List;
@@ -20,7 +23,7 @@ import java.util.List;
 @Table(name = "REPORT_BAND_DEFINITION")
 @NamePattern("%s|name")
 @SystemLevel
-public class BandDefinition extends BaseReportEntity {
+public class BandDefinition extends BaseReportEntity implements ReportBand {
     private static final long serialVersionUID = 8658220979738705511L;
 
     @Column(name = "NAME")
@@ -103,5 +106,25 @@ public class BandDefinition extends BaseReportEntity {
 
     public void setReport(Report report) {
         this.report = report;
+    }
+
+    @Override
+    public ReportBand getParent() {
+        return parentBandDefinition;
+    }
+
+    @Override
+    public List<ReportBand> getChildren() {
+        return (List) childrenBandDefinitions;
+    }
+
+    @Override
+    public List<ReportQuery> getReportQueries() {
+        return (List) dataSets;
+    }
+
+    @Override
+    public BandOrientation  getBandOrientation() {
+        return getOrientation() == Orientation.HORIZONTAL ? BandOrientation.HORIZONTAL : BandOrientation.VERTICAL;
     }
 }

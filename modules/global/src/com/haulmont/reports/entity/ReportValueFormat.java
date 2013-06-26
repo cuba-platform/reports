@@ -6,6 +6,7 @@
 package com.haulmont.reports.entity;
 
 import com.haulmont.cuba.core.entity.annotation.SystemLevel;
+import com.haulmont.yarg.structure.ReportFieldFormat;
 
 import javax.persistence.*;
 
@@ -16,8 +17,7 @@ import javax.persistence.*;
 @Entity(name = "report$ReportValueFormat")
 @Table(name = "REPORT_VALUE_FORMAT")
 @SystemLevel
-public class ReportValueFormat extends BaseReportEntity {
-
+public class ReportValueFormat extends BaseReportEntity implements ReportFieldFormat {
     private static final long serialVersionUID = 680180375698449946L;
 
     @Column(name = "NAME")
@@ -52,5 +52,15 @@ public class ReportValueFormat extends BaseReportEntity {
 
     public void setFormatString(String formatString) {
         this.formatString = formatString;
+    }
+
+    @Override
+    public String getName() {
+        return valueName;
+    }
+
+    @Override
+    public String getFormat() {
+        return formatString;
     }
 }

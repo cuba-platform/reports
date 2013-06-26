@@ -12,25 +12,18 @@ import com.haulmont.cuba.core.Transaction;
 import com.haulmont.cuba.core.app.FileStorageAPI;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.entity.FileDescriptor;
-import com.haulmont.cuba.core.global.FileStorageException;
-import com.haulmont.cuba.core.global.Metadata;
-import com.haulmont.cuba.core.global.TimeSource;
-import com.haulmont.cuba.core.global.View;
+import com.haulmont.cuba.core.global.*;
 import com.haulmont.reports.app.ParameterPrototype;
-import com.haulmont.reports.app.ReportOutputDocument;
-import com.haulmont.reports.entity.*;
+import com.haulmont.reports.entity.Report;
+import com.haulmont.reports.entity.ReportTemplate;
 import com.haulmont.reports.exception.ReportingException;
-import com.haulmont.reports.exception.UnsupportedFormatException;
-import com.haulmont.reports.formatters.*;
-import com.haulmont.reports.loaders.*;
-import org.apache.commons.lang.StringUtils;
-import org.perf4j.StopWatch;
-import org.perf4j.log4j.Log4JStopWatch;
+import com.haulmont.yarg.formatters.CustomReport;
+import com.haulmont.yarg.reporting.ReportOutputDocument;
+import com.haulmont.yarg.reporting.ReportingAPI;
+import com.haulmont.yarg.reporting.RunParams;
 
 import javax.annotation.ManagedBean;
-import javax.annotation.Nullable;
 import javax.inject.Inject;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.*;
 
@@ -40,13 +33,7 @@ import java.util.*;
  */
 @ManagedBean(ReportingApi.NAME)
 public class ReportingBean implements ReportingApi {
-
-    public static final String REPORT_FILE_NAME_KEY = "__REPORT_FILE_NAME";
     public static final String REPORT_EDIT_VIEW_NAME = "report.edit";
-
-    // todo remove thread locals
-    private ThreadLocal<Map<String, Object>> params = new ThreadLocal<>();
-    private ThreadLocal<Set<String>> bandDefinitionNames = new ThreadLocal<>();
 
     private PrototypesLoader prototypesLoader = new PrototypesLoader();
 
@@ -61,6 +48,12 @@ public class ReportingBean implements ReportingApi {
 
     @Inject
     private TimeSource timeSource;
+
+    @Inject
+    private ReportingAPI reportingApi;
+
+    @Inject
+    private Scripting scripting;
 
     @Override
     public ReportOutputDocument createReport(Report report, Map<String, Object> params) throws IOException {
@@ -86,20 +79,7 @@ public class ReportingBean implements ReportingApi {
 
     private ReportOutputDocument createReportDocument(Report report, ReportTemplate template, Map<String, Object> params)
             throws IOException {
-
-        if (template == null)
-            throw new NullPointerException("Report template is null");
-
-        String watchName = "Report.";
-        Band rootBand;
-        if (StringUtils.isNotEmpty(report.getCode()))
-            watchName += report.getCode();
-        else
-            watchName += report.getId();
-
-        StopWatch loadDataWatch = new Log4JStopWatch(watchName + "#data");
         try {
-            // Preprocess prototypes
             List<String> prototypes = new LinkedList<>();
             for (Map.Entry<String, Object> param : params.entrySet()) {
                 if (param.getValue() instanceof ParameterPrototype)
@@ -113,71 +93,19 @@ public class ReportingBean implements ReportingApi {
                 paramsMap.put(paramName, data);
             }
 
-            this.params.set(paramsMap);
-            this.bandDefinitionNames.set(new HashSet<String>());
-
-            if (template.getCustomFlag()) {
-                byte[] content = new CustomFormatter(report, template, params).createDocument(null);
-                return new ReportOutputDocument(report, template.getReportOutputType(), content);
+            if (!template.isCustom()) {
+                byte[] bytes = fileStorageAPI.loadFile(template.getTemplateFileDescriptor());
+                template.setContent(bytes);
+            } else {
+                Class<Object> reportClass = scripting.loadClass(template.getCustomClass());
+                template.setCustomReport((CustomReport) reportClass.newInstance());
             }
-            BandDefinition rootBandDefinition = report.getRootBandDefinition();
 
-            List<BandDefinition> childrenBandDefinitions = rootBandDefinition.getChildrenBandDefinitions();
-            rootBand = createRootBand(rootBandDefinition);
-
-            HashMap<String, ReportValueFormat> valuesFormats = new HashMap<>();
-            for (ReportValueFormat valueFormat : report.getValuesFormats()) {
-                valuesFormats.put(valueFormat.getValueName(), valueFormat);
-            }
-            rootBand.setValuesFormats(valuesFormats);
-
-            for (BandDefinition definition : childrenBandDefinitions) {
-                bandDefinitionNames.get().add(definition.getName());
-                List<Band> bands = createBands(definition, rootBand);
-                rootBand.addChildren(bands);
-            }
-            rootBand.setBandDefinitionNames(bandDefinitionNames.get());
-        } catch (ReportingException ex) {
-            throw ex;
-        } catch (Exception e) {
+            return reportingApi.runReport(new RunParams(report).template(template).params(params));
+        } catch (FileStorageException e) {
             throw new ReportingException(e);
-        } finally {
-            loadDataWatch.stop();
-        }
-
-        StopWatch processWatch = new Log4JStopWatch(watchName + "#process");
-        try {
-            ByteArrayOutputStream resultStream = new ByteArrayOutputStream();
-
-            ReportEngine reportEngine = getReportEngine(template);
-            ReportOutputType format = template.getReportOutputType();
-
-            if (reportEngine.hasSupportReport(
-                    template.getTemplateFileDescriptor().getExtension(), format)) {
-                reportEngine.setTemplateFile(template.getTemplateFileDescriptor());
-                reportEngine.createDocument(rootBand, format, resultStream);
-            } else
-                throw new UnsupportedFormatException();
-
-            byte[] result = resultStream.toByteArray();
-            ReportOutputDocument reportOutputDocument = new ReportOutputDocument(report,
-                    template.getReportOutputType(), result);
-            setNameToOutputFile(rootBand, reportOutputDocument);
-
-            return reportOutputDocument;
-        } catch (ReportingException ex) {
-            throw ex;
-        } catch (Exception e) {
-            throw new ReportingException(e);
-        } finally {
-            processWatch.stop();
-        }
-    }
-
-    private void setNameToOutputFile(Band rootBand, ReportOutputDocument reportOutputDocument) {
-        Object reportFileName = rootBand.getData().get(REPORT_FILE_NAME_KEY);
-        if (reportFileName != null) {
-            reportOutputDocument.setDocumentName(reportFileName.toString());
+        } catch (InstantiationException | IllegalAccessException e) {
+            throw new ReportingException(String.format("Could not instantiate class for custom template [%s]", template.getCustomClass()), e);
         }
     }
 
@@ -262,145 +190,6 @@ public class ReportingBean implements ReportingApi {
     @Override
     public Collection<Report> importReports(byte[] zipBytes) throws IOException, FileStorageException {
         return ImportExportHelper.importReports(zipBytes);
-    }
-
-    private ReportEngine getReportEngine(ReportTemplate template) {
-        ReportEngine reportEngine = null;
-        FileDescriptor templateFileDescriptor = template.getTemplateFileDescriptor();
-        if (templateFileDescriptor == null)
-            throw new ReportingException("No file descriptor for template: " + template.getCode());
-
-        String extension = templateFileDescriptor.getExtension();
-        if (StringUtils.isNotEmpty(extension)) {
-            ReportFileExtension reportExt = ReportFileExtension.fromId(extension.toLowerCase());
-            if (reportExt != null) {
-                switch (reportExt) {
-                    case DOC:
-                    case ODT:
-                        reportEngine = new DocFormatter();
-                        break;
-
-                    case HTML:
-                    case HTM:
-                        reportEngine = new HtmlFormatter();
-                        break;
-
-                    case XLS:
-                    case XLT:
-                        reportEngine = new XLSFormatter();
-                        break;
-                }
-            } else
-                throw new UnsupportedFormatException();
-        } else
-            throw new UnsupportedFormatException();
-
-        return reportEngine;
-    }
-
-    private Band createRootBand(BandDefinition rootBandDefinition) {
-        Band rootBand = new Band(rootBandDefinition.getName(), 1, null, rootBandDefinition.getOrientation());
-        List<Map<String, Object>> data = getBandData(rootBandDefinition, null);
-        if (data.size() > 0)
-            rootBand.setData(data.get(0));
-        return rootBand;
-    }
-
-    private List<Map<String, Object>> getBandData(BandDefinition definition, @Nullable Band parentBand) {
-        List<DataSet> dataSets = definition.getDataSets();
-        //add input params to band
-        if (dataSets == null || dataSets.size() == 0)
-            return Collections.singletonList(params.get());
-
-        DataSet firstDataSet = dataSets.get(0);
-
-        Map<String, Object> paramsMap = params.get();
-
-        List<Map<String, Object>> result;
-
-        //gets data from first dataset
-        result = new LinkedList<>(getDataSetData(parentBand, firstDataSet, paramsMap));
-
-        //adds data from second and following datasets to result
-        for (int i = 1; i < dataSets.size(); i++) {
-            List<Map<String, Object>> dataSetData = getDataSetData(parentBand, dataSets.get(i), paramsMap);
-            for (int j = 0; j < dataSetData.size(); j++) {
-                if (j == result.size()) {
-                    result.add(new HashMap<String, Object>());
-                }
-
-                result.get(j).putAll(dataSetData.get(j));
-            }
-        }
-
-        if (!result.isEmpty()) {
-            //add output params to band
-            for (Map<String, Object> map : result) {
-                map.putAll(params.get());
-            }
-        }
-
-        return result;
-    }
-
-    private List<Map<String, Object>> getDataSetData(Band parentBand, DataSet dataSet, Map<String, Object> paramsMap) {
-        List<Map<String, Object>> result = null;
-        DataSetType dataSetType = dataSet.getType();
-
-        if (StringUtils.isBlank(dataSet.getText())
-                && ((dataSet.getType() != DataSetType.SINGLE) || (dataSet.getType() == DataSetType.MULTI)))
-            throw new ReportingException("Please specify code for dataset: " + dataSet.getName());
-
-        DataLoader loader = null;
-        if (DataSetType.SQL.equals(dataSetType)) {
-            loader = new SqlDataDataLoader(paramsMap);
-        } else if (DataSetType.GROOVY.equals(dataSetType)) {
-            loader = new GroovyDataLoader(paramsMap);
-        } else if (DataSetType.JPQL.equals(dataSetType)) {
-            loader = new JpqlDataDataLoader(paramsMap);
-        } else if (DataSetType.SINGLE.equals(dataSetType)) {
-            loader = new SingleEntityDataLoader(paramsMap);
-        } else if (DataSetType.MULTI.equals(dataSetType)) {
-            loader = new MultiEntityDataLoader(paramsMap);
-        }
-
-        if (loader != null)
-            result = loader.loadData(dataSet, parentBand);
-
-        if (result == null)
-            return Collections.emptyList();
-
-        return result;
-    }
-
-    /**
-     * Create band from band definition
-     * Perform query from definition and create band from each result row. Do it recursive down
-     *
-     * @param definition Band definition
-     * @param parentBand Parent band
-     * @return Data bands
-     */
-    private List<Band> createBands(BandDefinition definition, Band parentBand) {
-        definition = reloadEntity(definition, REPORT_EDIT_VIEW_NAME);
-        List<Map<String, Object>> outputData = getBandData(definition, parentBand);
-        return createBandsList(definition, parentBand, outputData);
-    }
-
-    private List<Band> createBandsList(BandDefinition definition, Band parentBand, List<Map<String, Object>> outputData) {
-        List<Band> bandsList = new ArrayList<>();
-        for (Map<String, Object> data : outputData) {
-            Band band = new Band(definition.getName(), parentBand.getLevel() + 1, parentBand, definition.getOrientation());
-            band.setData(data);
-            List<BandDefinition> childrenBandDefinitions = definition.getChildrenBandDefinitions();
-            for (BandDefinition childDefinition : childrenBandDefinitions) {
-                bandDefinitionNames.get().add(definition.getName());
-                List<Band> childBands = createBands(childDefinition, band);
-                band.addChildren(childBands);
-            }
-            bandsList.add(band);
-        }
-        return bandsList;
     }
 
     private <T extends Entity> T reloadEntity(T entity, String viewName) {

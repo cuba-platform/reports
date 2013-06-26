@@ -13,8 +13,63 @@
 
     <context:component-scan base-package="com.haulmont.reports"/>
 
-    <!-- MBeans registration -->
+    <bean id="reporting_lib_Scripting" class="com.haulmont.reports.libintegration.ReportingScriptingImpl"/>
+    <bean id="reporting_lib_SqlParametersConverter" class="com.haulmont.reports.libintegration.SqlParametersConverter"/>
 
+
+    <bean id="reporting_lib_GroovyDataLoader" class="com.haulmont.yarg.loaders.impl.GroovyDataLoader">
+        <constructor-arg ref="reporting_lib_Scripting"/>
+    </bean>
+    <bean id="reporting_lib_SqlDataLoader" class="com.haulmont.yarg.loaders.impl.SqlDataLoader">
+        <constructor-arg ref="dataSource"/>
+        <property name="parametersConverter" ref="reporting_lib_SqlParametersConverter"/>
+    </bean>
+    <bean id="reporting_lib_JpqlDataLoader" class="com.haulmont.reports.libintegration.JpqlDataDataLoader"/>
+    <bean id="reporting_lib_SingleEntityDataLoader" class="com.haulmont.reports.libintegration.SingleEntityDataLoader"/>
+    <bean id="reporting_lib_MultiEntityDataLoader" class="com.haulmont.reports.libintegration.MultiEntityDataLoader"/>
+
+    <bean id="reporting_lib_OfficeIntegration"
+          class="com.haulmont.yarg.formatters.impl.doc.connector.OfficeIntegration">
+        <constructor-arg value="${cuba.reporting.openoffice.path}"/>
+        <constructor-arg>
+            <list>
+                <value>8100</value>
+                <value>8101</value>
+                <value>8102</value>
+                <value>8103</value>
+            </list>
+        </constructor-arg>
+        <property name="displayDeviceAvailable">
+            <value>${cuba.reporting.displayDeviceUnavailable}</value>
+        </property>
+        <property name="timeoutInSeconds">
+            <value>${cuba.reporting.openoffice.docFormatterTimeout}</value>
+        </property>
+    </bean>
+
+    <bean id="reporting_lib_FormatterFactory"
+          class="com.haulmont.yarg.formatters.factory.DefaultFormatterFactory">
+        <property name="officeIntegration" ref="reporting_lib_OfficeIntegration"/>
+    </bean>
+
+    <bean id="reporting_lib_LoaderFactory" class="com.haulmont.yarg.loaders.factory.DefaultLoaderFactory">
+        <property name="dataLoaders">
+            <map>
+                <entry key="sql" value-ref="reporting_lib_SqlDataLoader"/>
+                <entry key="groovy" value-ref="reporting_lib_GroovyDataLoader"/>
+                <entry key="jpql" value-ref="reporting_lib_JpqlDataLoader"/>
+                <entry key="single" value-ref="reporting_lib_SingleEntityDataLoader"/>
+                <entry key="multi" value-ref="reporting_lib_MultiEntityDataLoader"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean id="reporting_lib_Reporting" class="com.haulmont.yarg.reporting.Reporting">
+        <property name="formatterFactory" ref="reporting_lib_FormatterFactory"/>
+        <property name="loaderFactory" ref="reporting_lib_LoaderFactory"/>
+    </bean>
+
+    <!-- MBeans registration -->
     <bean id="reports_MBeanExporter" class="com.haulmont.cuba.core.sys.jmx.MBeanExporter" lazy-init="false">
         <property name="beans">
             <map>

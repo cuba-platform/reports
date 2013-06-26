@@ -8,8 +8,11 @@ package com.haulmont.reports.entity;
 
 import com.haulmont.cuba.core.entity.FileDescriptor;
 import com.haulmont.cuba.core.entity.annotation.SystemLevel;
+import com.haulmont.yarg.formatters.CustomReport;
 
 import javax.persistence.*;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 
 /**
  * Template for {@link Report}
@@ -21,7 +24,7 @@ import javax.persistence.*;
 @Table(name = "REPORT_TEMPLATE")
 @SystemLevel
 @SuppressWarnings("unused")
-public class ReportTemplate extends BaseReportEntity {
+public class ReportTemplate extends BaseReportEntity implements com.haulmont.yarg.structure.ReportTemplate {
 
     private static final long serialVersionUID = 3692751073234357754L;
 
@@ -47,6 +50,15 @@ public class ReportTemplate extends BaseReportEntity {
 
     @Column(name = "CUSTOM_CLASS")
     private String customClass;
+
+    @Column(name = "OUTPUT_NAME_PATTERN")
+    private String outputNamePattern;
+
+    @Transient
+    private byte[] content;
+
+    @Transient
+    private CustomReport customReport;
 
     public FileDescriptor getTemplateFileDescriptor() {
         return templateFileDescriptor;
@@ -102,5 +114,52 @@ public class ReportTemplate extends BaseReportEntity {
 
     public void setCustomClass(String customClass) {
         this.customClass = customClass;
+    }
+
+    @Override
+    public String getDocumentName() {
+        return templateFileDescriptor.getName();
+    }
+
+    @Override
+    public String getDocumentPath() {
+        return templateFileDescriptor.getName();
+    }
+
+    @Override
+    public InputStream getDocumentContent() {
+        return new ByteArrayInputStream(content);
+    }
+
+    @Override
+    public com.haulmont.yarg.structure.ReportOutputType getOutputType() {
+        return getReportOutputType().getOutputType();
+    }
+
+    public void setOutputNamePattern(String outputNamePattern) {
+        this.outputNamePattern = outputNamePattern;
+    }
+
+    @Override
+    public String getOutputNamePattern() {
+        return outputNamePattern;
+    }
+
+    @Override
+    public boolean isCustom() {
+        return Boolean.TRUE.equals(customFlag);
+    }
+
+    @Override
+    public CustomReport getCustomReport() {
+        return customReport;
+    }
+
+    public void setContent(byte[] content) {
+        this.content = content;
+    }
+
+    public void setCustomReport(CustomReport customReport) {
+        this.customReport = customReport;
     }
 }

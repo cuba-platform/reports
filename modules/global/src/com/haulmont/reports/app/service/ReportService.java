@@ -7,9 +7,9 @@ package com.haulmont.reports.app.service;
 
 import com.haulmont.cuba.core.entity.FileDescriptor;
 import com.haulmont.cuba.core.global.FileStorageException;
-import com.haulmont.reports.app.ReportOutputDocument;
 import com.haulmont.reports.entity.Report;
 import com.haulmont.reports.entity.ReportTemplate;
+import com.haulmont.yarg.reporting.ReportOutputDocument;
 
 import java.io.IOException;
 import java.util.Collection;

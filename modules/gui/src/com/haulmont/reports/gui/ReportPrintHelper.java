@@ -7,7 +7,7 @@
 package com.haulmont.reports.gui;
 
 import com.haulmont.cuba.gui.export.ExportFormat;
-import com.haulmont.reports.entity.ReportOutputType;
+import com.haulmont.yarg.structure.ReportOutputType;
 
 import java.util.HashMap;
 
@@ -20,10 +20,10 @@ public class ReportPrintHelper {
     private static HashMap<ReportOutputType, ExportFormat> exportFormats = new HashMap<>();
 
     static {
-        exportFormats.put(ReportOutputType.XLS, ExportFormat.XLS);
-        exportFormats.put(ReportOutputType.DOC, ExportFormat.DOC);
-        exportFormats.put(ReportOutputType.PDF, ExportFormat.PDF);
-        exportFormats.put(ReportOutputType.HTML, ExportFormat.HTML);
+        exportFormats.put(ReportOutputType.xls, ExportFormat.XLS);
+        exportFormats.put(ReportOutputType.doc, ExportFormat.DOC);
+        exportFormats.put(ReportOutputType.pdf, ExportFormat.PDF);
+        exportFormats.put(ReportOutputType.html, ExportFormat.HTML);
     }
 
     public static ExportFormat getExportFormat(ReportOutputType outputType) {

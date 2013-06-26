@@ -16,11 +16,11 @@ import com.haulmont.cuba.security.entity.Role;
 import com.haulmont.cuba.security.entity.RoleType;
 import com.haulmont.cuba.security.entity.User;
 import com.haulmont.cuba.security.entity.UserRole;
-import com.haulmont.reports.app.ReportOutputDocument;
 import com.haulmont.reports.app.service.ReportService;
 import com.haulmont.reports.entity.Report;
 import com.haulmont.reports.entity.ReportInputParameter;
 import com.haulmont.reports.entity.ReportScreen;
+import com.haulmont.yarg.reporting.ReportOutputDocument;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.lang.StringUtils;
@@ -105,7 +105,7 @@ public class ReportHelper {
                 document = srv.createReport(report, templateCode, params);
 
             byte[] byteArr = document.getContent();
-            ExportFormat exportFormat = ReportPrintHelper.getExportFormat(document.getOutputType());
+            ExportFormat exportFormat = ReportPrintHelper.getExportFormat(document.getReportOutputType());
 
             ExportDisplay exportDisplay = AppConfig.createExportDisplay(null);
             String documentName = document.getDocumentName();

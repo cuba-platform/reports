@@ -93,7 +93,7 @@ public class BandDefinitionEditor extends AbstractEditor implements Suggester {
 
     def initDataSetControls() {
         LookupField lookupField = getComponent('type')
-        AutoCompleteTextField queryTextField = getComponent('text')
+        TextField queryTextField = getComponent('text')
         TextField nameField = getComponent('datasetName')
         Label queryLabel = getComponent('dataSet_text')
 
@@ -134,7 +134,7 @@ public class BandDefinitionEditor extends AbstractEditor implements Suggester {
                             case DataSetType.JPQL:
                             case DataSetType.GROOVY:
                                 queryEditors.each { Component c -> c.visible = true }
-                                queryTextField.setSuggester(DataSetType.JPQL.equals(value) ? BandDefinitionEditor.this : null)
+//                                queryTextField.setSuggester(DataSetType.JPQL.equals(value) ? BandDefinitionEditor.this : null)
                                 break
 
                             case DataSetType.SINGLE:

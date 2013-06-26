@@ -91,6 +91,10 @@ configure(globalModule) {
     task enhance(type: CubaEnhancing, dependsOn: compileJava) {
         persistenceXml = "$projectDir/src/reports-persistence.xml"
     }
+
+    dependencies {
+        compile(group: 'com.haulmont.reporting', name: 'reporting-lib', version: '0.1-SNAPSHOT')
+    }
 }
 
 configure(coreModule) {
@@ -121,6 +125,8 @@ configure(coreModule) {
         compile(group: 'org.openoffice', name: 'juh', version: '3.0.0')
         compile(group: 'org.openoffice', name: 'ridl', version: '3.0.0')
         compile(group: 'org.openoffice', name: 'unoil', version: '3.0.0')
+        compile(group: 'com.haulmont.reporting', name: 'reporting-lib', version: '0.1-SNAPSHOT')
+
         testCompile(group: 'com.haulmont.cuba', name: 'cuba-core', version: baseVersion, classifier: 'tests')
         provided(servletApi)
         jdbc(postgres)

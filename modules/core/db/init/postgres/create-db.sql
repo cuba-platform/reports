@@ -80,6 +80,7 @@ create table REPORT_TEMPLATE
   IS_DEFAULT boolean default false,
   IS_CUSTOM boolean default false,
   CUSTOM_CLASS varchar,
+  OUTPUT_NAME_PATTERN varchar,
   --
   primary key (ID),
   constraint FK_REPORT_TEMPLATE_TO_REPORT foreign key (REPORT_ID)

@@ -8,16 +8,14 @@ package com.haulmont.reports.entity;
 import com.haulmont.chile.core.annotations.Composition;
 import com.haulmont.chile.core.annotations.MetaProperty;
 import com.haulmont.chile.core.annotations.NamePattern;
-import com.haulmont.cuba.core.entity.annotation.SystemLevel;
 import com.haulmont.cuba.security.entity.Role;
+import com.haulmont.yarg.structure.ReportFieldFormat;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.lang.StringUtils;
 
 import javax.persistence.*;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author degtyarjov
@@ -27,7 +25,7 @@ import java.util.Set;
 @Table(name = "REPORT_REPORT")
 @NamePattern("%s|locName")
 @SuppressWarnings("unused")
-public class Report extends BaseReportEntity {
+public class Report extends BaseReportEntity implements com.haulmont.yarg.structure.Report {
     private static final long serialVersionUID = -2817764915661205093L;
 
     @Column(name = "NAME")
@@ -227,5 +225,26 @@ public class Report extends BaseReportEntity {
                 localeName = name;
         }
         return localeName;
+    }
+
+
+    @Override
+    public Map<String, com.haulmont.yarg.structure.ReportTemplate> getReportTemplates() {
+        Map<String, com.haulmont.yarg.structure.ReportTemplate> templateMap = new HashMap<>();
+        for (ReportTemplate template : templates) {
+            templateMap.put(template.getCode(), template);
+        }
+
+        return templateMap;
+    }
+
+    @Override
+    public List<com.haulmont.yarg.structure.ReportParameter> getReportParameters() {
+        return (List) inputParameters;
+    }
+
+    @Override
+    public List<ReportFieldFormat> getReportFieldFormats() {
+        return (List) valuesFormats;
     }
 }

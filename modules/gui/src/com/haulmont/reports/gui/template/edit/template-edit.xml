@@ -50,6 +50,11 @@
                         </hbox>
                     </row>
                     <row>
+                        <label value="msg://template.outputNamePattern"/>
+                        <textField id="outputNamePattern" datasource="templateDs" property="outputNamePattern"
+                                   width="${width}"/>
+                    </row>
+                    <row>
                         <label value="msg://template.isCustom"/>
                         <checkBox id="customFlag" datasource="templateDs" property="customFlag"
                                   width="${width}"/>

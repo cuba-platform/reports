@@ -17,37 +17,44 @@ public enum DataSetType implements EnumClass<Integer> {
     /**
      * SQL query
      */
-    SQL(10),
+    SQL(10, "sql"),
 
     /**
      * JPQL query
      */
-    JPQL(20),
+    JPQL(20, "jpql"),
 
     /**
      * Groovy script
      */
-    GROOVY(30),
+    GROOVY(30, "groovy"),
 
     /**
      * Entity
      */
-    SINGLE(40),
+    SINGLE(40, "single"),
 
     /**
      * Entities list
      */
-    MULTI(50);
+    MULTI(50, "multi");
 
     private Integer id;
+
+    private String code;
 
     @Override
     public Integer getId() {
         return id;
     }
 
-    DataSetType(Integer id) {
+    public String getCode() {
+        return code;
+    }
+
+    private DataSetType(Integer id, String code) {
         this.id = id;
+        this.code = code;
     }
 
     public static DataSetType fromId(Integer id) {
