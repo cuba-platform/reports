@@ -109,6 +109,7 @@ create table REPORT_TEMPLATE (
     IS_DEFAULT char(1),
     IS_CUSTOM char(1),
     CUSTOM_CLASS varchar2(4000),
+    OUTPUT_NAME_PATTERN varchar(255),
     primary key(ID)
 )^
 
