@@ -136,8 +136,8 @@ configure(coreModule) {
         testRuntime postgres
         testRuntime servletApi
 
-        groovy groovyArtifact
-        groovy asm
+        compile groovyArtifact
+        compile asm
     }
     
     test {
