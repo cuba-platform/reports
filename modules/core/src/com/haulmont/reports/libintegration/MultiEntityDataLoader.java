@@ -11,7 +11,7 @@ import com.haulmont.reports.app.EntityMap;
 import com.haulmont.reports.entity.DataSet;
 import com.haulmont.yarg.loaders.ReportDataLoader;
 import com.haulmont.yarg.structure.ReportQuery;
-import com.haulmont.yarg.structure.impl.BandData;
+import com.haulmont.yarg.structure.BandData;
 
 import java.util.ArrayList;
 import java.util.Collection;

@@ -15,7 +15,7 @@ import com.haulmont.reports.exception.ReportDataLoaderException;
 import com.haulmont.yarg.loaders.ReportDataLoader;
 import com.haulmont.yarg.loaders.impl.AbstractDbDataLoader;
 import com.haulmont.yarg.structure.ReportQuery;
-import com.haulmont.yarg.structure.impl.BandData;
+import com.haulmont.yarg.structure.BandData;
 import org.apache.commons.lang.StringUtils;
 
 import javax.inject.Inject;

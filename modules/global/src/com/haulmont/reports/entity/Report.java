@@ -9,6 +9,7 @@ import com.haulmont.chile.core.annotations.Composition;
 import com.haulmont.chile.core.annotations.MetaProperty;
 import com.haulmont.chile.core.annotations.NamePattern;
 import com.haulmont.cuba.security.entity.Role;
+import com.haulmont.yarg.structure.ReportBand;
 import com.haulmont.yarg.structure.ReportFieldFormat;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
@@ -246,5 +247,10 @@ public class Report extends BaseReportEntity implements com.haulmont.yarg.struct
     @Override
     public List<ReportFieldFormat> getReportFieldFormats() {
         return (List) valuesFormats;
+    }
+
+    @Override
+    public ReportBand getRootBand() {
+        return getRootBandDefinition();
     }
 }
