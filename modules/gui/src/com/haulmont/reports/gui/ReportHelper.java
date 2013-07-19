@@ -27,16 +27,12 @@ import org.apache.commons.lang.StringUtils;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author degtyarjov
  * @version $Id$
  */
-@SuppressWarnings({"serial"})
 public class ReportHelper {
 
     private ReportHelper() {
@@ -119,7 +115,7 @@ public class ReportHelper {
     private static List<Report> checkRoles(User user, List<Report> reports) {
         List<Report> filter = new ArrayList<>();
         for (Report report : reports) {
-            final List<Role> reportRoles = report.getRoles();
+            final Set<Role> reportRoles = report.getRoles();
             if (reportRoles == null || reportRoles.size() == 0) {
                 filter.add(report);
             } else {

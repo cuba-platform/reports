@@ -130,7 +130,7 @@ public class ReportingBean implements ReportingApi {
 
     @Override
     public byte[] exportReports(Collection<Report> reports) throws IOException, FileStorageException {
-        return ImportExportHelper.exportReports(reports);
+        return ReportImportExportHelper.exportReports(reports);
     }
 
     @Override
@@ -189,7 +189,7 @@ public class ReportingBean implements ReportingApi {
 
     @Override
     public Collection<Report> importReports(byte[] zipBytes) throws IOException, FileStorageException {
-        return ImportExportHelper.importReports(zipBytes);
+        return ReportImportExportHelper.importReports(zipBytes);
     }
 
     private <T extends Entity> T reloadEntity(T entity, String viewName) {

@@ -10,14 +10,18 @@ import com.haulmont.cuba.core.app.FileStorageAPI;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.entity.FileDescriptor;
 import com.haulmont.cuba.core.global.*;
+import com.haulmont.cuba.security.entity.Role;
 import com.haulmont.reports.entity.*;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.reflection.ExternalizableConverter;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.Predicate;
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -25,9 +29,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.zip.CRC32;
 
 /**
@@ -36,10 +38,10 @@ import java.util.zip.CRC32;
  * @author fontanenko
  * @version $Id$
  */
-public class ImportExportHelper {
+public class ReportImportExportHelper {
     protected static final String ENCODING = "CP866";
 
-    private static Log log = LogFactory.getLog(ImportExportHelper.class);
+    private static Log log = LogFactory.getLog(ReportImportExportHelper.class);
 
     public static byte[] loadAndCompress(Collection<FileDescriptor> files) throws IOException, FileStorageException {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -94,7 +96,9 @@ public class ImportExportHelper {
         ZipArchiveOutputStream zipOutputStream = new ZipArchiveOutputStream(byteArrayOutputStream);
         zipOutputStream.setMethod(ZipArchiveOutputStream.STORED);
         zipOutputStream.setEncoding(ENCODING);
+
         report = ((ReportingApi) AppBeans.get(ReportingApi.NAME)).reloadReport(report);
+
         String xml = toXML(report);
         byte[] xmlBytes = xml.getBytes();
         ArchiveEntry zipEntryReportObject = newStoredEntry("report.xml", xmlBytes);
@@ -411,6 +415,33 @@ public class ImportExportHelper {
                         em.persist(ds);
                 }
                 em.persist(band);
+            }
+        }
+
+        TypedQuery<Role> rolesQuery = em.createQuery("select r from sec$Role r", Role.class);
+        rolesQuery.setViewName("_minimal");
+        List<Role> roles = rolesQuery.getResultList();
+
+        if (report.getRoles() == null) {
+            report.setRoles(new HashSet<Role>());
+        }
+
+        // merge roles, only add new
+        Set<Role> rolesFromXml = new HashSet<>(report.getRoles());
+        report.getRoles().clear();
+
+        for (final Role role: rolesFromXml) {
+            Role systemRole = (Role) CollectionUtils.find(roles, new Predicate() {
+                @Override
+                public boolean evaluate(Object object) {
+                    return ObjectUtils.equals(((Role) object).getId(), role.getId());
+                }
+            });
+
+            if (systemRole != null) {
+                report.getRoles().add(systemRole);
+            } else {
+                log.warn(String.format("Couldn't find system role %s for report %s", role.getName(), report.getName()));
             }
         }
     }

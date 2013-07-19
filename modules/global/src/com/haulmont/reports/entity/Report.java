@@ -77,7 +77,7 @@ public class Report extends BaseReportEntity implements com.haulmont.yarg.struct
             inverseJoinColumns = @JoinColumn(name = "ROLE_ID", referencedColumnName = "ID"),
             joinColumns = @JoinColumn(name = "REPORT_ID", referencedColumnName = "ID")
     )
-    private List<Role> roles;
+    private Set<Role> roles;
 
     @MetaProperty
     public BandDefinition getRootBandDefinition() {
@@ -125,11 +125,11 @@ public class Report extends BaseReportEntity implements com.haulmont.yarg.struct
         this.reportType = reportType != null ? reportType.getId() : null;
     }
 
-    public List<Role> getRoles() {
+    public Set<Role> getRoles() {
         return roles;
     }
 
-    public void setRoles(List<Role> roles) {
+    public void setRoles(Set<Role> roles) {
         this.roles = roles;
     }
 
