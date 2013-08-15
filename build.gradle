@@ -93,7 +93,7 @@ configure(globalModule) {
     }
 
     dependencies {
-        compile(group: 'com.haulmont.reporting', name: 'yarg', version: '0.1-SNAPSHOT')
+        compile(group: 'com.haulmont.yarg', name: 'yarg', version: '1.0-SNAPSHOT')
     }
 }
 
@@ -116,16 +116,6 @@ configure(coreModule) {
     dependencies {
         compile(globalModule)
         compile(group: 'com.haulmont.cuba', name: 'cuba-core', version: baseVersion)
-        compile(group: 'com.lowagie', name: 'itext', version: '2.1.0') {
-            exclude(group: 'bouncycastle', module: 'bcmail-jdk14')
-            exclude(group: 'bouncycastle', module: 'bcprov-jdk14')
-        }
-        compile(group: 'com.haulmont.thirdparty', name: 'ooo-bootstrapconnector', version: '3.0.0')
-        compile(group: 'com.haulmont.thirdparty', name: 'core-renderer', version: 'R8')
-        compile(group: 'org.openoffice', name: 'juh', version: '3.0.0')
-        compile(group: 'org.openoffice', name: 'ridl', version: '3.0.0')
-        compile(group: 'org.openoffice', name: 'unoil', version: '3.0.0')
-        compile(group: 'com.haulmont.reporting', name: 'yarg', version: '0.1-SNAPSHOT')
 
         testCompile(group: 'com.haulmont.cuba', name: 'cuba-core', version: baseVersion, classifier: 'tests')
         provided(servletApi)
