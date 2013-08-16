@@ -43,7 +43,7 @@
             </buttonsPanel>
             <columns>
                 <group>
-                    <column id="group" width="200"/>
+                    <column id="group" width="200px"/>
                 </group>
                 <column id="locName" caption="msg://report.name"/>
                 <column id="code" caption="msg://report.code"/>
