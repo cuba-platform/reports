@@ -17,7 +17,8 @@ public enum ReportOutputType implements EnumClass<Integer> {
     DOC(10, com.haulmont.yarg.structure.ReportOutputType.doc),
     PDF(20, com.haulmont.yarg.structure.ReportOutputType.pdf),
     HTML(30, com.haulmont.yarg.structure.ReportOutputType.html),
-    DOCX(40, com.haulmont.yarg.structure.ReportOutputType.docx);
+    DOCX(40, com.haulmont.yarg.structure.ReportOutputType.docx),
+    XLSX(50, com.haulmont.yarg.structure.ReportOutputType.xlsx);
 
     private Integer id;
 
