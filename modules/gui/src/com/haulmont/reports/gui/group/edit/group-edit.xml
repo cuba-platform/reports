@@ -18,7 +18,7 @@
             <field id="code"/>
         </fieldGroup>
         <label value="msg://groupLocaleCaption" stylename="h2"/>
-        <textArea id="localeTextField" datasource="groupDs" property="localeNames" rows="5" cols="30"/>
+        <textArea id="localeTextField" datasource="groupDs" property="localeNames" height="100px" width="100%" rows="5" cols="30"/>
         <iframe id="windowActions" screen="editWindowActions"/>
     </layout>
 </window>
