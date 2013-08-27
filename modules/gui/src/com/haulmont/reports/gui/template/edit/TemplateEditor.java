@@ -59,7 +59,6 @@ public class TemplateEditor extends AbstractEditor {
             if (report != null) {
                 if ((report.getTemplates() == null) || (report.getTemplates().size() == 0)) {
                     template.setCode(DEFAULT_TEMPLATE_CODE);
-                    template.setDefaultFlag(true);
                 } else
                     template.setCode("Template_" + Integer.toString(report.getTemplates().size()));
             }

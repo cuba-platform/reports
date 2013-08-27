@@ -55,9 +55,6 @@ public class ReportInputParameter extends BaseReportEntity implements ReportPara
     @Column(name = "SCREEN")
     private String screen;
 
-    @Column(name = "FROM_BROWSER")
-    private Boolean getFromBrowser = false;
-
     @Column(name = "REQUIRED")
     private Boolean required = false;
 
@@ -107,14 +104,6 @@ public class ReportInputParameter extends BaseReportEntity implements ReportPara
 
     public void setEnumerationClass(String enumerationClass) {
         this.enumerationClass = enumerationClass;
-    }
-
-    public Boolean getGetFromBrowser() {
-        return getFromBrowser;
-    }
-
-    public void setGetFromBrowser(Boolean getFromBrowser) {
-        this.getFromBrowser = getFromBrowser;
     }
 
     public Boolean getRequired() {

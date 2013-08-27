@@ -5,7 +5,7 @@
   ~ Use is subject to license terms.
   -->
 
-<views xmlns="http://schemas.haulmont.com/cuba/4.0/view.xsd">
+<views xmlns="http://schemas.haulmont.com/cuba/4.1/view.xsd">
 
     <view entity="report$BandDefinition" name="report.edit" extends="_local">
         <property name="parentBandDefinition" view="_minimal"/>
@@ -15,6 +15,7 @@
     </view>
 
     <view entity="report$ReportTemplate" name="template.edit" extends="_local">
+        <property name="report" view="_minimal" lazy="true"/>
         <property name="templateFileDescriptor" view="_local"/>
     </view>
 
@@ -36,6 +37,7 @@
         <property name="roles" view="_local"/>
         <property name="reportScreens" view="_local"/>
         <property name="templates" view="template.edit"/>
+        <property name="defaultTemplate" view="template.edit"/>
         <property name="group" view="_minimal"/>
         <property name="bands" view="report.edit"/>
     </view>

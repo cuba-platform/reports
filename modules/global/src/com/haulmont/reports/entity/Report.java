@@ -42,6 +42,10 @@ public class Report extends BaseReportEntity implements com.haulmont.yarg.struct
     @JoinColumn(name = "GROUP_ID")
     private ReportGroup group;
 
+    @OneToOne
+    @JoinColumn(name = "DEFAULT_TEMPLATE_ID")
+    private ReportTemplate defaultTemplate;
+
     @Column(name = "REPORT_TYPE")
     private Integer reportType;
 
@@ -149,27 +153,36 @@ public class Report extends BaseReportEntity implements com.haulmont.yarg.struct
         this.templates = templates;
     }
 
-    /**
-     * Get default template for report
-     *
-     * @return Template
-     */
-    @MetaProperty
+//    /**
+//     * Get default template for report
+//     *
+//     * @return Template
+//     */
+//    @MetaProperty
+//    public ReportTemplate getDefaultTemplate() {
+//        ReportTemplate template = null;
+//        if (templates != null) {
+//            if (templates.size() == 1)
+//                template = templates.get(0);
+//            else {
+//                Iterator<ReportTemplate> iter = templates.iterator();
+//                while (iter.hasNext() && template == null) {
+//                    ReportTemplate temp = iter.next();
+//                    if (temp.getDefaultFlag())
+//                        template = temp;
+//                }
+//            }
+//        }
+//        return template;
+//    }
+
+
     public ReportTemplate getDefaultTemplate() {
-        ReportTemplate template = null;
-        if (templates != null) {
-            if (templates.size() == 1)
-                template = templates.get(0);
-            else {
-                Iterator<ReportTemplate> iter = templates.iterator();
-                while (iter.hasNext() && template == null) {
-                    ReportTemplate temp = iter.next();
-                    if (temp.getDefaultFlag())
-                        template = temp;
-                }
-            }
-        }
-        return template;
+        return defaultTemplate;
+    }
+
+    public void setDefaultTemplate(ReportTemplate defaultTemplate) {
+        this.defaultTemplate = defaultTemplate;
     }
 
     public ReportTemplate getTemplateByCode(String templateCode) {

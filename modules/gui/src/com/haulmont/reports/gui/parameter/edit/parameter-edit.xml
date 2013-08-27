@@ -42,11 +42,6 @@
                             </row>
 
                             <row>
-                                <label value="msg://parameters.getFromBrowser"/>
-                                <checkBox id="getFromBrowser" datasource="parameterDs" property="getFromBrowser"/>
-                            </row>
-
-                            <row>
                                 <label value="msg://parameters.required"/>
                                 <checkBox id="required" datasource="parameterDs" property="required"/>
                             </row>

@@ -93,7 +93,6 @@ public class ImportExportTest extends ReportsTestCase {
         ReportTemplate template = new ReportTemplate();
         template.setReport(report);
         template.setCode("DEFAULT");
-        template.setDefaultFlag(true);
         template.setReportOutputType(ReportOutputType.HTML);
 
         String templateContent = "<html></html>";

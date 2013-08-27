@@ -6,6 +6,7 @@
 
 package com.haulmont.reports.entity;
 
+import com.haulmont.chile.core.annotations.NamePattern;
 import com.haulmont.cuba.core.entity.FileDescriptor;
 import com.haulmont.cuba.core.entity.annotation.SystemLevel;
 import com.haulmont.yarg.formatters.CustomReport;
@@ -23,6 +24,7 @@ import java.io.InputStream;
 @Entity(name = "report$ReportTemplate")
 @Table(name = "REPORT_TEMPLATE")
 @SystemLevel
+@NamePattern("%s|code")
 @SuppressWarnings("unused")
 public class ReportTemplate extends BaseReportEntity implements com.haulmont.yarg.structure.ReportTemplate {
 
@@ -41,9 +43,6 @@ public class ReportTemplate extends BaseReportEntity implements com.haulmont.yar
 
     @Column(name = "CODE")
     private String code;
-
-    @Column(name = "IS_DEFAULT")
-    private Boolean defaultFlag;
 
     @Column(name = "IS_CUSTOM")
     private Boolean customFlag = false;
@@ -82,14 +81,6 @@ public class ReportTemplate extends BaseReportEntity implements com.haulmont.yar
 
     public void setCode(String code) {
         this.code = code;
-    }
-
-    public Boolean getDefaultFlag() {
-        return defaultFlag;
-    }
-
-    public void setDefaultFlag(Boolean defaultFlag) {
-        this.defaultFlag = defaultFlag;
     }
 
     public Report getReport() {

@@ -30,6 +30,7 @@ create table REPORT_REPORT
   LOCALE_NAMES varchar(7000),
   GROUP_ID varchar(36) not null,
   REPORT_TYPE integer not null,
+  DEFAULT_TEMPLATE_ID varchar(36),
 
   primary key (ID),
   constraint FK_REPORT_REPORT_TO_REPORT_GROUP foreign key (GROUP_ID)
@@ -187,6 +188,9 @@ create table REPORT_VALUE_FORMAT
   constraint FK_REPORT_VALUE_FORMAT_TO_REPORT_REPORT foreign key (REPORT_ID)
       references report_report (ID) on delete cascade
 )^
+
+alter table REPORT_REPORT add constraint FK_REPORT_REPORT_TO_DEF_TEMPLATE foreign key (DEFAULT_TEMPLATE_ID)
+references REPORT_TEMPLATE (ID);
 
 insert into REPORT_GROUP (ID, CREATE_TS, CREATED_BY, VERSION, TITLE, CODE, LOCALE_NAMES)
 values ('4e083530-0b9c-11e1-9b41-6bdaa41bff94', now(), 'admin', 0, 'General', 'ReportGroup.default',

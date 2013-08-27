@@ -9,7 +9,6 @@ import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.global.Metadata;
 import com.haulmont.cuba.gui.components.AbstractEditor;
-import com.haulmont.cuba.gui.components.CheckBox;
 import com.haulmont.cuba.gui.components.LookupField;
 import com.haulmont.cuba.gui.config.WindowConfig;
 import com.haulmont.cuba.gui.config.WindowInfo;
@@ -30,7 +29,6 @@ public class ParameterEditor extends AbstractEditor {
     private LookupField metaClass;
     private LookupField screen;
     private LookupField enumLookup;
-    private CheckBox fromBrowser;
     private Map<String, String> metaNamesToClassNames = new HashMap<>();
     private Map<String, String> classNamesToMetaNames = new HashMap<>();
 
@@ -63,7 +61,6 @@ public class ParameterEditor extends AbstractEditor {
         metaClass = getComponent("metaClass");
         enumLookup = getComponent("enumeration");
         screen = getComponent("screen");
-        fromBrowser = getComponent("getFromBrowser");
 
         List metaClasses = new ArrayList();
         Collection<MetaClass> classes = metadata.getSession().getClasses();
@@ -128,7 +125,6 @@ public class ParameterEditor extends AbstractEditor {
         metaClass.setEnabled(isEntity);
         enumLookup.setEnabled(isEnum);
         screen.setEnabled(isEntity);
-        fromBrowser.setEnabled(isEntity);
 
         metaClass.setRequired(isEntity);
         enumLookup.setRequired(isEnum);

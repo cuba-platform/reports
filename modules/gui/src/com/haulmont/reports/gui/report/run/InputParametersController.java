@@ -23,6 +23,7 @@ import com.haulmont.cuba.gui.xml.layout.ComponentsFactory;
 import com.haulmont.reports.entity.ParameterType;
 import com.haulmont.reports.entity.Report;
 import com.haulmont.reports.entity.ReportInputParameter;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 
 import javax.inject.Inject;
@@ -76,10 +77,8 @@ public class InputParametersController extends AbstractWindow {
 
         if (report != null) {
             report = getDsContext().getDataSupplier().reload(report, "report.edit");
-            if (report.getInputParameters() != null)
+            if (CollectionUtils.isNotEmpty(report.getInputParameters()))
                 parametersGrid.setRows(report.getInputParameters().size());
-            else
-                parametersGrid.setRows(0);
 
             int currentGridRow = 0;
             for (ReportInputParameter parameter : report.getInputParameters()) {

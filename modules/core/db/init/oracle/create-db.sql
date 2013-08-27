@@ -74,6 +74,8 @@ create table REPORT_REPORT (
     CODE varchar2(255),
     LOCALE_NAMES clob,
     GROUP_ID varchar2(32) not null,
+    DEFAULT_TEMPLATE_ID varchar2(32),
+
     REPORT_TYPE integer not null,
     primary key(ID)
 )^
@@ -134,6 +136,7 @@ alter table REPORT_DATA_SET add constraint FK_REP_DAT_SET_TO_REP_BAN_DEF foreign
 alter table REPORT_INPUT_PARAMETER add constraint FK_REPORT_INPUT_PAR_TO_REP_REP foreign key (REPORT_ID) references REPORT_REPORT(ID)^
 
 alter table REPORT_REPORT add constraint FK_REPORT_REPORT_TO_REPORT_GRO foreign key (GROUP_ID) references REPORT_GROUP(ID)^
+alter table REPORT_REPORT add constraint FK_REPORT_TO_DEF_TEMPLATE foreign key (DEFAULT_TEMPLATE_ID) references REPORT_TEMPLATE(ID)^
 
 alter table REPORT_REPORT_SCREEN add constraint FK_REPORT_REP_SCR_TO_REP_REP foreign key (REPORT_ID) references REPORT_REPORT(ID)^
 

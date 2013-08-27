@@ -1,0 +1,954 @@
+/*
+ * Copyright (c) 2008 Haulmont Technology Ltd. All Rights Reserved.
+ * Haulmont Technology proprietary and confidential.
+ * Use is subject to license terms.
+ */
+package com.haulmont.reports.gui.report.edit;
+
+import com.haulmont.chile.core.model.MetaClass;
+import com.haulmont.chile.core.model.MetaPropertyPath;
+import com.haulmont.cuba.core.app.FileStorageService;
+import com.haulmont.cuba.core.entity.Entity;
+import com.haulmont.cuba.core.entity.FileDescriptor;
+import com.haulmont.cuba.core.global.*;
+import com.haulmont.cuba.gui.AppConfig;
+import com.haulmont.cuba.gui.WindowManager;
+import com.haulmont.cuba.gui.WindowManager.OpenType;
+import com.haulmont.cuba.gui.app.core.file.FileUploadDialog;
+import com.haulmont.cuba.gui.components.*;
+import com.haulmont.cuba.gui.components.actions.CreateAction;
+import com.haulmont.cuba.gui.components.actions.EditAction;
+import com.haulmont.cuba.gui.components.actions.ItemTrackingAction;
+import com.haulmont.cuba.gui.components.actions.RemoveAction;
+import com.haulmont.cuba.gui.config.WindowConfig;
+import com.haulmont.cuba.gui.config.WindowInfo;
+import com.haulmont.cuba.gui.data.*;
+import com.haulmont.cuba.gui.data.DsContext.CommitListener;
+import com.haulmont.cuba.gui.data.impl.*;
+import com.haulmont.cuba.gui.export.ByteArrayDataProvider;
+import com.haulmont.cuba.gui.export.ExportDisplay;
+import com.haulmont.cuba.gui.export.ExportFormat;
+import com.haulmont.cuba.gui.upload.FileUploadingAPI;
+import com.haulmont.cuba.gui.xml.layout.ComponentsFactory;
+import com.haulmont.cuba.security.entity.Role;
+import com.haulmont.reports.entity.*;
+import com.haulmont.reports.gui.definition.edit.BandDefinitionEditor;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang.StringUtils;
+
+import javax.annotation.Nullable;
+import javax.inject.Inject;
+import javax.inject.Named;
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
+
+/**
+ * @author degtyarjov
+ * @version $Id$
+ */
+public class ReportEditor extends AbstractEditor {
+
+    protected Report report;
+
+    protected Map<Entity, List<FileDescriptor>> deletedFiles = new HashMap<>();
+
+    @Named("generalFrame.propertiesFieldGroup")
+    protected FieldGroup propertiesFieldGroup;
+
+    @Named("generalFrame.bandEditor")
+    protected BandDefinitionEditor bandEditor;
+
+    @Named("generalFrame.bandEditor.name")
+    protected TextField bandName;
+
+    @Named("generalFrame.bandEditor.orientation")
+    protected LookupField bandOrientation;
+
+    @Named("generalFrame.bandEditor.parentBand")
+    protected LookupField parentBand;
+
+    @Named("securityFrame.screenIdLookup")
+    protected LookupField screenIdLookup;
+
+    @Named("securityFrame.screenTable")
+    protected Table screenTable;
+
+    @Named("generalFrame.serviceTree")
+    protected Tree tree;
+
+    @Named("templatesFrame.defaultTemplateBtn")
+    protected Button defaultTemplateBtn;
+
+    @Named("templatesFrame.templatesTable")
+    protected Table templatesTable;
+
+    @Named("saveAndRun")
+    protected Button saveAndRun;
+
+    @Named("generalFrame.createBandDefinition")
+    protected Button createBandDefinitionButton;
+
+    @Named("generalFrame.removeBandDefinition")
+    protected Button removeBandDefinitionButton;
+
+    @Named("generalFrame.up")
+    protected Button bandUpButton;
+
+    @Named("generalFrame.down")
+    protected Button bandDownButton;
+
+    @Named("securityFrame.addReportScreenBtn")
+    protected Button addReportScreenBtn;
+
+    @Named("securityFrame.addRoleBtn")
+    protected Button addRoleBtn;
+
+    @Named("securityFrame.rolesTable")
+    protected Table rolesTable;
+
+    @Named("parametersFrame.inputParametersTable")
+    protected Table parametersTable;
+
+    @Named("formatsFrame.valuesFormatsTable")
+    Table formatsTable;
+
+    @Named("parametersFrame.up")
+    protected Button paramUpButton;
+
+    @Named("parametersFrame.down")
+    protected Button paramDownButton;
+
+    @Named("generalFrame.serviceTree")
+    protected Tree bandTree;
+
+    @Inject
+    protected WindowConfig windowConfig;
+
+    @Inject
+    protected Datasource<Report> reportDs;
+
+    @Inject
+    protected CollectionDatasource<ReportGroup, UUID> groupsDs;
+
+    @Inject
+    protected CollectionDatasource<ReportInputParameter, UUID> parametersDs;
+
+    @Inject
+    protected CollectionDatasource<ReportScreen, UUID> reportScreensDs;
+
+    @Inject
+    protected CollectionDatasource<Role, UUID> rolesDs;
+
+    @Inject
+    protected CollectionDatasource<Role, UUID> lookupRolesDs;
+
+    @Inject
+    protected CollectionDatasource<DataSet, UUID> dataSetsDs;
+
+    @Inject
+    protected HierarchicalDatasource<BandDefinition, UUID> treeDs;
+
+    @Inject
+    protected CollectionDatasource<ReportTemplate, UUID> templatesDs;
+
+    @Inject
+    protected FileStorageService fileStorageService;
+
+    @Inject
+    protected ComponentsFactory componentsFactory;
+
+    @Inject
+    private FileUploadingAPI fileUpload;
+
+    @Inject
+    private TimeSource timeSource;
+
+    @Override
+    public void setItem(Entity item) {
+        Report report = (Report) item;
+        BandDefinition rootDefinition = null;
+
+        if (PersistenceHelper.isNew(item)) {
+            report.setReportType(ReportType.SIMPLE);
+
+            rootDefinition = new BandDefinition();
+            rootDefinition.setName("Root");
+            rootDefinition.setPosition(0);
+            report.setBands(new HashSet<BandDefinition>());
+            report.getBands().add(rootDefinition);
+
+            groupsDs.refresh();
+            if (groupsDs.getItemIds() != null) {
+                UUID id = groupsDs.getItemIds().iterator().next();
+                report.setGroup((ReportGroup) groupsDs.getItem(id));
+            }
+        }
+
+        if (!StringUtils.isEmpty(report.getName())) {
+            setCaption(AppBeans.get(Messages.class).formatMessage(getClass(), "reportEditor.format", report.getName()));
+        }
+
+        super.setItem(item);
+        this.report = (Report) getItem();
+
+        if (PersistenceHelper.isNew(item))
+            rootDefinition.setReport(this.report);
+
+        ((CollectionPropertyDatasourceImpl) treeDs).setModified(false);
+        ((DatasourceImpl) reportDs).setModified(false);
+
+        bandTree.getDatasource().refresh();
+        bandTree.expandTree();
+    }
+
+    @Override
+    public void init(Map<String, Object> params) {
+        super.init(params);
+        initGeneral();
+        initTemplates();
+        initParameters();
+        initRoles();
+        initScreens();
+        initValuesFormats();
+    }
+
+    private void initParameters() {
+        final MetaClass metaClass = AppBeans.get(Metadata.class).getSession().getClass(ReportInputParameter.class);
+        final MetaPropertyPath mpp = new MetaPropertyPath(metaClass, metaClass.getProperty("position"));
+
+        parametersTable.addAction(
+                new CreateAction(parametersTable, OpenType.DIALOG) {
+                    @Override
+                    public Map<String, Object> getInitialValues() {
+                        Map<String, Object> params = new HashMap<String, Object>();
+                        params.put("position", parametersDs.getItemIds().size());
+                        params.put("report", report);
+                        return params;
+                    }
+
+                    @Override
+                    public void actionPerform(Component component) {
+                        orderParameters();
+                        super.actionPerform(component);
+                    }
+                }
+        );
+
+        parametersTable.addAction(new RemoveAction(parametersTable, false) {
+            @Override
+            protected void afterRemove(Set selected) {
+                super.afterRemove(selected);
+                orderParameters();
+            }
+        });
+        parametersTable.addAction(new EditAction(parametersTable, OpenType.DIALOG));
+
+        paramUpButton.setAction(new ItemTrackingAction("generalFrame.up") {
+            @Override
+            public void actionPerform(Component component) {
+                ReportInputParameter parameter = (ReportInputParameter) parametersDs.getItem();
+                if (parameter != null) {
+                    List<ReportInputParameter> inputParameters = report.getInputParameters();
+                    int index = parameter.getPosition();
+                    if (index > 0) {
+                        ReportInputParameter previousParameter = null;
+                        for (ReportInputParameter _param : inputParameters) {
+                            if (_param.getPosition() == index - 1) {
+                                previousParameter = _param;
+                                break;
+                            }
+                        }
+                        if (previousParameter != null) {
+                            parameter.setPosition(previousParameter.getPosition());
+                            previousParameter.setPosition(index);
+                            parametersTable.sortBy(mpp, true);
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void itemChanged(Datasource ds, Entity prevItem, Entity item) {
+                super.itemChanged(ds, prevItem, item);
+                turnEnabled(item);
+            }
+
+            @Override
+            public void valueChanged(Entity source, String property, Object prevValue, Object value) {
+                if ("position".equals(property)) {
+                    turnEnabled(parametersDs.getItem());
+                }
+            }
+
+            public void turnEnabled(Entity item) {
+                ReportInputParameter parameter = (ReportInputParameter) item;
+                setEnabled(item != null && parameter.getPosition() > 0);
+            }
+        });
+
+        paramDownButton.setAction(new ItemTrackingAction("generalFrame.down") {
+            @Override
+            public void actionPerform(Component component) {
+                ReportInputParameter parameter = parametersDs.getItem();
+                if (parameter != null) {
+                    List<ReportInputParameter> inputParameters = report.getInputParameters();
+                    int index = parameter.getPosition();
+                    if (index < parametersDs.getItemIds().size() - 1) {
+                        ReportInputParameter nextParameter = null;
+                        for (ReportInputParameter _param : inputParameters) {
+                            if (_param.getPosition() == index + 1) {
+                                nextParameter = _param;
+                                break;
+                            }
+                        }
+                        if (nextParameter != null) {
+                            parameter.setPosition(nextParameter.getPosition());
+                            nextParameter.setPosition(index);
+                            parametersTable.sortBy(mpp, true);
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void itemChanged(Datasource ds, Entity prevItem, Entity item) {
+                super.itemChanged(ds, prevItem, item);
+                turnEnabled(item);
+            }
+
+            @Override
+            public void valueChanged(Entity source, String property, Object prevValue, Object value) {
+                if ("position".equals(property)) {
+                    turnEnabled(parametersDs.getItem());
+                }
+            }
+
+            void turnEnabled(Entity item) {
+                ReportInputParameter parameter = (ReportInputParameter) item;
+                setEnabled(item != null && parameter.getPosition() < parametersDs.size() - 1);
+            }
+        }
+        );
+
+        parametersTable.addAction(paramUpButton.getAction());
+        parametersTable.addAction(paramDownButton.getAction());
+    }
+
+    private void initValuesFormats() {
+        formatsTable.addAction(
+                new CreateAction(formatsTable, OpenType.DIALOG) {
+                    @Override
+                    public Map<String, Object> getInitialValues() {
+                        return Collections.<String, Object>singletonMap("report", report);
+                    }
+                }
+        );
+        formatsTable.addAction(new RemoveAction(formatsTable, false));
+        formatsTable.addAction(new EditAction(formatsTable, OpenType.DIALOG));
+    }
+
+    private void initRoles() {
+        rolesTable.addAction(new RemoveAction(rolesTable, false));
+
+        addRoleBtn.setAction(new AbstractAction("actions.Add") {
+            @Override
+            public void actionPerform(Component component) {
+                if (lookupRolesDs.getItem() != null && !rolesDs.containsItem(lookupRolesDs.getItem().getId())) {
+                    rolesDs.addItem(lookupRolesDs.getItem());
+                }
+            }
+        });
+    }
+
+    private void initScreens() {
+        screenTable.addAction(new RemoveAction(screenTable, false));
+        List<WindowInfo> windowInfoCollection = new ArrayList<WindowInfo>(windowConfig.getWindows());
+        // sort by screenId
+        Collections.sort(windowInfoCollection, new Comparator<WindowInfo>() {
+            @Override
+            public int compare(WindowInfo w1, WindowInfo w2) {
+                int w1DollarIndex = w1.getId().indexOf("$");
+                int w2DollarIndex = w2.getId().indexOf("$");
+
+                if ((w1DollarIndex > 0 && w2DollarIndex > 0) || (w1DollarIndex < 0 && w2DollarIndex < 0)) {
+                    return w1.getId().compareTo(w2.getId());
+                } else if (w1DollarIndex > 0)
+                    return -1;
+                else
+                    return 1;
+            }
+        });
+
+        Map<String, Object> screens = new LinkedHashMap<String, Object>();
+        for (WindowInfo windowInfo : windowInfoCollection) {
+            String id = windowInfo.getId();
+            String menuId = "menu-config." + id;
+            String localeMsg = AppBeans.get(Messages.class).getMessage(AppConfig.getMessagesPack(), menuId);
+            String title = menuId.equals(localeMsg) ? id : id + " ( " + localeMsg + " )";
+            screens.put(title, id);
+        }
+        screenIdLookup.setOptionsMap(screens);
+
+        addReportScreenBtn.setAction(new AbstractAction("actions.Add") {
+            @Override
+            public void actionPerform(Component component) {
+                if (screenIdLookup.getValue() != null) {
+                    String screenId = (String) screenIdLookup.getValue();
+
+                    boolean exists = false;
+                    for (UUID id : reportScreensDs.getItemIds()) {
+                        ReportScreen item = reportScreensDs.getItem(id);
+                        if (screenId.equalsIgnoreCase(item.getScreenId())) {
+                            exists = true;
+                            break;
+                        }
+                    }
+
+                    if (!exists) {
+                        ReportScreen reportScreen = new ReportScreen();
+                        reportScreen.setReport((Report) getItem());
+                        reportScreen.setScreenId(screenId);
+                        reportScreensDs.addItem(reportScreen);
+                    }
+                }
+            }
+        });
+    }
+
+    private void initGeneral() {
+        treeDs.addListener(new DsListenerAdapter<BandDefinition>() {
+            @Override
+            public void itemChanged(Datasource<BandDefinition> ds, @Nullable BandDefinition prevItem, @Nullable BandDefinition item) {
+                bandEditor.setBandDefinition(item);
+                bandName.setEnabled(item != null);
+                bandOrientation.setEnabled(item != null);
+                parentBand.setEnabled(item != null);
+            }
+        });
+
+        bandEditor.getBandDefinitionDs().addListener(new DsListenerAdapter<BandDefinition>() {
+            @Override
+            public void valueChanged(BandDefinition source, String property, @Nullable Object prevValue, @Nullable Object value) {
+                if ("parentBandDefinition".equals(property)) {
+                    if (value == source) {
+                        source.setParentBandDefinition((BandDefinition) prevValue);
+                    } else {
+                        treeDs.refresh();
+                    }
+                }
+            }
+        });
+
+        propertiesFieldGroup.addCustomField("defaultTemplate", new FieldGroup.CustomFieldGenerator() {
+            @Override
+            public Component generateField(Datasource datasource, String propertyId) {
+                LookupPickerField lookupPickerField = componentsFactory.createComponent(LookupPickerField.NAME);
+
+                lookupPickerField.setOptionsDatasource(templatesDs);
+
+                lookupPickerField.addAction(new AbstractAction("download") {
+
+                    @Override
+                    public String getCaption() {
+                        return getMessage("report.download");
+                    }
+
+                    @Override
+                    public String getIcon() {
+                        return "icons/report-template-download.png";
+                    }
+
+                    @Override
+                    public void actionPerform(Component component) {
+                        ReportTemplate defaultTemplate = report.getDefaultTemplate();
+                        if (defaultTemplate != null) {
+                            try {
+                                ExportDisplay exportDisplay = AppConfig.createExportDisplay(ReportEditor.this);
+
+                                if (defaultTemplate.getTemplateFileDescriptor() != null) {
+                                    byte[] reportTemplate = fileStorageService.loadFile(defaultTemplate.getTemplateFileDescriptor());
+                                    exportDisplay.show(new ByteArrayDataProvider(reportTemplate), defaultTemplate.getTemplateFileDescriptor().getName(), ExportFormat.getByExtension(defaultTemplate.getTemplateFileDescriptor().getExtension()));
+                                }
+                            } catch (FileStorageException e) {
+                                throw new RuntimeException(String.format("An error occurred while downloading file from template [%s]", defaultTemplate.getCode()));
+                            }
+                        } else {
+                            showNotification(getMessage("notification.defaultTemplateIsEmpty"), NotificationType.HUMANIZED);
+                        }
+                    }
+                });
+
+                lookupPickerField.addAction(new AbstractAction("upload") {
+                    @Override
+                    public String getCaption() {
+                        return getMessage("report.upload");
+                    }
+
+                    @Override
+                    public String getIcon() {
+                        return "icons/report-template-upload.png";
+                    }
+
+                    @Override
+                    public void actionPerform(Component component) {
+                        final ReportTemplate defaultTemplate = report.getDefaultTemplate();
+                        if (defaultTemplate != null) {
+                            final FileUploadDialog dialog = openWindow("fileUploadDialog", OpenType.DIALOG);
+                            dialog.addListener(new CloseListener() {
+                                @Override
+                                public void windowClosed(String actionId) {
+                                    if (Window.COMMIT_ACTION_ID.equals(actionId)) {
+                                        File file = fileUpload.getFile(dialog.getFileId());
+                                        try {
+                                            byte[] data = FileUtils.readFileToByteArray(file);
+
+                                            FileDescriptor fileDescr = new FileDescriptor();
+                                            fileDescr.setExtension(StringUtils.substringAfterLast(dialog.getFileName(), "."));
+                                            fileDescr.setName(dialog.getFileName());
+                                            fileDescr.setSize(data.length);
+                                            fileDescr.setCreateTs(timeSource.currentTimestamp());
+                                            fileDescr.setCreateDate(timeSource.currentTimestamp());
+                                            fileStorageService.saveFile(fileDescr, data);
+
+                                            defaultTemplate.setTemplateFileDescriptor(fileDescr);
+                                            templatesDs.modifyItem(defaultTemplate);
+                                        } catch (IOException | FileStorageException e) {
+                                            throw new RuntimeException(String.format("An error occurred while uploading file for template [%s]", defaultTemplate.getCode()));
+                                        }
+                                    }
+                                }
+                            });
+                        } else {
+                            showNotification(getMessage("notification.defaultTemplateIsEmpty"), NotificationType.HUMANIZED);
+                        }
+                    }
+                });
+
+                lookupPickerField.addAction(new AbstractAction("edit") {
+                    @Override
+                    public String getIcon() {
+                        return "icons/report-template-view.png";
+                    }
+
+                    @Override
+                    public void actionPerform(Component component) {
+                        ReportTemplate defaultTemplate = report.getDefaultTemplate();
+                        if (defaultTemplate != null) {
+                            final Editor editor = openEditor("report$ReportTemplate.edit", defaultTemplate, OpenType.DIALOG, templatesDs);
+                            editor.addListener(new CloseListener() {
+                                @Override
+                                public void windowClosed(String actionId) {
+                                    if (Window.COMMIT_ACTION_ID.equals(actionId)) {
+                                        ReportTemplate item = (ReportTemplate) editor.getItem();
+                                        report.setDefaultTemplate(item);
+                                        templatesDs.modifyItem(item);
+                                    }
+                                }
+                            });
+                        } else {
+                            showNotification(getMessage("notification.defaultTemplateIsEmpty"), NotificationType.HUMANIZED);
+                        }
+                    }
+                });
+
+                return lookupPickerField;
+            }
+        });
+
+
+        ((HierarchicalPropertyDatasourceImpl) treeDs).setSortPropertyName("position");
+
+        createBandDefinitionButton.setAction(new AbstractAction("create") {
+            @Override
+            public String getCaption() {
+                return "";
+            }
+
+            @Override
+            public void actionPerform(Component component) {
+                BandDefinition parentDefinition = treeDs.getItem();
+                Report report = (Report) getItem();
+                // Use root band as parent if no items selected
+                if (parentDefinition == null) {
+                    parentDefinition = report.getRootBandDefinition();
+                }
+                if (parentDefinition.getChildrenBandDefinitions() == null) {
+                    parentDefinition.setChildrenBandDefinitions(new ArrayList<BandDefinition>());
+                }
+
+                //
+                orderBandDefinitions(parentDefinition);
+
+                BandDefinition newBandDefinition = new BandDefinition();
+                newBandDefinition.setName("new Band");
+                newBandDefinition.setOrientation(Orientation.HORIZONTAL);
+                newBandDefinition.setParentBandDefinition(parentDefinition);
+                newBandDefinition.setPosition(parentDefinition.getChildrenBandDefinitions() != null ? parentDefinition.getChildrenBandDefinitions().size() : 0);
+                newBandDefinition.setReport(report);
+                parentDefinition.getChildrenBandDefinitions().add(newBandDefinition);
+
+                treeDs.addItem(newBandDefinition);
+
+                treeDs.refresh();
+                tree.expandTree();
+            }
+        });
+
+        removeBandDefinitionButton.setAction(new RemoveAction(bandTree, false, "generalFrame.removeBandDefinition") {
+            @Override
+            public String getCaption() {
+                return "";
+            }
+
+            @Override
+            public void itemChanged(Datasource ds, Entity prevItem, Entity item) {
+                super.itemChanged(ds, prevItem, item);
+
+                if (item != null && !ObjectUtils.equals(report.getRootBandDefinition(), item)) {
+                    setEnabled(true);
+                } else {
+                    setEnabled(false);
+                }
+            }
+
+            @Override
+            protected void doRemove(Set selected, boolean autocommit) {
+
+                if (selected != null) {
+                    removeChildrenCascade(selected);
+                    for (Object object : selected) {
+                        BandDefinition definition = (BandDefinition) object;
+                        if (definition.getParentBandDefinition() != null)
+                            orderBandDefinitions(((BandDefinition) object).getParentBandDefinition());
+                    }
+                }
+            }
+
+            private void removeChildrenCascade(Collection selected) {
+                for (Object o : selected) {
+                    BandDefinition definition = (BandDefinition) o;
+                    BandDefinition parentDefinition = definition.getParentBandDefinition();
+                    if (parentDefinition != null)
+                        definition.getParentBandDefinition().getChildrenBandDefinitions().remove(definition);
+
+                    if (definition.getChildrenBandDefinitions() != null)
+                        removeChildrenCascade(new ArrayList<BandDefinition>(definition.getChildrenBandDefinitions()));
+
+                    if (definition.getDataSets() != null) {
+                        treeDs.setItem(definition);
+                        for (DataSet dataSet : new ArrayList<DataSet>(definition.getDataSets())) {
+                            if (PersistenceHelper.isNew(dataSet))
+                                dataSetsDs.removeItem(dataSet);
+                        }
+                    }
+                    treeDs.removeItem(definition);
+                }
+            }
+        });
+
+        bandUpButton.setAction(new ItemTrackingAction("generalFrame.up") {
+            @Override
+            public String getCaption() {
+                return "";
+            }
+
+            @Override
+            public void actionPerform(Component component) {
+                BandDefinition definition = (BandDefinition) treeDs.getItem();
+                if (definition != null && definition.getParentBandDefinition() != null) {
+                    BandDefinition parentDefinition = definition.getParentBandDefinition();
+                    List<BandDefinition> definitionsList = parentDefinition.getChildrenBandDefinitions();
+                    int index = definitionsList.indexOf(definition);
+                    if (index > 0) {
+                        BandDefinition previousDefinition = definitionsList.get(index - 1);
+                        definition.setPosition(definition.getPosition() - 1);
+                        previousDefinition.setPosition(previousDefinition.getPosition() + 1);
+
+                        definitionsList.set(index, previousDefinition);
+                        definitionsList.set(index - 1, definition);
+
+                        treeDs.refresh();
+                    }
+                }
+            }
+
+            @Override
+            public void valueChanged(Entity source, String property, Object prevValue, Object value) {
+                if ("position".equals(property)) {
+                    turnEnabled(treeDs.getItem());
+                }
+            }
+
+            @Override
+            public void itemChanged(Datasource ds, Entity prevItem, Entity item) {
+                super.itemChanged(ds, prevItem, item);
+                turnEnabled(item);
+            }
+
+            private void turnEnabled(Entity item) {
+                BandDefinition bandDefinition = (BandDefinition) item;
+                setEnabled(bandDefinition != null && bandDefinition.getPosition() > 0);
+            }
+        });
+
+        bandDownButton.setAction(new ItemTrackingAction("generalFrame.down") {
+            @Override
+            public String getCaption() {
+                return "";
+            }
+
+            @Override
+            public void actionPerform(Component component) {
+                BandDefinition definition = (BandDefinition) treeDs.getItem();
+                if (definition != null && definition.getParentBandDefinition() != null) {
+                    BandDefinition parentDefinition = definition.getParentBandDefinition();
+                    List<BandDefinition> definitionsList = parentDefinition.getChildrenBandDefinitions();
+                    int index = definitionsList.indexOf(definition);
+                    if (index < definitionsList.size() - 1) {
+                        BandDefinition nextDefinition = definitionsList.get(index + 1);
+                        definition.setPosition(definition.getPosition() + 1);
+                        nextDefinition.setPosition(nextDefinition.getPosition() - 1);
+
+                        definitionsList.set(index, nextDefinition);
+                        definitionsList.set(index + 1, definition);
+
+                        treeDs.refresh();
+                    }
+                }
+            }
+
+            @Override
+            public void valueChanged(Entity source, String property, Object prevValue, Object value) {
+                if ("position".equals(property))
+                    turnEnabled(treeDs.getItem());
+            }
+
+            @Override
+            public void itemChanged(Datasource ds, Entity prevItem, Entity item) {
+                super.itemChanged(ds, prevItem, item);
+                turnEnabled(item);
+            }
+
+            private void turnEnabled(Entity item) {
+                BandDefinition bandDefinition = (BandDefinition) item;
+                if (bandDefinition != null) {
+                    BandDefinition parent = bandDefinition.getParentBandDefinition();
+                    setEnabled(parent != null &&
+                            parent.getChildrenBandDefinitions() != null &&
+                            bandDefinition.getPosition() < parent.getChildrenBandDefinitions().size() - 1);
+                }
+            }
+        });
+
+        bandTree.addAction(createBandDefinitionButton.getAction());
+        bandTree.addAction(removeBandDefinitionButton.getAction());
+        bandTree.addAction(bandUpButton.getAction());
+        bandTree.addAction(bandDownButton.getAction());
+
+        saveAndRun.setAction(new AbstractAction("button.saveAndRun") {
+            @Override
+            public void actionPerform(Component component) {
+                ReportEditor.this.commit();
+                ReportEditor.this.openWindow("report$inputParameters", WindowManager.OpenType.DIALOG,
+                        Collections.<String, Object>singletonMap("report", report));
+            }
+        });
+    }
+
+    private void initTemplates() {
+        templatesTable.addAction(new CreateAction(templatesTable, OpenType.DIALOG) {
+            @Override
+            public Map<String, Object> getInitialValues() {
+                return Collections.<String, Object>singletonMap("report", report);
+            }
+
+            @Override
+            public Map<String, Object> getWindowParams() {
+                return Collections.<String, Object>singletonMap("deletedContainer", deletedFiles);
+            }
+        });
+        templatesTable.addAction(new EditAction(templatesTable, OpenType.DIALOG) {
+            @Override
+            public Map<String, Object> getWindowParams() {
+                return Collections.<String, Object>singletonMap("deletedContainer", deletedFiles);
+            }
+        });
+        templatesTable.addAction(new RemoveAction(templatesTable, false));
+
+        defaultTemplateBtn.setAction(new ItemTrackingAction("report.defaultTemplate") {
+
+            @Override
+            public void actionPerform(Component component) {
+                ReportTemplate template = templatesTable.getSingleSelected();
+                if (template != null) {
+                    template.getReport().setDefaultTemplate(template);
+                }
+            }
+        });
+
+        templatesTable.addAction(defaultTemplateBtn.getAction());
+    }
+
+    private void orderParameters() {
+        if (report.getInputParameters() == null) {
+            report.setInputParameters(new ArrayList<ReportInputParameter>());
+        }
+
+        for (int i = 0; i < report.getInputParameters().size(); i++) {
+            report.getInputParameters().get(i).setPosition(i);
+        }
+    }
+
+    private void orderBandDefinitions(BandDefinition parent) {
+        if (parent.getChildrenBandDefinitions() != null) {
+            List<BandDefinition> childrenBandDefinitions = parent.getChildrenBandDefinitions();
+            for (int i = 0, childrenBandDefinitionsSize = childrenBandDefinitions.size(); i < childrenBandDefinitionsSize; i++) {
+                BandDefinition bandDefinition = childrenBandDefinitions.get(i);
+                bandDefinition.setPosition(i);
+
+            }
+        }
+    }
+
+    @Override
+    public void commitAndClose() {
+        addCommitListeners();
+
+        if (PersistenceHelper.isNew(report)) {
+            ((CollectionPropertyDatasourceImpl) treeDs).setModified(true);
+        }
+        super.commitAndClose();
+    }
+
+    private void addCommitListeners() {
+        final DatasourceImplementation dataSets = (DatasourceImplementation) dataSetsDs;
+        final DatasourceImplementation bandDefinition = (DatasourceImplementation) bandEditor.getBandDefinitionDs();
+        dataSets.setModified(false);
+        bandDefinition.setModified(false);
+        ((DatasourceImplementation) reportDs).setModified(true);
+
+        reportDs.getDsContext().addListener(new CommitListener() {
+            @Override
+            public void beforeCommit(CommitContext context) {
+                context.getCommitInstances().addAll(dataSets.getItemsToCreate());
+                context.getCommitInstances().addAll(bandDefinition.getItemsToCreate());
+
+                context.getCommitInstances().addAll(dataSets.getItemsToUpdate());
+                context.getCommitInstances().addAll(bandDefinition.getItemsToUpdate());
+
+                context.getRemoveInstances().addAll(dataSets.getItemsToDelete());
+                context.getRemoveInstances().addAll(bandDefinition.getItemsToDelete());
+            }
+
+            @Override
+            public void afterCommit(CommitContext context, Set<Entity> result) {
+                //do nothing
+            }
+        });
+
+        getDsContext().addListener(new CommitListener() {
+            @Override
+            public void beforeCommit(CommitContext context) {
+                List<FileDescriptor> fileDescriptors = new ArrayList<FileDescriptor>();
+                // delete descriptors from db
+                // persist related file descriptors
+                for (Entity entity : context.getCommitInstances()) {
+                    if (entity instanceof ReportTemplate) {
+                        List<FileDescriptor> deletedFilesList = deletedFiles.get(entity);
+                        if (CollectionUtils.isNotEmpty(deletedFilesList)) {
+                            context.getRemoveInstances().add((Entity) deletedFilesList.get(0));
+                        }
+                        ReportTemplate template = (ReportTemplate) entity;
+                        if (template.getTemplateFileDescriptor() != null)
+                            fileDescriptors.add(template.getTemplateFileDescriptor());
+                    }
+                }
+                context.getCommitInstances().addAll(fileDescriptors);
+            }
+
+            @Override
+            public void afterCommit(CommitContext context, Set<Entity> result) {
+                for (Entity entity : context.getCommitInstances()) {
+                    if (entity instanceof ReportTemplate && result.contains(entity)) {
+                        List<FileDescriptor> deletedFilesList = deletedFiles.get(entity);
+                        if (CollectionUtils.isNotEmpty(deletedFilesList)) {
+                            for (FileDescriptor fileDescriptor : deletedFilesList) {
+                                removeQuietly(fileDescriptor);
+                            }
+                        }
+                    }
+                }
+
+                for (Entity entity : context.getRemoveInstances()) {
+                    if (entity instanceof ReportTemplate && result.contains(entity)) {
+                        List<FileDescriptor> deletedFilesList = deletedFiles.get(entity);
+                        if (CollectionUtils.isNotEmpty(deletedFilesList)) {
+                            for (FileDescriptor fileDescriptor : deletedFilesList) {
+                                removeQuietly(fileDescriptor);
+                            }
+                        }
+                        ReportTemplate template = (ReportTemplate) entity;
+                        removeQuietly(template.getTemplateFileDescriptor());
+                    }
+                }
+            }
+
+            private void removeQuietly(FileDescriptor fileDescriptor) {
+                try {
+                    fileStorageService.removeFile(fileDescriptor);
+                } catch (FileStorageException ignored) {
+                }
+            }
+        });
+    }
+
+    @Override
+    protected void postValidate(ValidationErrors errors) {
+        if (report.getRootBand() == null) {
+            errors.add(getMessage("error.rootBandNull"));
+        }
+
+        if (CollectionUtils.isNotEmpty(report.getRootBandDefinition().getChildrenBandDefinitions())) {
+            for (BandDefinition band : report.getRootBandDefinition().getChildrenBandDefinitions()) {
+                validateBand(errors, band);
+            }
+        }
+    }
+
+    private void validateBand(ValidationErrors errors, BandDefinition band) {
+        if (StringUtils.isBlank(band.getName())) {
+            errors.add(getMessage("error.bandNameNull"));
+        }
+
+        if (band.getBandOrientation() == null) {
+            errors.add(formatMessage("error.bandOrientationNull", band.getName()));
+        }
+
+        if (CollectionUtils.isNotEmpty(band.getDataSets())) {
+            for (DataSet dataSet : band.getDataSets()) {
+                if (StringUtils.isBlank(dataSet.getName())) {
+                    errors.add(getMessage("error.dataSetNameNull"));
+                }
+
+                if (dataSet.getType() == null) {
+                    errors.add(formatMessage("error.dataSetTypeNull", dataSet.getName()));
+                }
+
+                if (dataSet.getType() == DataSetType.GROOVY || dataSet.getType() == DataSetType.SQL || dataSet.getType() == DataSetType.JPQL) {
+                    if (StringUtils.isBlank(dataSet.getScript())) {
+                        errors.add(formatMessage("error.dataSetScriptNull", dataSet.getName()));
+                    }
+                }
+            }
+        }
+
+        if (CollectionUtils.isNotEmpty(band.getChildrenBandDefinitions())) {
+            for (BandDefinition child : band.getChildrenBandDefinitions()) {
+                validateBand(errors, child);
+            }
+        }
+    }
+}

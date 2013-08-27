@@ -30,6 +30,8 @@ create table REPORT_REPORT
   LOCALE_NAMES varchar(1000),
   GROUP_ID uniqueidentifier not null,
   REPORT_TYPE integer not null,
+  DEFAULT_TEMPLATE_ID uniqueidentifier,
+
   --
   primary key (ID),
   constraint FK_REPORT_REPORT_TO_REPORT_GROUP foreign key (GROUP_ID)
@@ -188,6 +190,8 @@ create table REPORT_VALUE_FORMAT (
 )^
 
 --------------------------------------------------------------------------------------------------------------
+alter table REPORT_REPORT add constraint FK_REPORT_REPORT_TO_DEF_TEMPLATE foreign key (DEFAULT_TEMPLATE_ID)
+references REPORT_TEMPLATE (ID);
 
 insert into REPORT_GROUP (ID, CREATE_TS, CREATED_BY, VERSION, TITLE, CODE, LOCALE_NAMES)
 values ('4e083530-0b9c-11e1-9b41-6bdaa41bff94', current_timestamp, 'admin', 0, 'General', 'ReportGroup.default',

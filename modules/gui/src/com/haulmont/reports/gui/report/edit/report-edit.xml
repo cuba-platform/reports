@@ -17,6 +17,7 @@
             <collectionDatasource id="rolesDs" property="roles"/>
             <collectionDatasource id="reportScreensDs" property="reportScreens"/>
             <collectionDatasource id="templatesDs" property="templates"/>
+            <collectionDatasource id="bandsDs" property="bands"/>
             <hierarchicalDatasource id="treeDs" property="bands" hierarchyProperty="parentBandDefinition">
                 <collectionDatasource id="dataSetsDs" property="dataSets"/>
             </hierarchicalDatasource>
@@ -37,15 +38,34 @@
     <layout expand="tabsheet">
         <tabSheet id="tabsheet" width="100%">
             <tab id="generalTab" caption="msg://generalTab">
-                <iframe src="/com/haulmont/reports/gui/report/edit/tabs/general.xml" id="generalFrame" width="100%" height="100%"/>
+                <iframe src="/com/haulmont/reports/gui/report/edit/tabs/general.xml" id="generalFrame" width="100%"
+                        height="100%"/>
+            </tab>
+            <tab id="parametersAndFormatsTab" caption="msg://parametersAndFormatsTab">
+                <hbox width="100%" height="100%" spacing="true" margin="false;true;true;true">
+                    <iframe src="/com/haulmont/reports/gui/report/edit/tabs/parameters.xml" id="parametersFrame"
+                            height="100%" width="100%"/>
+                    <iframe src="/com/haulmont/reports/gui/report/edit/tabs/formats.xml" id="formatsFrame" height="100%"
+                            width="100%"/>
+                </hbox>
+            </tab>
+            <tab id="templatesTab" caption="msg://templatesTab">
+                <iframe src="/com/haulmont/reports/gui/report/edit/tabs/templates.xml" id="templatesFrame" width="100%"
+                        height="100%"/>
             </tab>
             <tab id="securityTab" caption="msg://securityTab">
-                <iframe src="/com/haulmont/reports/gui/report/edit/tabs/security.xml" id="securityFrame" width="100%" height="100%"/>
+                <iframe src="/com/haulmont/reports/gui/report/edit/tabs/security.xml" id="securityFrame" width="100%"
+                        height="100%"/>
             </tab>
             <tab id="localesTab" caption="msg://localesTab">
-                <iframe src="/com/haulmont/reports/gui/report/edit/tabs/locales.xml" id="localesFrame" width="100%" height="100%"/>
+                <iframe src="/com/haulmont/reports/gui/report/edit/tabs/locales.xml" id="localesFrame" width="100%"
+                        height="100%"/>
             </tab>
         </tabSheet>
-        <iframe id="windowActions" src="/com/haulmont/cuba/gui/edit-window.actions.xml"/>
+        <hbox spacing="true" margin="true;false;false;false" height="-1px">
+            <button id="windowCommit" action="windowCommit" icon="icons/ok.png"/>
+            <button id="saveAndRun" icon="icons/ok.png"/>
+            <button id="windowClose" action="windowClose" icon="icons/cancel.png"/>
+        </hbox>
     </layout>
 </window>
