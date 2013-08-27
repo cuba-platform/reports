@@ -92,6 +92,11 @@ public class DataSet extends BaseReportEntity implements ReportQuery {
     }
 
     @Override
+    public String getLinkParameterName() {
+        return null; //todo create persistent field
+    }
+
+    @Override
     public String getScript() {
         return text;
     }
