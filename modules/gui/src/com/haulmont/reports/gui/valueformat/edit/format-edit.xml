@@ -17,16 +17,14 @@
     </dsContext>
 
     <layout expand="windowActions">
-        <vbox margin="true" stylename="edit-area">
-            <fieldGroup id="formatFields" datasource="valuesFormatsDs">
-                <column flex="1">
-                    <field id="valueName" required="true" caption="msg://valuesFormats.name" width="${width}"
-                           requiredMessage="msg://valueNameMsg"/>
-                    <field id="formatString" required="true"  caption="msg://valuesFormats.format" width="${width}"
-                           maxLength="255" custom="true" requiredMessage="msg://formatStringMsg"/>
-                </column>
-            </fieldGroup>
-        </vbox>
+        <fieldGroup id="formatFields" datasource="valuesFormatsDs">
+            <column flex="1">
+                <field id="valueName" required="true" caption="msg://valuesFormats.name" width="${width}"
+                       requiredMessage="msg://valueNameMsg"/>
+                <field id="formatString" required="true"  caption="msg://valuesFormats.format" width="${width}"
+                       maxLength="255" custom="true" requiredMessage="msg://formatStringMsg"/>
+            </column>
+        </fieldGroup>
         <iframe id="windowActions" screen="editWindowActions"/>
     </layout>
 </window>

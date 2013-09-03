@@ -41,7 +41,7 @@ public class ValueFormatEditor extends AbstractEditor {
         final FieldGroup fields = getComponent("formatFields");
 
         // Add default format strings to combobox
-        FieldGroup.Field f = fields.getField("formatString");
+        FieldGroup.FieldConfig f = fields.getField("formatString");
         fields.addCustomField(f, new FieldGroup.CustomFieldGenerator() {
             @Override
             public Component generateField(Datasource datasource, String propertyId) {
@@ -72,7 +72,6 @@ public class ValueFormatEditor extends AbstractEditor {
         optionsMap.put(caption, caption);
         formatField.setOptionsMap(optionsMap);
     }
-
 
     @Override
     public void setItem(Entity item) {
