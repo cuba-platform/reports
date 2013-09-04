@@ -119,6 +119,8 @@ public class InputParametersController extends AbstractWindow {
 
     private void createComponent(ReportInputParameter parameter, int currentGridRow) {
         Field field = fieldCreationMapping.get(parameter.getType()).createField(parameter);
+        field.setRequiredMessage(formatMessage("error.paramIsRequiredButEmpty", parameter.getLocName()));
+
         field.setId(parameter.getAlias());
         field.setWidth("250px");
         field.setFrame(this);
@@ -256,7 +258,6 @@ public class InputParametersController extends AbstractWindow {
 
             if ((linkedEntity != null) && (clazz != null) && (clazz.isAssignableFrom(linkedEntity.getClass())))
                 pickerField.setValue(linkedEntity);
-
             return pickerField;
         }
     }
@@ -264,7 +265,7 @@ public class InputParametersController extends AbstractWindow {
     private class MultiFieldCreator implements FieldCreator {
 
         @Override
-        public Field createField(ReportInputParameter parameter) {
+        public Field createField(final ReportInputParameter parameter) {
             TokenList tokenList = cFactory.createComponent(TokenList.NAME);
             final com.haulmont.chile.core.model.MetaClass entityMetaClass =
                     metadata.getSession().getClass(parameter.getEntityMetaClass());
@@ -284,10 +285,10 @@ public class InputParametersController extends AbstractWindow {
             tokenList.setLookup(true);
             tokenList.setLookupOpenMode(WindowManager.OpenType.DIALOG);
             tokenList.setHeight("150px");
-            String alias = parameter.getScreen();
+            String screen = parameter.getScreen();
 
-            if (StringUtils.isNotEmpty(alias)) {
-                tokenList.setLookupScreen(alias);
+            if (StringUtils.isNotEmpty(screen)) {
+                tokenList.setLookupScreen(screen);
                 tokenList.setLookupScreenParams(Collections.<String, Object>emptyMap());
             } else {
                 tokenList.setLookupScreen("report$commonLookup");
@@ -298,6 +299,15 @@ public class InputParametersController extends AbstractWindow {
 
             tokenList.setAddButtonCaption(messages.getMessage(TokenList.class, "actions.Select"));
             tokenList.setSimple(true);
+            tokenList.addValidator(new Field.Validator() {
+                @Override
+                public void validate(Object value) throws ValidationException {
+                    if (value instanceof Collection && CollectionUtils.isEmpty((Collection) value)) {
+                        throw new ValidationException(formatMessage("error.paramIsRequiredButEmpty", parameter.getLocName()));
+                    }
+                }
+            });
+
 
             return tokenList;
         }
