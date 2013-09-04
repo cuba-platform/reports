@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2013 Haulmont Technology Ltd. All Rights Reserved.
+ * Haulmont Technology proprietary and confidential.
+ * Use is subject to license terms.
+ */
+
 import com.haulmont.cuba.core.EntityManager
 import com.haulmont.cuba.core.Persistence
 import com.haulmont.cuba.core.Transaction
@@ -6,6 +12,7 @@ import com.haulmont.cuba.core.entity.FileDescriptor
 import com.haulmont.cuba.core.global.AppBeans
 import com.haulmont.cuba.core.global.FileStorageException
 import com.haulmont.reports.app.service.ReportService
+import com.haulmont.reports.entity.BandDefinition
 import com.haulmont.reports.entity.Report
 import com.haulmont.reports.entity.ReportTemplate
 import org.mybatis.spring.SqlSessionFactoryBean
@@ -225,12 +232,30 @@ postUpdate.add({
                 }
             }
 
+            Map<UUID, BandDefinition> map = [:]
+            for (BandDefinition band : report.bands) {
+                map.put(band.id, band)
+            }
+
+            for (BandDefinition band : report.bands) {
+                if (band.parentBandDefinition) {
+                    BandDefinition parentBand = map[band.parentBandDefinition.id]
+                    if (parentBand != null) {
+                        band.setParentBandDefinition(parentBand)
+                    }
+                }
+            }
+
+
             ReportService reportService = AppBeans.get(ReportService.NAME);
             String xml = reportService.convertToXml(report);
             report.setXml(xml);
 
             Report updatedReport = entityManager.merge(report);
         }
+
+        entityManager.flush();
+        entityManager.createNativeQuery("update report_report r set default_template_id = t.id from report_template t where r.default_template_id is null and t.report_id = r.id and t.is_default = true");
 
         tx.commit();
     } finally {

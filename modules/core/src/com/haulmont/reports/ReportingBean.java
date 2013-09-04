@@ -231,6 +231,7 @@ public class ReportingBean implements ReportingApi {
         xStream.alias("format", ReportValueFormat.class);
         xStream.aliasSystemAttribute(null, "class");
         xStream.omitField(ReportTemplate.class, "content");
+        xStream.omitField(ReportInputParameter.class, "localeName");
         xStream.omitField(Report.class, "xml");
 
         return xStream;

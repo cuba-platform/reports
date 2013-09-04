@@ -93,7 +93,7 @@ public class InputParametersController extends AbstractWindow {
     public void printReport() {
         if (report != null) {
             try {
-                validate();
+                validateAll();
                 Map<String, Object> collectedParams = collectParameters(parameterComponents);
                 ReportHelper.printReport(report, collectedParams);
             } catch (ValidationException e) {
