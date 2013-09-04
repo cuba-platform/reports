@@ -11,7 +11,10 @@ package com.haulmont.reports.core;
  * @version $Id$
  */
 public class ImportExportTest extends ReportsTestCase {
-/*
+    public void testNothing() throws Exception {
+
+    }
+    /*
     private Report report = null;
     private ReportingApi reportingApi;
     private byte[] reportExportBytes;
