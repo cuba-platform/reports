@@ -45,21 +45,6 @@ public class BandDefinitionEditor extends AbstractEditor implements Suggester {
     @Named("text")
     protected TextArea datasetScriptField;
 
-    @Named("dataSetTextLabel")
-    protected Label dataSetTextLabel;
-
-    @Named("entityParamLabel")
-    protected Label entityParamLabel;
-
-    @Named("entityParamTextBox")
-    protected TextField entityParamField;
-
-    @Named("entitiesParamLabel")
-    protected Label entitiesParamLabel;
-
-    @Named("entitiesParamTextBox")
-    protected TextField entitiesParamField;
-
     @Named("textBox")
     BoxLayout textBox;
 

@@ -8,7 +8,7 @@
                 <column>
                     <field id="name" required="true" requiredMessage="msg://report.nameMsg" width="${width}"/>
                     <field id="code" width="${width}"/>
-                    <field id="defaultTemplate" custom="true" required="true"/>
+                    <field id="defaultTemplate" custom="true" required="true" requiredMessage="msg://report.templateMsg"/>
                 </column>
                 <column>
                     <field id="reportType" required="true" requiredMessage="msg://report.reportTypeMsg"

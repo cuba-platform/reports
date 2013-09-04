@@ -22,15 +22,21 @@ import com.haulmont.cuba.gui.components.actions.ItemTrackingAction;
 import com.haulmont.cuba.gui.components.actions.RemoveAction;
 import com.haulmont.cuba.gui.config.WindowConfig;
 import com.haulmont.cuba.gui.config.WindowInfo;
-import com.haulmont.cuba.gui.data.*;
-import com.haulmont.cuba.gui.data.DsContext.CommitListener;
-import com.haulmont.cuba.gui.data.impl.*;
+import com.haulmont.cuba.gui.data.CollectionDatasource;
+import com.haulmont.cuba.gui.data.Datasource;
+import com.haulmont.cuba.gui.data.DsContext;
+import com.haulmont.cuba.gui.data.HierarchicalDatasource;
+import com.haulmont.cuba.gui.data.impl.CollectionPropertyDatasourceImpl;
+import com.haulmont.cuba.gui.data.impl.DatasourceImpl;
+import com.haulmont.cuba.gui.data.impl.DsListenerAdapter;
+import com.haulmont.cuba.gui.data.impl.HierarchicalPropertyDatasourceImpl;
 import com.haulmont.cuba.gui.export.ByteArrayDataProvider;
 import com.haulmont.cuba.gui.export.ExportDisplay;
 import com.haulmont.cuba.gui.export.ExportFormat;
 import com.haulmont.cuba.gui.upload.FileUploadingAPI;
 import com.haulmont.cuba.gui.xml.layout.ComponentsFactory;
 import com.haulmont.cuba.security.entity.Role;
+import com.haulmont.reports.app.service.ReportService;
 import com.haulmont.reports.entity.*;
 import com.haulmont.reports.gui.definition.edit.BandDefinitionEditor;
 import org.apache.commons.collections.CollectionUtils;
@@ -165,6 +171,9 @@ public class ReportEditor extends AbstractEditor {
 
     @Inject
     private TimeSource timeSource;
+
+    @Inject
+    private ReportService reportService;
 
     @Override
     public void setItem(Entity item) {
@@ -465,16 +474,9 @@ public class ReportEditor extends AbstractEditor {
                     public void actionPerform(Component component) {
                         ReportTemplate defaultTemplate = report.getDefaultTemplate();
                         if (defaultTemplate != null) {
-                            try {
-                                ExportDisplay exportDisplay = AppConfig.createExportDisplay(ReportEditor.this);
-
-                                if (defaultTemplate.getTemplateFileDescriptor() != null) {
-                                    byte[] reportTemplate = fileStorageService.loadFile(defaultTemplate.getTemplateFileDescriptor());
-                                    exportDisplay.show(new ByteArrayDataProvider(reportTemplate), defaultTemplate.getTemplateFileDescriptor().getName(), ExportFormat.getByExtension(defaultTemplate.getTemplateFileDescriptor().getExtension()));
-                                }
-                            } catch (FileStorageException e) {
-                                throw new RuntimeException(String.format("An error occurred while downloading file from template [%s]", defaultTemplate.getCode()));
-                            }
+                            ExportDisplay exportDisplay = AppConfig.createExportDisplay(ReportEditor.this);
+                            byte[] reportTemplate = defaultTemplate.getContent();
+                            exportDisplay.show(new ByteArrayDataProvider(reportTemplate), defaultTemplate.getName(), ExportFormat.getByExtension(defaultTemplate.getExt()));
                         } else {
                             showNotification(getMessage("notification.defaultTemplateIsEmpty"), NotificationType.HUMANIZED);
                         }
@@ -504,18 +506,10 @@ public class ReportEditor extends AbstractEditor {
                                         File file = fileUpload.getFile(dialog.getFileId());
                                         try {
                                             byte[] data = FileUtils.readFileToByteArray(file);
-
-                                            FileDescriptor fileDescr = new FileDescriptor();
-                                            fileDescr.setExtension(StringUtils.substringAfterLast(dialog.getFileName(), "."));
-                                            fileDescr.setName(dialog.getFileName());
-                                            fileDescr.setSize(data.length);
-                                            fileDescr.setCreateTs(timeSource.currentTimestamp());
-                                            fileDescr.setCreateDate(timeSource.currentTimestamp());
-                                            fileStorageService.saveFile(fileDescr, data);
-
-                                            defaultTemplate.setTemplateFileDescriptor(fileDescr);
+                                            defaultTemplate.setContent(data);
+                                            defaultTemplate.setName(dialog.getFileName());
                                             templatesDs.modifyItem(defaultTemplate);
-                                        } catch (IOException | FileStorageException e) {
+                                        } catch (IOException e) {
                                             throw new RuntimeException(String.format("An error occurred while uploading file for template [%s]", defaultTemplate.getCode()));
                                         }
                                     }
@@ -813,94 +807,34 @@ public class ReportEditor extends AbstractEditor {
         }
     }
 
-    @Override
-    public void commitAndClose() {
+    protected boolean preCommit() {
         addCommitListeners();
 
         if (PersistenceHelper.isNew(report)) {
             ((CollectionPropertyDatasourceImpl) treeDs).setModified(true);
         }
-        super.commitAndClose();
+
+        return true;
     }
 
     private void addCommitListeners() {
-        final DatasourceImplementation dataSets = (DatasourceImplementation) dataSetsDs;
-        final DatasourceImplementation bandDefinition = (DatasourceImplementation) bandEditor.getBandDefinitionDs();
-        dataSets.setModified(false);
-        bandDefinition.setModified(false);
-        ((DatasourceImplementation) reportDs).setModified(true);
+        String xml = reportService.convertToXml(report);
+        report.setXml(xml);
 
-        reportDs.getDsContext().addListener(new CommitListener() {
+        reportDs.getDsContext().addListener(new DsContext.CommitListener() {
             @Override
             public void beforeCommit(CommitContext context) {
-                context.getCommitInstances().addAll(dataSets.getItemsToCreate());
-                context.getCommitInstances().addAll(bandDefinition.getItemsToCreate());
-
-                context.getCommitInstances().addAll(dataSets.getItemsToUpdate());
-                context.getCommitInstances().addAll(bandDefinition.getItemsToUpdate());
-
-                context.getRemoveInstances().addAll(dataSets.getItemsToDelete());
-                context.getRemoveInstances().addAll(bandDefinition.getItemsToDelete());
+                for (Iterator<Entity> iterator = context.getCommitInstances().iterator(); iterator.hasNext(); ) {
+                    Entity entity = iterator.next();
+                    if (!(entity instanceof Report || entity instanceof ReportTemplate)) {
+                        iterator.remove();
+                    }
+                }
             }
 
             @Override
             public void afterCommit(CommitContext context, Set<Entity> result) {
-                //do nothing
-            }
-        });
 
-        getDsContext().addListener(new CommitListener() {
-            @Override
-            public void beforeCommit(CommitContext context) {
-                List<FileDescriptor> fileDescriptors = new ArrayList<FileDescriptor>();
-                // delete descriptors from db
-                // persist related file descriptors
-                for (Entity entity : context.getCommitInstances()) {
-                    if (entity instanceof ReportTemplate) {
-                        List<FileDescriptor> deletedFilesList = deletedFiles.get(entity);
-                        if (CollectionUtils.isNotEmpty(deletedFilesList)) {
-                            context.getRemoveInstances().add((Entity) deletedFilesList.get(0));
-                        }
-                        ReportTemplate template = (ReportTemplate) entity;
-                        if (template.getTemplateFileDescriptor() != null)
-                            fileDescriptors.add(template.getTemplateFileDescriptor());
-                    }
-                }
-                context.getCommitInstances().addAll(fileDescriptors);
-            }
-
-            @Override
-            public void afterCommit(CommitContext context, Set<Entity> result) {
-                for (Entity entity : context.getCommitInstances()) {
-                    if (entity instanceof ReportTemplate && result.contains(entity)) {
-                        List<FileDescriptor> deletedFilesList = deletedFiles.get(entity);
-                        if (CollectionUtils.isNotEmpty(deletedFilesList)) {
-                            for (FileDescriptor fileDescriptor : deletedFilesList) {
-                                removeQuietly(fileDescriptor);
-                            }
-                        }
-                    }
-                }
-
-                for (Entity entity : context.getRemoveInstances()) {
-                    if (entity instanceof ReportTemplate && result.contains(entity)) {
-                        List<FileDescriptor> deletedFilesList = deletedFiles.get(entity);
-                        if (CollectionUtils.isNotEmpty(deletedFilesList)) {
-                            for (FileDescriptor fileDescriptor : deletedFilesList) {
-                                removeQuietly(fileDescriptor);
-                            }
-                        }
-                        ReportTemplate template = (ReportTemplate) entity;
-                        removeQuietly(template.getTemplateFileDescriptor());
-                    }
-                }
-            }
-
-            private void removeQuietly(FileDescriptor fileDescriptor) {
-                try {
-                    fileStorageService.removeFile(fileDescriptor);
-                } catch (FileStorageException ignored) {
-                }
             }
         });
     }

@@ -5,30 +5,29 @@
  */
 package com.haulmont.reports.entity;
 
+import com.haulmont.chile.core.annotations.MetaClass;
+import com.haulmont.chile.core.annotations.MetaProperty;
+import com.haulmont.cuba.core.entity.AbstractNotPersistentEntity;
 import com.haulmont.cuba.core.entity.annotation.SystemLevel;
 import com.haulmont.yarg.structure.ReportFieldFormat;
-
-import javax.persistence.*;
 
 /**
  * @author artamonov
  * @version $Id$
  */
-@Entity(name = "report$ReportValueFormat")
-@Table(name = "REPORT_VALUE_FORMAT")
+@MetaClass(name = "report$ReportValueFormat")
 @SystemLevel
-public class ReportValueFormat extends BaseReportEntity implements ReportFieldFormat {
+public class ReportValueFormat extends AbstractNotPersistentEntity implements ReportFieldFormat {
     private static final long serialVersionUID = 680180375698449946L;
 
-    @Column(name = "NAME")
-    private String valueName;
+    @MetaProperty
+    protected String valueName;
 
-    @Column(name = "FORMAT")
-    private String formatString;
+    @MetaProperty
+    protected String formatString;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "REPORT_ID")
-    private Report report;
+    @MetaProperty
+    protected Report report;
 
     public Report getReport() {
         return report;

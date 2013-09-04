@@ -41,12 +41,6 @@ public interface ReportService {
                                        Map<String, Object> params, String fileName) throws IOException;
 
     /**
-     * @deprecated
-     */
-    @Deprecated
-    Report reloadReport(Report report);
-
-    /**
      * Exports all reports and their templates into one zip archive. Each report is exported into a separete zip
      * archive with 2 files (report.xml and a template file (for example MyReport.doc)).
      * For example:
@@ -75,4 +69,8 @@ public interface ReportService {
      * @throws FileStorageException Exception in file system
      */
     Collection<Report> importReports(byte[] zipBytes) throws IOException, FileStorageException;
+
+    String convertToXml(Report report);
+
+    Report convertToReport(String xml);
 }

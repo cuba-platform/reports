@@ -8,18 +8,22 @@ package com.haulmont.reports.gui.template.edit;
 
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.entity.FileDescriptor;
-import com.haulmont.cuba.core.global.FileStorageException;
 import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.gui.AppConfig;
 import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.data.ValueListener;
+import com.haulmont.cuba.gui.export.ByteArrayDataProvider;
 import com.haulmont.cuba.gui.export.ExportDisplay;
+import com.haulmont.cuba.gui.export.ExportFormat;
 import com.haulmont.cuba.gui.upload.FileUploadingAPI;
 import com.haulmont.reports.entity.Report;
 import com.haulmont.reports.entity.ReportTemplate;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 
 import javax.inject.Inject;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -53,7 +57,7 @@ public class TemplateEditor extends AbstractEditor {
 
     @Override
     public void setItem(Entity item) {
-        template = (ReportTemplate)item;
+        template = (ReportTemplate) item;
         if (StringUtils.isEmpty(template.getCode())) {
             Report report = template.getReport();
             if (report != null) {
@@ -68,9 +72,7 @@ public class TemplateEditor extends AbstractEditor {
         template = (ReportTemplate) getItem();
         enableCustomProps(template.getCustomFlag());
 
-        FileDescriptor templateDescriptor = template.getTemplateFileDescriptor();
-        if (templateDescriptor != null)
-            templatePath.setCaption(templateDescriptor.getName());
+        templatePath.setCaption(template.getName());
     }
 
     private void enableCustomProps(boolean customEnabled) {
@@ -111,19 +113,15 @@ public class TemplateEditor extends AbstractEditor {
 
             @Override
             public void uploadSucceeded(Event event) {
-                FileDescriptor templateDescriptor = uploadTemplate.getFileDescriptor();
-
+                template.setName(uploadTemplate.getFileName());
+                File file = fileUploading.getFile(uploadTemplate.getFileId());
                 try {
-                    fileUploading.putFileIntoStorage(uploadTemplate.getFileId(), templateDescriptor);
-                } catch (FileStorageException e) {
-                    throw new RuntimeException(e);
+                    byte[] data = FileUtils.readFileToByteArray(file);
+                    template.setContent(data);
+                } catch (IOException e) {
+                    throw new RuntimeException(String.format("An error occurred while uploading file for template [%s]", template.getCode()));
                 }
-
-                templatePath.setCaption(templateDescriptor.getName());
-
-                if (template.getTemplateFileDescriptor() != null)
-                    deletedList.add(template.getTemplateFileDescriptor());
-                template.setTemplateFileDescriptor(templateDescriptor);
+                templatePath.setCaption(uploadTemplate.getFileName());
 
                 showNotification(messages.getMessage(TemplateEditor.class,
                         "templateEditor.uploadSuccess"), IFrame.NotificationType.HUMANIZED);
@@ -140,9 +138,9 @@ public class TemplateEditor extends AbstractEditor {
         templatePath.setAction(new AbstractAction("report.template") {
             @Override
             public void actionPerform(Component component) {
-                if (template.getTemplateFileDescriptor() != null) {
+                if (template.getContent() != null) {
                     ExportDisplay display = AppConfig.createExportDisplay(TemplateEditor.this);
-                    display.show(template.getTemplateFileDescriptor());
+                    display.show(new ByteArrayDataProvider(template.getContent()), template.getName(), ExportFormat.getByExtension(template.getExt()));
                 }
             }
         });
@@ -175,7 +173,7 @@ public class TemplateEditor extends AbstractEditor {
     }
 
     private boolean validateTemplateFile() {
-        if (template.getTemplateFileDescriptor() == null)  {
+        if (template.getContent() == null) {
             showNotification(getMessage("validationFail.caption"),
                     getMessage("template.uploadTemplate"), NotificationType.TRAY);
             return false;

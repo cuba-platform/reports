@@ -4,7 +4,7 @@
  * Use is subject to license terms.
  */
 
-package com.haulmont.reports.gui;
+package com.haulmont.reports.gui.datasource;
 
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.gui.data.impl.DatasourceImpl;

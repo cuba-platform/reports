@@ -31,10 +31,6 @@ public interface ReportingApi {
 
     ReportOutputDocument createReport(Report report, ReportTemplate template, Map<String, Object> params) throws IOException;
 
-    Report reloadReport(Report report) ;
-
-    byte[] exportReports(Collection<Report> reports) throws IOException, FileStorageException;
-
     FileDescriptor createAndSaveReport(Report report,
                                               Map<String, Object> params, String fileName) throws IOException;
 
@@ -44,5 +40,11 @@ public interface ReportingApi {
     FileDescriptor createAndSaveReport(Report report, ReportTemplate template,
                                               Map<String, Object> params, String fileName) throws IOException;
 
+    byte[] exportReports(Collection<Report> reports) throws IOException, FileStorageException;
+
     Collection<Report> importReports(byte[] zipBytes) throws IOException, FileStorageException;
+
+    String convertToXml(Report report);
+
+    Report convertToReport(String xml);
 }

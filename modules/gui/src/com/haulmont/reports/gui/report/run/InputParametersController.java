@@ -77,13 +77,14 @@ public class InputParametersController extends AbstractWindow {
 
         if (report != null) {
             report = getDsContext().getDataSupplier().reload(report, "report.edit");
-            if (CollectionUtils.isNotEmpty(report.getInputParameters()))
+            if (CollectionUtils.isNotEmpty(report.getInputParameters())) {
                 parametersGrid.setRows(report.getInputParameters().size());
 
-            int currentGridRow = 0;
-            for (ReportInputParameter parameter : report.getInputParameters()) {
-                createComponent(parameter, currentGridRow);
-                currentGridRow++;
+                int currentGridRow = 0;
+                for (ReportInputParameter parameter : report.getInputParameters()) {
+                    createComponent(parameter, currentGridRow);
+                    currentGridRow++;
+                }
             }
         }
     }

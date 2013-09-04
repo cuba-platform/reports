@@ -11,11 +11,10 @@
                     <button id="defaultTemplateBtn" icon="icons/ok.png"/>
                 </buttonsPanel>
                 <columns>
+                    <column id="name"/>
                     <column id="code"/>
-                    <column id="templateFileDescriptor"/>
                     <column id="reportOutputType"/>
                     <column id="customClass"/>
-                    <column id="defaultFlag"/>
                 </columns>
                 <rows datasource="templatesDs"/>
             </table>

@@ -5,27 +5,26 @@
  */
 package com.haulmont.reports.entity;
 
+import com.haulmont.chile.core.annotations.MetaClass;
+import com.haulmont.chile.core.annotations.MetaProperty;
+import com.haulmont.cuba.core.entity.AbstractNotPersistentEntity;
 import com.haulmont.cuba.core.entity.annotation.SystemLevel;
-
-import javax.persistence.*;
 
 /**
  * @author fontanenko
  * @version $Id$
  */
-@Entity(name = "report$ReportScreen")
-@Table(name = "REPORT_REPORT_SCREEN")
+@MetaClass(name = "report$ReportScreen")
 @SystemLevel
-public class ReportScreen extends BaseReportEntity {
+public class ReportScreen extends AbstractNotPersistentEntity {
 
     private static final long serialVersionUID = -7416940515333599470L;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "REPORT_ID")
-    private Report report;
+    @MetaProperty
+    protected Report report;
 
-    @Column(name="SCREEN_ID")
-    private String screenId;
+    @MetaProperty
+    protected String screenId;
 
     public Report getReport() {
         return report;

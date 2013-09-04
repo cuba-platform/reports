@@ -5,52 +5,48 @@
  */
 package com.haulmont.reports.entity;
 
-import com.haulmont.chile.core.annotations.Composition;
+import com.haulmont.chile.core.annotations.MetaClass;
+import com.haulmont.chile.core.annotations.MetaProperty;
 import com.haulmont.chile.core.annotations.NamePattern;
+import com.haulmont.cuba.core.entity.AbstractNotPersistentEntity;
 import com.haulmont.cuba.core.entity.annotation.SystemLevel;
 import com.haulmont.yarg.structure.ReportBand;
 import com.haulmont.yarg.structure.ReportQuery;
 import com.haulmont.yarg.structure.impl.BandOrientation;
 
-import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author degtyarjov
  * @version $Id$
  */
-@Entity(name = "report$BandDefinition")
-@Table(name = "REPORT_BAND_DEFINITION")
+@MetaClass(name = "report$BandDefinition")
 @NamePattern("%s|name")
 @SystemLevel
-public class BandDefinition extends BaseReportEntity implements ReportBand {
+public class BandDefinition extends AbstractNotPersistentEntity implements ReportBand {
     private static final long serialVersionUID = 8658220979738705511L;
 
-    @Column(name = "NAME")
-    private String name;
+    @MetaProperty
+    protected String name;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "PARENT_DEFINITION_ID")
-    private BandDefinition parentBandDefinition;
+    @MetaProperty
+    protected BandDefinition parentBandDefinition;
 
-    @ManyToOne
-    @JoinColumn(name = "REPORT_ID")
-    private Report report;
+    @MetaProperty
+    protected Report report;
 
-    @OneToMany(mappedBy = "parentBandDefinition")
-    @Composition
-    @OrderBy("position")
-    private List<BandDefinition> childrenBandDefinitions;
+    @MetaProperty
+    protected List<BandDefinition> childrenBandDefinitions = new ArrayList<>();
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "bandDefinition")
-    @Composition
-    private List<DataSet> dataSets;
+    @MetaProperty
+    protected List<DataSet> dataSets = new ArrayList<>();
 
-    @Column(name = "ORIENTATION")
-    private Integer orientation;
+    @MetaProperty
+    protected Integer orientation;
 
-    @Column(name = "POSITION_")
-    private Integer position;
+    @MetaProperty
+    protected Integer position;
 
     public BandDefinition getParentBandDefinition() {
         return parentBandDefinition;

@@ -6,28 +6,12 @@
 
 package com.haulmont.reports.core;
 
-import com.haulmont.cuba.core.EntityManager;
-import com.haulmont.cuba.core.Transaction;
-import com.haulmont.cuba.core.app.FileStorageAPI;
-import com.haulmont.cuba.core.entity.FileDescriptor;
-import com.haulmont.cuba.core.global.AppBeans;
-import com.haulmont.cuba.core.global.FileStorageException;
-import com.haulmont.cuba.core.global.View;
-import com.haulmont.reports.ReportingApi;
-import com.haulmont.reports.entity.*;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-
 /**
  * @author artamonov
  * @version $Id$
  */
 public class ImportExportTest extends ReportsTestCase {
-
+/*
     private Report report = null;
     private ReportingApi reportingApi;
     private byte[] reportExportBytes;
@@ -37,7 +21,7 @@ public class ImportExportTest extends ReportsTestCase {
         super.setUp();
         reportingApi = AppBeans.get(ReportingApi.NAME);
 
-        View exportView = metadata.getViewRepository().getView(Report.class, "report.export");
+        View exportView = metadata.getViewRepository().getView(Report.class, "report.edit");
 
         Transaction tx = persistence.createTransaction();
 
@@ -97,18 +81,8 @@ public class ImportExportTest extends ReportsTestCase {
 
         String templateContent = "<html></html>";
 
-        FileDescriptor fileDescriptor = new FileDescriptor();
-        fileDescriptor.setExtension("htm");
-        fileDescriptor.setName("testTemplate");
-        fileDescriptor.setSize(templateContent.length());
-        fileDescriptor.setCreateDate(new Date());
-
-        FileStorageAPI fsApi = AppBeans.get(FileStorageAPI.NAME);
-        fsApi.saveFile(fileDescriptor, templateContent.getBytes());
-
-        em.persist(fileDescriptor);
-
-        template.setTemplateFileDescriptor(fileDescriptor);
+        template.setContent(templateContent.getBytes());
+        template.setName("testTemplate.html");
         template.setCustomFlag(false);
 
         em.persist(template);
@@ -196,5 +170,5 @@ public class ImportExportTest extends ReportsTestCase {
             deleteRecord("REPORT_REPORT", report.getId());
 
         super.tearDown();
-    }
+    }*/
 }

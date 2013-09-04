@@ -8,6 +8,7 @@ package com.haulmont.reports.entity;
 import com.haulmont.chile.core.annotations.Composition;
 import com.haulmont.chile.core.annotations.MetaProperty;
 import com.haulmont.chile.core.annotations.NamePattern;
+import com.haulmont.cuba.core.entity.annotation.Listeners;
 import com.haulmont.cuba.security.entity.Role;
 import com.haulmont.yarg.structure.ReportBand;
 import com.haulmont.yarg.structure.ReportFieldFormat;
@@ -19,69 +20,71 @@ import javax.persistence.*;
 import java.util.*;
 
 /**
+ * <Attention>This entity should be detached for correct work. If you do not detach it please use logic as in com.haulmont.reports.listener.ReportDetachListener#onBeforeDetach(com.haulmont.reports.entity.Report, com.haulmont.cuba.core.EntityManager)</Attention>
+ *
  * @author degtyarjov
  * @version $Id$
  */
 @Entity(name = "report$Report")
 @Table(name = "REPORT_REPORT")
 @NamePattern("%s|locName")
+@Listeners("com.haulmont.reports.listener.ReportDetachListener")
 @SuppressWarnings("unused")
 public class Report extends BaseReportEntity implements com.haulmont.yarg.structure.Report {
     private static final long serialVersionUID = -2817764915661205093L;
 
     @Column(name = "NAME")
-    private String name;
+    protected String name;
 
     @Column(name = "LOCALE_NAMES")
-    private String localeNames;
+    protected String localeNames;
 
     @Column(name = "CODE")
-    private String code;
+    protected String code;
 
     @ManyToOne
     @JoinColumn(name = "GROUP_ID")
-    private ReportGroup group;
+    protected ReportGroup group;
 
     @OneToOne
     @JoinColumn(name = "DEFAULT_TEMPLATE_ID")
-    private ReportTemplate defaultTemplate;
+    protected ReportTemplate defaultTemplate;
 
     @Column(name = "REPORT_TYPE")
-    private Integer reportType;
+    protected Integer reportType;
+
+    @Column(name = "XML")
+    protected String xml;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "report")
+    @Composition
+    protected List<ReportTemplate> templates;
 
     @Transient
-    private String localeName;
+    protected String localeName;
 
     @Transient
-    private BandDefinition rootBandDefinition;
+    protected BandDefinition rootBandDefinition;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "report")
-    @Composition
-    private Set<BandDefinition> bands;
+    @Transient
+    @MetaProperty
+    protected Set<BandDefinition> bands = new HashSet<>();
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "report")
-    @Composition
-    private List<ReportTemplate> templates;
+    @Transient
+    @MetaProperty
+    protected List<ReportInputParameter> inputParameters = new ArrayList<>();
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "report")
-    @Composition
-    @OrderBy("position")
-    private List<ReportInputParameter> inputParameters;
+    @Transient
+    @MetaProperty
+    protected List<ReportValueFormat> valuesFormats = new ArrayList<>();
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "report")
-    @Composition
-    private List<ReportValueFormat> valuesFormats;
+    @Transient
+    @MetaProperty
+    protected List<ReportScreen> reportScreens = new ArrayList<>();
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "report")
-    @Composition
-    private List<ReportScreen> reportScreens;
-
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "REPORT_REPORTS_ROLES",
-            inverseJoinColumns = @JoinColumn(name = "ROLE_ID", referencedColumnName = "ID"),
-            joinColumns = @JoinColumn(name = "REPORT_ID", referencedColumnName = "ID")
-    )
-    private Set<Role> roles;
+    @Transient
+    @MetaProperty
+    protected Set<Role> roles = new HashSet<>();
 
     @MetaProperty
     public BandDefinition getRootBandDefinition() {
@@ -110,6 +113,7 @@ public class Report extends BaseReportEntity implements com.haulmont.yarg.struct
     }
 
     public void setInputParameters(List<ReportInputParameter> inputParameters) {
+        if (inputParameters == null) inputParameters = Collections.emptyList();
         this.inputParameters = inputParameters;
     }
 
@@ -118,6 +122,7 @@ public class Report extends BaseReportEntity implements com.haulmont.yarg.struct
     }
 
     public void setValuesFormats(List<ReportValueFormat> valuesFormats) {
+        if (valuesFormats == null) valuesFormats = Collections.emptyList();
         this.valuesFormats = valuesFormats;
     }
 
@@ -134,6 +139,7 @@ public class Report extends BaseReportEntity implements com.haulmont.yarg.struct
     }
 
     public void setRoles(Set<Role> roles) {
+        if (roles == null) roles = Collections.emptySet();
         this.roles = roles;
     }
 
@@ -142,6 +148,7 @@ public class Report extends BaseReportEntity implements com.haulmont.yarg.struct
     }
 
     public void setReportScreens(List<ReportScreen> reportScreens) {
+        if (reportScreens == null) reportScreens = Collections.emptyList();
         this.reportScreens = reportScreens;
     }
 
@@ -152,30 +159,6 @@ public class Report extends BaseReportEntity implements com.haulmont.yarg.struct
     public void setTemplates(List<ReportTemplate> templates) {
         this.templates = templates;
     }
-
-//    /**
-//     * Get default template for report
-//     *
-//     * @return Template
-//     */
-//    @MetaProperty
-//    public ReportTemplate getDefaultTemplate() {
-//        ReportTemplate template = null;
-//        if (templates != null) {
-//            if (templates.size() == 1)
-//                template = templates.get(0);
-//            else {
-//                Iterator<ReportTemplate> iter = templates.iterator();
-//                while (iter.hasNext() && template == null) {
-//                    ReportTemplate temp = iter.next();
-//                    if (temp.getDefaultFlag())
-//                        template = temp;
-//                }
-//            }
-//        }
-//        return template;
-//    }
-
 
     public ReportTemplate getDefaultTemplate() {
         return defaultTemplate;
@@ -212,6 +195,7 @@ public class Report extends BaseReportEntity implements com.haulmont.yarg.struct
     }
 
     public void setBands(Set<BandDefinition> bands) {
+        if (bands == null) bands = Collections.emptySet();
         this.bands = bands;
     }
 
@@ -229,6 +213,14 @@ public class Report extends BaseReportEntity implements com.haulmont.yarg.struct
 
     public void setCode(String code) {
         this.code = code;
+    }
+
+    public String getXml() {
+        return xml;
+    }
+
+    public void setXml(String xml) {
+        this.xml = xml;
     }
 
     @MetaProperty

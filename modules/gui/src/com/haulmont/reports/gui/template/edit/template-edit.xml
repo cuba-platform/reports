@@ -18,7 +18,7 @@
                 id="templateDs"
                 class="com.haulmont.reports.entity.ReportTemplate"
                 view="template.edit"
-                datasourceClass="com.haulmont.reports.gui.NotPersistenceDatasource"/>
+                datasourceClass="com.haulmont.reports.gui.datasource.NotPersistenceDatasource"/>
     </dsContext>
     <#assign width = 300>
     <layout expand="windowActions">
@@ -35,6 +35,11 @@
                         <textField id="code" datasource="templateDs" property="code"
                                    width="${width}" required="true"
                                    requiredMessage="msg://template.codeMsg"/>
+                    </row>
+                    <row>
+                        <label value="msg://template.name"/>
+                        <textField id="name" datasource="templateDs" property="name"
+                                   width="${width}" enable="false"/>
                     </row>
                     <row>
                         <label value="msg://template.outputType"/>

@@ -49,6 +49,9 @@
                         <label id="dataSetTextLabel" value="msg://dataSet.text"/>
                         <textArea id="text" datasource="dataSetsDs" property="text" rows="25"
                                   width="100%"/>
+                        <label value="msg://dataSet.linkParameterName"/>
+                        <textField id="linkParameterName" width="${width}"
+                                   datasource="dataSetsDs" property="linkParameterName"/>
                     </vbox>
                     <vbox id="entityBox">
                         <label id="entityParamLabel" value="msg://dataSet.entityParamName"/>

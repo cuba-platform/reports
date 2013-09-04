@@ -43,16 +43,6 @@ public class ReportServiceBean implements ReportService {
     }
 
     @Override
-    public Report reloadReport(Report report) {
-        return reportingApi.reloadReport(report);
-    }
-
-    @Override
-    public byte[] exportReports(Collection<Report> reports) throws IOException, FileStorageException {
-        return reportingApi.exportReports(reports);
-    }
-
-    @Override
     public FileDescriptor createAndSaveReport(Report report,
                                               Map<String, Object> params, String fileName) throws IOException {
         return reportingApi.createAndSaveReport(report, params, fileName);
@@ -71,7 +61,20 @@ public class ReportServiceBean implements ReportService {
     }
 
     @Override
+    public byte[] exportReports(Collection<Report> reports) throws IOException, FileStorageException {
+        return reportingApi.exportReports(reports);
+    }
+
+    @Override
     public Collection<Report> importReports(byte[] zipBytes) throws IOException, FileStorageException {
         return reportingApi.importReports(zipBytes);
+    }
+
+    public String convertToXml(Report report) {
+        return reportingApi.convertToXml(report);
+    }
+
+    public Report convertToReport(String xml) {
+        return reportingApi.convertToReport(xml);
     }
 }

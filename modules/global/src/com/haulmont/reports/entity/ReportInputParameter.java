@@ -5,58 +5,58 @@
  */
 package com.haulmont.reports.entity;
 
+import com.haulmont.chile.core.annotations.MetaClass;
 import com.haulmont.chile.core.annotations.MetaProperty;
 import com.haulmont.chile.core.annotations.NamePattern;
+import com.haulmont.cuba.core.entity.AbstractNotPersistentEntity;
 import com.haulmont.cuba.core.entity.annotation.SystemLevel;
 import com.haulmont.yarg.structure.ReportParameter;
 
-import javax.persistence.*;
+import javax.persistence.Transient;
 
 /**
  * @author degtyarjov
  * @version $Id$
  */
-@Entity(name = "report$ReportInputParameter")
-@Table(name = "REPORT_INPUT_PARAMETER")
+@MetaClass(name = "report$ReportInputParameter")
 @SystemLevel
 @NamePattern("%s|locName")
 @SuppressWarnings("unused")
-public class ReportInputParameter extends BaseReportEntity implements ReportParameter {
+public class ReportInputParameter extends AbstractNotPersistentEntity implements ReportParameter {
     private static final long serialVersionUID = 6231014880104406246L;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "REPORT_ID")
-    private Report report;
+    @MetaProperty
+    protected Report report;
 
-    @Column(name = "PARAMETER_TYPE")
-    private Integer type;
+    @MetaProperty
+    protected Integer type;
 
-    @Column(name = "NAME")
-    private String name;
+    @MetaProperty
+    protected String name;
 
-    @Column(name = "LOCALE_NAMES")
-    private String localeNames;
+    @MetaProperty
+    protected String localeNames;
+
+    @MetaProperty
+    protected String alias;
+
+    @MetaProperty
+    protected Integer position;
+
+    @MetaProperty
+    protected String entityMetaClass;
+
+    @MetaProperty
+    protected String enumerationClass;
+
+    @MetaProperty
+    protected String screen;
+
+    @MetaProperty
+    protected Boolean required = false;
 
     @Transient
-    private String localeName;
-
-    @Column(name = "ALIAS")
-    private String alias;
-
-    @Column(name = "POSITION_")
-    private Integer position;
-
-    @Column(name = "META_CLASS")
-    private String entityMetaClass;
-
-    @Column(name = "ENUM_CLASS")
-    private String enumerationClass;
-
-    @Column(name = "SCREEN")
-    private String screen;
-
-    @Column(name = "REQUIRED")
-    private Boolean required = false;
+    protected String localeName;
 
     public Report getReport() {
         return report;

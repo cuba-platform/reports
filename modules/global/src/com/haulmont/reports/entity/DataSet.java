@@ -5,10 +5,12 @@
  */
 package com.haulmont.reports.entity;
 
+import com.haulmont.chile.core.annotations.MetaClass;
+import com.haulmont.chile.core.annotations.MetaProperty;
+import com.haulmont.cuba.core.entity.AbstractNotPersistentEntity;
 import com.haulmont.cuba.core.entity.annotation.SystemLevel;
 import com.haulmont.yarg.structure.ReportQuery;
 
-import javax.persistence.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,32 +18,33 @@ import java.util.Map;
  * @author degtyarjov
  * @version $id$
  */
-@Entity(name = "report$DataSet")
-@Table(name = "REPORT_DATA_SET")
+@MetaClass(name = "report$DataSet")
 @SystemLevel
-public class DataSet extends BaseReportEntity implements ReportQuery {
+public class DataSet extends AbstractNotPersistentEntity implements ReportQuery{
     private static final long serialVersionUID = -3706206933129963303L;
     public static final String ENTITY_PARAM_NAME = "entityParamName";
     public static final String LIST_ENTITIES_PARAM_NAME = "listEntitiesParamName";
 
-    @Column(name = "NAME")
-    private String name;
+    @MetaProperty
+    protected String name;
 
-    @Column(name = "TEXT", length = 0)
-    private String text;
+    @MetaProperty
+    protected String text;
 
-    @Column(name = "DATA_SET_TYPE")
-    private Integer type;
+    @MetaProperty
+    protected Integer type;
 
-    @Column(name = "ENTITY_PARAM_NAME")
-    private String entityParamName;
+    @MetaProperty
+    protected String entityParamName;
 
-    @Column(name = "LIST_ENTITIES_PARAM_NAME")
-    private String listEntitiesParamName;
+    @MetaProperty
+    protected String listEntitiesParamName;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "BAND_DEFINITION")
-    private BandDefinition bandDefinition;
+    @MetaProperty
+    protected BandDefinition bandDefinition;
+
+    @MetaProperty
+    protected String linkParameterName;
 
     public String getName() {
         return name;
@@ -91,9 +94,13 @@ public class DataSet extends BaseReportEntity implements ReportQuery {
         this.bandDefinition = bandDefinition;
     }
 
+    public void setLinkParameterName(String linkParameterName) {
+        this.linkParameterName = linkParameterName;
+    }
+
     @Override
     public String getLinkParameterName() {
-        return null; //todo create persistent field
+        return linkParameterName;
     }
 
     @Override

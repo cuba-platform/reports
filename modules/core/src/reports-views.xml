@@ -15,8 +15,7 @@
     </view>
 
     <view entity="report$ReportTemplate" name="template.edit" extends="_local">
-        <property name="report" view="_minimal" lazy="true"/>
-        <property name="templateFileDescriptor" view="_local"/>
+        <property name="report" view="_minimal"/>
     </view>
 
     <view entity="report$ReportInputParameter" name="report.edit" extends="_local">
@@ -32,45 +31,12 @@
     </view>
 
     <view entity="report$Report" name="report.edit" extends="_local">
-        <property name="inputParameters" view="_local"/>
-        <property name="valuesFormats" view="_local"/>
-        <property name="roles" view="_local"/>
-        <property name="reportScreens" view="_local"/>
         <property name="templates" view="template.edit"/>
         <property name="defaultTemplate" view="template.edit"/>
         <property name="group" view="_minimal"/>
-        <property name="bands" view="report.edit"/>
     </view>
 
     <view entity="report$Report" name="report.view" extends="_local">
         <property name="group" view="_local"/>
     </view>
-
-    <!--export-->
-
-    <view entity="report$ReportTemplate" name="report.export" extends="_local">
-        <property name="templateFileDescriptor" view="_local"/>
-    </view>
-
-    <view entity="report$DataSet" name="report.export" extends="_local">
-        <property name="bandDefinition" view="_minimal"/>
-    </view>
-
-    <view entity="report$BandDefinition" name="report.export" extends="_local">
-        <property name="parentBandDefinition" view="_minimal"/>
-        <property name="childrenBandDefinitions" view="_local"/>
-        <property name="dataSets" view="report.export"/>
-        <property name="report" view="_minimal"/>
-    </view>
-
-    <view entity="report$Report" name="report.export" extends="_local">
-        <property name="inputParameters" view="_local"/>
-        <property name="valuesFormats" view="_local"/>
-        <property name="roles" view="_local"/>
-        <property name="reportScreens" view="_local"/>
-        <property name="templates" view="report.export"/>
-        <property name="group" view="_minimal"/>
-        <property name="bands" view="report.export"/>
-    </view>
-
 </views>
