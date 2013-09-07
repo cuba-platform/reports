@@ -467,7 +467,7 @@ public class ReportEditor extends AbstractEditor {
 
                     @Override
                     public String getIcon() {
-                        return "icons/report-template-download.png";
+                        return "icons/reports-template-download.png";
                     }
 
                     @Override
@@ -491,7 +491,7 @@ public class ReportEditor extends AbstractEditor {
 
                     @Override
                     public String getIcon() {
-                        return "icons/report-template-upload.png";
+                        return "icons/reports-template-upload.png";
                     }
 
                     @Override
@@ -524,7 +524,7 @@ public class ReportEditor extends AbstractEditor {
                 lookupPickerField.addAction(new AbstractAction("edit") {
                     @Override
                     public String getIcon() {
-                        return "icons/report-template-view.png";
+                        return "icons/reports-template-view.png";
                     }
 
                     @Override
