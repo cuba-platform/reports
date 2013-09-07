@@ -6,7 +6,6 @@
         messagesPack="com.haulmont.reports.gui"
         focusComponent="name"
         >
-    <assign name="width" value="250"/>
 
     <dsContext>
         <datasource
@@ -16,55 +15,57 @@
         </datasource>
     </dsContext>
 
-    <layout expand="box">
+    <assign name="width" value="250"/>
 
-        <vbox id="box" margin="true" stylename="edit-area" spacing="true" expand="split" width="100%">
+    <layout expand="split">
+        <hbox spacing="true">
+            <label value="msg://definition.name"/>
+            <textField id="name" datasource="bandDefinitionDs" property="name" enable="false" width="${width}"
+                       required="true"/>
+            <label value="msg://definition.orientation"/>
+            <lookupField id="orientation" datasource="bandDefinitionDs" property="orientation" enable="false"
+                         width="${width}" required="true"/>
+            <label value="msg://definition.parentBand"/>
+            <lookupField id="parentBand" datasource="bandDefinitionDs" optionsDatasource="bandsDs"
+                         property="parentBandDefinition" enable="false" width="${width}"/>
+        </hbox>
 
-            <hbox spacing="true">
-                <label value="msg://definition.name"/>
-                <textField id="name" datasource="bandDefinitionDs" property="name" enable="false" width="${width}" required="true"/>
-                <label value="msg://definition.orientation"/>
-                <lookupField id="orientation" datasource="bandDefinitionDs" property="orientation" enable="false" width="${width}" required="true"/>
-                <label value="msg://definition.parentBand"/>
-                <lookupField id="parentBand" datasource="bandDefinitionDs" optionsDatasource="bandsDs" property="parentBandDefinition" enable="false" width="${width}"/>
-            </hbox>
-
-            <split id="split" orientation="horizontal" pos="40" width="100%">
-                <vbox margin="false;true;false;false" width="100%" height="100%">
-                    <table id="dataSets" editable="true" width="100%" height="100%" columnControlVisible="false" reorderingAllowed="false" presentations="false">
-                        <buttonsPanel>
-                            <button action="dataSets.create" icon="icons/plus-btn.png"/>
-                            <button action="dataSets.remove" icon="icons/remove.png"/>
-                        </buttonsPanel>
-                        <columns>
-                            <column id="name" caption="msg://dataSet.name" editable="true"/>
-                            <column id="type" caption="msg://dataSet.type" editable="true"/>
-                        </columns>
-                        <rows datasource="dataSetsDs"/>
-                    </table>
+        <split id="split" orientation="horizontal" pos="40" width="100%">
+            <vbox margin="false;true;false;false" width="100%" height="100%">
+                <table id="dataSets" editable="true" width="100%" height="100%" columnControlVisible="false"
+                       reorderingAllowed="false" presentations="false">
+                    <buttonsPanel>
+                        <button action="dataSets.create" icon="icons/plus-btn.png"/>
+                        <button action="dataSets.remove" icon="icons/remove.png"/>
+                    </buttonsPanel>
+                    <columns>
+                        <column id="name" caption="msg://dataSet.name" editable="true"/>
+                        <column id="type" caption="msg://dataSet.type" editable="true"/>
+                    </columns>
+                    <rows datasource="dataSetsDs"/>
+                </table>
+            </vbox>
+            <!-- Split -->
+            <vbox margin="false;false;false;true" expand="textBox" spacing="true" width="100%" height="100%">
+                <vbox id="textBox">
+                    <label id="dataSetTextLabel" value="msg://dataSet.text"/>
+                    <textArea id="text" datasource="dataSetsDs" property="text" rows="25"
+                              width="100%"/>
+                    <label value="msg://dataSet.linkParameterName"/>
+                    <textField id="linkParameterName" width="${width}"
+                               datasource="dataSetsDs" property="linkParameterName"/>
                 </vbox>
-                <!-- Split -->
-                <vbox margin="false;false;false;true" expand="text" spacing="true" width="100%" height="100%">
-                    <vbox id="textBox">
-                        <label id="dataSetTextLabel" value="msg://dataSet.text"/>
-                        <textArea id="text" datasource="dataSetsDs" property="text" rows="25"
-                                  width="100%"/>
-                        <label value="msg://dataSet.linkParameterName"/>
-                        <textField id="linkParameterName" width="${width}"
-                                   datasource="dataSetsDs" property="linkParameterName"/>
-                    </vbox>
-                    <vbox id="entityBox">
-                        <label id="entityParamLabel" value="msg://dataSet.entityParamName"/>
-                        <textField id="entityParamTextBox" width="${width}"
-                                   datasource="dataSetsDs" property="entityParamName"/>
-                    </vbox>
-                    <vbox id="entitiesBox">
-                        <label id="entitiesParamLabel" value="msg://dataSet.entitiesParamName"/>
-                        <textField id="entitiesParamTextBox" width="${width}"
-                                   datasource="dataSetsDs" property="listEntitiesParamName"/>
-                    </vbox>
+                <vbox id="entityBox">
+                    <label id="entityParamLabel" value="msg://dataSet.entityParamName"/>
+                    <textField id="entityParamTextBox" width="${width}"
+                               datasource="dataSetsDs" property="entityParamName"/>
                 </vbox>
-            </split>
-        </vbox>
+                <vbox id="entitiesBox">
+                    <label id="entitiesParamLabel" value="msg://dataSet.entitiesParamName"/>
+                    <textField id="entitiesParamTextBox" width="${width}"
+                               datasource="dataSetsDs" property="listEntitiesParamName"/>
+                </vbox>
+            </vbox>
+        </split>
     </layout>
 </window>

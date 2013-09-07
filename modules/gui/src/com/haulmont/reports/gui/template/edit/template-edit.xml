@@ -20,59 +20,59 @@
                 view="template.edit"
                 datasourceClass="com.haulmont.reports.gui.datasource.NotPersistenceDatasource"/>
     </dsContext>
-    <#assign width = 300>
+
+    <assign name="width" value="300px"/>
+
     <layout expand="windowActions">
-        <vbox margin="true" stylename="edit-area">
-            <grid spacing="true" expandable="false">
-                <columns>
-                    <column flex="1"/>
-                    <column flex="1"/>
-                    <column flex="1"/>
-                </columns>
-                <rows>
-                    <row>
-                        <label value="msg://template.code"/>
-                        <textField id="code" datasource="templateDs" property="code"
-                                   width="${width}" required="true"
-                                   requiredMessage="msg://template.codeMsg"/>
-                    </row>
-                    <row>
-                        <label value="msg://template.name"/>
-                        <textField id="name" datasource="templateDs" property="name"
-                                   width="${width}" enable="false"/>
-                    </row>
-                    <row>
-                        <label value="msg://template.outputType"/>
-                        <lookupField id="outputType" datasource="templateDs"
-                                     property="reportOutputType"
-                                     width="${width}" required="true"
-                                     requiredMessage="msg://template.outputTypeMsg"/>
-                    </row>
-                    <row>
-                        <label value="msg://template.file"/>
-                        <hbox spacing="true">
-                            <button id="templatePath" stylename="link"/>
-                            <upload id="uploadTemplate"/>
-                        </hbox>
-                    </row>
-                    <row>
-                        <label value="msg://template.outputNamePattern"/>
-                        <textField id="outputNamePattern" datasource="templateDs" property="outputNamePattern"
-                                   width="${width}"/>
-                    </row>
-                    <row>
-                        <label value="msg://template.isCustom"/>
-                        <checkBox id="customFlag" datasource="templateDs" property="customFlag"
-                                  width="${width}"/>
-                    </row>
-                    <row>
-                        <label value="msg://template.customClass"/>
-                        <textField id="customClass" datasource="templateDs" property="customClass"
-                                   width="${width}"/>
-                    </row>
-                </rows>
-            </grid>
-        </vbox>
+        <grid spacing="true">
+            <columns>
+                <column flex="1"/>
+                <column flex="1"/>
+                <column flex="1"/>
+            </columns>
+            <rows>
+                <row>
+                    <label value="msg://template.code"/>
+                    <textField id="code" datasource="templateDs" property="code"
+                               width="${width}" required="true"
+                               requiredMessage="msg://template.codeMsg"/>
+                </row>
+                <row>
+                    <label value="msg://template.name"/>
+                    <textField id="name" datasource="templateDs" property="name"
+                               width="${width}" enable="false"/>
+                </row>
+                <row>
+                    <label value="msg://template.outputType"/>
+                    <lookupField id="outputType" datasource="templateDs"
+                                 property="reportOutputType"
+                                 width="${width}" required="true"
+                                 requiredMessage="msg://template.outputTypeMsg"/>
+                </row>
+                <row>
+                    <label value="msg://template.file"/>
+                    <hbox spacing="true">
+                        <button id="templatePath" stylename="link"/>
+                        <upload id="uploadTemplate"/>
+                    </hbox>
+                </row>
+                <row>
+                    <label value="msg://template.outputNamePattern"/>
+                    <textField id="outputNamePattern" datasource="templateDs" property="outputNamePattern"
+                               width="${width}"/>
+                </row>
+                <row>
+                    <label value="msg://template.isCustom"/>
+                    <checkBox id="customFlag" datasource="templateDs" property="customFlag"
+                              width="${width}"/>
+                </row>
+                <row>
+                    <label value="msg://template.customClass"/>
+                    <textField id="customClass" datasource="templateDs" property="customClass"
+                               width="${width}"/>
+                </row>
+            </rows>
+        </grid>
         <iframe id="windowActions" screen="editWindowActions"/>
     </layout>
 </window>
