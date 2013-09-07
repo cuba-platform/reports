@@ -4,7 +4,7 @@
 
     <layout expand="bands">
         <vbox margin="true">
-            <fieldGroup id="propertiesFieldGroup" border="hidden" margin="true" datasource="reportDs" width="50%">
+            <fieldGroup id="propertiesFieldGroup" border="hidden" datasource="reportDs" width="50%">
                 <column>
                     <field id="name" required="true" requiredMessage="msg://report.nameMsg" width="${width}"/>
                     <field id="code" width="${width}"/>
@@ -18,7 +18,7 @@
                 </column>
             </fieldGroup>
         </vbox>
-        <vbox id="bands" width="100%" height="100%" expand="treeBox" margin="false;false;false;true">
+        <vbox id="bands" width="100%" height="100%" margin="false;false;false;true">
             <split orientation="horizontal" id="hSplit" pos="60" width="100%" height="100%">
                 <groupBox id="treeBox" expand="serviceTree" height="100%" width="100%" spacing="true" caption="msg://report.bands">
                     <buttonsPanel>
@@ -28,11 +28,11 @@
                         <button id="down" icon="icons/down.png"/>
                     </buttonsPanel>
 
-                    <tree id="serviceTree" margin="true" width="100%" height="100%">
+                    <tree id="serviceTree" width="100%" height="100%">
                         <treechildren datasource="treeDs" captionProperty="name"/>
                     </tree>
                 </groupBox>
-                <groupBox id="treeBox" expand="serviceTree" height="100%" width="100%" caption="msg://report.bandDetails">
+                <groupBox id="bandDetailsBox" height="100%" width="100%" caption="msg://report.bandDetails">
                     <iframe src="/com/haulmont/reports/gui/definition/edit/definition-edit.xml" id="bandEditor"
                             width="100%"
                             height="100%"/>
