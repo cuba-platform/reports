@@ -243,6 +243,11 @@ postUpdate.add({
                     BandDefinition parentBand = map[band.parentBandDefinition.id]
                     if (parentBand != null) {
                         band.setParentBandDefinition(parentBand)
+                        if (!parentBand.childrenBandDefinitions) {
+                            parentBand.childrenBandDefinitions = []
+                        }
+
+                        parentBand.childrenBandDefinitions.add(band)
                     }
                 }
             }
