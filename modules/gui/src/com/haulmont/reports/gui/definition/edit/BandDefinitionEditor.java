@@ -93,7 +93,7 @@ public class BandDefinitionEditor extends AbstractEditor implements Suggester {
                         selectedBand.setDataSets(new ArrayList<DataSet>());
                     }
                     dataset.setBandDefinition(selectedBand);
-                    dataset.setName(dataset.getBandDefinition().getName() != null ? dataset.getBandDefinition().getName() : "dataset");
+                    dataset.setName(selectedBand.getName() != null ? selectedBand.getName() : "dataset");
                     dataset.setType(DataSetType.GROOVY);
 
                     dataset.setEntityParamName("entity");
@@ -141,12 +141,11 @@ public class BandDefinitionEditor extends AbstractEditor implements Suggester {
         );
     }
 
-    private void applyType(DataSetType value) {
+    private void applyType(DataSetType dsType) {
         textBox.setVisible(false);
         entityBox.setVisible(false);
         entitiesBox.setVisible(false);
 
-        DataSetType dsType = (DataSetType) value;
         if (dsType != null) {
             switch (dsType) {
                 case SQL:

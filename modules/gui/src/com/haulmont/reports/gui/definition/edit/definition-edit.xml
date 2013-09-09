@@ -17,7 +17,7 @@
 
     <assign name="width" value="250"/>
 
-    <layout expand="split">
+    <layout expand="split" spacing="true">
         <hbox spacing="true">
             <label value="msg://definition.name"/>
             <textField id="name" datasource="bandDefinitionDs" property="name" enable="false" width="${width}"
@@ -40,7 +40,7 @@
                     </buttonsPanel>
                     <columns>
                         <column id="name" caption="msg://dataSet.name" editable="true"/>
-                        <column id="type" caption="msg://dataSet.type" editable="true"/>
+                        <column id="type" caption="msg://dataSet.type" editable="true" required="true"/>
                     </columns>
                     <rows datasource="dataSetsDs"/>
                 </table>
