@@ -167,13 +167,10 @@ public class ReportEditor extends AbstractEditor {
     protected ComponentsFactory componentsFactory;
 
     @Inject
-    private FileUploadingAPI fileUpload;
+    protected FileUploadingAPI fileUpload;
 
     @Inject
-    private TimeSource timeSource;
-
-    @Inject
-    private ReportService reportService;
+    protected ReportService reportService;
 
     @Override
     public void setItem(Entity item) {
@@ -192,7 +189,7 @@ public class ReportEditor extends AbstractEditor {
             groupsDs.refresh();
             if (groupsDs.getItemIds() != null) {
                 UUID id = groupsDs.getItemIds().iterator().next();
-                report.setGroup((ReportGroup) groupsDs.getItem(id));
+                report.setGroup(groupsDs.getItem(id));
             }
         }
 
@@ -224,7 +221,7 @@ public class ReportEditor extends AbstractEditor {
         initValuesFormats();
     }
 
-    private void initParameters() {
+    protected void initParameters() {
         final MetaClass metaClass = AppBeans.get(Metadata.class).getSession().getClass(ReportInputParameter.class);
         final MetaPropertyPath mpp = new MetaPropertyPath(metaClass, metaClass.getProperty("position"));
 
@@ -232,7 +229,7 @@ public class ReportEditor extends AbstractEditor {
                 new CreateAction(parametersTable, OpenType.DIALOG) {
                     @Override
                     public Map<String, Object> getInitialValues() {
-                        Map<String, Object> params = new HashMap<String, Object>();
+                        Map<String, Object> params = new HashMap<>();
                         params.put("position", parametersDs.getItemIds().size());
                         params.put("report", report);
                         return params;
@@ -258,7 +255,7 @@ public class ReportEditor extends AbstractEditor {
         paramUpButton.setAction(new ItemTrackingAction("generalFrame.up") {
             @Override
             public void actionPerform(Component component) {
-                ReportInputParameter parameter = (ReportInputParameter) parametersDs.getItem();
+                ReportInputParameter parameter = parametersDs.getItem();
                 if (parameter != null) {
                     List<ReportInputParameter> inputParameters = report.getInputParameters();
                     int index = parameter.getPosition();
@@ -346,7 +343,7 @@ public class ReportEditor extends AbstractEditor {
         parametersTable.addAction(paramDownButton.getAction());
     }
 
-    private void initValuesFormats() {
+    protected void initValuesFormats() {
         formatsTable.addAction(
                 new CreateAction(formatsTable, OpenType.DIALOG) {
                     @Override
@@ -359,7 +356,7 @@ public class ReportEditor extends AbstractEditor {
         formatsTable.addAction(new EditAction(formatsTable, OpenType.DIALOG));
     }
 
-    private void initRoles() {
+    protected void initRoles() {
         rolesTable.addAction(new RemoveAction(rolesTable, false));
 
         addRoleBtn.setAction(new AbstractAction("actions.Add") {
@@ -372,9 +369,9 @@ public class ReportEditor extends AbstractEditor {
         });
     }
 
-    private void initScreens() {
+    protected void initScreens() {
         screenTable.addAction(new RemoveAction(screenTable, false));
-        List<WindowInfo> windowInfoCollection = new ArrayList<WindowInfo>(windowConfig.getWindows());
+        List<WindowInfo> windowInfoCollection = new ArrayList<>(windowConfig.getWindows());
         // sort by screenId
         Collections.sort(windowInfoCollection, new Comparator<WindowInfo>() {
             @Override
@@ -391,7 +388,7 @@ public class ReportEditor extends AbstractEditor {
             }
         });
 
-        Map<String, Object> screens = new LinkedHashMap<String, Object>();
+        Map<String, Object> screens = new LinkedHashMap<>();
         for (WindowInfo windowInfo : windowInfoCollection) {
             String id = windowInfo.getId();
             String menuId = "menu-config." + id;
@@ -405,7 +402,7 @@ public class ReportEditor extends AbstractEditor {
             @Override
             public void actionPerform(Component component) {
                 if (screenIdLookup.getValue() != null) {
-                    String screenId = (String) screenIdLookup.getValue();
+                    String screenId = screenIdLookup.getValue();
 
                     boolean exists = false;
                     for (UUID id : reportScreensDs.getItemIds()) {
@@ -427,7 +424,7 @@ public class ReportEditor extends AbstractEditor {
         });
     }
 
-    private void initGeneral() {
+    protected void initGeneral() {
         treeDs.addListener(new DsListenerAdapter<BandDefinition>() {
             @Override
             public void itemChanged(Datasource<BandDefinition> ds, @Nullable BandDefinition prevItem, @Nullable BandDefinition item) {
@@ -629,11 +626,11 @@ public class ReportEditor extends AbstractEditor {
                         definition.getParentBandDefinition().getChildrenBandDefinitions().remove(definition);
 
                     if (definition.getChildrenBandDefinitions() != null)
-                        removeChildrenCascade(new ArrayList<BandDefinition>(definition.getChildrenBandDefinitions()));
+                        removeChildrenCascade(new ArrayList<>(definition.getChildrenBandDefinitions()));
 
                     if (definition.getDataSets() != null) {
                         treeDs.setItem(definition);
-                        for (DataSet dataSet : new ArrayList<DataSet>(definition.getDataSets())) {
+                        for (DataSet dataSet : new ArrayList<>(definition.getDataSets())) {
                             if (PersistenceHelper.isNew(dataSet))
                                 dataSetsDs.removeItem(dataSet);
                         }
@@ -651,7 +648,7 @@ public class ReportEditor extends AbstractEditor {
 
             @Override
             public void actionPerform(Component component) {
-                BandDefinition definition = (BandDefinition) treeDs.getItem();
+                BandDefinition definition = treeDs.getItem();
                 if (definition != null && definition.getParentBandDefinition() != null) {
                     BandDefinition parentDefinition = definition.getParentBandDefinition();
                     List<BandDefinition> definitionsList = parentDefinition.getChildrenBandDefinitions();
@@ -696,7 +693,7 @@ public class ReportEditor extends AbstractEditor {
 
             @Override
             public void actionPerform(Component component) {
-                BandDefinition definition = (BandDefinition) treeDs.getItem();
+                BandDefinition definition = treeDs.getItem();
                 if (definition != null && definition.getParentBandDefinition() != null) {
                     BandDefinition parentDefinition = definition.getParentBandDefinition();
                     List<BandDefinition> definitionsList = parentDefinition.getChildrenBandDefinitions();
@@ -752,7 +749,7 @@ public class ReportEditor extends AbstractEditor {
         });
     }
 
-    private void initTemplates() {
+    protected void initTemplates() {
         templatesTable.addAction(new CreateAction(templatesTable, OpenType.DIALOG) {
             @Override
             public Map<String, Object> getInitialValues() {
@@ -786,7 +783,7 @@ public class ReportEditor extends AbstractEditor {
         templatesTable.addAction(defaultTemplateBtn.getAction());
     }
 
-    private void orderParameters() {
+    protected void orderParameters() {
         if (report.getInputParameters() == null) {
             report.setInputParameters(new ArrayList<ReportInputParameter>());
         }
@@ -796,7 +793,7 @@ public class ReportEditor extends AbstractEditor {
         }
     }
 
-    private void orderBandDefinitions(BandDefinition parent) {
+    protected void orderBandDefinitions(BandDefinition parent) {
         if (parent.getChildrenBandDefinitions() != null) {
             List<BandDefinition> childrenBandDefinitions = parent.getChildrenBandDefinitions();
             for (int i = 0, childrenBandDefinitionsSize = childrenBandDefinitions.size(); i < childrenBandDefinitionsSize; i++) {
@@ -817,7 +814,7 @@ public class ReportEditor extends AbstractEditor {
         return true;
     }
 
-    private void addCommitListeners() {
+    protected void addCommitListeners() {
         String xml = reportService.convertToXml(report);
         report.setXml(xml);
 
@@ -852,7 +849,7 @@ public class ReportEditor extends AbstractEditor {
         }
     }
 
-    private void validateBand(ValidationErrors errors, BandDefinition band) {
+    protected void validateBand(ValidationErrors errors, BandDefinition band) {
         if (StringUtils.isBlank(band.getName())) {
             errors.add(getMessage("error.bandNameNull"));
         }

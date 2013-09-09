@@ -3,7 +3,7 @@
         class="com.haulmont.reports.gui.group.browse.ReportGroupBrowser"
         caption="msg://reportGroupBrowser"
         messagesPack="com.haulmont.reports.gui"
-        focusComponent="table"
+        focusComponent="reportGroupsTable"
         >
 
     <dsContext>
@@ -14,13 +14,17 @@
         </collectionDatasource>
     </dsContext>
 
-    <layout expand="table">
-        <table id="table" width="100%">
+    <layout expand="reportGroupsTable">
+        <table id="reportGroupsTable" width="100%">
             <buttonsPanel>
-                <button action="table.create" icon="icons/create.png"/>
-                <button action="table.edit" icon="icons/edit.png"/>
-                <button action="table.remove" icon="icons/remove.png"/>
+                <button action="reportGroupsTable.create"/>
+                <button action="reportGroupsTable.edit"/>
+                <button action="reportGroupsTable.remove"/>
             </buttonsPanel>
+            <actions>
+                <action id="create"/>
+                <action id="edit"/>
+            </actions>
             <columns>
                 <column id="locName"/>
                 <column id="systemFlag"/>
