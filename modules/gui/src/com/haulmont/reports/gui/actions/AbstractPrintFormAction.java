@@ -18,7 +18,9 @@ import com.haulmont.cuba.gui.components.Window;
 import com.haulmont.cuba.security.entity.User;
 import com.haulmont.reports.app.ParameterPrototype;
 import com.haulmont.reports.entity.*;
+import com.haulmont.reports.exception.ReportingException;
 import com.haulmont.reports.gui.ReportGuiManager;
+import org.apache.commons.collections.CollectionUtils;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
@@ -68,13 +70,13 @@ abstract class AbstractPrintFormAction extends AbstractAction {
 
                 @Override
                 public void handleLookup(Collection items) {
-                    if (items != null && items.size() > 0) {
+                    if (CollectionUtils.isNotEmpty(items)) {
                         Report report = (Report) items.iterator().next();
                         ReportInputParameter parameter = getParameterAlias(report, metaClass.getName());
                         if (selectedValue instanceof ParameterPrototype) {
                             ((ParameterPrototype) selectedValue).setParamName(parameter.getAlias());
                         }
-                        reportGuiManager.runReport(report, window, parameter, selectedValue);
+                        reportGuiManager.runReport(report, window, parameter, selectedValue, null, outputFileName);
                     }
                 }
             }, WindowManager.OpenType.DIALOG, params);
@@ -84,7 +86,7 @@ abstract class AbstractPrintFormAction extends AbstractAction {
             if (selectedValue instanceof ParameterPrototype) {
                 ((ParameterPrototype) selectedValue).setParamName(parameter.getAlias());
             }
-            reportGuiManager.runReport(report, window, parameter, selectedValue);
+            reportGuiManager.runReport(report, window, parameter, selectedValue, null, outputFileName);
         } else {
             window.showNotification(messages.getMessage(ReportGuiManager.class, "report.notFoundReports"), IFrame.NotificationType.HUMANIZED);
         }
@@ -97,6 +99,6 @@ abstract class AbstractPrintFormAction extends AbstractAction {
             }
         }
 
-        return null;//todo
+        throw new ReportingException(String.format("Selected report [%s] doesn't have parameter with class [%s].", report.getName(), paramMetaClassName));
     }
 }

@@ -51,53 +51,53 @@ public class ReportGuiManager {
     public void runReport(Report report, Window window) {
         if (report != null) {
             if (report.getInputParameters() != null && report.getInputParameters().size() > 0) {
-                openReportParamsDialog(window, report, null);
+                openReportParamsDialog(window, report, null, null, null);
             } else {
                 printReport(report, Collections.<String, Object>emptyMap());
             }
         }
     }
 
-    public void runReport(Report report, Window window, final ReportInputParameter parameter, final Object paramValue) {
+    public void runReport(Report report, Window window, final ReportInputParameter parameter, final Object paramValue, @Nullable String templateCode, @Nullable String outputFileName) {
         if (report != null) {
             List<ReportInputParameter> params = report.getInputParameters();
             if (params != null && params.size() > 1) {
                 if (ParameterType.ENTITY == parameter.getType()) {
                     Collection selected = (Collection) paramValue;
                     if (CollectionUtils.isNotEmpty(selected)) {
-                        openReportParamsDialog(window, report, Collections.singletonMap(parameter.getAlias(), selected.iterator().next()));
+                        openReportParamsDialog(window, report, Collections.singletonMap(parameter.getAlias(), selected.iterator().next()), null, null);
                     } else {
-                        openReportParamsDialog(window, report, Collections.singletonMap(parameter.getAlias(), null));
+                        openReportParamsDialog(window, report, Collections.singletonMap(parameter.getAlias(), null), null, null);
                     }
                 } else {
-                    openReportParamsDialog(window, report, Collections.singletonMap(parameter.getAlias(), paramValue));
+                    openReportParamsDialog(window, report, Collections.singletonMap(parameter.getAlias(), paramValue), null, null);
                 }
             } else if (params == null || params.size() <= 1) {
                 if (ParameterType.ENTITY == parameter.getType()) {
                     if (paramValue instanceof Collection) {
                         Collection selectedEntities = (Collection) paramValue;
                         if (selectedEntities.size() == 1) {
-                            printReport(report, Collections.<String, Object>singletonMap(parameter.getAlias(), selectedEntities.iterator().next()));
+                            printReport(report, Collections.<String, Object>singletonMap(parameter.getAlias(), selectedEntities.iterator().next()), templateCode, outputFileName);
                         } else if (selectedEntities.size() > 1) {
                             bulkPrint(report, parameter.getAlias(), selectedEntities);
                         } else if (selectedEntities.size() == 0) {
-                            printReport(report, Collections.<String, Object>singletonMap(parameter.getAlias(), null));
+                            printReport(report, Collections.<String, Object>singletonMap(parameter.getAlias(), null), templateCode, outputFileName);
                         }
                     } else if (paramValue instanceof ParameterPrototype) {
                         throw new ReportingException("[Entity] parameter type does not support prototype loaders");
                     }
                 } else if (ParameterType.ENTITY_LIST == parameter.getType()) {
-                    printReport(report, Collections.<String, Object>singletonMap(parameter.getAlias(), paramValue));
+                    printReport(report, Collections.<String, Object>singletonMap(parameter.getAlias(), paramValue), templateCode, outputFileName);
                 }
             }
         }
     }
 
     public void printReport(Report report, Map<String, Object> params) {
-        printReport(report, null, params);
+        printReport(report, params, null, null);
     }
 
-    public void printReport(Report report, @Nullable String templateCode, Map<String, Object> params) {
+    public void printReport(Report report, Map<String, Object> params, @Nullable String templateCode, @Nullable String outputFileName) {
         try {
             ReportOutputDocument document;
             if (StringUtils.isBlank(templateCode)) {
@@ -108,9 +108,8 @@ public class ReportGuiManager {
 
             byte[] byteArr = document.getContent();
             ExportFormat exportFormat = ReportPrintHelper.getExportFormat(document.getReportOutputType());
-
             ExportDisplay exportDisplay = AppConfig.createExportDisplay(null);
-            String documentName = document.getDocumentName();
+            String documentName = StringUtils.isNotBlank(outputFileName) ? outputFileName : document.getDocumentName();
             exportDisplay.show(new ByteArrayDataProvider(byteArr), documentName, exportFormat);
 
         } catch (IOException e) {
@@ -160,10 +159,12 @@ public class ReportGuiManager {
         return filter;
     }
 
-    private void openReportParamsDialog(Window window, Report report, Map<String, Object> parameters) {
+    private void openReportParamsDialog(Window window, Report report, @Nullable Map<String, Object> parameters, @Nullable String templateCode, @Nullable String outputFileName) {
         Map<String, Object> params = new HashMap<>();
         params.put("report", report);
         params.put("parameters", parameters);
+        params.put("templateCode", templateCode);
+        params.put("outputFileName", outputFileName);
 
         window.openWindow("report$inputParameters", WindowManager.OpenType.DIALOG, params);
     }

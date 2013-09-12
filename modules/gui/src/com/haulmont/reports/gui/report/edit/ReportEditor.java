@@ -743,6 +743,8 @@ public class ReportEditor extends AbstractEditor {
             @Override
             public void actionPerform(Component component) {
                 ReportEditor.this.commit();
+                setItem(report);
+                report = (Report) getItem();
                 ReportEditor.this.openWindow("report$inputParameters", WindowManager.OpenType.DIALOG,
                         Collections.<String, Object>singletonMap("report", report));
             }

@@ -46,6 +46,10 @@ public class InputParametersController extends AbstractWindow {
 
     protected Map<String, Object> parameters;
 
+    protected String templateCode;
+
+    protected String outputFileName;
+
     @Inject
     protected Messages messages;
 
@@ -80,6 +84,9 @@ public class InputParametersController extends AbstractWindow {
         report = (Report) params.get("report");
         linkedEntity = (Entity) params.get("entity");
         parameters = (Map<String, Object>) params.get("parameters");
+        templateCode = (String) params.get("templateCode");
+        outputFileName = (String) params.get("outputFileName");
+
         if (parameters == null) {
             parameters = Collections.emptyMap();
         }
@@ -104,7 +111,7 @@ public class InputParametersController extends AbstractWindow {
             try {
                 validateAll();
                 Map<String, Object> collectedParams = collectParameters(parameterComponents);
-                reportGuiManager.printReport(report, collectedParams);
+                reportGuiManager.printReport(report, collectedParams, templateCode, outputFileName);
             } catch (ValidationException e) {
                 showNotification(getMessage("input.requiredParametersNotSet"), IFrame.NotificationType.WARNING);
             }
