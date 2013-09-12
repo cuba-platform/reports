@@ -7,134 +7,96 @@
 package com.haulmont.reports.gui.actions;
 
 import com.haulmont.chile.core.model.MetaClass;
-import com.haulmont.cuba.core.global.*;
+import com.haulmont.cuba.core.global.AppBeans;
+import com.haulmont.cuba.core.global.Messages;
+import com.haulmont.cuba.core.global.Metadata;
+import com.haulmont.cuba.core.global.UserSessionSource;
 import com.haulmont.cuba.gui.WindowManager;
 import com.haulmont.cuba.gui.components.AbstractAction;
 import com.haulmont.cuba.gui.components.IFrame;
 import com.haulmont.cuba.gui.components.Window;
-import com.haulmont.cuba.gui.data.DsContext;
 import com.haulmont.cuba.security.entity.User;
+import com.haulmont.reports.app.ParameterPrototype;
 import com.haulmont.reports.entity.*;
-import com.haulmont.reports.gui.ReportHelper;
+import com.haulmont.reports.gui.ReportGuiManager;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author artamonov
  * @version $Id$
  */
 abstract class AbstractPrintFormAction extends AbstractAction {
+    protected ReportGuiManager reportGuiManager = AppBeans.get(ReportGuiManager.class);
 
-    protected static final String ENTITY_SPECIAL_KEY = "entity_special_key";
+    protected Messages messages = AppBeans.get(Messages.class);
 
     protected AbstractPrintFormAction(String id) {
         super(id);
     }
 
-    protected void openRunReportScreen(final Window window, final String paramAlias, final Object paramValue,
-                                       String javaClassName, ReportType reportType) {
-        openRunReportScreen(window, paramAlias, paramValue, javaClassName, reportType, null);
+    protected void openRunReportScreen(final Window window, final Object selectedValue, String javaClassName) {
+        openRunReportScreen(window, selectedValue, javaClassName, null);
     }
 
-    protected DataSet findDataSet(BandDefinition bandDefinition, DataSetType dsType) {
-        if (bandDefinition == null)
-            return null;
+    protected void openRunReportScreen(final Window window, final Object selectedValue, String javaClassName, @Nullable final String outputFileName) {
 
-        List<DataSet> dataSets = bandDefinition.getDataSets();
-        if (dataSets == null)
-            return null;
-
-        for (DataSet ds : dataSets) {
-            if (ds.getType() == dsType)
-                return ds;
-        }
-
-        List<BandDefinition> childrenBandDefinitions = bandDefinition.getChildrenBandDefinitions();
-        if (childrenBandDefinitions == null)
-            return null;
-
-        for (BandDefinition child : childrenBandDefinitions) {
-            DataSet queryDataSet = findDataSet(child, dsType);
-            if (queryDataSet != null)
-                return queryDataSet;
-        }
-
-        return null;
-    }
-
-    protected String preprocessParams(Report report, String paramAlias, Object paramValue) {
-        return paramAlias;
-    }
-
-    protected void openRunReportScreen(final Window window, final String paramAlias, final Object paramValue,
-                                       String javaClassName, ReportType reportType, @Nullable final String name) {
         Map<String, Object> params = new HashMap<>();
 
-        String metaClass;
+        final MetaClass metaClass;
         try {
             Class<?> javaClass = Class.forName(javaClassName);
-            metaClass = AppBeans.get(Metadata.class).getSession().getClass(javaClass).getName();
+            metaClass = AppBeans.get(Metadata.class).getSession().getClass(javaClass);
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
 
-        params.put("entityMetaClass", metaClass);
-        params.put("reportType", reportType.getId());
-        params.put("screen", window.getId());
+        User user = AppBeans.get(UserSessionSource.class).getUserSession().getUser();
+        boolean selectListReportsOnly = selectedValue instanceof ParameterPrototype;
+        List<Report> reports = reportGuiManager.getAvailableReports(window.getId(), user, metaClass, selectListReportsOnly);
 
-        if (checkReportsForStart(window, paramAlias, paramValue, javaClassName, reportType, name)) {
+        params.put("entityMetaClass", metaClass.getName());
+        params.put("screen", window.getId());
+        params.put("reports", reports);
+
+        if (reports.size() > 1) {
             window.openLookup("report$Report.run", new Window.Lookup.Handler() {
 
                 @Override
                 public void handleLookup(Collection items) {
                     if (items != null && items.size() > 0) {
                         Report report = (Report) items.iterator().next();
-                        report = window.getDsContext().getDataSupplier().reload(report, "report.edit");
-                        String inputParamAlias = preprocessParams(report, paramAlias, paramValue);
-                        ReportHelper.runReport(report, window, inputParamAlias, paramValue, name);
+                        ReportInputParameter parameter = getParameterAlias(report, metaClass.getName());
+                        if (selectedValue instanceof ParameterPrototype) {
+                            ((ParameterPrototype) selectedValue).setParamName(parameter.getAlias());
+                        }
+                        reportGuiManager.runReport(report, window, parameter, selectedValue);
                     }
                 }
             }, WindowManager.OpenType.DIALOG, params);
+        } else if (reports.size() == 1) {
+            Report report = reports.get(0);
+            ReportInputParameter parameter = getParameterAlias(report, metaClass.getName());
+            if (selectedValue instanceof ParameterPrototype) {
+                ((ParameterPrototype) selectedValue).setParamName(parameter.getAlias());
+            }
+            reportGuiManager.runReport(report, window, parameter, selectedValue);
+        } else {
+            window.showNotification(messages.getMessage(ReportGuiManager.class, "report.notFoundReports"), IFrame.NotificationType.HUMANIZED);
         }
     }
 
-    protected boolean checkReportsForStart(final Window window, final String paramAlias, final Object paramValue,
-                                           String javaClassName, ReportType reportType, @Nullable final String name) {
-        Collection<MetaClass> metaClasses = AppBeans.get(Metadata.class).getSession().getClasses();
-        String metaClassName = "";
-        Iterator<MetaClass> iterator = metaClasses.iterator();
-        while (iterator.hasNext() && ("".equals(metaClassName))) {
-            MetaClass metaClass = iterator.next();
-            if (metaClass.getJavaClass().getCanonicalName().equals(javaClassName))
-                metaClassName = metaClass.getName();
+    protected ReportInputParameter getParameterAlias(Report report, String paramMetaClassName) {
+        for (ReportInputParameter parameter : report.getInputParameters()) {
+            if (parameter.getEntityMetaClass().equals(paramMetaClassName)) {
+                return parameter;
+            }
         }
 
-        boolean result = false;
-        LoadContext lContext = new LoadContext(Report.class);
-        lContext.setView("report.edit");
-        String queryStr = "select r from report$Report r left join r.inputParameters ip where " +
-                "(ip.entityMetaClass like :param$entityMetaClass or :param$entityMetaClass is null) " +
-                " and (r.reportType = :param$reportType)";
-        LoadContext.Query query = new LoadContext.Query(queryStr);
-        query.setParameter("param$entityMetaClass", metaClassName);
-        query.setParameter("param$reportType", reportType);
-        lContext.setQuery(query);
-
-        DsContext dsContext = window.getDsContext();
-        List<Report> reports = dsContext.getDataSupplier().loadList(lContext);
-        User user = AppBeans.get(UserSessionSource.class).getUserSession().getUser();
-        reports = ReportHelper.applySecurityPolicies(user, window.getId(), reports);
-        if (reports.size() == 1) {
-            Report report = reports.get(0);
-            window.getDsContext().getDataSupplier().reload(report, "report.edit");
-            String inputParamAlias = preprocessParams(report, paramAlias, paramValue);
-            ReportHelper.runReport(report, window, inputParamAlias, paramValue, name);
-        } else if (reports.size() == 0) {
-            String msg = AppBeans.get(Messages.class).getMessage(ReportHelper.class, "report.notFoundReports");
-            window.showNotification(msg, IFrame.NotificationType.HUMANIZED);
-        } else
-            result = true;
-        return result;
+        return null;//todo
     }
 }

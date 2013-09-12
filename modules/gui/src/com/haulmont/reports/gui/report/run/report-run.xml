@@ -12,16 +12,6 @@
                 class="com.haulmont.reports.entity.Report"
                 view="report.edit"
                 datasourceClass="com.haulmont.reports.gui.report.run.RunReportDatasource">
-            <query>
-                <![CDATA[select r from report$Report r]]>
-                <filter>
-                    <and>
-                        <!--todo: move it to datasource-->
-                        <c join=",report$ReportInputParameter p">p.report.id = r.id and p.entityMetaClass like :param$entityMetaClass</c>
-                        <c>r.reportType = :param$reportType</c>
-                    </and>
-                </filter>
-            </query>
         </collectionDatasource>
     </dsContext>
 

@@ -14,6 +14,7 @@ import com.haulmont.yarg.reporting.ReportOutputDocument;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -47,4 +48,8 @@ public interface ReportingApi {
     String convertToXml(Report report);
 
     Report convertToReport(String xml);
+
+    Report copyReport(Report source);
+
+    ReportOutputDocument bulkPrint(Report report, List<Map<String, Object>> paramsList);
 }

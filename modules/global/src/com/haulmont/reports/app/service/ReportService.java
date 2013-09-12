@@ -13,6 +13,7 @@ import com.haulmont.yarg.reporting.ReportOutputDocument;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -21,6 +22,8 @@ import java.util.Map;
  */
 public interface ReportService {
     String NAME = "report_ReportService";
+
+    String MAIN_VIEW_NAME = "report.edit";
 
     ReportOutputDocument createReport(Report report,
                                       Map<String, Object> params) throws IOException;
@@ -73,4 +76,8 @@ public interface ReportService {
     String convertToXml(Report report);
 
     Report convertToReport(String xml);
+
+    Report copyReport(Report source);
+
+    ReportOutputDocument bulkPrint(Report report, List<Map<String, Object>> paramsList);
 }

@@ -15,11 +15,10 @@ import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
 import com.haulmont.cuba.gui.data.Datasource;
 import com.haulmont.reports.app.ParameterPrototype;
-import com.haulmont.reports.entity.*;
-import com.haulmont.reports.gui.ReportHelper;
+import com.haulmont.reports.gui.ReportGuiManager;
+import org.apache.commons.collections.CollectionUtils;
 
-import java.util.Collection;
-import java.util.List;
+import java.util.Set;
 
 /**
  * @author artamonov
@@ -28,11 +27,8 @@ import java.util.List;
 public class TablePrintFormAction extends AbstractPrintFormAction {
     private final Window window;
     private final Table table;
-    private final boolean multiObjects;
 
     private final static String DEFAULT_ACTION_ID = "tablePrintForm";
-
-    protected final static String ENTITIES_LIST_SPECIAL_KEY = "entities_special_key";
 
     protected Messages messages;
 
@@ -45,19 +41,17 @@ public class TablePrintFormAction extends AbstractPrintFormAction {
         super(captionId);
         this.window = window;
         this.table = table;
-        this.multiObjects = multiObjects;
 
         messages = AppBeans.get(Messages.class);
     }
 
     @Override
     public void actionPerform(Component component) {
-        final Object selected = multiObjects ? table.getSelected() : table.getSingleSelected();
+        final Set selected = table.getSelected();
 
         Action cancelAction = new DialogAction(DialogAction.Type.CANCEL);
 
-        if (selected != null && (!multiObjects || ((Collection) selected).size() > 0)) {
-
+        if (CollectionUtils.isNotEmpty(selected)) {
             Action printSelectedAction = new AbstractAction("actions.printSelected") {
                 @Override
                 public void actionPerform(Component component) {
@@ -83,19 +77,18 @@ public class TablePrintFormAction extends AbstractPrintFormAction {
             };
 
             Action[] actions;
-            if (multiObjects) {
+            if (selected.size() > 1) {
                 actions = new Action[]{printAllAction, printSelectedAction, cancelAction};
 
-                window.showOptionDialog(messages.getMessage(ReportHelper.class, "notifications.confirmPrintSelectedheader"),
-                        messages.getMessage(ReportHelper.class, "notifications.confirmPrintSelected"),
+                window.showOptionDialog(messages.getMessage(ReportGuiManager.class, "notifications.confirmPrintSelectedheader"),
+                        messages.getMessage(ReportGuiManager.class, "notifications.confirmPrintSelected"),
                         IFrame.MessageType.CONFIRMATION,
                         actions);
             } else {
                 printSelected(selected);
             }
         } else {
-            if (multiObjects && (table.getDatasource().getState() == Datasource.State.VALID) &&
-                    (table.getDatasource().getItemIds().size() > 0)) {
+            if ((table.getDatasource().getState() == Datasource.State.VALID) && (table.getDatasource().getItemIds().size() > 0)) {
                 Action yesAction = new DialogAction(DialogAction.Type.OK) {
                     @Override
                     public void actionPerform(Component component) {
@@ -103,61 +96,24 @@ public class TablePrintFormAction extends AbstractPrintFormAction {
                     }
                 };
 
-                window.showOptionDialog(messages.getMessage(ReportHelper.class, "notifications.confirmPrintAllheader"),
-                        messages.getMessage(ReportHelper.class, "notifications.confirmPrintAll"),
+                window.showOptionDialog(messages.getMessage(getClass(), "notifications.confirmPrintAllheader"),
+                        messages.getMessage(getClass(), "notifications.confirmPrintAll"),
                         IFrame.MessageType.CONFIRMATION, new Action[]{yesAction, cancelAction});
             } else {
-                window.showNotification(messages.getMessage(ReportHelper.class, "notifications.noSelectedEntity"),
+                window.showNotification(messages.getMessage(ReportGuiManager.class, "notifications.noSelectedEntity"),
                         IFrame.NotificationType.HUMANIZED);
             }
         }
     }
 
-    protected String preprocessParams(Report report, String paramAlias, Object paramValue) {
-        List<ReportInputParameter> inputParameters = report.getInputParameters();
+    private void printSelected(Set selected) {
+        Class<?> entityClass = selected.iterator().next().getClass();
+        String javaClassName = entityClass.getCanonicalName();
 
-        if (ENTITY_SPECIAL_KEY.equals(paramAlias)) {
-            DataSet singleDataSet = findDataSet(report.getRootBandDefinition(), DataSetType.SINGLE);
-            if (singleDataSet == null) {
-                if ((inputParameters != null) && (inputParameters.size() > 0)) {
-                    paramAlias = inputParameters.get(0).getAlias();
-                }
-            } else
-                paramAlias = singleDataSet.getEntityParamName();
-
-            if (paramValue instanceof ParameterPrototype) {
-                ((ParameterPrototype) paramValue).setParamName(paramAlias);
-            }
-        } else if (ENTITIES_LIST_SPECIAL_KEY.equals(paramAlias)) {
-            DataSet multiDataSet = findDataSet(report.getRootBandDefinition(), DataSetType.MULTI);
-            if (multiDataSet == null) {
-                if ((inputParameters != null) && (inputParameters.size() > 0)) {
-                    paramAlias = inputParameters.get(0).getAlias();
-                }
-            } else
-                paramAlias = multiDataSet.getListEntitiesParamName();
-
-            if (paramValue instanceof ParameterPrototype) {
-                ((ParameterPrototype) paramValue).setParamName(paramAlias);
-            }
-        }
-        return paramAlias;
-    }
-
-    private void printSelected(Object selected) {
-        ReportType reportType = multiObjects ? ReportType.LIST_PRINT_FORM : ReportType.PRINT_FORM;
-        String paramKey = multiObjects ? ENTITIES_LIST_SPECIAL_KEY : ENTITY_SPECIAL_KEY;
-        Class<?> selectedClass = multiObjects ? ((Collection) selected).iterator().next().getClass() : selected.getClass();
-
-        String javaClassName = multiObjects ? selectedClass.getCanonicalName() :
-                selected.getClass().getCanonicalName();
-
-        openRunReportScreen(window, paramKey, selected, javaClassName, reportType);
+        openRunReportScreen(window, selected, javaClassName);
     }
 
     private void printAll() {
-        ReportType reportType = multiObjects ? ReportType.LIST_PRINT_FORM : ReportType.PRINT_FORM;
-        String paramKey = multiObjects ? ENTITIES_LIST_SPECIAL_KEY : ENTITY_SPECIAL_KEY;
         CollectionDatasource datasource = table.getDatasource();
 
         MetaClass metaClass = datasource.getMetaClass();
@@ -165,14 +121,14 @@ public class TablePrintFormAction extends AbstractPrintFormAction {
 
         LoadContext loadContext = datasource.getCompiledLoadContext();
 
-        ParameterPrototype parameterPrototype = new ParameterPrototype(paramKey);
+        ParameterPrototype parameterPrototype = new ParameterPrototype("");//todo
         parameterPrototype.setMetaClassName(metaClass.getFullName());
         parameterPrototype.setQueryString(loadContext.getQuery().getQueryString());
         parameterPrototype.setQueryParams(loadContext.getQuery().getParameters());
         parameterPrototype.setViewName(loadContext.getView().getName());
         parameterPrototype.setUseSecurityConstraints(loadContext.isUseSecurityConstraints());
 
-        openRunReportScreen(window, paramKey, parameterPrototype, javaClassName, reportType);
+        openRunReportScreen(window, parameterPrototype, javaClassName);
     }
 
     @Override

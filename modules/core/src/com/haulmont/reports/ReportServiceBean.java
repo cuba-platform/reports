@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -76,5 +77,14 @@ public class ReportServiceBean implements ReportService {
 
     public Report convertToReport(String xml) {
         return reportingApi.convertToReport(xml);
+    }
+
+    @Override
+    public Report copyReport(Report source) {
+        return reportingApi.copyReport(source);
+    }
+
+    public ReportOutputDocument bulkPrint(Report report, List<Map<String, Object>> paramsList) {
+        return reportingApi.bulkPrint(report, paramsList);
     }
 }

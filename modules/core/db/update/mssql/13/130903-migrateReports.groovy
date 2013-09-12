@@ -15,6 +15,7 @@ import com.haulmont.reports.app.service.ReportService
 import com.haulmont.reports.entity.BandDefinition
 import com.haulmont.reports.entity.Report
 import com.haulmont.reports.entity.ReportTemplate
+import org.apache.commons.lang.StringUtils
 import org.mybatis.spring.SqlSessionFactoryBean
 import org.mybatis.spring.SqlSessionTemplate
 import org.springframework.core.io.ByteArrayResource
@@ -217,7 +218,8 @@ postUpdate.add({
                             if (fileDescr != null) {
                                 byte[] bytes = fileStorage.loadFile(fileDescr);
                                 reportTemplate.setContent(bytes);
-                                reportTemplate.setName(fileDescr.getName() + "." + fileDescr.getExtension());
+                                reportTemplate.setName(fileDescr.getName());
+                                reportTemplate.setOutputNamePattern(StringUtils.substringBeforeLast(reportTemplate.getName(), ".") + "." + reportTemplate.getReportOutputType().outputType.getId())
                             }
                         } catch (FileStorageException e) {
                             System.out.println("Failed to load file " + id);
@@ -235,7 +237,7 @@ postUpdate.add({
 
             Map<UUID, BandDefinition> map = [:]
             for (BandDefinition band : report.bands) {
-                 map.put(band.id, band)
+                map.put(band.id, band)
             }
 
             for (BandDefinition band : report.bands) {

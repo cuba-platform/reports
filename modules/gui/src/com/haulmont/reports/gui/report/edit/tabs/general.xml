@@ -7,14 +7,12 @@
             <fieldGroup id="propertiesFieldGroup" border="hidden" datasource="reportDs" width="50%">
                 <column>
                     <field id="name" required="true" requiredMessage="msg://report.nameMsg" width="${width}"/>
-                    <field id="code" width="${width}"/>
                     <field id="defaultTemplate" custom="true" required="true" requiredMessage="msg://report.templateMsg"/>
                 </column>
                 <column>
-                    <field id="reportType" required="true" requiredMessage="msg://report.reportTypeMsg"
-                           width="${width}"/>
                     <field id="group" required="true" optionsDatasource="groupsDs"
                            requiredMessage="msg://report.reportTypeMsg" width="${width}"/>
+                    <field id="code" width="${width}"/>
                 </column>
             </fieldGroup>
         </vbox>

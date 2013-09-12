@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2013 Haulmont Technology Ltd. All Rights Reserved.
+ * Haulmont Technology proprietary and confidential.
+ * Use is subject to license terms.
+ */
+
 import com.haulmont.cuba.core.EntityManager
 import com.haulmont.cuba.core.Persistence
 import com.haulmont.cuba.core.Transaction
@@ -9,6 +15,7 @@ import com.haulmont.reports.app.service.ReportService
 import com.haulmont.reports.entity.BandDefinition
 import com.haulmont.reports.entity.Report
 import com.haulmont.reports.entity.ReportTemplate
+import org.apache.commons.lang.StringUtils
 import org.mybatis.spring.SqlSessionFactoryBean
 import org.mybatis.spring.SqlSessionTemplate
 import org.springframework.core.io.ByteArrayResource
@@ -211,7 +218,8 @@ postUpdate.add({
                             if (fileDescr != null) {
                                 byte[] bytes = fileStorage.loadFile(fileDescr);
                                 reportTemplate.setContent(bytes);
-                                reportTemplate.setName(fileDescr.getName() + "." + fileDescr.getExtension());
+                                reportTemplate.setName(fileDescr.getName());
+                                reportTemplate.setOutputNamePattern(StringUtils.substringBeforeLast(reportTemplate.getName(), ".") + "." + reportTemplate.getReportOutputType().outputType.getId())
                             }
                         } catch (FileStorageException e) {
                             System.out.println("Failed to load file " + id);
@@ -244,6 +252,7 @@ postUpdate.add({
                     }
                 }
             }
+
 
             ReportService reportService = AppBeans.get(ReportService.NAME);
             String xml = reportService.convertToXml(report);

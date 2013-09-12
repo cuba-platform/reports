@@ -6,6 +6,7 @@
 
 package com.haulmont.reports;
 
+import com.haulmont.chile.core.model.utils.InstanceUtils;
 import com.haulmont.cuba.core.EntityManager;
 import com.haulmont.cuba.core.Persistence;
 import com.haulmont.cuba.core.Transaction;
@@ -20,16 +21,22 @@ import com.haulmont.yarg.formatters.CustomReport;
 import com.haulmont.yarg.reporting.ReportOutputDocument;
 import com.haulmont.yarg.reporting.ReportingAPI;
 import com.haulmont.yarg.reporting.RunParams;
+import com.haulmont.yarg.structure.ReportOutputType;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.basic.DateConverter;
 import com.thoughtworks.xstream.converters.collections.CollectionConverter;
 import com.thoughtworks.xstream.converters.reflection.ExternalizableConverter;
+import org.apache.commons.compress.archivers.ArchiveEntry;
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
+import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import org.apache.commons.lang.StringUtils;
 
 import javax.annotation.ManagedBean;
 import javax.inject.Inject;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.*;
+import java.util.zip.CRC32;
 
 /**
  * @author artamonov
@@ -39,63 +46,104 @@ import java.util.*;
 public class ReportingBean implements ReportingApi {
     public static final String REPORT_EDIT_VIEW_NAME = "report.edit";
 
-    private PrototypesLoader prototypesLoader = new PrototypesLoader();
+    protected PrototypesLoader prototypesLoader = new PrototypesLoader();
 
     @Inject
-    private Persistence persistence;
+    protected Persistence persistence;
 
     @Inject
-    private Metadata metadata;
+    protected Metadata metadata;
 
     @Inject
-    private FileStorageAPI fileStorageAPI;
+    protected FileStorageAPI fileStorageAPI;
 
     @Inject
-    private TimeSource timeSource;
+    protected TimeSource timeSource;
 
     @Inject
-    private ReportingAPI reportingApi;
+    protected ReportingAPI reportingApi;
 
     @Inject
-    private Scripting scripting;
+    protected Scripting scripting;
 
     @Inject
-    private ReportImportExport reportImportExport;
+    protected ReportImportExport reportImportExport;
+
+    @Inject
+    protected UuidSource uuidSource;
 
     @Override
     public ReportOutputDocument createReport(Report report, Map<String, Object> params) throws IOException {
         report = reloadEntity(report, REPORT_EDIT_VIEW_NAME);
-        fromXml(report);
-
         ReportTemplate reportTemplate = report.getDefaultTemplate();
         return createReportDocument(report, reportTemplate, params);
-    }
-
-    private void fromXml(Report report) {
-        if (StringUtils.isNotBlank(report.getXml())) {
-            Report reportFromXml = convertToReport(report.getXml());
-            report.setBands(reportFromXml.getBands());
-            report.setInputParameters(reportFromXml.getInputParameters());
-            report.setReportScreens(reportFromXml.getReportScreens());
-            report.setRoles(reportFromXml.getRoles());
-            report.setValuesFormats(reportFromXml.getValuesFormats());
-        }
     }
 
     @Override
     public ReportOutputDocument createReport(Report report, String templateCode, Map<String, Object> params)
             throws IOException {
         report = reloadEntity(report, REPORT_EDIT_VIEW_NAME);
-        fromXml(report);
         ReportTemplate template = report.getTemplateByCode(templateCode);
         return createReportDocument(report, template, params);
+    }
+
+    @Override
+    public ReportOutputDocument bulkPrint(Report report, List<Map<String, Object>> paramsList) {
+        try {
+            report = reloadEntity(report, REPORT_EDIT_VIEW_NAME);
+
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+
+            ZipArchiveOutputStream zipOutputStream = new ZipArchiveOutputStream(byteArrayOutputStream);
+            zipOutputStream.setMethod(ZipArchiveOutputStream.STORED);
+            zipOutputStream.setEncoding(ReportImportExport.ENCODING);
+
+            ReportTemplate reportTemplate = report.getDefaultTemplate();
+            Map<String, Integer> alreadyUsedNames = new HashMap<>();
+
+            for (Map<String, Object> params : paramsList) {
+                ReportOutputDocument reportDocument = createReportDocument(report, reportTemplate, params);
+
+                String documentName = reportDocument.getDocumentName();
+                if (alreadyUsedNames.containsKey(documentName)) {
+                    int newCount = alreadyUsedNames.get(documentName) + 1;
+                    alreadyUsedNames.put(documentName, newCount);
+                    documentName = StringUtils.substringBeforeLast(documentName, ".") + newCount + "." + StringUtils.substringAfterLast(documentName, ".");
+                    alreadyUsedNames.put(documentName, 1);
+                } else {
+                    alreadyUsedNames.put(documentName, 1);
+                }
+
+                ArchiveEntry singleReportEntry = newStoredEntry(documentName, reportDocument.getContent());
+                zipOutputStream.putArchiveEntry(singleReportEntry);
+                zipOutputStream.write(reportDocument.getContent());
+            }
+
+            zipOutputStream.closeArchiveEntry();
+            zipOutputStream.close();
+
+
+            ReportOutputDocument reportOutputDocument = new ReportOutputDocument(report, byteArrayOutputStream.toByteArray(), "Reports.zip", ReportOutputType.custom);
+            return reportOutputDocument;
+        } catch (IOException e) {
+            throw new ReportingException("An error occurred while zipping report contents", e);
+        }
+    }
+
+    private ArchiveEntry newStoredEntry(String name, byte[] data) {
+        ZipArchiveEntry zipEntry = new ZipArchiveEntry(name);
+        zipEntry.setSize(data.length);
+        zipEntry.setCompressedSize(zipEntry.getSize());
+        CRC32 crc32 = new CRC32();
+        crc32.update(data);
+        zipEntry.setCrc(crc32.getValue());
+        return zipEntry;
     }
 
     @Override
     public ReportOutputDocument createReport(Report report, ReportTemplate template, Map<String, Object> params)
             throws IOException {
         report = reloadEntity(report, REPORT_EDIT_VIEW_NAME);
-        fromXml(report);
         return createReportDocument(report, template, params);
     }
 
@@ -107,12 +155,12 @@ public class ReportingBean implements ReportingApi {
                 if (param.getValue() instanceof ParameterPrototype)
                     prototypes.add(param.getKey());
             }
-            Map<String, Object> paramsMap = new HashMap<>(params);
+            Map<String, Object> resultParams = new HashMap<>(params);
 
             for (String paramName : prototypes) {
                 ParameterPrototype prototype = (ParameterPrototype) params.get(paramName);
                 List data = prototypesLoader.loadData(prototype);
-                paramsMap.put(paramName, data);
+                resultParams.put(paramName, data);
             }
 
             if (template.isCustom()) {
@@ -120,11 +168,53 @@ public class ReportingBean implements ReportingApi {
                 template.setCustomReport((CustomReport) reportClass.newInstance());
             }
 
-            return reportingApi.runReport(new RunParams(report).template(template).params(params));
+            return reportingApi.runReport(new RunParams(report).template(template).params(resultParams));
         } catch (InstantiationException | IllegalAccessException e) {
             throw new ReportingException(String.format("Could not instantiate class for custom template [%s]", template.getCustomClass()), e);
         }
     }
+
+    public Report copyReport(Report source) {
+        source = reloadEntity(source, REPORT_EDIT_VIEW_NAME);
+        Report copiedReport = (Report) InstanceUtils.copy(source);
+
+        copiedReport.setName("(Copy)" + source.getName());
+        copiedReport.setId(uuidSource.createUuid());
+        copiedReport.setTemplates(null);
+
+        List<ReportTemplate> copiedTemplates = new ArrayList<>();
+        ReportTemplate defaultCopiedTemplate = null;
+
+        for (ReportTemplate reportTemplate : source.getTemplates()) {
+            ReportTemplate copiedTemplate = (ReportTemplate) InstanceUtils.copy(reportTemplate);
+            copiedTemplate.setId(uuidSource.createUuid());
+            copiedTemplate.setReport(copiedReport);
+            copiedTemplates.add(copiedTemplate);
+            if (source.getDefaultTemplate().equals(reportTemplate)) {
+                defaultCopiedTemplate = copiedTemplate;
+            }
+        }
+
+
+        Transaction tx = persistence.createTransaction();
+        try {
+            EntityManager em = persistence.getEntityManager();
+            em.persist(copiedReport);
+            for (ReportTemplate copiedTemplate : copiedTemplates) {
+                em.persist(copiedTemplate);
+            }
+            copiedReport.setTemplates(copiedTemplates);
+            copiedReport.setDefaultTemplate(defaultCopiedTemplate);
+
+            copiedReport.setXml(convertToXml(copiedReport));
+            tx.commit();
+        } finally {
+            tx.end();
+        }
+
+        return copiedReport;
+    }
+
 
     @Override
     public byte[] exportReports(Collection<Report> reports) throws IOException, FileStorageException {

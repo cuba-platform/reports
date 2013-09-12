@@ -77,7 +77,7 @@ create table REPORT_REPORT (
     DEFAULT_TEMPLATE_ID varchar2(32),
     XML clob,
 
-    REPORT_TYPE integer not null,
+    REPORT_TYPE integer,
     primary key(ID)
 )^
 create unique index UK_REPORT_REPORT_CODE on REPORT_REPORT(CODE)^
@@ -108,7 +108,6 @@ create table REPORT_TEMPLATE (
     UPDATED_BY varchar2(50),
     REPORT_ID varchar2(32) not null,
     CODE varchar2(50),
-    TEMPLATE_FILE_ID varchar2(32) not null,
     OUTPUT_TYPE integer not null,
     IS_DEFAULT char(1),
     IS_CUSTOM char(1),

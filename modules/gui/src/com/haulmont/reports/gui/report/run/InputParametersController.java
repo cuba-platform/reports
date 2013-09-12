@@ -7,7 +7,6 @@ package com.haulmont.reports.gui.report.run;
 
 import com.haulmont.chile.core.datatypes.Datatypes;
 import com.haulmont.cuba.core.entity.Entity;
-import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.core.global.Metadata;
 import com.haulmont.cuba.core.global.View;
@@ -18,11 +17,11 @@ import com.haulmont.cuba.gui.components.DateField.Resolution;
 import com.haulmont.cuba.gui.components.validators.DoubleValidator;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
 import com.haulmont.cuba.gui.data.DsBuilder;
-import com.haulmont.reports.gui.ReportHelper;
 import com.haulmont.cuba.gui.xml.layout.ComponentsFactory;
 import com.haulmont.reports.entity.ParameterType;
 import com.haulmont.reports.entity.Report;
 import com.haulmont.reports.entity.ReportInputParameter;
+import com.haulmont.reports.gui.ReportGuiManager;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 
@@ -35,23 +34,33 @@ import java.util.*;
  */
 public class InputParametersController extends AbstractWindow {
 
-    private interface FieldCreator {
+    protected interface FieldCreator {
         Field createField(ReportInputParameter parameter);
     }
 
-    private ComponentsFactory cFactory = AppConfig.getFactory();
+    protected ComponentsFactory cFactory = AppConfig.getFactory();
 
-    private Report report;
-    private Entity linkedEntity;
+    protected Report report;
 
-    private Messages messages;
-    private Metadata metadata;
+    protected Entity linkedEntity;
+
+    protected Map<String, Object> parameters;
 
     @Inject
-    private GridLayout parametersGrid;
+    protected Messages messages;
 
-    private HashMap<String, Field> parameterComponents = new HashMap<>();
-    private Map<ParameterType, FieldCreator> fieldCreationMapping = new HashMap<>();
+    @Inject
+    protected Metadata metadata;
+
+    @Inject
+    protected GridLayout parametersGrid;
+
+    @Inject
+    protected ReportGuiManager reportGuiManager;
+
+    protected HashMap<String, Field> parameterComponents = new HashMap<>();
+
+    protected Map<ParameterType, FieldCreator> fieldCreationMapping = new HashMap<>();
 
     {
         fieldCreationMapping.put(ParameterType.BOOLEAN, new CheckBoxCreator());
@@ -68,12 +77,12 @@ public class InputParametersController extends AbstractWindow {
     @Override
     public void init(Map<String, Object> params) {
         super.init(params);
-
-        messages = AppBeans.get(Messages.NAME);
-        metadata = AppBeans.get(Metadata.NAME);
-
         report = (Report) params.get("report");
         linkedEntity = (Entity) params.get("entity");
+        parameters = (Map<String, Object>) params.get("parameters");
+        if (parameters == null) {
+            parameters = Collections.emptyMap();
+        }
 
         if (report != null) {
             report = getDsContext().getDataSupplier().reload(report, "report.edit");
@@ -95,7 +104,7 @@ public class InputParametersController extends AbstractWindow {
             try {
                 validateAll();
                 Map<String, Object> collectedParams = collectParameters(parameterComponents);
-                ReportHelper.printReport(report, collectedParams);
+                reportGuiManager.printReport(report, collectedParams);
             } catch (ValidationException e) {
                 showNotification(getMessage("input.requiredParametersNotSet"), IFrame.NotificationType.WARNING);
             }
@@ -115,8 +124,6 @@ public class InputParametersController extends AbstractWindow {
         return parameters;
     }
 
-    //todo: reimplement this method
-
     private void createComponent(ReportInputParameter parameter, int currentGridRow) {
         Field field = fieldCreationMapping.get(parameter.getType()).createField(parameter);
         field.setRequiredMessage(formatMessage("error.paramIsRequiredButEmpty", parameter.getLocName()));
@@ -128,6 +135,19 @@ public class InputParametersController extends AbstractWindow {
 
         parameterComponents.put(parameter.getAlias(), field);
         field.setRequired(parameter.getRequired());
+
+        Object value = parameters.get(parameter.getAlias());
+        if (!(field instanceof TokenList)) {
+            field.setValue(value);
+        } else {
+            CollectionDatasource datasource = (CollectionDatasource) field.getDatasource();
+            if (value instanceof Collection) {
+                Collection collection = (Collection) value;
+                for (Object selected : collection) {
+                    datasource.includeItem((Entity) selected);
+                }
+            }
+        }
 
         Label label = cFactory.createComponent(Label.NAME);
         label.setAlignment(Alignment.MIDDLE_LEFT);
@@ -299,14 +319,17 @@ public class InputParametersController extends AbstractWindow {
 
             tokenList.setAddButtonCaption(messages.getMessage(TokenList.class, "actions.Select"));
             tokenList.setSimple(true);
-            tokenList.addValidator(new Field.Validator() {
-                @Override
-                public void validate(Object value) throws ValidationException {
-                    if (value instanceof Collection && CollectionUtils.isEmpty((Collection) value)) {
-                        throw new ValidationException(formatMessage("error.paramIsRequiredButEmpty", parameter.getLocName()));
+
+            if (Boolean.TRUE.equals(parameter.getRequired())) {
+                tokenList.addValidator(new Field.Validator() {
+                    @Override
+                    public void validate(Object value) throws ValidationException {
+                        if (value instanceof Collection && CollectionUtils.isEmpty((Collection) value)) {
+                            throw new ValidationException(formatMessage("error.paramIsRequiredButEmpty", parameter.getLocName()));
+                        }
                     }
-                }
-            });
+                });
+            }
 
 
             return tokenList;

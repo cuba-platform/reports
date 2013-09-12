@@ -38,7 +38,7 @@ import java.util.zip.CRC32;
 
 @ManagedBean
 public class ReportImportExport {
-    protected static final String ENCODING = "CP866";
+    public static final String ENCODING = "CP866";
 
     @Inject
     protected ReportingApi reportingApi;
@@ -101,8 +101,7 @@ public class ReportImportExport {
                 if (template.getContent() != null) {
                     byte[] fileBytes = template.getContent();
                     ArchiveEntry zipEntryTemplate = newStoredEntry(
-                            "templates/" + Integer.toString(i) + "/" + template.getName(),
-                            fileBytes);
+                            "templates/" + i + "/" + template.getName(), fileBytes);
                     zipOutputStream.putArchiveEntry(zipEntryTemplate);
                     zipOutputStream.write(fileBytes);
                 }

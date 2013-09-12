@@ -29,7 +29,7 @@ create table REPORT_REPORT
   CODE varchar(255),
   LOCALE_NAMES text,
   GROUP_ID uuid not null,
-  REPORT_TYPE integer not null,
+  REPORT_TYPE integer,
   DEFAULT_TEMPLATE_ID uuid,
   XML text,
   --
@@ -77,7 +77,6 @@ create table REPORT_TEMPLATE
   --
   REPORT_ID uuid not null,
   CODE varchar(50),
-  TEMPLATE_FILE_ID uuid not null,
   OUTPUT_TYPE integer default 0 not null,
   IS_DEFAULT boolean default false,
   IS_CUSTOM boolean default false,

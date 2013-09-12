@@ -21,7 +21,9 @@ public class ReportPrintHelper {
 
     static {
         exportFormats.put(ReportOutputType.xls, ExportFormat.XLS);
+        exportFormats.put(ReportOutputType.xlsx, ExportFormat.XLSX);
         exportFormats.put(ReportOutputType.doc, ExportFormat.DOC);
+        exportFormats.put(ReportOutputType.docx, ExportFormat.DOCX);
         exportFormats.put(ReportOutputType.pdf, ExportFormat.PDF);
         exportFormats.put(ReportOutputType.html, ExportFormat.HTML);
     }

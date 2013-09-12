@@ -29,7 +29,7 @@ create table REPORT_REPORT
   CODE varchar(255),
   LOCALE_NAMES varchar(1000),
   GROUP_ID uniqueidentifier not null,
-  REPORT_TYPE integer not null,
+  REPORT_TYPE integer,
   DEFAULT_TEMPLATE_ID uniqueidentifier,
   XML varchar(max),
   --
@@ -77,7 +77,6 @@ create table REPORT_TEMPLATE
   --
   REPORT_ID uniqueidentifier not null,
   CODE varchar(50),
-  TEMPLATE_FILE_ID uniqueidentifier not null,
   OUTPUT_TYPE integer default 0 not null,
   IS_DEFAULT tinyint default 0,
   IS_CUSTOM tinyint default 0,
