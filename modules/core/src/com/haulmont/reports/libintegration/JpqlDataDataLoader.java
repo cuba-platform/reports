@@ -28,7 +28,8 @@ public class JpqlDataDataLoader extends AbstractDbDataLoader implements ReportDa
     private Persistence persistence;
 
     private static final String QUERY_END = "%%END%%";
-    private static final String OUTPUT_PARAMS_PATTERN = "as ([\\w|\\d|_]+\\b)[\\s]*[,|from|" + QUERY_END + "]";
+    private static final String ALIAS_PATTERN = "as +([\\w|\\d|_]+\\b) *";
+    private static final String OUTPUT_PARAMS_PATTERN = "(?i)" + ALIAS_PATTERN + "[,|from|" + QUERY_END + "]";
 
     protected List<String> parseQueryOutputParametersNames(String query) {
         ArrayList<String> result = new ArrayList<>();
@@ -58,8 +59,8 @@ public class JpqlDataDataLoader extends AbstractDbDataLoader implements ReportDa
 
             outputParameters = parseQueryOutputParametersNames(query);
 
-            query = query.replaceAll("(?i)as [\\w|\\d|_|\\s]+,", ",");//replaces [as alias_name] entries except last
-            query = query.replaceAll("(?i)as [\\w|\\d|_]+ *", " ");//replaces last [as alias_name] entry
+            query = query.replaceAll("(?i)" + ALIAS_PATTERN + ",", ",");//replaces [as alias_name], entries except last
+            query = query.replaceAll("(?i)" + ALIAS_PATTERN, " ");//replaces last [as alias_name] entry
 
             Query select = insertParameters(query, band.getParentBand(), params);
             queryResult = select.getResultList();
@@ -104,8 +105,7 @@ public class JpqlDataDataLoader extends AbstractDbDataLoader implements ReportDa
             //replaces ${alias} marks with ? and remembers their positions
             String alias = "${" + entry.getKey() + "}";
             String regexp = "\\$\\{" + entry.getKey() + "\\}";
-            //todo: another regexp to remove parameter
-            String deleteRegexp = "(?i)(and)?(or)? ?[\\w|\\d|\\.|\\_]+ ?(=|>=|<=|like) ?\\$\\{" + entry.getKey() + "\\}";
+            String deleteRegexp = "(?i)(and)?(or)? *[\\w|\\d|\\.|\\_]+ *(=|>=|<=|like) *\\$\\{" + entry.getKey() + "\\}";
 
             if (entry.getValue() == null) {
                 query = query.replaceAll(deleteRegexp, "");
