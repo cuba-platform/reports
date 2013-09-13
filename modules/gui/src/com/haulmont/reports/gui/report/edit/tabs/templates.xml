@@ -8,7 +8,7 @@
                     <button action="templatesTable.create" icon="icons/create.png"/>
                     <button action="templatesTable.edit" icon="icons/edit.png"/>
                     <button action="templatesTable.remove" icon="icons/remove.png"/>
-                    <button id="defaultTemplateBtn" icon="icons/ok.png"/>
+                    <button action="templatesTable.defaultTemplate" icon="icons/ok.png"/>
                 </buttonsPanel>
                 <columns>
                     <column id="name"/>

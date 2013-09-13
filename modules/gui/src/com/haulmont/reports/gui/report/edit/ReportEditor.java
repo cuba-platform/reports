@@ -9,7 +9,6 @@ import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.chile.core.model.MetaPropertyPath;
 import com.haulmont.cuba.core.app.FileStorageService;
 import com.haulmont.cuba.core.entity.Entity;
-import com.haulmont.cuba.core.entity.FileDescriptor;
 import com.haulmont.cuba.core.global.*;
 import com.haulmont.cuba.gui.AppConfig;
 import com.haulmont.cuba.gui.WindowManager;
@@ -58,8 +57,6 @@ import java.util.*;
 public class ReportEditor extends AbstractEditor {
 
     protected Report report;
-
-    protected Map<Entity, List<FileDescriptor>> deletedFiles = new HashMap<>();
 
     @Named("generalFrame.propertiesFieldGroup")
     protected FieldGroup propertiesFieldGroup;
@@ -757,21 +754,15 @@ public class ReportEditor extends AbstractEditor {
             public Map<String, Object> getInitialValues() {
                 return Collections.<String, Object>singletonMap("report", report);
             }
-
-            @Override
-            public Map<String, Object> getWindowParams() {
-                return Collections.<String, Object>singletonMap("deletedContainer", deletedFiles);
-            }
         });
-        templatesTable.addAction(new EditAction(templatesTable, OpenType.DIALOG) {
-            @Override
-            public Map<String, Object> getWindowParams() {
-                return Collections.<String, Object>singletonMap("deletedContainer", deletedFiles);
-            }
-        });
+        templatesTable.addAction(new EditAction(templatesTable, OpenType.DIALOG));
         templatesTable.addAction(new RemoveAction(templatesTable, false));
 
-        defaultTemplateBtn.setAction(new ItemTrackingAction("report.defaultTemplate") {
+        templatesTable.addAction(new AbstractAction("defaultTemplate") {
+            @Override
+            public String getCaption() {
+                return getMessage("report.defaultTemplate");
+            }
 
             @Override
             public void actionPerform(Component component) {
@@ -781,8 +772,6 @@ public class ReportEditor extends AbstractEditor {
                 }
             }
         });
-
-        templatesTable.addAction(defaultTemplateBtn.getAction());
     }
 
     protected void orderParameters() {

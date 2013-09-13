@@ -7,7 +7,6 @@
 package com.haulmont.reports.gui.template.edit;
 
 import com.haulmont.cuba.core.entity.Entity;
-import com.haulmont.cuba.core.entity.FileDescriptor;
 import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.gui.AppConfig;
 import com.haulmont.cuba.gui.components.*;
@@ -24,8 +23,6 @@ import org.apache.commons.lang.StringUtils;
 import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -51,9 +48,6 @@ public class TemplateEditor extends AbstractEditor {
 
     @Inject
     private FileUploadingAPI fileUploading;
-
-    private Map<ReportTemplate, ArrayList<FileDescriptor>> deletedContainer;
-    private List<FileDescriptor> deletedList = new ArrayList<>();
 
     @Override
     public void setItem(Entity item) {
@@ -87,8 +81,6 @@ public class TemplateEditor extends AbstractEditor {
         super.init(params);
 
         getDialogParams().setWidth(490);
-
-        deletedContainer = (java.util.Map) params.get("deletedContainer");
 
         CheckBox custom = getComponent("customFlag");
         custom.addListener(new ValueListener() {
@@ -147,29 +139,10 @@ public class TemplateEditor extends AbstractEditor {
     }
 
     @Override
-    public boolean commit() {
-        boolean result = super.commit();
-        if (result) {
-            if (deletedContainer.get(template) == null)
-                deletedContainer.put(template, new ArrayList<FileDescriptor>());
-            List<FileDescriptor> deletedFilesList = deletedContainer.get(template);
-            deletedFilesList.addAll(deletedList);
-        }
-        return result;
-    }
-
-    @Override
     public boolean commit(boolean validate) {
         if (!validateTemplateFile()) return false;
 
-        boolean result = super.commit(validate);
-        if (result && (deletedList.size() > 0)) {
-            if (deletedContainer.get(template) == null)
-                deletedContainer.put(template, new ArrayList<FileDescriptor>());
-            List<FileDescriptor> deletedFilesList = deletedContainer.get(template);
-            deletedFilesList.addAll(deletedList);
-        }
-        return result;
+        return super.commit(validate);
     }
 
     private boolean validateTemplateFile() {
