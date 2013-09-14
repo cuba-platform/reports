@@ -54,9 +54,7 @@ import java.util.*;
  * @author degtyarjov
  * @version $Id$
  */
-public class ReportEditor extends AbstractEditor {
-
-    protected Report report;
+public class ReportEditor extends AbstractEditor<Report> {
 
     @Named("generalFrame.propertiesFieldGroup")
     protected FieldGroup propertiesFieldGroup;
@@ -81,9 +79,6 @@ public class ReportEditor extends AbstractEditor {
 
     @Named("generalFrame.serviceTree")
     protected Tree tree;
-
-    @Named("templatesFrame.defaultTemplateBtn")
-    protected Button defaultTemplateBtn;
 
     @Named("templatesFrame.templatesTable")
     protected Table templatesTable;
@@ -170,18 +165,17 @@ public class ReportEditor extends AbstractEditor {
     protected ReportService reportService;
 
     @Override
-    public void setItem(Entity item) {
-        Report report = (Report) item;
-        BandDefinition rootDefinition = null;
-
-        if (PersistenceHelper.isNew(item)) {
+    protected void initItem(Report report) {
+        if (PersistenceHelper.isNew(report)) {
             report.setReportType(ReportType.SIMPLE);
 
-            rootDefinition = new BandDefinition();
+            BandDefinition rootDefinition = new BandDefinition();
             rootDefinition.setName("Root");
             rootDefinition.setPosition(0);
             report.setBands(new HashSet<BandDefinition>());
             report.getBands().add(rootDefinition);
+
+            rootDefinition.setReport(report);
 
             groupsDs.refresh();
             if (groupsDs.getItemIds() != null) {
@@ -189,16 +183,13 @@ public class ReportEditor extends AbstractEditor {
                 report.setGroup(groupsDs.getItem(id));
             }
         }
+    }
 
-        if (!StringUtils.isEmpty(report.getName())) {
-            setCaption(AppBeans.get(Messages.class).formatMessage(getClass(), "reportEditor.format", report.getName()));
+    @Override
+    protected void postInit() {
+        if (!StringUtils.isEmpty(getItem().getName())) {
+            setCaption(AppBeans.get(Messages.class).formatMessage(getClass(), "reportEditor.format", getItem().getName()));
         }
-
-        super.setItem(item);
-        this.report = (Report) getItem();
-
-        if (PersistenceHelper.isNew(item))
-            rootDefinition.setReport(this.report);
 
         ((CollectionPropertyDatasourceImpl) treeDs).setModified(false);
         ((DatasourceImpl) reportDs).setModified(false);
@@ -228,7 +219,7 @@ public class ReportEditor extends AbstractEditor {
                     public Map<String, Object> getInitialValues() {
                         Map<String, Object> params = new HashMap<>();
                         params.put("position", parametersDs.getItemIds().size());
-                        params.put("report", report);
+                        params.put("report", getItem());
                         return params;
                     }
 
@@ -254,7 +245,7 @@ public class ReportEditor extends AbstractEditor {
             public void actionPerform(Component component) {
                 ReportInputParameter parameter = parametersDs.getItem();
                 if (parameter != null) {
-                    List<ReportInputParameter> inputParameters = report.getInputParameters();
+                    List<ReportInputParameter> inputParameters = getItem().getInputParameters();
                     int index = parameter.getPosition();
                     if (index > 0) {
                         ReportInputParameter previousParameter = null;
@@ -274,21 +265,8 @@ public class ReportEditor extends AbstractEditor {
             }
 
             @Override
-            public void itemChanged(Datasource ds, Entity prevItem, Entity item) {
-                super.itemChanged(ds, prevItem, item);
-                turnEnabled(item);
-            }
-
-            @Override
-            public void valueChanged(Entity source, String property, Object prevValue, Object value) {
-                if ("position".equals(property)) {
-                    turnEnabled(parametersDs.getItem());
-                }
-            }
-
-            public void turnEnabled(Entity item) {
-                ReportInputParameter parameter = (ReportInputParameter) item;
-                setEnabled(item != null && parameter.getPosition() > 0);
+            public boolean isApplicableTo(Datasource.State state, Entity item) {
+                return super.isApplicableTo(state, item) && ((ReportInputParameter) item).getPosition() > 0;
             }
         });
 
@@ -297,7 +275,7 @@ public class ReportEditor extends AbstractEditor {
             public void actionPerform(Component component) {
                 ReportInputParameter parameter = parametersDs.getItem();
                 if (parameter != null) {
-                    List<ReportInputParameter> inputParameters = report.getInputParameters();
+                    List<ReportInputParameter> inputParameters = getItem().getInputParameters();
                     int index = parameter.getPosition();
                     if (index < parametersDs.getItemIds().size() - 1) {
                         ReportInputParameter nextParameter = null;
@@ -317,24 +295,11 @@ public class ReportEditor extends AbstractEditor {
             }
 
             @Override
-            public void itemChanged(Datasource ds, Entity prevItem, Entity item) {
-                super.itemChanged(ds, prevItem, item);
-                turnEnabled(item);
+            public boolean isApplicableTo(Datasource.State state, Entity item) {
+                return super.isApplicableTo(state, item) &&
+                        ((ReportInputParameter) item).getPosition() < parametersDs.size() - 1;
             }
-
-            @Override
-            public void valueChanged(Entity source, String property, Object prevValue, Object value) {
-                if ("position".equals(property)) {
-                    turnEnabled(parametersDs.getItem());
-                }
-            }
-
-            void turnEnabled(Entity item) {
-                ReportInputParameter parameter = (ReportInputParameter) item;
-                setEnabled(item != null && parameter.getPosition() < parametersDs.size() - 1);
-            }
-        }
-        );
+        });
 
         parametersTable.addAction(paramUpButton.getAction());
         parametersTable.addAction(paramDownButton.getAction());
@@ -345,7 +310,7 @@ public class ReportEditor extends AbstractEditor {
                 new CreateAction(formatsTable, OpenType.DIALOG) {
                     @Override
                     public Map<String, Object> getInitialValues() {
-                        return Collections.<String, Object>singletonMap("report", report);
+                        return Collections.<String, Object>singletonMap("report", getItem());
                     }
                 }
         );
@@ -378,10 +343,11 @@ public class ReportEditor extends AbstractEditor {
 
                 if ((w1DollarIndex > 0 && w2DollarIndex > 0) || (w1DollarIndex < 0 && w2DollarIndex < 0)) {
                     return w1.getId().compareTo(w2.getId());
-                } else if (w1DollarIndex > 0)
+                } else if (w1DollarIndex > 0) {
                     return -1;
-                else
+                } else {
                     return 1;
+                }
             }
         });
 
@@ -412,7 +378,7 @@ public class ReportEditor extends AbstractEditor {
 
                     if (!exists) {
                         ReportScreen reportScreen = new ReportScreen();
-                        reportScreen.setReport((Report) getItem());
+                        reportScreen.setReport(getItem());
                         reportScreen.setScreenId(screenId);
                         reportScreensDs.addItem(reportScreen);
                     }
@@ -466,7 +432,7 @@ public class ReportEditor extends AbstractEditor {
 
                     @Override
                     public void actionPerform(Component component) {
-                        ReportTemplate defaultTemplate = report.getDefaultTemplate();
+                        ReportTemplate defaultTemplate = getItem().getDefaultTemplate();
                         if (defaultTemplate != null) {
                             ExportDisplay exportDisplay = AppConfig.createExportDisplay(ReportEditor.this);
                             byte[] reportTemplate = defaultTemplate.getContent();
@@ -490,7 +456,7 @@ public class ReportEditor extends AbstractEditor {
 
                     @Override
                     public void actionPerform(Component component) {
-                        final ReportTemplate defaultTemplate = report.getDefaultTemplate();
+                        final ReportTemplate defaultTemplate = getItem().getDefaultTemplate();
                         if (defaultTemplate != null) {
                             final FileUploadDialog dialog = openWindow("fileUploadDialog", OpenType.DIALOG);
                             dialog.addListener(new CloseListener() {
@@ -523,7 +489,7 @@ public class ReportEditor extends AbstractEditor {
 
                     @Override
                     public void actionPerform(Component component) {
-                        ReportTemplate defaultTemplate = report.getDefaultTemplate();
+                        ReportTemplate defaultTemplate = getItem().getDefaultTemplate();
                         if (defaultTemplate != null) {
                             final Editor editor = openEditor("report$ReportTemplate.edit", defaultTemplate, OpenType.DIALOG, templatesDs);
                             editor.addListener(new CloseListener() {
@@ -531,7 +497,7 @@ public class ReportEditor extends AbstractEditor {
                                 public void windowClosed(String actionId) {
                                     if (Window.COMMIT_ACTION_ID.equals(actionId)) {
                                         ReportTemplate item = (ReportTemplate) editor.getItem();
-                                        report.setDefaultTemplate(item);
+                                        getItem().setDefaultTemplate(item);
                                         templatesDs.modifyItem(item);
                                     }
                                 }
@@ -558,7 +524,7 @@ public class ReportEditor extends AbstractEditor {
             @Override
             public void actionPerform(Component component) {
                 BandDefinition parentDefinition = treeDs.getItem();
-                Report report = (Report) getItem();
+                Report report = getItem();
                 // Use root band as parent if no items selected
                 if (parentDefinition == null) {
                     parentDefinition = report.getRootBandDefinition();
@@ -592,14 +558,8 @@ public class ReportEditor extends AbstractEditor {
             }
 
             @Override
-            public void itemChanged(Datasource ds, Entity prevItem, Entity item) {
-                super.itemChanged(ds, prevItem, item);
-
-                if (item != null && !ObjectUtils.equals(report.getRootBandDefinition(), item)) {
-                    setEnabled(true);
-                } else {
-                    setEnabled(false);
-                }
+            public boolean isApplicableTo(Datasource.State state, Entity item) {
+                return super.isApplicableTo(state, item) && !ObjectUtils.equals(getItem().getRootBandDefinition(), item);
             }
 
             @Override
@@ -609,8 +569,9 @@ public class ReportEditor extends AbstractEditor {
                     removeChildrenCascade(selected);
                     for (Object object : selected) {
                         BandDefinition definition = (BandDefinition) object;
-                        if (definition.getParentBandDefinition() != null)
+                        if (definition.getParentBandDefinition() != null) {
                             orderBandDefinitions(((BandDefinition) object).getParentBandDefinition());
+                        }
                     }
                 }
             }
@@ -619,17 +580,20 @@ public class ReportEditor extends AbstractEditor {
                 for (Object o : selected) {
                     BandDefinition definition = (BandDefinition) o;
                     BandDefinition parentDefinition = definition.getParentBandDefinition();
-                    if (parentDefinition != null)
+                    if (parentDefinition != null) {
                         definition.getParentBandDefinition().getChildrenBandDefinitions().remove(definition);
+                    }
 
-                    if (definition.getChildrenBandDefinitions() != null)
+                    if (definition.getChildrenBandDefinitions() != null) {
                         removeChildrenCascade(new ArrayList<>(definition.getChildrenBandDefinitions()));
+                    }
 
                     if (definition.getDataSets() != null) {
                         treeDs.setItem(definition);
                         for (DataSet dataSet : new ArrayList<>(definition.getDataSets())) {
-                            if (PersistenceHelper.isNew(dataSet))
+                            if (PersistenceHelper.isNew(dataSet)) {
                                 dataSetsDs.removeItem(dataSet);
+                            }
                         }
                     }
                     treeDs.removeItem(definition);
@@ -664,21 +628,8 @@ public class ReportEditor extends AbstractEditor {
             }
 
             @Override
-            public void valueChanged(Entity source, String property, Object prevValue, Object value) {
-                if ("position".equals(property)) {
-                    turnEnabled(treeDs.getItem());
-                }
-            }
-
-            @Override
-            public void itemChanged(Datasource ds, Entity prevItem, Entity item) {
-                super.itemChanged(ds, prevItem, item);
-                turnEnabled(item);
-            }
-
-            private void turnEnabled(Entity item) {
-                BandDefinition bandDefinition = (BandDefinition) item;
-                setEnabled(bandDefinition != null && bandDefinition.getPosition() > 0);
+            public boolean isApplicableTo(Datasource.State state, Entity item) {
+                return super.isApplicableTo(state, item) && ((BandDefinition) item).getPosition() > 0;
             }
         });
 
@@ -709,25 +660,15 @@ public class ReportEditor extends AbstractEditor {
             }
 
             @Override
-            public void valueChanged(Entity source, String property, Object prevValue, Object value) {
-                if ("position".equals(property))
-                    turnEnabled(treeDs.getItem());
-            }
-
-            @Override
-            public void itemChanged(Datasource ds, Entity prevItem, Entity item) {
-                super.itemChanged(ds, prevItem, item);
-                turnEnabled(item);
-            }
-
-            private void turnEnabled(Entity item) {
-                BandDefinition bandDefinition = (BandDefinition) item;
-                if (bandDefinition != null) {
+            public boolean isApplicableTo(Datasource.State state, Entity item) {
+                if (super.isApplicableTo(state, item)) {
+                    BandDefinition bandDefinition = (BandDefinition) item;
                     BandDefinition parent = bandDefinition.getParentBandDefinition();
-                    setEnabled(parent != null &&
+                    return parent != null &&
                             parent.getChildrenBandDefinitions() != null &&
-                            bandDefinition.getPosition() < parent.getChildrenBandDefinitions().size() - 1);
+                            bandDefinition.getPosition() < parent.getChildrenBandDefinitions().size() - 1;
                 }
+                return false;
             }
         });
 
@@ -740,10 +681,9 @@ public class ReportEditor extends AbstractEditor {
             @Override
             public void actionPerform(Component component) {
                 ReportEditor.this.commit();
-                setItem(report);
-                report = (Report) getItem();
+                postInit();
                 ReportEditor.this.openWindow("report$inputParameters", WindowManager.OpenType.DIALOG,
-                        Collections.<String, Object>singletonMap("report", report));
+                        Collections.<String, Object>singletonMap("report", getItem()));
             }
         });
     }
@@ -752,13 +692,13 @@ public class ReportEditor extends AbstractEditor {
         templatesTable.addAction(new CreateAction(templatesTable, OpenType.DIALOG) {
             @Override
             public Map<String, Object> getInitialValues() {
-                return Collections.<String, Object>singletonMap("report", report);
+                return Collections.<String, Object>singletonMap("report", getItem());
             }
         });
         templatesTable.addAction(new EditAction(templatesTable, OpenType.DIALOG));
         templatesTable.addAction(new RemoveAction(templatesTable, false));
 
-        templatesTable.addAction(new AbstractAction("defaultTemplate") {
+        templatesTable.addAction(new ItemTrackingAction("defaultTemplate") {
             @Override
             public String getCaption() {
                 return getMessage("report.defaultTemplate");
@@ -770,17 +710,23 @@ public class ReportEditor extends AbstractEditor {
                 if (template != null) {
                     template.getReport().setDefaultTemplate(template);
                 }
+                updateApplicableTo(false);
+            }
+
+            @Override
+            public boolean isApplicableTo(Datasource.State state, Entity item) {
+                return super.isApplicableTo(state, item) && getItem().getDefaultTemplate() != item;
             }
         });
     }
 
     protected void orderParameters() {
-        if (report.getInputParameters() == null) {
-            report.setInputParameters(new ArrayList<ReportInputParameter>());
+        if (getItem().getInputParameters() == null) {
+            getItem().setInputParameters(new ArrayList<ReportInputParameter>());
         }
 
-        for (int i = 0; i < report.getInputParameters().size(); i++) {
-            report.getInputParameters().get(i).setPosition(i);
+        for (int i = 0; i < getItem().getInputParameters().size(); i++) {
+            getItem().getInputParameters().get(i).setPosition(i);
         }
     }
 
@@ -798,7 +744,7 @@ public class ReportEditor extends AbstractEditor {
     protected boolean preCommit() {
         addCommitListeners();
 
-        if (PersistenceHelper.isNew(report)) {
+        if (PersistenceHelper.isNew(getItem())) {
             ((CollectionPropertyDatasourceImpl) treeDs).setModified(true);
         }
 
@@ -806,8 +752,8 @@ public class ReportEditor extends AbstractEditor {
     }
 
     protected void addCommitListeners() {
-        String xml = reportService.convertToXml(report);
-        report.setXml(xml);
+        String xml = reportService.convertToXml(getItem());
+        getItem().setXml(xml);
 
         reportDs.getDsContext().addListener(new DsContext.CommitListener() {
             @Override
@@ -829,12 +775,12 @@ public class ReportEditor extends AbstractEditor {
 
     @Override
     protected void postValidate(ValidationErrors errors) {
-        if (report.getRootBand() == null) {
+        if (getItem().getRootBand() == null) {
             errors.add(getMessage("error.rootBandNull"));
         }
 
-        if (CollectionUtils.isNotEmpty(report.getRootBandDefinition().getChildrenBandDefinitions())) {
-            for (BandDefinition band : report.getRootBandDefinition().getChildrenBandDefinitions()) {
+        if (CollectionUtils.isNotEmpty(getItem().getRootBandDefinition().getChildrenBandDefinitions())) {
+            for (BandDefinition band : getItem().getRootBandDefinition().getChildrenBandDefinitions()) {
                 validateBand(errors, band);
             }
         }

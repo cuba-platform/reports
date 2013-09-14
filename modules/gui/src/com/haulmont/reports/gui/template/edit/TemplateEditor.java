@@ -6,7 +6,6 @@
 
 package com.haulmont.reports.gui.template.edit;
 
-import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.gui.AppConfig;
 import com.haulmont.cuba.gui.components.*;
@@ -29,29 +28,33 @@ import java.util.Map;
  * @author artamonov
  * @version $Id$
  */
-public class TemplateEditor extends AbstractEditor {
-    private static final String DEFAULT_TEMPLATE_CODE = "DEFAULT";
-
-    private ReportTemplate template;
+public class TemplateEditor extends AbstractEditor<ReportTemplate> {
+    protected static final String DEFAULT_TEMPLATE_CODE = "DEFAULT";
 
     @Inject
-    private Button templatePath;
+    protected Button templatePath;
 
     @Inject
-    private TextField customClass;
+    protected TextField customClass;
 
     @Inject
-    private FileUploadField uploadTemplate;
+    protected CheckBox customFlag;
 
     @Inject
-    private Messages messages;
+    protected FileUploadField uploadTemplate;
 
     @Inject
-    private FileUploadingAPI fileUploading;
+    protected Messages messages;
+
+    @Inject
+    protected FileUploadingAPI fileUploading;
+
+    public TemplateEditor() {
+        showSaveNotification = false;
+    }
 
     @Override
-    public void setItem(Entity item) {
-        template = (ReportTemplate) item;
+    protected void initItem(ReportTemplate template) {
         if (StringUtils.isEmpty(template.getCode())) {
             Report report = template.getReport();
             if (report != null) {
@@ -61,12 +64,16 @@ public class TemplateEditor extends AbstractEditor {
                     template.setCode("Template_" + Integer.toString(report.getTemplates().size()));
             }
         }
-        super.setItem(template);
+    }
 
-        template = (ReportTemplate) getItem();
-        enableCustomProps(template.getCustomFlag());
+    @Override
+    protected void postInit() {
+        super.postInit();
 
-        templatePath.setCaption(template.getName());
+        enableCustomProps(getItem().getCustomFlag());
+
+        templatePath.setCaption(getItem().getName());
+
     }
 
     private void enableCustomProps(boolean customEnabled) {
@@ -82,8 +89,7 @@ public class TemplateEditor extends AbstractEditor {
 
         getDialogParams().setWidth(490);
 
-        CheckBox custom = getComponent("customFlag");
-        custom.addListener(new ValueListener() {
+        customFlag.addListener(new ValueListener() {
             @Override
             public void valueChanged(Object source, String property, Object prevValue, Object value) {
                 Boolean isCustom = Boolean.TRUE.equals(value);
@@ -105,13 +111,14 @@ public class TemplateEditor extends AbstractEditor {
 
             @Override
             public void uploadSucceeded(Event event) {
-                template.setName(uploadTemplate.getFileName());
+                getItem().setName(uploadTemplate.getFileName());
                 File file = fileUploading.getFile(uploadTemplate.getFileId());
                 try {
                     byte[] data = FileUtils.readFileToByteArray(file);
-                    template.setContent(data);
+                    getItem().setContent(data);
                 } catch (IOException e) {
-                    throw new RuntimeException(String.format("An error occurred while uploading file for template [%s]", template.getCode()));
+                    throw new RuntimeException(
+                            String.format("An error occurred while uploading file for template [%s]", getItem().getCode()));
                 }
                 templatePath.setCaption(uploadTemplate.getFileName());
 
@@ -130,9 +137,10 @@ public class TemplateEditor extends AbstractEditor {
         templatePath.setAction(new AbstractAction("report.template") {
             @Override
             public void actionPerform(Component component) {
-                if (template.getContent() != null) {
+                if (getItem().getContent() != null) {
                     ExportDisplay display = AppConfig.createExportDisplay(TemplateEditor.this);
-                    display.show(new ByteArrayDataProvider(template.getContent()), template.getName(), ExportFormat.getByExtension(template.getExt()));
+                    display.show(new ByteArrayDataProvider(getItem().getContent()), getItem().getName(),
+                            ExportFormat.getByExtension(getItem().getExt()));
                 }
             }
         });
@@ -145,8 +153,8 @@ public class TemplateEditor extends AbstractEditor {
         return super.commit(validate);
     }
 
-    private boolean validateTemplateFile() {
-        if (template.getContent() == null) {
+    protected boolean validateTemplateFile() {
+        if (getItem().getContent() == null) {
             showNotification(getMessage("validationFail.caption"),
                     getMessage("template.uploadTemplate"), NotificationType.TRAY);
             return false;
@@ -159,8 +167,8 @@ public class TemplateEditor extends AbstractEditor {
         if (!validateTemplateFile())
             return;
 
-        if (!template.getCustomFlag()) {
-            template.setCustomClass("");
+        if (!getItem().getCustomFlag()) {
+            getItem().setCustomClass("");
         }
         if (commit(true))
             close(COMMIT_ACTION_ID);
