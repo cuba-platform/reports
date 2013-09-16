@@ -47,6 +47,12 @@ String mapping = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n" +
         "        t.is_custom as template_is_custom,\n" +
         "        t.custom_class as template_custom_class,\n" +
         "        t.output_name_pattern as template_output_name_pattern,\n" +
+        "        case\n" +
+        "            when t.output_type = 0 then 'XLS'\n" +
+        "            when t.output_type = 10 then 'DOC'\n" +
+        "            when t.output_type = 20 then 'PDF'\n" +
+        "            when t.output_type = 30 then 'HTML'\n" +
+        "        end as template_output_type,\n" +
         "        t.name as template_name,\n" +
         "        b.id as band_id,\n" +
         "        b.name as band_name,\n" +
@@ -124,6 +130,7 @@ String mapping = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n" +
         "            <result property=\"customClass\" column=\"template_custom_class\"/>\n" +
         "            <result property=\"outputNamePattern\" column=\"template_output_name_pattern\"/>\n" +
         "            <result property=\"name\" column=\"template_name\"/>\n" +
+        "            <result property=\"reportOutputType\" column=\"template_output_type\"/>\n" +
         "        </collection>\n" +
         "\n" +
         "        <collection property=\"inputParameters\" ofType=\"com.haulmont.reports.entity.ReportInputParameter\">\n" +
@@ -226,14 +233,13 @@ postUpdate.add({
                         }
                     }
 
-                    if (ReportTemplate.DEFAULT_TEMPLATE_CODE.equals(reportTemplate.getCode())) {
+                    if (ReportTemplate.DEFAULT_TEMPLATE_CODE.equals(reportTemplate.getCode()) || 'report$default'.equalsIgnoreCase(reportTemplate.getCode())) {
                         report.setDefaultTemplate(reportTemplate);
                     }
 
                     ReportTemplate updated = entityManager.merge(reportTemplate);
                 }
             }
-
 
             Map<UUID, BandDefinition> map = [:]
             for (BandDefinition band : report.bands) {
