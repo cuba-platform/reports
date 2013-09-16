@@ -9,7 +9,7 @@
 
     <layout expand="bands">
         <vbox margin="true">
-            <fieldGroup id="propertiesFieldGroup" border="hidden" datasource="reportDs" width="50%">
+            <fieldGroup id="propertiesFieldGroup" border="hidden" datasource="reportDs" width="auto">
                 <column>
                     <field id="name" required="true" requiredMessage="msg://report.nameMsg" width="${width}"/>
                     <field id="defaultTemplate" custom="true" required="true" requiredMessage="msg://report.templateMsg"/>
@@ -22,7 +22,7 @@
             </fieldGroup>
         </vbox>
         <vbox id="bands" width="100%" height="100%" margin="false;false;false;true">
-            <split orientation="horizontal" id="hSplit" pos="60" width="100%" height="100%">
+            <split orientation="horizontal" id="hSplit" pos="30" width="100%" height="100%">
                 <groupBox id="treeBox" expand="serviceTree" height="100%" width="100%" spacing="true" caption="msg://report.bands">
                     <buttonsPanel>
                         <button id="createBandDefinition" icon="icons/plus-btn.png"/>
