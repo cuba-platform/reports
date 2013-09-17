@@ -16,7 +16,7 @@
         <datasource id="groupDs" class="com.haulmont.reports.entity.ReportGroup" view="_local"/>
     </dsContext>
 
-    <layout expand="windowActions">
+    <layout expand="windowActions" spacing="true">
         <label value="msg://groupProperties" stylename="h2"/>
         <fieldGroup id="groupProps" datasource="groupDs">
             <field id="title" required="true"/>

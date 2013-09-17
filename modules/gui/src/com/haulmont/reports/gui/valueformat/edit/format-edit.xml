@@ -11,7 +11,6 @@
         caption="msg://formatsEdit"
         focusComponent="formatFields"
         >
-    <assign name="width" value="200"/>
 
     <dsContext>
         <datasource
@@ -21,7 +20,9 @@
         </datasource>
     </dsContext>
 
-    <layout expand="windowActions">
+    <assign name="width" value="200"/>
+
+    <layout expand="windowActions" spacing="true">
         <fieldGroup id="formatFields" datasource="valuesFormatsDs">
             <column flex="1">
                 <field id="valueName" required="true" caption="msg://valuesFormats.name" width="${width}"

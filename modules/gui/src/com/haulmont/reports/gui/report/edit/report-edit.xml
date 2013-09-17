@@ -40,7 +40,7 @@
             </query>
         </collectionDatasource>
     </dsContext>
-    <layout expand="tabsheet">
+    <layout expand="tabsheet" spacing="true">
         <tabSheet id="tabsheet" width="100%">
             <tab id="generalTab" caption="msg://generalTab">
                 <iframe src="/com/haulmont/reports/gui/report/edit/tabs/general.xml" id="generalFrame" width="100%"
@@ -67,7 +67,7 @@
                         height="100%"/>
             </tab>
         </tabSheet>
-        <hbox spacing="true" margin="true;false;false;false" height="-1px">
+        <hbox spacing="true">
             <button id="windowCommit" action="windowCommit" icon="icons/ok.png"/>
             <button id="saveAndRun" icon="icons/ok.png"/>
             <button id="windowClose" action="windowClose" icon="icons/cancel.png"/>

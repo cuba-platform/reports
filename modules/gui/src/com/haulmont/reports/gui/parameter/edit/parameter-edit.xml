@@ -22,7 +22,7 @@
 
     <assign name="width" value="200px"/>
 
-    <layout expand="windowActions">
+    <layout expand="windowActions" spacing="true">
         <tabSheet id="tabsheet">
             <tab id="optionsTab" caption="msg://parameters.optionsTab">
                 <grid spacing="true">
