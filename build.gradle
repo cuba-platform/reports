@@ -88,12 +88,22 @@ configure([globalModule, coreModule, guiModule, webModule, desktopModule]) {
 }
 
 configure(globalModule) {
-    task enhance(type: CubaEnhancing, dependsOn: compileJava) {
+    task enhance(type: CubaEnhancing) {
         persistenceXml = "$projectDir/src/reports-persistence.xml"
     }
 
+    task enhanceTransient(type: CubaEnhanceTransient) {
+        classes = [
+                'com.haulmont.reports.entity.BandDefinition',
+                'com.haulmont.reports.entity.DataSet',
+                'com.haulmont.reports.entity.ReportInputParameter',
+                'com.haulmont.reports.entity.ReportScreen',
+                'com.haulmont.reports.entity.ReportScreen',
+        ]
+    }
+
     dependencies {
-        compile(group: 'com.haulmont.yarg', name: 'yarg', version: '1.0-SNAPSHOT') {
+        compile(group: 'com.haulmont.yarg', name: 'yarg', version: '1.0.0') {
             exclude group: 'org.codehaus.groovy'
         }
     }
