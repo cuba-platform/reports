@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class SqlParametersConverter implements ReportParametersConverter {
+public class JpqlParametersConverter implements ReportParametersConverter {
     @Inject
     private Persistence persistence;
 
@@ -36,7 +36,7 @@ public class SqlParametersConverter implements ReportParametersConverter {
                 if (firstObject instanceof Entity) {
                     List<Object> entityIds = new ArrayList<>();
                     for (Object object : collection) {
-                        entityIds.add(dbSpecificConvert(((Entity) object).getId()));
+                        entityIds.add(((Entity) object).getId());
                     }
 
                     return (T) entityIds;
@@ -49,17 +49,17 @@ public class SqlParametersConverter implements ReportParametersConverter {
                 if (firstObject instanceof Entity) {
                     List<Object> entityIds = new ArrayList<>();
                     for (Object object : objects) {
-                        entityIds.add(dbSpecificConvert(((Entity) object).getId()));
+                        entityIds.add(((Entity) object).getId());
                     }
 
                     return (T) entityIds;
                 }
             }
         } else if (input instanceof Entity) {
-            return (T) dbSpecificConvert(((Entity) input).getId());
+            return (T) ((Entity) input).getId();
         }
 
-        return (T) dbSpecificConvert(input);
+        return (T) input;
     }
 
     private Object dbSpecificConvert(Object object) {

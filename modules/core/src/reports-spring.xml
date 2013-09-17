@@ -14,6 +14,7 @@
 
     <bean id="reporting_lib_Scripting" class="com.haulmont.reports.libintegration.ReportingScriptingImpl"/>
     <bean id="reporting_lib_SqlParametersConverter" class="com.haulmont.reports.libintegration.SqlParametersConverter"/>
+    <bean id="reporting_lib_JpqlParametersConverter" class="com.haulmont.reports.libintegration.JpqlParametersConverter"/>
 
 
     <bean id="reporting_lib_GroovyDataLoader" class="com.haulmont.yarg.loaders.impl.GroovyDataLoader">
@@ -23,7 +24,9 @@
         <constructor-arg ref="dataSource"/>
         <property name="parametersConverter" ref="reporting_lib_SqlParametersConverter"/>
     </bean>
-    <bean id="reporting_lib_JpqlDataLoader" class="com.haulmont.reports.libintegration.JpqlDataDataLoader"/>
+    <bean id="reporting_lib_JpqlDataLoader" class="com.haulmont.reports.libintegration.JpqlDataDataLoader">
+        <property name="parametersConverter" ref="reporting_lib_JpqlParametersConverter"/>
+    </bean>
     <bean id="reporting_lib_SingleEntityDataLoader" class="com.haulmont.reports.libintegration.SingleEntityDataLoader"/>
     <bean id="reporting_lib_MultiEntityDataLoader" class="com.haulmont.reports.libintegration.MultiEntityDataLoader"/>
 

@@ -8,17 +8,18 @@ import com.haulmont.cuba.core.EntityManager;
 import com.haulmont.cuba.core.Persistence;
 import com.haulmont.cuba.core.Query;
 import com.haulmont.cuba.core.Transaction;
-import com.haulmont.cuba.core.entity.Entity;
-
 import com.haulmont.reports.exception.ReportDataLoaderException;
 import com.haulmont.yarg.loaders.ReportDataLoader;
 import com.haulmont.yarg.loaders.impl.AbstractDbDataLoader;
-import com.haulmont.yarg.structure.ReportQuery;
 import com.haulmont.yarg.structure.BandData;
+import com.haulmont.yarg.structure.ReportQuery;
 import org.apache.commons.lang.StringUtils;
 
 import javax.inject.Inject;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,7 +28,7 @@ public class JpqlDataDataLoader extends AbstractDbDataLoader implements ReportDa
     private Persistence persistence;
 
     private static final String QUERY_END = "%%END%%";
-    private static final String ALIAS_PATTERN = "as +([\\w|\\d|_]+\\b) *";
+    private static final String ALIAS_PATTERN = "as\\s+\"?([\\w|\\d|_|\\.]+)\"?\\s*";
     private static final String OUTPUT_PARAMS_PATTERN = "(?i)" + ALIAS_PATTERN + "[,|from|" + QUERY_END + "]";
 
     protected List<String> parseQueryOutputParametersNames(String query) {
@@ -80,43 +81,17 @@ public class JpqlDataDataLoader extends AbstractDbDataLoader implements ReportDa
         Query select = em.createQuery(pack.getQuery());
         if (inserted) {
             //insert parameters to their position
-            int i = 1;
-            for (Object value : pack.getParams()) {
-                select.setParameter(i++, value instanceof Entity ? ((Entity) value).getId() : value);
+            for (QueryParameter queryParameter : pack.getParams()) {
+                Object value = queryParameter.getValue();
+                select.setParameter(queryParameter.getPosition(), convertParameter(value));
             }
         }
         return select;
     }
 
-    protected QueryPack prepareQuery(String query, BandData parentBand, Map<String, Object> params) {
-        Map<String, Object> currentParams = new HashMap<String, Object>();
-        if (params != null) currentParams.putAll(params);
-
-        //adds parameters from parent bands hierarchy
-        while (parentBand != null) {
-            addParentBandDataToParameters(parentBand, currentParams);
-            parentBand = parentBand.getParentBand();
-        }
-
-        List<Object> values = new ArrayList<Object>();
-        int i = 1;
-        for (Map.Entry<String, Object> entry : currentParams.entrySet()) {
-            //replaces ${alias} marks with ? and remembers their positions
-            String alias = "${" + entry.getKey() + "}";
-            String regexp = "\\$\\{" + entry.getKey() + "\\}";
-            String deleteRegexp = "(?i)(and)?(or)? *[\\w|\\d|\\.|\\_]+ *(=|>=|<=|like) *\\$\\{" + entry.getKey() + "\\}";
-
-            if (entry.getValue() == null) {
-                query = query.replaceAll(deleteRegexp, "");
-            } else if (query.contains(alias)) {
-                values.add(entry.getValue());
-                query = query.replaceAll(regexp, "?" + i++);
-            }
-        }
-
-        query = query.trim();
-        if (query.endsWith("where")) query = query.replace("where", "");
-
-        return new QueryPack(query, values.toArray());
+    @Override
+    protected String insertParameterToQuery(String query, QueryParameter parameter) {
+        query = query.replaceAll(parameter.getParamRegexp(), "?" + parameter.getPosition());
+        return query;
     }
 }
