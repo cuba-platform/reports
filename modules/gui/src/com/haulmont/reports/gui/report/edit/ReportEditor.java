@@ -679,10 +679,11 @@ public class ReportEditor extends AbstractEditor<Report> {
         saveAndRun.setAction(new AbstractAction("button.saveAndRun") {
             @Override
             public void actionPerform(Component component) {
-                ReportEditor.this.commit();
-                postInit();
-                ReportEditor.this.openWindow("report$inputParameters", WindowManager.OpenType.DIALOG,
-                        Collections.<String, Object>singletonMap("report", getItem()));
+                if (ReportEditor.this.commit()) {
+                    postInit();
+                    ReportEditor.this.openWindow("report$inputParameters", WindowManager.OpenType.DIALOG,
+                            Collections.<String, Object>singletonMap("report", getItem()));
+                }
             }
         });
     }
