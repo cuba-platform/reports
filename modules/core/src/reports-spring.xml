@@ -32,7 +32,7 @@
 
     <bean id="reporting_lib_OfficeIntegration"
           class="com.haulmont.yarg.formatters.impl.doc.connector.OfficeIntegration">
-        <constructor-arg value="${cuba.reporting.openoffice.path}"/>
+        <constructor-arg value="${cuba.reporting.openoffice.path?:/}"/>
         <constructor-arg>
             <list>
                 <value>8100</value>
@@ -42,10 +42,10 @@
             </list>
         </constructor-arg>
         <property name="displayDeviceAvailable">
-            <value>${cuba.reporting.displayDeviceAvailable}</value>
+            <value>${cuba.reporting.displayDeviceAvailable?:false}</value>
         </property>
         <property name="timeoutInSeconds">
-            <value>${cuba.reporting.openoffice.docFormatterTimeout}</value>
+            <value>${cuba.reporting.openoffice.docFormatterTimeout?:2000}</value>
         </property>
     </bean>
 
