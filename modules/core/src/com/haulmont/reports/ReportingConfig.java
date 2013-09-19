@@ -24,6 +24,7 @@ public interface ReportingConfig extends Config {
      * @return Path to the installed OpenOffice
      */
     @Property("cuba.reporting.openoffice.path")
+    @DefaultString("/")
     String getOpenOfficePath();
 
     /**

@@ -45,7 +45,7 @@
             <value>${cuba.reporting.displayDeviceAvailable?:false}</value>
         </property>
         <property name="timeoutInSeconds">
-            <value>${cuba.reporting.openoffice.docFormatterTimeout?:2000}</value>
+            <value>${cuba.reporting.openoffice.docFormatterTimeout?:20}</value>
         </property>
     </bean>
 
