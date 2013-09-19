@@ -24,7 +24,7 @@ allprojects {
 
 buildscript {
 	def cubaPluginVersion = '4.1-SNAPSHOT'
-	def docPluginVersion = '1.2.0-SNAPSHOT'
+	def docPluginVersion = '1.2.4'
 	
 	def CUBA_PLUGIN_VERSION = 'cubaPluginVersion'
 	def DOC_PLUGIN_VERSION = 'docPluginVersion'
@@ -238,6 +238,36 @@ task transformReportingEng(type: TransformDocbook) {
     classpath = configurations.buildDoc
 }
 
+def commonXslParameters = [
+        'toc.section.depth': '5',
+        'chunk.section.depth': '5',
+        'section.autolabel': '1',
+        'chapter.autolabel': '1',
+        'appendix.autolabel': 'A'
+    ]
+
+task buildReportingWebHelp(type: DocBook2WebHelp, dependsOn: transformReporting) {
+    sourceFile = transformReporting.destFile
+    imagesDir = new File(transformReporting.sourceDir, "img")
+    destDir = new File(docDstDir, "reporting/ru/webhelp")
+    templateDir = new File(docToolsDir, "webhelp/template")
+    searchDir = new File(docToolsDir, "webhelp/search")
+    brand = "Reporting Library"
+    language = "ru"
+    xslParameters = commonXslParameters
+}
+
+task buildReportingWebHelpEng(type: DocBook2WebHelp, dependsOn: transformReportingEng) {
+    sourceFile = transformReportingEng.destFile
+    imagesDir = new File(transformReportingEng.sourceDir, "img")
+    destDir = new File(docDstDir, "reporting/eng/webhelp")
+    templateDir = new File(docToolsDir, "webhelp/template")
+    searchDir = new File(docToolsDir, "webhelp/search")
+    brand = "Reporting Library"
+    language = "en"
+    xslParameters = commonXslParameters
+}
+
 task buildReportingXhtml(type: Docbook2Xhtml, dependsOn: transformReporting) {
     source transformReporting.destFile
     destFile = new File(docTmpDir, 'reporting-pdf/reporting-pdf.html')
@@ -306,7 +336,7 @@ task buildReportingSingleHtmlEng(type: Docbook2Xhtml, dependsOn: transformReport
 }
 
 task buildDoc(type: Zip, description: 'Build documentation',
-        dependsOn: [buildReportingSingleHtml, /*buildReportingSingleHtmlEng,*/ buildReportingPdf/*, buildReportingPdfEng*/]) {
+        dependsOn: [buildReportingSingleHtml, /*buildReportingSingleHtmlEng,*/ buildReportingPdf/*, buildReportingPdfEng*/, buildReportingWebHelp]) {
     from 'build/doc'
     destinationDir = file('build/distributions')
     baseName = 'reports-doc'
