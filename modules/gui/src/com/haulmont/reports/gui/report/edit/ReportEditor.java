@@ -416,6 +416,7 @@ public class ReportEditor extends AbstractEditor<Report> {
                 LookupPickerField lookupPickerField = componentsFactory.createComponent(LookupPickerField.NAME);
 
                 lookupPickerField.setOptionsDatasource(templatesDs);
+                lookupPickerField.setDatasource(datasource, propertyId);
 
                 lookupPickerField.addAction(new AbstractAction("download") {
 
