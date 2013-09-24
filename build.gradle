@@ -4,16 +4,10 @@
  * Use is subject to license terms.
  */
 
-def defaultVersion = '4.2'
-
-def BUILD_VERSION = 'buildVersion'
-def BUILD_VCS_NUMBER = 'buildVcsNumber'
-
 allprojects {
     ext.artifactGroup = 'com.haulmont.reports'
-    ext.artifactVersion = rootProject.hasProperty(BUILD_VERSION) ? 
-                                    rootProject[BUILD_VERSION].replace('-SNAPSHOT', '') : defaultVersion
-    ext.isSnapshot = !rootProject.hasProperty(BUILD_VERSION) || rootProject[BUILD_VERSION].endsWith('-SNAPSHOT')
+    ext.artifactVersion = cubaVersion.replace('-SNAPSHOT', '')
+    ext.isSnapshot = cubaVersion.endsWith('-SNAPSHOT')
     ext.vcs = 'svn'
 
     configurations.all {
@@ -23,13 +17,14 @@ allprojects {
 }
 
 buildscript {
-	def cubaPluginVersion = '4.1-SNAPSHOT'
-	def docPluginVersion = '1.2.4'
-	
-	def CUBA_PLUGIN_VERSION = 'cubaPluginVersion'
+    ext.cubaVersion = '4.2-SNAPSHOT'
+    ext.cubaVersion = rootProject.hasProperty('buildVersion') ? rootProject['buildVersion'] : cubaVersion
+    
+    println("CUBA Platform - Reports Version ${ext.cubaVersion}")
+    println("")
+    
+	def docPluginVersion = '1.2.4'	
 	def DOC_PLUGIN_VERSION = 'docPluginVersion'
-
-	cubaPluginVersion = rootProject.hasProperty(CUBA_PLUGIN_VERSION) ? rootProject[CUBA_PLUGIN_VERSION] : cubaPluginVersion
 	docPluginVersion = rootProject.hasProperty(DOC_PLUGIN_VERSION) ? rootProject[DOC_PLUGIN_VERSION] : docPluginVersion
 		
     repositories {
@@ -43,7 +38,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath group: 'com.haulmont.gradle', name: 'cuba-plugin', version: cubaPluginVersion
+        classpath group: 'com.haulmont.gradle', name: 'cuba-plugin', version: cubaVersion
 		classpath group: 'com.haulmont.gradle', name: 'doc-plugin', version: docPluginVersion
     }
 }
