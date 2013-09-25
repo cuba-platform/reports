@@ -54,8 +54,8 @@
             <vbox margin="false;false;false;true" spacing="true" width="100%" height="100%">
                 <vbox id="textBox" expand="text" height="100%">
                     <label id="dataSetTextLabel" value="msg://dataSet.text"/>
-                    <textArea id="text" datasource="dataSetsDs" property="text" height="100%"
-                              width="100%"/>
+                    <sourceCodeEditor id="text" datasource="dataSetsDs" property="text" height="100%"
+                                      mode="Text" width="100%"/>
                     <label value="msg://dataSet.linkParameterName"/>
                     <textField id="linkParameterName" width="${width}"
                                datasource="dataSetsDs" property="linkParameterName"/>

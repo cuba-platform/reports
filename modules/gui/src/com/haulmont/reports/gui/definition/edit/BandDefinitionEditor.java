@@ -42,7 +42,7 @@ public class BandDefinitionEditor extends AbstractEditor implements Suggester {
     protected Table dataSets;
 
     @Named("text")
-    protected TextArea datasetScriptField;
+    protected SourceCodeEditor datasetScriptField;
 
     @Named("textBox")
     BoxLayout textBox;
@@ -159,6 +159,28 @@ public class BandDefinitionEditor extends AbstractEditor implements Suggester {
                     entitiesBox.setVisible(true);
                     break;
             }
+
+            switch (dsType) {
+                case SQL:
+                    datasetScriptField.setMode(SourceCodeEditor.Mode.SQL);
+                    datasetScriptField.setSuggester(null);
+                    break;
+
+                case GROOVY:
+                    datasetScriptField.setSuggester(null);
+                    datasetScriptField.setMode(SourceCodeEditor.Mode.Groovy);
+                    break;
+
+                case JPQL:
+                    datasetScriptField.setSuggester(this);
+                    datasetScriptField.setMode(SourceCodeEditor.Mode.Text);
+                    break;
+
+                default:
+                    datasetScriptField.setSuggester(null);
+                    datasetScriptField.setMode(SourceCodeEditor.Mode.Text);
+                    break;
+            }
         }
     }
 
@@ -172,13 +194,12 @@ public class BandDefinitionEditor extends AbstractEditor implements Suggester {
 
     @Override
     public List<Suggestion> getSuggestions(AutoCompleteSupport source, String text, int cursorPosition) {
-        String query = (String) source.getValue();
-        if (query == null || "".equals(query.trim())) {
+        if (text == null || "".equals(text.trim())) {
             return Collections.emptyList();
         }
         int queryPosition = cursorPosition - 1;
 
-        return JpqlSuggestionFactory.requestHint(query, queryPosition, source, cursorPosition);
+        return JpqlSuggestionFactory.requestHint(text, queryPosition, source, cursorPosition);
     }
 
     public void setBandDefinition(BandDefinition bandDefinition) {
