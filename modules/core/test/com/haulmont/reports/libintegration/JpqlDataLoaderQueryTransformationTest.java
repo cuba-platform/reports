@@ -47,7 +47,7 @@ public class JpqlDataLoaderQueryTransformationTest extends JpqlDataDataLoader {
         String query = "select id as id\n" +
                 "from tm$Task t\n" +
                 "where t.id  =  ${param1} and t.id  >  ${param2} and t1.id like \n" +
-                "${param3}";
+                "${param3} and t1.id = ${Root.parentBandParam}";
 
         HashMap<String, Object> params = new HashMap<>();
         params.put("param1", null);
