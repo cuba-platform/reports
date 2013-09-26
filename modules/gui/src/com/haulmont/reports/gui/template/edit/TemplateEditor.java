@@ -72,7 +72,12 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
         enableCustomProps(getItem().getCustomFlag());
 
         templatePath.setCaption(getItem().getName());
+        updateTemplatePathVisibility();
 
+    }
+
+    private void updateTemplatePathVisibility() {
+        templatePath.setVisible(StringUtils.isNotEmpty(getItem().getName()));
     }
 
     private void enableCustomProps(boolean customEnabled) {
@@ -120,7 +125,7 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
                             String.format("An error occurred while uploading file for template [%s]", getItem().getCode()));
                 }
                 templatePath.setCaption(uploadTemplate.getFileName());
-
+                updateTemplatePathVisibility();
                 showNotification(messages.getMessage(TemplateEditor.class,
                         "templateEditor.uploadSuccess"), IFrame.NotificationType.HUMANIZED);
             }
