@@ -109,7 +109,7 @@ public class BandDefinitionEditor extends AbstractEditor implements Suggester {
 
         initDataSetControls();
 
-        bandDefinitionDs.addListener(new DsListenerAdapter<BandDefinition>(){
+        bandDefinitionDs.addListener(new DsListenerAdapter<BandDefinition>() {
             @Override
             public void itemChanged(Datasource<BandDefinition> ds, BandDefinition prevItem, BandDefinition item) {
                 selectFirstDataset();
