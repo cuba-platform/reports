@@ -38,7 +38,6 @@ import java.util.*;
 
 @ManagedBean
 public class ReportGuiManager {
-
     @Inject
     protected ReportService reportService;
 
@@ -111,13 +110,13 @@ public class ReportGuiManager {
         }
     }
 
-    public List<Report> getAvailableReports(String screenId, User user, MetaClass metaClass, boolean listReportsOnly) {
+    public List<Report> getAvailableReports(@Nullable String screenId, @Nullable User user, @Nullable MetaClass parameterMetaClass, boolean listReportsOnly) {
         LoadContext lContext = new LoadContext(Report.class);
         lContext.setView(ReportService.MAIN_VIEW_NAME);
         lContext.setQueryString("select r from report$Report r");
 
         List<Report> reports = AppBeans.get(DataService.class).loadList(lContext);
-        reports = filterReportsByEntityParameters(metaClass, reports, listReportsOnly);
+        reports = filterReportsByEntityParameters(parameterMetaClass, reports, listReportsOnly);
         reports = applySecurityPolicies(screenId, user, reports);
         return reports;
     }
@@ -134,26 +133,30 @@ public class ReportGuiManager {
         exportDisplay.show(new ByteArrayDataProvider(reportOutputDocument.getContent()), documentName, ExportFormat.ZIP);
     }
 
-    private List<Report> filterReportsByEntityParameters(MetaClass metaClass, List<Report> reports, boolean listReportsOnly) {
-        List<Report> reportsForEntity = new ArrayList<>();
-        for (Report report : reports) {
-            for (ReportInputParameter parameter : report.getInputParameters()) {
-                if (parameter.getEntityMetaClass().equals(metaClass.getName()) && (!listReportsOnly || ParameterType.ENTITY_LIST == parameter.getType())) {
-                    reportsForEntity.add(report);
-                    break;
+    protected List<Report> filterReportsByEntityParameters(@Nullable MetaClass parameterMetaClass, List<Report> reports, boolean listReportsOnly) {
+        if (parameterMetaClass != null) {
+            List<Report> reportsForEntity = new ArrayList<>();
+            for (Report report : reports) {
+                for (ReportInputParameter parameter : report.getInputParameters()) {
+                    if (parameter.getEntityMetaClass().equals(parameterMetaClass.getName()) && (!listReportsOnly || ParameterType.ENTITY_LIST == parameter.getType())) {
+                        reportsForEntity.add(report);
+                        break;
+                    }
                 }
             }
+            return reportsForEntity;
+        } else {
+            return reports;
         }
-        return reportsForEntity;
     }
 
-    public List<Report> applySecurityPolicies(String screen, User user, List<Report> reports) {
+    protected List<Report> applySecurityPolicies(@Nullable String screen, @Nullable User user, List<Report> reports) {
         List<Report> filter = checkRoles(user, reports);
-        filter = checkScreens(filter, screen);
+        filter = checkScreens(screen, filter);
         return filter;
     }
 
-    private void openReportParamsDialog(Window window, Report report, @Nullable Map<String, Object> parameters, @Nullable String templateCode, @Nullable String outputFileName) {
+    protected void openReportParamsDialog(Window window, Report report, @Nullable Map<String, Object> parameters, @Nullable String templateCode, @Nullable String outputFileName) {
         Map<String, Object> params = new HashMap<>();
         params.put("report", report);
         params.put("parameters", parameters);
@@ -163,46 +166,54 @@ public class ReportGuiManager {
         window.openWindow("report$inputParameters", WindowManager.OpenType.DIALOG, params);
     }
 
-    private List<Report> checkRoles(User user, List<Report> reports) {
-        List<Report> filter = new ArrayList<>();
-        for (Report report : reports) {
-            final Set<Role> reportRoles = report.getRoles();
-            if (reportRoles == null || reportRoles.size() == 0) {
-                filter.add(report);
-            } else {
-                List<UserRole> userRoles = user.getUserRoles();
-                Object requiredUserRole = CollectionUtils.find(userRoles, new Predicate() {
-                    @Override
-                    public boolean evaluate(Object object) {
-                        UserRole userRole = (UserRole) object;
-                        return reportRoles.contains(userRole.getRole()) ||
-                                RoleType.SUPER.equals(userRole.getRole().getType());
-                    }
-                });
-                if (requiredUserRole != null)
+    protected List<Report> checkRoles(@Nullable User user, List<Report> reports) {
+        if (user != null) {
+            List<Report> filter = new ArrayList<>();
+            for (Report report : reports) {
+                final Set<Role> reportRoles = report.getRoles();
+                if (reportRoles == null || reportRoles.size() == 0) {
                     filter.add(report);
+                } else {
+                    List<UserRole> userRoles = user.getUserRoles();
+                    Object requiredUserRole = CollectionUtils.find(userRoles, new Predicate() {
+                        @Override
+                        public boolean evaluate(Object object) {
+                            UserRole userRole = (UserRole) object;
+                            return reportRoles.contains(userRole.getRole()) ||
+                                    RoleType.SUPER.equals(userRole.getRole().getType());
+                        }
+                    });
+                    if (requiredUserRole != null)
+                        filter.add(report);
+                }
             }
+            return filter;
+        } else {
+            return reports;
         }
-        return filter;
     }
 
-    private List<Report> checkScreens(List<Report> reports, final String screen) {
-        List<Report> filter = new ArrayList<>();
-        for (Report report : reports) {
-            List<ReportScreen> reportScreens = report.getReportScreens();
-            if (reportScreens == null || reportScreens.size() == 0)
-                filter.add(report);
-            else {
-                Object reportScreen = CollectionUtils.find(reportScreens, new Predicate() {
-                    @Override
-                    public boolean evaluate(Object item) {
-                        return StringUtils.equals(screen, ((ReportScreen) item).getScreenId());
-                    }
-                });
-                if (reportScreen != null)
+    protected List<Report> checkScreens(@Nullable final String screen, List<Report> reports) {
+        if (screen != null) {
+            List<Report> filter = new ArrayList<>();
+            for (Report report : reports) {
+                List<ReportScreen> reportScreens = report.getReportScreens();
+                if (reportScreens == null || reportScreens.size() == 0)
                     filter.add(report);
+                else {
+                    Object reportScreen = CollectionUtils.find(reportScreens, new Predicate() {
+                        @Override
+                        public boolean evaluate(Object item) {
+                            return StringUtils.equals(screen, ((ReportScreen) item).getScreenId());
+                        }
+                    });
+                    if (reportScreen != null)
+                        filter.add(report);
+                }
             }
+            return filter;
+        } else {
+            return reports;
         }
-        return filter;
     }
 }

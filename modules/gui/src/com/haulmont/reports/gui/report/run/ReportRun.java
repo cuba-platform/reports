@@ -5,6 +5,7 @@
 
 package com.haulmont.reports.gui.report.run;
 
+import com.haulmont.cuba.core.global.UserSessionSource;
 import com.haulmont.cuba.gui.components.AbstractAction;
 import com.haulmont.cuba.gui.components.AbstractLookup;
 import com.haulmont.cuba.gui.components.Component;
@@ -37,10 +38,17 @@ public class ReportRun extends AbstractLookup {
     @Inject
     protected CollectionDatasource<Report, UUID> reportDs;
 
+    @Inject
+    protected UserSessionSource userSessionSource;
+
     @Override
     public void init(Map<String, Object> params) {
         super.init(params);
         List<Report> reports = (List<Report>) params.get("reports");
+        if (reports == null) {
+            reports = reportGuiManager.getAvailableReports(null, userSessionSource.getUserSession().getUser(), null, false);
+        }
+
 
         if (CollectionUtils.isNotEmpty(reports)) {
             for (Report report : reports) {
