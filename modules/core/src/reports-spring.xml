@@ -16,7 +16,6 @@
     <bean id="reporting_lib_SqlParametersConverter" class="com.haulmont.reports.libintegration.SqlParametersConverter"/>
     <bean id="reporting_lib_JpqlParametersConverter" class="com.haulmont.reports.libintegration.JpqlParametersConverter"/>
 
-
     <bean id="reporting_lib_GroovyDataLoader" class="com.haulmont.yarg.loaders.impl.GroovyDataLoader">
         <constructor-arg ref="reporting_lib_Scripting"/>
     </bean>
@@ -49,9 +48,12 @@
         </property>
     </bean>
 
+    <bean id="reporting_lib_CubaFieldFormatProvider" class="com.haulmont.reports.libintegration.CubaFieldFormatProvider"/>
+
     <bean id="reporting_lib_FormatterFactory"
           class="com.haulmont.yarg.formatters.factory.DefaultFormatterFactory">
         <property name="officeIntegration" ref="reporting_lib_OfficeIntegration"/>
+        <property name="defaultFormatProvider" ref="reporting_lib_CubaFieldFormatProvider"/>
     </bean>
 
     <bean id="reporting_lib_LoaderFactory" class="com.haulmont.yarg.loaders.factory.DefaultLoaderFactory">
