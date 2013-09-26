@@ -44,6 +44,9 @@ public class BandDefinitionEditor extends AbstractEditor implements Suggester {
     @Named("text")
     protected SourceCodeEditor datasetScriptField;
 
+    @Named("linkParameterName")
+    protected TextField linkParameterField;
+
     @Named("textBox")
     BoxLayout textBox;
 
@@ -105,6 +108,13 @@ public class BandDefinitionEditor extends AbstractEditor implements Suggester {
         });
 
         initDataSetControls();
+
+        bandDefinitionDs.addListener(new DsListenerAdapter<BandDefinition>(){
+            @Override
+            public void itemChanged(Datasource<BandDefinition> ds, BandDefinition prevItem, BandDefinition item) {
+                selectFirstDataset();
+            }
+        });
     }
 
     public void initDataSetControls() {
@@ -131,10 +141,8 @@ public class BandDefinitionEditor extends AbstractEditor implements Suggester {
                 new DsListenerAdapter<DataSet>() {
                     @Override
                     public void itemChanged(Datasource<DataSet> datasetDs, DataSet prevItem, DataSet item) {
-                        List<Field> fields = Arrays.<Field>asList(datasetScriptField);
-                        for (Field field : fields) {
-                            field.setEnabled(item != null);
-                        }
+                        datasetScriptField.setEnabled(item != null);
+                        linkParameterField.setEnabled(item != null);
                     }
                 }
         );
@@ -189,6 +197,8 @@ public class BandDefinitionEditor extends AbstractEditor implements Suggester {
         if (!dataSetsDs.getItemIds().isEmpty()) {
             Entity item = dataSetsDs.getItem(dataSetsDs.getItemIds().iterator().next());
             dataSets.setSelected(item);
+        } else {
+            dataSets.setSelected((Entity) null);
         }
     }
 
