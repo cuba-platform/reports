@@ -5,14 +5,16 @@
 
 <window xmlns="http://schemas.haulmont.com/cuba/4.1/window.xsd">
 
-    <assign name="width" value="200"/>
+    <assign name="width" value="250"/>
+    <assign name="widthBig" value="300"/>
 
     <layout expand="bands">
         <vbox margin="true">
             <fieldGroup id="propertiesFieldGroup" border="hidden" datasource="reportDs" width="auto">
                 <column>
-                    <field id="name" required="true" requiredMessage="msg://report.nameMsg" width="${width}"/>
-                    <field id="defaultTemplate" custom="true" required="true" requiredMessage="msg://report.templateMsg"/>
+                    <field id="name" required="true" requiredMessage="msg://report.nameMsg" width="${widthBig}"/>
+                    <field id="defaultTemplate" custom="true" required="true"
+                           requiredMessage="msg://report.templateMsg" width="${widthBig}"/>
                 </column>
                 <column>
                     <field id="group" required="true" optionsDatasource="groupsDs"

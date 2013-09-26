@@ -389,7 +389,7 @@ public class ReportEditor extends AbstractEditor<Report> {
     protected void initGeneral() {
         treeDs.addListener(new DsListenerAdapter<BandDefinition>() {
             @Override
-            public void itemChanged(Datasource<BandDefinition> ds, @Nullable BandDefinition prevItem, @Nullable BandDefinition item) {
+            public void itemChanged(Datasource<BandDefinition> ds, BandDefinition prevItem, BandDefinition item) {
                 bandEditor.setBandDefinition(item);
                 bandName.setEnabled(item != null);
                 bandOrientation.setEnabled(item != null);
@@ -399,7 +399,7 @@ public class ReportEditor extends AbstractEditor<Report> {
 
         bandEditor.getBandDefinitionDs().addListener(new DsListenerAdapter<BandDefinition>() {
             @Override
-            public void valueChanged(BandDefinition source, String property, @Nullable Object prevValue, @Nullable Object value) {
+            public void valueChanged(BandDefinition source, String property, Object prevValue, Object value) {
                 if ("parentBandDefinition".equals(property)) {
                     if (value == source) {
                         source.setParentBandDefinition((BandDefinition) prevValue);
@@ -436,7 +436,8 @@ public class ReportEditor extends AbstractEditor<Report> {
                         if (defaultTemplate != null) {
                             ExportDisplay exportDisplay = AppConfig.createExportDisplay(ReportEditor.this);
                             byte[] reportTemplate = defaultTemplate.getContent();
-                            exportDisplay.show(new ByteArrayDataProvider(reportTemplate), defaultTemplate.getName(), ExportFormat.getByExtension(defaultTemplate.getExt()));
+                            exportDisplay.show(new ByteArrayDataProvider(reportTemplate),
+                                    defaultTemplate.getName(), ExportFormat.getByExtension(defaultTemplate.getExt()));
                         } else {
                             showNotification(getMessage("notification.defaultTemplateIsEmpty"), NotificationType.HUMANIZED);
                         }
@@ -470,7 +471,9 @@ public class ReportEditor extends AbstractEditor<Report> {
                                             defaultTemplate.setName(dialog.getFileName());
                                             templatesDs.modifyItem(defaultTemplate);
                                         } catch (IOException e) {
-                                            throw new RuntimeException(String.format("An error occurred while uploading file for template [%s]", defaultTemplate.getCode()));
+                                            throw new RuntimeException(String.format(
+                                                    "An error occurred while uploading file for template [%s]",
+                                                    defaultTemplate.getCode()));
                                         }
                                     }
                                 }
@@ -478,6 +481,32 @@ public class ReportEditor extends AbstractEditor<Report> {
                         } else {
                             showNotification(getMessage("notification.defaultTemplateIsEmpty"), NotificationType.HUMANIZED);
                         }
+                    }
+                });
+
+                lookupPickerField.addAction(new AbstractAction("create") {
+
+                    @Override
+                    public String getIcon() {
+                        return "icons/plus-btn.png";
+                    }
+
+                    @Override
+                    public void actionPerform(Component component) {
+                        ReportTemplate template = new ReportTemplate();
+                        template.setReport(getItem());
+                        final Editor editor = openEditor("report$ReportTemplate.edit",
+                                template, OpenType.DIALOG, templatesDs);
+                        editor.addListener(new CloseListener() {
+                            @Override
+                            public void windowClosed(String actionId) {
+                                if (Window.COMMIT_ACTION_ID.equals(actionId)) {
+                                    ReportTemplate item = (ReportTemplate) editor.getItem();
+                                    templatesDs.addItem(item);
+                                    getItem().setDefaultTemplate(item);
+                                }
+                            }
+                        });
                     }
                 });
 
@@ -491,7 +520,8 @@ public class ReportEditor extends AbstractEditor<Report> {
                     public void actionPerform(Component component) {
                         ReportTemplate defaultTemplate = getItem().getDefaultTemplate();
                         if (defaultTemplate != null) {
-                            final Editor editor = openEditor("report$ReportTemplate.edit", defaultTemplate, OpenType.DIALOG, templatesDs);
+                            final Editor editor = openEditor("report$ReportTemplate.edit",
+                                    defaultTemplate, OpenType.DIALOG, templatesDs);
                             editor.addListener(new CloseListener() {
                                 @Override
                                 public void windowClosed(String actionId) {
@@ -540,7 +570,11 @@ public class ReportEditor extends AbstractEditor<Report> {
                 newBandDefinition.setName("new Band");
                 newBandDefinition.setOrientation(Orientation.HORIZONTAL);
                 newBandDefinition.setParentBandDefinition(parentDefinition);
-                newBandDefinition.setPosition(parentDefinition.getChildrenBandDefinitions() != null ? parentDefinition.getChildrenBandDefinitions().size() : 0);
+                if (parentDefinition.getChildrenBandDefinitions() != null) {
+                    newBandDefinition.setPosition(parentDefinition.getChildrenBandDefinitions().size());
+                } else {
+                    newBandDefinition.setPosition(0);
+                }
                 newBandDefinition.setReport(report);
                 parentDefinition.getChildrenBandDefinitions().add(newBandDefinition);
 
@@ -806,7 +840,9 @@ public class ReportEditor extends AbstractEditor<Report> {
                     errors.add(formatMessage("error.dataSetTypeNull", dataSet.getName()));
                 }
 
-                if (dataSet.getType() == DataSetType.GROOVY || dataSet.getType() == DataSetType.SQL || dataSet.getType() == DataSetType.JPQL) {
+                if (dataSet.getType() == DataSetType.GROOVY
+                        || dataSet.getType() == DataSetType.SQL
+                        || dataSet.getType() == DataSetType.JPQL) {
                     if (StringUtils.isBlank(dataSet.getScript())) {
                         errors.add(formatMessage("error.dataSetScriptNull", dataSet.getName()));
                     }
