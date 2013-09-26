@@ -64,8 +64,12 @@ public class ParameterEditor extends AbstractEditor {
         List metaClasses = new ArrayList();
         Collection<MetaClass> classes = metadata.getSession().getClasses();
         for (MetaClass clazz : classes) {
-            metaNamesToClassNames.put(clazz.getName(), clazz.getJavaClass().getSimpleName());
-            classNamesToMetaNames.put(clazz.getJavaClass().getSimpleName(), clazz.getName());
+            Class javaClass = clazz.getJavaClass();
+            StringBuilder sb = new StringBuilder();
+            sb.append(messages.getMessage(javaClass, javaClass.getSimpleName()))
+                    .append(" (").append(clazz.getName()).append(")");
+            metaNamesToClassNames.put(clazz.getName(), sb.toString());
+            classNamesToMetaNames.put(sb.toString(), clazz.getName());
         }
 
         metaClasses.addAll(classNamesToMetaNames.keySet());
@@ -79,9 +83,10 @@ public class ParameterEditor extends AbstractEditor {
 
         List enums = new ArrayList();
         for (Class enumClass : metadata.getTools().getAllEnums()) {
-            enums.add(enumClass.getSimpleName());
-            enumNamesToEnumClass.put(enumClass.getSimpleName(), enumClass);
-            enumClassToEnumNames.put(enumClass.getCanonicalName(), enumClass.getSimpleName());
+            String enumLocalizedName = messages.getMessage(enumClass, enumClass.getSimpleName());
+            enums.add(enumLocalizedName);
+            enumNamesToEnumClass.put(enumLocalizedName, enumClass);
+            enumClassToEnumNames.put(enumClass.getCanonicalName(), enumLocalizedName);
         }
         enumLookup.setOptionsList(enums);
         enumLookup.addListener(new ValueListener() {

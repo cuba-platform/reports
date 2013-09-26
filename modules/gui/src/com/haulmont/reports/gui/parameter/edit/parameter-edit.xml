@@ -25,7 +25,7 @@
     <layout expand="windowActions" spacing="true">
         <tabSheet id="tabsheet">
             <tab id="optionsTab" caption="msg://parameters.optionsTab">
-                <grid spacing="true">
+                <grid spacing="true" margin="true">
                     <columns>
                         <column flex="1"/>
                         <column flex="1"/>
