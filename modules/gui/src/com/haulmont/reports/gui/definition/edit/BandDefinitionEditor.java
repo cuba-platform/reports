@@ -44,9 +44,6 @@ public class BandDefinitionEditor extends AbstractEditor implements Suggester {
     @Named("text")
     protected SourceCodeEditor datasetScriptField;
 
-    @Named("linkParameterName")
-    protected TextField linkParameterField;
-
     @Named("textBox")
     BoxLayout textBox;
 
@@ -141,8 +138,7 @@ public class BandDefinitionEditor extends AbstractEditor implements Suggester {
                 new DsListenerAdapter<DataSet>() {
                     @Override
                     public void itemChanged(Datasource<DataSet> datasetDs, DataSet prevItem, DataSet item) {
-                        datasetScriptField.setEnabled(item != null);
-                        linkParameterField.setEnabled(item != null);
+                        textBox.setVisible(item != null);
                     }
                 }
         );
