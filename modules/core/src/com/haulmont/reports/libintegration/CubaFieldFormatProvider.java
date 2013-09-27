@@ -25,7 +25,15 @@ public class CubaFieldFormatProvider implements DefaultFormatProvider {
     public String format(Object o) {
         if (o != null) {
             Datatype datatype = Datatypes.get(o.getClass());
-            return datatype != null ? datatype.format(o, userSessionSource.getLocale()) : o.toString();
+            if (datatype != null) {
+                if (userSessionSource.checkCurrentUserSession()) {
+                    return datatype.format(o, userSessionSource.getLocale());
+                } else {
+                    return datatype.format(o);
+                }
+            } else {
+                return o.toString();
+            }
         } else {
             return null;
         }

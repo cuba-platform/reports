@@ -30,7 +30,7 @@
     <bean id="reporting_lib_MultiEntityDataLoader" class="com.haulmont.reports.libintegration.MultiEntityDataLoader"/>
 
     <bean id="reporting_lib_OfficeIntegration"
-          class="com.haulmont.yarg.formatters.impl.doc.connector.OfficeIntegration">
+          class="com.haulmont.reports.libintegration.CubaOfficeIntegration">
         <constructor-arg value="${cuba.reporting.openoffice.path?:/}"/>
         <constructor-arg>
             <list>
