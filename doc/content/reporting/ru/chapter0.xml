@@ -1,10 +1,10 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- This document was created with Syntext Serna Free. --><chapter id="chapter0_theoretical_info" lang="ru">
   <title>Общие сведения</title>
-  <para>В платформе <trademark>CUBA</trademark> существует подсистема создания отчетов. Подсистема позволяет  добавлять в систему новые отчеты и изменять существующие. Подсистема позволяет:</para>
+  <para>Генератор отчетов  позволяет:</para>
   <itemizedlist>
     <listitem>
-      <para>использовать  редактор  отчета для создания отчета пользователями, не имеющими навык программирования;</para>
+      <para>использовать  редактор  отчета для описания структуры извлекаемых данных;</para>
     </listitem>
     <listitem>
       <para>хранить шаблон отчета в форматах <filename>*.doc</filename>, <filename>*.odt</filename>, <filename>*.html</filename>, <filename>*.xls</filename>;</para>

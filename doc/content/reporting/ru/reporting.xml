@@ -6,32 +6,17 @@
       <holder>Haulmont (<ulink url="http://www.haulmont.ru/">www.haulmont.ru</ulink>)</holder>
     </copyright>
     <title>Платформа <trademark>CUBA</trademark>. Генератор отчетов</title>
+    <author>
+      <othername>Версия 4.1</othername>
+    </author>
   </bookinfo>
   <preface lang="ru">
     <title>Предисловие</title>
-    <section id="appointment_id">
-      <title>Назначение</title>
-      <para>Документ является руководством по созданию отчетов в системах, разработанных на платформе <trademark>CUBA</trademark>.    Информация, представленная в руководстве, актуальна для платформы  версии 4.0.</para>
-    </section>
+    <para>Данный документ является руководством по созданию отчетов в системах, разработанных на платформе CUBA.</para>
     <section>
-      <title>Структура руководства</title>
-      <para>Данное руководство состоит из следующих разделов:</para>
-      <para><link linkend="chapter2_working_in_nix">
-          <emphasis role="bold">Глава 1. Установка и настройка OpenOffice.org</emphasis>
-        </link></para>
-      <para>В данной главе  описана последовательность действий при установке и настройке <application>OpenOffice.org</application>. </para>
-      <para><link linkend="chapter0_theoretical_info">
-          <emphasis role="bold">Глава 2. Общие сведения</emphasis>
-        </link></para>
-      <para>Данная глава содержит описание структуры и функциональности отчетов.</para>
-      <para><link linkend="chapter1_tool_description">
-          <emphasis role="bold">Глава 3. Описание инструментария</emphasis>
-        </link></para>
-      <para>В данной главе содержится описание интерфейса подсистемы, с помощью которой можно создавать отчеты. </para>
-      <para><link linkend="chapter3_examples">
-          <emphasis role="bold">Глава 4. Примеры построения отчетов</emphasis>
-        </link></para>
-      <para>В главе 4 приводится подробное описание создания основных видов отчетов.</para>
+      <title>Целевая аудитория</title>
+      <para>Руководство предназначено для разработчиков и администраторов CUBA-приложений. Для успешной работы с генератором отчетов требуется как минимум понимание принципов работы реляционных баз данных
+и умение писать запросы на языке SQL. В некоторых случаях данные для отчетов удобнее извлекать с помощью языков JPQL или Groovy, поэтому знакомство с ними является полезным.</para>
     </section>
     <section id="additional_info">
       <title>Дополнительные материалы</title>
@@ -39,7 +24,7 @@
     </section>
     <section>
       <title>Обратная связь</title>
-      <para>Если  у Вас имеются предложения по улучшению данного руководства, пожалуйста, обратитесь в службу поддержки по электронной почте <email>cuba@haulmont.com</email>. В теме письма укажите тег <code>[Documentation]</code>.</para>
+      <para>Если  у Вас имеются предложения по улучшению данного руководства,  обратитесь в службу поддержки по адресу <ulink url="https://www.cuba-platform.com/support">https://www.cuba-platform.com/support</ulink>. </para>
       <para>Если Вы обнаружили ошибку, укажите, пожалуйста, номер главы и приведите небольшой участок окружающего текста для облегчения поиска. </para>
     </section>
   </preface>

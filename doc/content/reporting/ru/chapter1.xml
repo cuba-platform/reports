@@ -1,6 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- This document was created with Syntext Serna Free. --><chapter lang="ru" id="chapter1_tool_description">
   <title>Описание инструментария</title>
+  <para>В данной главе содержится описание пользовательского интерфейса генератора отчетов. </para>
   <para>Для того чтобы войти в подсистему создания отчетов, необходимо в главном меню приложения перейти к пункту меню <guimenu>Отчеты</guimenu> −&gt; <guimenu>Отчеты</guimenu>. Перед Вами откроется окно, представленное на рисунке ниже.</para>
   <figure>
     <title>Окно управления отчетами системы</title>
