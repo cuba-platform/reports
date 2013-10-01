@@ -4,9 +4,9 @@
   ~ Use is subject to license terms, see http://www.cuba-platform.com/license for details.
   -->
 
-<menu-config xmlns="http://schemas.haulmont.com/cuba/4.0/menu.xsd">
+<menu-config xmlns="http://schemas.haulmont.com/cuba/4.1/menu.xsd">
 
-    <menu id="reports" insertAfter="administration">
+    <menu id="reports" insertBefore="administration">
         <item id="report$Report.browse"/>
         <item id="report$ReportGroup.browse"/>
         <item id="report$Report.run"/>
