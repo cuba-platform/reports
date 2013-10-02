@@ -143,6 +143,8 @@ configure(coreModule) {
         includes = ['**/*Test.class']
     }
 
+    assembleDbScripts { moduleAlias = '20-reports' }
+
     dbScriptsArchive {
         exclude '10-cuba/**'
     }
