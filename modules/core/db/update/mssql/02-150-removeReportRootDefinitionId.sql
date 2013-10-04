@@ -5,7 +5,7 @@ alter table REPORT_REPORT drop constraint FK_REPORT_REPORT_TO_REPORT_BAND_DEFINI
 
 alter table REPORT_REPORT drop column ROOT_DEFINITION_ID^
 
-create unique index UK_REPORT_REPORT_CODE on REPORT_REPORT (CODE) where CODE is not null^
+create unique index UK_REPORT_REPORT_CODE on REPORT_REPORT (CODE)^
 
 alter table REPORT_BAND_DEFINITION drop column QUERY^
 
