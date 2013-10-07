@@ -24,9 +24,13 @@
             <collectionDatasource id="templatesDs" property="templates"/>
             <collectionDatasource id="bandsDs" property="bands"/>
             <hierarchicalDatasource id="treeDs" property="bands" hierarchyProperty="parentBandDefinition">
-                <collectionDatasource id="dataSetsDs" property="dataSets" datasourceClass="com.haulmont.reports.gui.datasource.ReportPropertyDatasourceImpl"/>
+                <collectionDatasource id="dataSetsDs" property="dataSets"
+                    datasourceClass="com.haulmont.reports.gui.datasource.ReportPropertyDatasourceImpl"/>
             </hierarchicalDatasource>
         </datasource>
+
+        <collectionDatasource id="availableParentBandsDs" class="com.haulmont.reports.entity.BandDefinition"
+                              datasourceClass="com.haulmont.reports.gui.datasource.NotPersistenceCollectionDatasource"/>
 
         <collectionDatasource id="groupsDs" class="com.haulmont.reports.entity.ReportGroup" view="_local">
             <query>

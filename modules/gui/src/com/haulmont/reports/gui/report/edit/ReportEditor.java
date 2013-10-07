@@ -14,20 +14,11 @@ import com.haulmont.cuba.gui.WindowManager;
 import com.haulmont.cuba.gui.WindowManager.OpenType;
 import com.haulmont.cuba.gui.app.core.file.FileUploadDialog;
 import com.haulmont.cuba.gui.components.*;
-import com.haulmont.cuba.gui.components.actions.CreateAction;
-import com.haulmont.cuba.gui.components.actions.EditAction;
-import com.haulmont.cuba.gui.components.actions.ItemTrackingAction;
-import com.haulmont.cuba.gui.components.actions.RemoveAction;
+import com.haulmont.cuba.gui.components.actions.*;
 import com.haulmont.cuba.gui.config.WindowConfig;
 import com.haulmont.cuba.gui.config.WindowInfo;
-import com.haulmont.cuba.gui.data.CollectionDatasource;
-import com.haulmont.cuba.gui.data.Datasource;
-import com.haulmont.cuba.gui.data.DsContext;
-import com.haulmont.cuba.gui.data.HierarchicalDatasource;
-import com.haulmont.cuba.gui.data.impl.CollectionPropertyDatasourceImpl;
-import com.haulmont.cuba.gui.data.impl.DatasourceImpl;
-import com.haulmont.cuba.gui.data.impl.DsListenerAdapter;
-import com.haulmont.cuba.gui.data.impl.HierarchicalPropertyDatasourceImpl;
+import com.haulmont.cuba.gui.data.*;
+import com.haulmont.cuba.gui.data.impl.*;
 import com.haulmont.cuba.gui.export.ByteArrayDataProvider;
 import com.haulmont.cuba.gui.export.ExportDisplay;
 import com.haulmont.cuba.gui.export.ExportFormat;
@@ -42,7 +33,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.File;
@@ -162,6 +152,12 @@ public class ReportEditor extends AbstractEditor<Report> {
 
     @Inject
     protected ReportService reportService;
+
+    @Inject
+    protected CollectionDatasource<BandDefinition, UUID> bandsDs;
+
+    @Inject
+    protected CollectionDatasource<BandDefinition, UUID> availableParentBandsDs;
 
     @Override
     protected void initItem(Report report) {
@@ -386,6 +382,16 @@ public class ReportEditor extends AbstractEditor<Report> {
         });
     }
 
+    private boolean isChildOrEqual(BandDefinition definition, BandDefinition child) {
+        if (definition.equals(child)) {
+            return true;
+        } else if (child != null) {
+            return isChildOrEqual(definition, child.getParentBandDefinition());
+        } else {
+            return false;
+        }
+    }
+
     protected void initGeneral() {
         treeDs.addListener(new DsListenerAdapter<BandDefinition>() {
             @Override
@@ -394,6 +400,16 @@ public class ReportEditor extends AbstractEditor<Report> {
                 bandName.setEnabled(item != null);
                 bandOrientation.setEnabled(item != null);
                 parentBand.setEnabled(item != null);
+
+                availableParentBandsDs.clear();
+                if (item != null) {
+                    for (BandDefinition bandDefinition : bandsDs.getItems()) {
+                        if (!isChildOrEqual(item, bandDefinition) ||
+                                ObjectUtils.equals(item.getParentBandDefinition(), bandDefinition)) {
+                            availableParentBandsDs.addItem(bandDefinition);
+                        }
+                    }
+                }
             }
         });
 

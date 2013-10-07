@@ -31,7 +31,7 @@
             <lookupField id="orientation" datasource="bandDefinitionDs" property="orientation" enable="false"
                          width="${width}" required="true"/>
             <label value="msg://definition.parentBand"/>
-            <lookupField id="parentBand" datasource="bandDefinitionDs" optionsDatasource="bandsDs"
+            <lookupField id="parentBand" datasource="bandDefinitionDs" optionsDatasource="availableParentBandsDs"
                          property="parentBandDefinition" enable="false" width="${width}"/>
         </hbox>
 
