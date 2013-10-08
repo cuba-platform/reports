@@ -37,11 +37,6 @@
                                requiredMessage="msg://template.codeMsg"/>
                 </row>
                 <row>
-                    <label value="msg://template.name"/>
-                    <textField id="name" datasource="templateDs" property="name"
-                               width="${width}" enable="false"/>
-                </row>
-                <row>
                     <label value="msg://template.outputType"/>
                     <lookupField id="outputType" datasource="templateDs"
                                  property="reportOutputType"
