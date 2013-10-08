@@ -16,6 +16,7 @@ import com.haulmont.cuba.gui.upload.FileUploadingAPI;
 import com.haulmont.reports.entity.Report;
 import com.haulmont.reports.entity.ReportTemplate;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 
 import javax.inject.Inject;
@@ -84,6 +85,9 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
         templatePath.setEnabled(!customEnabled);
         uploadTemplate.setEnabled(!customEnabled);
         customClass.setEnabled(customEnabled);
+        customClass.setRequired(customEnabled);
+        customClass.setRequiredMessage(messages.getMessage(TemplateEditor.class,
+                "templateEditor.classRequired"));
     }
 
     @Override
@@ -158,7 +162,7 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
     }
 
     protected boolean validateTemplateFile() {
-        if (getItem().getContent() == null) {
+        if (BooleanUtils.isNotTrue(getItem().getCustomFlag()) && getItem().getContent() == null) {
             showNotification(getMessage("validationFail.caption"),
                     getMessage("template.uploadTemplate"), NotificationType.TRAY);
             return false;
