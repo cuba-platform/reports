@@ -45,10 +45,10 @@
                 <button action="table.create" icon="icons/create.png"/>
                 <button action="table.edit" icon="icons/edit.png"/>
                 <button action="table.remove" icon="icons/remove.png"/>
-                <button id="copy" caption="msg://button.copy"/>
+                <button id="copy"/>
                 <button id="import" caption="msg://button.import"/>
-                <button id="export" caption="msg://button.export"/>
-                <button id="runReport" icon="icons/run.png" caption="msg://button.run"/>
+                <button id="export"/>
+                <button id="runReport" icon="icons/run.png"/>
             </buttonsPanel>
             <columns>
                 <group>

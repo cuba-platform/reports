@@ -124,7 +124,7 @@ public class ReportBrowser extends AbstractLookup {
                 }
             }
         });
-
+        reportsTable.addAction(copyReport.getAction());
         reportsTable.addAction(exportReport.getAction());
         reportsTable.addAction(runReport.getAction());
     }
