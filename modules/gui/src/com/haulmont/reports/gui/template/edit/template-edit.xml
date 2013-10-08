@@ -45,9 +45,9 @@
                 </row>
                 <row>
                     <label value="msg://template.file"/>
-                    <hbox spacing="true">
-                        <button id="templatePath" stylename="link"/>
+                    <hbox spacing="true" width="${width}" expand="templatePath">
                         <upload id="uploadTemplate"/>
+                        <button id="templatePath" stylename="link"/>
                     </hbox>
                 </row>
                 <row>
