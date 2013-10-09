@@ -59,7 +59,7 @@ public class ReportBrowser extends AbstractLookup {
         super.init(params);
 
 
-        copyReport.setAction(new AbstractAction("copy") {
+        copyReport.setAction(new ItemTrackingAction("copy") {
             @Override
             public void actionPerform(Component component) {
                 Report report = reportsTable.getSingleSelected();
