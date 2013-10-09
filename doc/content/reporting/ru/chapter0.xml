@@ -7,7 +7,10 @@
       <para>использовать  редактор  отчета для описания структуры извлекаемых данных;</para>
     </listitem>
     <listitem>
-      <para>хранить шаблон отчета в форматах <filename>*.doc</filename>, <filename>*.odt</filename>, <filename>*.html</filename>, <filename>*.xls</filename>;</para>
+      <para>создавать отчет, определяемый классом Java. Для такого отчета необходимо определить класс и задать входные параметры. Класс должен реализовать интерфейс <code>com.haulmont.yarg.formatters.CustomReport</code>;</para>
+    </listitem>
+    <listitem>
+      <para>хранить шаблон отчета в форматах <filename>*.doc</filename>, <filename>*.docx</filename>,   <filename>*.odt</filename>, <filename>*.html</filename>, <filename>*.xls</filename>, <filename>*.xlsx</filename><filename>*.ftl</filename>;</para>
     </listitem>
     <listitem>
       <para>определять состав доступных отчетов для роли системы;</para>
@@ -19,76 +22,35 @@
       <para>сохранять результаты отчетов в форматах, доступных для просмотра без использования специальных средств:</para>
       <itemizedlist>
         <listitem>
-          <para><filename>*.doc</filename>;</para>
+          <para><filename>*.doc</filename>,</para>
         </listitem>
         <listitem>
-          <para><filename>*.pdf</filename>;</para>
+          <para><filename>*.docx</filename>,</para>
         </listitem>
         <listitem>
-          <para><filename>*.xls</filename>;</para>
+          <para><filename>*.pdf</filename>,</para>
         </listitem>
         <listitem>
-          <para><filename>*.html</filename>.</para>
+          <para><filename>*.xls</filename>,</para>
+        </listitem>
+        <listitem>
+          <para><filename>*.xlsx</filename>,</para>
+        </listitem>
+        <listitem>
+          <para><filename>*.html</filename>;</para>
         </listitem>
       </itemizedlist>
     </listitem>
     <listitem>
-      <para>задавать форматы выходных значений отчета.</para>
+      <para>задавать форматы выходных значений отчета;</para>
+    </listitem>
+    <listitem>
+      <para>локализовать имена отчетов.</para>
     </listitem>
   </itemizedlist>
-  <para>На диаграмме представлены виды отчетов.</para>
-  <figure>
-    <title>Диаграмма видов отчетов</title>
-    <mediaobject>
-      <imageobject>
-        <imagedata align="center" fileref="img/types.png" contentwidth="90%"/>
-      </imageobject>
-    </mediaobject>
-  </figure>
-  <para>Рассмотрим их более подробно. </para>
-  <para><emphasis role="bold">Печатная форма</emphasis>  используется для создания отчета, содержащего информацию о выбранном в данный момент экземпляре сущности системы.</para>
-  <para><emphasis role="bold">Печатная форма списка</emphasis> используется для создания отчета с информацией о выбранных в данный момент экземплярах сущности системы.</para>
-  <para><emphasis role="bold">Простая форма</emphasis> используется при создании остальных отчетов.</para>
-  <para><emphasis role="bold">Отчет, определенный классом</emphasis>, использует класс Java, созданный программистом. Для такого отчета необходимо определить класс и задать входные параметры. Класс должен реализовать интерфейс <code>com.haulmont.cuba.report.CustomReport</code>.</para>
-  <para><emphasis role="bold">Алгоритм создания простого отчета</emphasis></para>
-  <orderedlist>
-    <listitem>
-      <para>Создать структуру выбираемых данных.</para>
-    </listitem>
-    <listitem>
-      <para>Создать шаблон и определить тип формата вывода отчета (<filename>*.xls</filename>, <filename>*.doc</filename>, <filename>*.pdf</filename>, <filename>*.html</filename>).</para>
-    </listitem>
-    <listitem>
-      <para>Задать входные параметры отчета, если необходимо.</para>
-    </listitem>
-    <listitem>
-      <para>Задать формат выходных значений отчета, если необходимо.</para>
-    </listitem>
-    <listitem>
-      <para>Cоздать кнопку  на соответствующем экране, если необходимо.</para>
-    </listitem>
-  </orderedlist>
-  <para><emphasis role="bold">Алгоритм создания печатных форм и печатных форм списков</emphasis></para>
-  <orderedlist id="inner_param">
-    <listitem>
-      <para>Создать шаблон отчета.</para>
-    </listitem>
-    <listitem>
-      <para>Указать тип отчета <userinput>Печатная форма</userinput> или <userinput>Печатная форма списка</userinput>.</para>
-    </listitem>
-    <listitem>
-      <para>Задать параметр с типом <userinput>Объект</userinput> или <userinput>Список объектов</userinput>.</para>
-    </listitem>
-    <listitem>
-      <para>Создать полосу отчета, имеющую источник данных с типом <userinput>Связанная сущность</userinput> или <userinput>Группа связанных сущностей</userinput>. Имя параметра в источнике данных должность совпадать с <glossterm linkend="glossary_alias_id">алиасом</glossterm> параметра из <link linkend="inner_param">пункта 3</link>.</para>
-    </listitem>
-    <listitem>
-      <para>Cоздать кнопку печатной формы или печатной формы списка на соответствующем экране, если необходимо.</para>
-    </listitem>
-  </orderedlist>
   <section>
     <title>Создание структуры данных отчета</title>
-    <para>Структура данных отчета представляет собой  <firstterm>дерево определителей полос</firstterm> (<firstterm>band definition</firstterm>). Определитель полосы имеет имя, ориентацию и список источников данных.</para>
+    <para>Структура данных отчета представляет собой  <firstterm>дерево определителей полос</firstterm> (<firstterm>band definition</firstterm>). Определитель полосы имеет имя, ориентацию, родителя и список источников данных.</para>
     <warning>
       <para>Имена полос и извлекаемых параметров должны содержать только латинские буквы, цифры или символ подчеркивания.</para>
     </warning>
@@ -135,6 +97,7 @@ return [[&apos;userName&apos;: user.name,
         <para>Чтобы использовать данные типы источников данных необходимо, чтобы в отчете типы параметров  были <userinput>Объект</userinput> и <userinput>Группа объектов</userinput> соответственно, а сам параметр был связанной сущностью. В этом случае в шаблоне будут использованы поля сущностей. <glossterm linkend="glossary_alias_id">Алиасы</glossterm> в шаблоне должны соответствовать именам выгружаемых полей сущности.</para>
       </listitem>
     </orderedlist>
+    <para>Если определитель полосы имеет несколько источников данных, их необходимо связать. Для этого используется связывающий параметр. Он представляет собой алиас, по которому будут связываться между собой источники данных.</para>
   </section>
   <section>
     <title>Создание шаблона отчета</title>
@@ -226,6 +189,9 @@ return [[&apos;userName&apos;: user.name,
       </tip>
       <para><emphasis role="bold">Задание выходных параметров</emphasis></para>
       <para>В doc-шаблоне <glossterm linkend="glossary_alias_id">алиасы</glossterm> могут быть двух  видов − в таблицах и в тексте. В тексте алиас должен иметь вид <code>${имя полосы.имя параметра}</code>. В таблице алиас должен иметь вид <code>${имя параметра}</code>. Текст может содержать форматирование, а в ячейках таблиц может содержаться несколько алиасов.</para>
+      <warning>
+        <para>Таблица с <glossterm linkend="glossary_alias_id">алиасами</glossterm> должна содержать либо одну, либо две строки. Если строк в таблице две, то алиасы должны находиться во второй. Первая должна быть пустой, или содержать фиксированный текст. </para>
+      </warning>
     </section>
     <section>
       <title>Специальные объекты в документе</title>
@@ -404,7 +370,9 @@ return [[&apos;userName&apos;: user.name,
   </section>
   <section>
     <title>Задание входных параметров отчета</title>
-    <para>Отчет может иметь параметры, которые используются источниками данных для извлечения данных.  Параметр должен иметь <glossterm linkend="glossary_alias_id">алиас</glossterm> и имя. Имя параметра отображается на экране ввода параметров, алиас используется источниками данных. Параметры могут быть следующих типов: дата, текст, булевский тип, число, перечисление, объект, список объектов. Параметры могут быть обязательными или не обязательными. Если тип параметра − объект или группа объектов, существует возможность задать экран выбора сущностей. </para>
+    <para>Отчет может иметь параметры, которые используются источниками данных для извлечения данных.  Параметр должен иметь <glossterm linkend="glossary_alias_id">алиас</glossterm> и имя. Имя параметра отображается на экране ввода параметров, алиас используется источниками данных. Параметры могут быть следующих типов: дата, время, дата и время, текст, булевский тип, число, перечисление, объект, список объектов. Параметры могут быть обязательными или не обязательными. Если тип параметра − объект или группа объектов, существует возможность задать экран выбора сущностей. Поддерживается возможность локализации параметров. В строках локализации сначала указывается локаль, затем локализованное значение:</para>
+    <programlisting>en=Name
+ru=Имя</programlisting>
   </section>
   <section>
     <title>Задание форматирования значений выходных параметров отчета</title>
@@ -413,5 +381,11 @@ return [[&apos;userName&apos;: user.name,
   <section>
     <title>Разграничение прав доступа к отчетам</title>
     <para>Отчеты можно привязывать к экранам и\или ролям пользователей. Для этого необходимо на вкладке <guilabel>Экраны и роли</guilabel> добавить экраны, с которых можно вызывать отчет, и роли пользователей, которым позволено это делать. По умолчанию отчет может вызываться из любых экранов и любыми ролями. Если экран или роль заданы явно, то отчет может быть вызван только из этого экрана или только данной ролью.</para>
+  </section>
+  <section>
+    <title>Локализация отчетов</title>
+    <para>Имена отчетов можно локализовать. Строки локализации задаются в виде</para>
+    <programlisting>en=Name
+ru=Имя</programlisting>
   </section>
 </chapter>

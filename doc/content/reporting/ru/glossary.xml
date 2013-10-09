@@ -80,7 +80,7 @@
         <emphasis role="bold">XML-дескриптор</emphasis>
       </glossterm>
       <glossdef>
-        <para>Описывает <glossterm linkend="glossary_datasource_id">источники данных</glossterm> и расположение визуальных компонентов экрана.</para>
+        <para>Описывает источники данных и расположение визуальных компонентов экрана.</para>
         <para>XML-дескриптор содержит следующие элементы:</para>
         <itemizedlist>
           <listitem>
@@ -93,7 +93,7 @@
                 <para><sgmltag>class</sgmltag> − имя класса <glossterm linkend="glossary_controller_id">контроллера</glossterm></para>
               </listitem>
               <listitem>
-                <para><sgmltag>messagesPack</sgmltag> − имя <glossterm linkend="glossary_localized_folders_id">пакета сообщений</glossterm>. Фактически это имя Java-пакета, содержащего файл  <filename>messages.properties</filename></para>
+                <para><sgmltag>messagesPack</sgmltag> − имя пакета сообщений. Фактически это имя Java-пакета, содержащего файл  <filename>messages.properties</filename></para>
               </listitem>
               <listitem>
                 <para><sgmltag>caption</sgmltag> − заголовок экрана, должен содержать ссылку на сообщение из вышеуказанного пакета, например <programlisting>caption=&quot;msg://caption&quot;</programlisting></para>
@@ -104,10 +104,10 @@
             </orderedlist>
           </listitem>
           <listitem>
-            <para><sgmltag>metadataContext</sgmltag> − опциональный элемент для инициализации <glossterm linkend="glossary_view_ru_id">представлений</glossterm> (views). Предпочтительным является определение всех представлений в одном общем файле <filename>ext-views.xml</filename>  модуля <structname>core</structname>. </para>
+            <para><sgmltag>metadataContext</sgmltag> − опциональный элемент для инициализации представлений (views). Предпочтительным является определение всех представлений в одном общем файле <filename>ext-views.xml</filename>  модуля <structname>core</structname>. </para>
           </listitem>
           <listitem>
-            <para><sgmltag>dsContext</sgmltag> − элемент, определяющий <glossterm linkend="glossary_datasource_id">источники данных</glossterm> данного экрана. Источники данных предназначены для реализации связанных с данными  компонентов.</para>
+            <para><sgmltag>dsContext</sgmltag> − элемент, определяющий <glossterm>источники данных</glossterm> данного экрана. Источники данных предназначены для реализации связанных с данными  компонентов.</para>
           </listitem>
           <listitem>
             <para><sgmltag>layout</sgmltag> − элемент, определяющий компоновку экрана.</para>
