@@ -33,6 +33,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.File;
@@ -100,7 +101,7 @@ public class ReportEditor extends AbstractEditor<Report> {
     protected Table parametersTable;
 
     @Named("formatsFrame.valuesFormatsTable")
-    Table formatsTable;
+    protected Table formatsTable;
 
     @Named("parametersFrame.up")
     protected Button paramUpButton;
@@ -298,6 +299,15 @@ public class ReportEditor extends AbstractEditor<Report> {
 
         parametersTable.addAction(paramUpButton.getAction());
         parametersTable.addAction(paramDownButton.getAction());
+
+        parametersDs.addListener(new DsListenerAdapter<ReportInputParameter>() {
+            @Override
+            public void valueChanged(ReportInputParameter source, String property, Object prevValue, Object value) {
+                if ("position".equals(property)) {
+                    ((DatasourceImplementation) parametersDs).modified(source);
+                }
+            }
+        });
     }
 
     protected void initValuesFormats() {
@@ -423,6 +433,7 @@ public class ReportEditor extends AbstractEditor<Report> {
                         treeDs.refresh();
                     }
                 }
+                treeDs.modifyItem(source);
             }
         });
 
@@ -485,7 +496,6 @@ public class ReportEditor extends AbstractEditor<Report> {
                                             byte[] data = FileUtils.readFileToByteArray(file);
                                             defaultTemplate.setContent(data);
                                             defaultTemplate.setName(dialog.getFileName());
-                                            templatesDs.modifyItem(defaultTemplate);
                                         } catch (IOException e) {
                                             throw new RuntimeException(String.format(
                                                     "An error occurred while uploading file for template [%s]",

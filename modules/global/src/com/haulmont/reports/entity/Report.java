@@ -71,10 +71,12 @@ public class Report extends BaseReportEntity implements com.haulmont.yarg.struct
 
     @Transient
     @MetaProperty
+    @Composition
     protected List<ReportInputParameter> inputParameters = new ArrayList<>();
 
     @Transient
     @MetaProperty
+    @Composition
     protected List<ReportValueFormat> valuesFormats = new ArrayList<>();
 
     @Transient

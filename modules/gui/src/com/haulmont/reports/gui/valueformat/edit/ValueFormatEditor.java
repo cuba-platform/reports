@@ -4,24 +4,32 @@
  */
 package com.haulmont.reports.gui.valueformat.edit;
 
+import com.haulmont.chile.core.model.Instance;
+import com.haulmont.chile.core.model.utils.InstanceUtils;
+import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.gui.components.AbstractEditor;
 import com.haulmont.cuba.gui.components.Component;
 import com.haulmont.cuba.gui.components.FieldGroup;
 import com.haulmont.cuba.gui.components.LookupField;
 import com.haulmont.cuba.gui.data.Datasource;
+import com.haulmont.cuba.gui.data.impl.DatasourceImplementation;
+import com.haulmont.cuba.gui.data.impl.DsListenerAdapter;
 import com.haulmont.cuba.gui.xml.layout.ComponentsFactory;
+import com.haulmont.reports.entity.ReportValueFormat;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * @author artamonov
  * @version $Id$
  */
-public class ValueFormatEditor extends AbstractEditor {
+public class ValueFormatEditor extends AbstractEditor<ReportValueFormat> {
 
-    protected String[] defaultFormats = new String[] {
+    protected String[] defaultFormats = new String[]{
             "#,##0",
             "##,##0",
             "#,##0.###",
@@ -40,6 +48,9 @@ public class ValueFormatEditor extends AbstractEditor {
 
     @Inject
     protected ComponentsFactory componentsFactory;
+
+    @Inject
+    protected Datasource valuesFormatsDs;
 
     @Override
     public void init(Map<String, Object> params) {
@@ -69,6 +80,13 @@ public class ValueFormatEditor extends AbstractEditor {
             }
         });
 
+        valuesFormatsDs.addListener(new DsListenerAdapter() {
+            @Override
+            public void valueChanged(Entity source, String property, Object prevValue, Object value) {
+                ((DatasourceImplementation) valuesFormatsDs).modified(source);
+            }
+        });
+
         getDialogParams().setWidth(450);
     }
 
@@ -87,5 +105,13 @@ public class ValueFormatEditor extends AbstractEditor {
             }
             formatField.setValue(value);
         }
+    }
+
+    @Override
+    public void setItem(Entity item) {
+        Entity newItem = valuesFormatsDs.getDataSupplier().newInstance(valuesFormatsDs.getMetaClass());
+        InstanceUtils.copy(item, newItem);
+        ((ReportValueFormat) newItem).setId((UUID) item.getId());
+        super.setItem(newItem);
     }
 }

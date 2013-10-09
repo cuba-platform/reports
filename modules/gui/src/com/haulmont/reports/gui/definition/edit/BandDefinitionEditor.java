@@ -14,6 +14,7 @@ import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.components.actions.RemoveAction;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
 import com.haulmont.cuba.gui.data.Datasource;
+import com.haulmont.cuba.gui.data.impl.DatasourceImplementation;
 import com.haulmont.cuba.gui.data.impl.DsListenerAdapter;
 import com.haulmont.reports.entity.BandDefinition;
 import com.haulmont.reports.entity.DataSet;
@@ -117,10 +118,12 @@ public class BandDefinitionEditor extends AbstractEditor implements Suggester {
     public void initDataSetControls() {
         dataSetsDs.addListener(new DsListenerAdapter<DataSet>() {
             @Override
-            public void valueChanged(DataSet source, String property, @Nullable Object prevValue, @Nullable Object value) {
+            public void valueChanged(DataSet source, String property,
+                                     @Nullable Object prevValue, @Nullable Object value) {
                 if (property.equals("type")) {
                     applyType((DataSetType) value);
                 }
+                ((DatasourceImplementation) dataSetsDs).modified(source);
             }
 
             @Override
@@ -128,20 +131,13 @@ public class BandDefinitionEditor extends AbstractEditor implements Suggester {
                 if (item != null) {
                     applyType(item.getType());
                 }
+                textBox.setVisible(item != null);
             }
         });
 
         textBox.setVisible(false);
         entityBox.setVisible(false);
         entitiesBox.setVisible(false);
-        dataSetsDs.addListener(
-                new DsListenerAdapter<DataSet>() {
-                    @Override
-                    public void itemChanged(Datasource<DataSet> datasetDs, DataSet prevItem, DataSet item) {
-                        textBox.setVisible(item != null);
-                    }
-                }
-        );
     }
 
     private void applyType(DataSetType dsType) {

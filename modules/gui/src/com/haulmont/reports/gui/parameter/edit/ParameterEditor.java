@@ -5,16 +5,21 @@
 package com.haulmont.reports.gui.parameter.edit;
 
 import com.haulmont.chile.core.model.MetaClass;
+import com.haulmont.chile.core.model.utils.InstanceUtils;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.global.Metadata;
 import com.haulmont.cuba.gui.components.AbstractEditor;
 import com.haulmont.cuba.gui.components.LookupField;
 import com.haulmont.cuba.gui.config.WindowConfig;
 import com.haulmont.cuba.gui.config.WindowInfo;
+import com.haulmont.cuba.gui.data.Datasource;
 import com.haulmont.cuba.gui.data.ValueListener;
+import com.haulmont.cuba.gui.data.impl.DatasourceImplementation;
+import com.haulmont.cuba.gui.data.impl.DsListenerAdapter;
 import com.haulmont.reports.entity.ParameterType;
 import com.haulmont.reports.entity.ReportInputParameter;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.util.*;
 
@@ -40,9 +45,15 @@ public class ParameterEditor extends AbstractEditor {
     @Inject
     private Metadata metadata;
 
+    @Inject
+    private Datasource parameterDs;
+
     @Override
     public void setItem(Entity item) {
-        super.setItem(item);
+        Entity newItem = parameterDs.getDataSupplier().newInstance(parameterDs.getMetaClass());
+        InstanceUtils.copy(item, newItem);
+        ((ReportInputParameter) newItem).setId((UUID) item.getId());
+        super.setItem(newItem);
         parameter = (ReportInputParameter) getItem();
         enableControlsByParamType(parameter.getType());
 
@@ -117,6 +128,13 @@ public class ParameterEditor extends AbstractEditor {
             @Override
             public void valueChanged(Object source, String property, Object prevValue, Object value) {
                 enableControlsByParamType(value);
+            }
+        });
+
+        parameterDs.addListener(new DsListenerAdapter() {
+            @Override
+            public void valueChanged(Entity source, String property, Object prevValue, Object value) {
+                ((DatasourceImplementation) parameterDs).modified(source);
             }
         });
 

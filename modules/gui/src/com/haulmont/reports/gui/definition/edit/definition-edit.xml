@@ -16,6 +16,7 @@
         <datasource
                 id="bandDefinitionDs"
                 class="com.haulmont.reports.entity.BandDefinition"
+                datasourceClass="com.haulmont.reports.gui.datasource.NotPersistenceDatasource"
                 view="report.edit">
         </datasource>
     </dsContext>
