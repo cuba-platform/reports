@@ -56,7 +56,7 @@ public class ReportTemplate extends BaseReportEntity implements com.haulmont.yar
     protected byte[] content;
 
     @Transient
-    protected CustomReport customReport;
+    protected transient CustomReport customReport;
 
     public ReportOutputType getReportOutputType() {
         return reportOutputType != null ? ReportOutputType.fromId(reportOutputType) : null;
