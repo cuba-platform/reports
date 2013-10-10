@@ -38,7 +38,7 @@ create table REPORT_REPORT
       references REPORT_GROUP (ID)
 )^
 
-create unique index UK_REPORT_REPORT_CODE on REPORT_REPORT (CODE)^
+--create unique index UK_REPORT_REPORT_CODE on REPORT_REPORT (CODE)^
 
 --------------------------------------------------------------------------------------------------------------
 --

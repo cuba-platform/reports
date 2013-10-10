@@ -80,7 +80,7 @@ create table REPORT_REPORT (
     REPORT_TYPE integer,
     primary key(ID)
 )^
-create unique index UK_REPORT_REPORT_CODE on REPORT_REPORT(CODE)^
+--create unique index UK_REPORT_REPORT_CODE on REPORT_REPORT(CODE)^
 
 --create table REPORT_REPORT_SCREEN (
 --    ID varchar2(32) not null,
