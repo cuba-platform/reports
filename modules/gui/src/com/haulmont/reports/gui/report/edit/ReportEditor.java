@@ -33,7 +33,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.File;
@@ -192,6 +191,7 @@ public class ReportEditor extends AbstractEditor<Report> {
 
         bandTree.getDatasource().refresh();
         bandTree.expandTree();
+        bandEditor.setEnabled(false);
     }
 
     @Override
@@ -407,9 +407,7 @@ public class ReportEditor extends AbstractEditor<Report> {
             @Override
             public void itemChanged(Datasource<BandDefinition> ds, BandDefinition prevItem, BandDefinition item) {
                 bandEditor.setBandDefinition(item);
-                bandName.setEnabled(item != null);
-                bandOrientation.setEnabled(item != null);
-                parentBand.setEnabled(item != null);
+                bandEditor.setEnabled(!(item == null || item.getReport().getRootBandDefinition().equals(item)));
 
                 availableParentBandsDs.clear();
                 if (item != null) {

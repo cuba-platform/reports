@@ -24,16 +24,14 @@
     <assign name="width" value="150"/>
 
     <layout expand="split" spacing="true">
-        <hbox spacing="true">
+        <hbox spacing="true" id="propertiesBox">
             <label value="msg://definition.name"/>
-            <textField id="name" datasource="bandDefinitionDs" property="name" enable="false" width="${width}"
-                       required="true"/>
+            <textField id="name" datasource="bandDefinitionDs" property="name" width="${width}"/>
             <label value="msg://definition.orientation"/>
-            <lookupField id="orientation" datasource="bandDefinitionDs" property="orientation" enable="false"
-                         width="${width}" required="true"/>
+            <lookupField id="orientation" datasource="bandDefinitionDs" property="orientation" width="${width}"/>
             <label value="msg://definition.parentBand"/>
             <lookupField id="parentBand" datasource="bandDefinitionDs" optionsDatasource="availableParentBandsDs"
-                         property="parentBandDefinition" enable="false" width="${width}"/>
+                         property="parentBandDefinition" width="${width}"/>
         </hbox>
 
         <split id="split" orientation="horizontal" pos="40" width="100%">

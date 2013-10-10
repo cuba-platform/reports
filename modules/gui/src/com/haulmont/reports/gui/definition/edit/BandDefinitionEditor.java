@@ -46,13 +46,22 @@ public class BandDefinitionEditor extends AbstractEditor implements Suggester {
     protected SourceCodeEditor datasetScriptField;
 
     @Named("textBox")
-    BoxLayout textBox;
+    protected BoxLayout textBox;
 
     @Named("entityBox")
-    BoxLayout entityBox;
+    protected BoxLayout entityBox;
 
     @Named("entitiesBox")
-    BoxLayout entitiesBox;
+    protected BoxLayout entitiesBox;
+
+    @Inject
+    protected LookupField orientation;
+
+    @Inject
+    protected LookupField parentBand;
+
+    @Inject
+    protected TextField name;
 
     @Override
     protected void initItem(Entity item) {
@@ -111,9 +120,23 @@ public class BandDefinitionEditor extends AbstractEditor implements Suggester {
         bandDefinitionDs.addListener(new DsListenerAdapter<BandDefinition>() {
             @Override
             public void itemChanged(Datasource<BandDefinition> ds, BandDefinition prevItem, BandDefinition item) {
+                updateRequiredIndicators(item);
                 selectFirstDataset();
             }
         });
+    }
+
+    protected void updateRequiredIndicators(BandDefinition item) {
+        boolean required = !(item == null || item.getReport().getRootBandDefinition().equals(item));
+        parentBand.setRequired(required);
+        orientation.setRequired(required);
+        name.setRequired(item != null);
+    }
+
+    @Override
+    public boolean validateAll() {
+        //validation works in ReportEditor
+        return true;
     }
 
     public void initDataSetControls() {
@@ -211,5 +234,13 @@ public class BandDefinitionEditor extends AbstractEditor implements Suggester {
 
     public Datasource<BandDefinition> getBandDefinitionDs() {
         return bandDefinitionDs;
+    }
+
+    @Override
+    public void setEnabled(boolean enabled) {
+        //Desktop Component containers doesn't apply disable flags for child components
+        for (Component component : getComponents()) {
+            component.setEnabled(enabled);
+        }
     }
 }
