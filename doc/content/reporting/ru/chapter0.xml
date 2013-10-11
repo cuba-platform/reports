@@ -10,7 +10,7 @@
       <para>создавать отчет, определяемый классом Java. Для такого отчета необходимо определить класс и задать входные параметры. Класс должен реализовать интерфейс <code>com.haulmont.yarg.formatters.CustomReport</code>;</para>
     </listitem>
     <listitem>
-      <para>хранить шаблон отчета в форматах <filename>*.doc</filename>, <filename>*.docx</filename>,   <filename>*.odt</filename>, <filename>*.html</filename>, <filename>*.xls</filename>, <filename>*.xlsx</filename><filename>*.ftl</filename>;</para>
+      <para>хранить шаблон отчета в форматах <filename>.doc</filename>, <filename>.docx</filename>,   <filename>.odt</filename>, <filename>.html</filename>, <filename>.xls</filename>, <filename>.xlsx</filename>, <filename>.ftl</filename>;</para>
     </listitem>
     <listitem>
       <para>определять состав доступных отчетов для роли системы;</para>
@@ -22,22 +22,22 @@
       <para>сохранять результаты отчетов в форматах, доступных для просмотра без использования специальных средств:</para>
       <itemizedlist>
         <listitem>
-          <para><filename>*.doc</filename>,</para>
+          <para><filename>.doc</filename>,</para>
         </listitem>
         <listitem>
-          <para><filename>*.docx</filename>,</para>
+          <para><filename>.docx</filename>,</para>
         </listitem>
         <listitem>
-          <para><filename>*.pdf</filename>,</para>
+          <para><filename>.pdf</filename>,</para>
         </listitem>
         <listitem>
-          <para><filename>*.xls</filename>,</para>
+          <para><filename>.xls</filename>,</para>
         </listitem>
         <listitem>
-          <para><filename>*.xlsx</filename>,</para>
+          <para><filename>.xlsx</filename>,</para>
         </listitem>
         <listitem>
-          <para><filename>*.html</filename>;</para>
+          <para><filename>.html</filename>;</para>
         </listitem>
       </itemizedlist>
     </listitem>
@@ -50,17 +50,19 @@
   </itemizedlist>
   <section>
     <title>Создание структуры данных отчета</title>
-    <para>Структура данных отчета представляет собой  <firstterm>дерево определителей полос</firstterm> (<firstterm>band definition</firstterm>). Определитель полосы имеет имя, ориентацию, родителя и список источников данных.</para>
+    <para>Структура данных отчета представляет собой  <firstterm>дерево определителей полос</firstterm> (<firstterm>band definition</firstterm>). Определитель полосы имеет имя, ориентацию, родителя и список наборов данных.</para>
     <warning>
       <para>Имена полос и извлекаемых параметров должны содержать только латинские буквы, цифры или символ подчеркивания.</para>
     </warning>
-    <para><firstterm>Источник данных</firstterm> − это объект, который описывает извлечение данных. Он может извлекать данные различными путями — SQL или <glossterm linkend="glossary_jpql_id">JPQL</glossterm> запросом, Groovy скриптом или брать данные из переданных в параметрах сущностей (типы <userinput>Связанная сущность</userinput>, <userinput>Группа связанных сущностей</userinput>). В подсистеме создания отчетов существуют следующие источники данных:</para>
+    <para><firstterm>Набор данных</firstterm> − это объект, который описывает извлечение данных. Он может извлекать данные различными путями — SQL- или <glossterm linkend="glossary_jpql_id">JPQL</glossterm>-запросом, Groovy-скриптом или брать данные из переданных в параметрах сущностей (типы <userinput>Связанная сущность</userinput>, <userinput>Группа связанных сущностей</userinput>). В подсистеме создания отчетов существуют следующие типы наборов данных:</para>
     <orderedlist>
       <listitem>
         <para><emphasis role="bold">SQL и JPQL</emphasis></para>
-        <para>SQL и <glossterm linkend="glossary_jpql_id">JPQL</glossterm>  скрипты должны возвращать данные, помеченные <glossterm linkend="glossary_alias_id">алиасами</glossterm> с помощью <database>AS</database>. </para>
+        <para><glossterm linkend="glossary_jpql_id">JPQL</glossterm>-скрипт должен возвращать данные, помеченные <glossterm linkend="glossary_alias_id">алиасами</glossterm> с помощью <database>AS</database>. Для SQL-скрипта это условие не является обязательным.  </para>
         <warning>
-          <para>Данные <glossterm linkend="glossary_alias_id">алиасы</glossterm> далее будут  использованы в шаблоне отчета.</para>
+          <para>Данные <glossterm linkend="glossary_alias_id">алиасы</glossterm> далее будут  использованы в шаблоне отчета. Если в SQL-скрипте отсутствуют алиасы, то обращение к атрибуту в шаблоне должно производиться через имя полосы:</para>
+          <para><programlisting>&lt;имя полосы&gt;.&lt;имя атрибута в таблице&gt;</programlisting></para>
+          <para>Если  используется PostgreSQL  или другая нечувствительная к регистру  СУБД, алиасы, присутствующие в SQL-скрипте необходимо обернуть в двойные кавычки.</para>
         </warning>
         <para>В запросе можно использовать входные параметры отчета и данные из родительских полос. К параметрам нужно обращаться по имени, заключенному в конструкцию <code>${}</code> (<code>${userName}</code>). К данным родительской полосы нужно обращаться аналогично, добавляя имя полосы перед именем параметра (<code>${Band1.param1}</code>)
 Пример запроса на SQL:</para>
@@ -79,7 +81,7 @@ where u.updateTs &gt; ${date1}</programlisting>
       </listitem>
       <listitem>
         <para><emphasis role="bold">Groovy</emphasis></para>
-        <para>Groovy скрипт должен возвращать объект типа <code>List&lt;Map&lt;String, Object&gt;&gt;</code>. Объект <code>Map&lt;String, Object&gt;</code> соответствует одной записи в SQL-запросе. Ключ в отображении должен содержать <glossterm linkend="glossary_alias_id">алиас</glossterm> параметра.</para>
+        <para>Groovy-скрипт должен возвращать объект типа <code>List&lt;Map&lt;String, Object&gt;&gt;</code>. Объект <code>Map&lt;String, Object&gt;</code> соответствует одной записи в SQL-запросе. Ключ в отображении должен содержать <glossterm linkend="glossary_alias_id">алиас</glossterm> параметра.</para>
         <warning>
           <para>Данные <glossterm linkend="glossary_alias_id">алиасы</glossterm> далее будут  использованы в шаблоне отчета.</para>
         </warning>
@@ -94,16 +96,40 @@ return [[&apos;userName&apos;: user.name,
       </listitem>
       <listitem>
         <para><emphasis role="bold">Связанная сущность и Группа связанных сущностей</emphasis></para>
-        <para>Чтобы использовать данные типы источников данных необходимо, чтобы в отчете типы параметров  были <userinput>Объект</userinput> и <userinput>Группа объектов</userinput> соответственно, а сам параметр был связанной сущностью. В этом случае в шаблоне будут использованы поля сущностей. <glossterm linkend="glossary_alias_id">Алиасы</glossterm> в шаблоне должны соответствовать именам выгружаемых полей сущности.</para>
+        <para>Чтобы использовать данные типы набора данных необходимо, чтобы в отчете присутствовали параметры типов <userinput>Объект</userinput> и <userinput>Группа объектов</userinput> соответственно.  В этом случае в шаблоне будут использованы поля сущностей. <glossterm linkend="glossary_alias_id">Алиасы</glossterm> в шаблоне должны соответствовать именам выгружаемых полей сущности. Пример использования связанной сущности в качестве источника данных проиллюстрирован ниже.</para>
+        <figure>
+          <title>Шаблон отчета</title>
+          <mediaobject>
+            <imageobject>
+              <imagedata align="center" fileref="img/example_singleEntityAsDataSetTypeTemplate.png"/>
+            </imageobject>
+          </mediaobject>
+        </figure>
+        <figure>
+          <title>Структура отчета</title>
+          <mediaobject>
+            <imageobject>
+              <imagedata align="center" fileref="img/example_singleEntityAsDataSetTypereportParameters.png" width="70%"/>
+            </imageobject>
+          </mediaobject>
+        </figure>
+        <figure>
+          <title>Параметры отчета</title>
+          <mediaobject>
+            <imageobject>
+              <imagedata align="center" fileref="img/example_singleEntityAsDataSetTypeParametersAndFormats.png"/>
+            </imageobject>
+          </mediaobject>
+        </figure>
       </listitem>
     </orderedlist>
-    <para>Если определитель полосы имеет несколько источников данных, их необходимо связать. Для этого используется связывающий параметр. Он представляет собой алиас, по которому будут связываться между собой источники данных.</para>
+    <para>Если определитель полосы имеет несколько наборов данных, их необходимо связать. Для этого используется связывающий параметр. Он представляет собой алиас, по которому будут связываться между собой наборы данных.</para>
   </section>
   <section>
     <title>Создание шаблона отчета</title>
     <section>
-      <title>xls шаблон</title>
-      <para><filename>xls</filename> шаблон создается с помощью <application>Microsoft Office</application> или <application>OpenOffice</application>. </para>
+      <title>Шаблоны .xls и .xlsx</title>
+      <para><filename>.xls</filename>- и .<filename>xlsx</filename>-шаблоны создается с помощью <application>Microsoft Office</application> или <application>OpenOffice</application>. </para>
       <para><emphasis role="bold">Именование регионов</emphasis></para>
       <para>Для того чтобы полоса отчета отобразилась на результирующем листе, необходимо создать в шаблоне именованный регион, имя которого совпадает с именем полосы. </para>
       <tip>
@@ -141,7 +167,7 @@ return [[&apos;userName&apos;: user.name,
         <para>Именованные регионы можно удалять, назначать им другие диапазоны.</para>
       </tip>
       <para>Регионы в результирующем отчете отрисовываются в том порядке, в котором идут соответствующие им полосы.</para>
-      <para>Полосы в xls-отчете могут быть двух видов: горизонтальные и вертикальные. Горизонтальные растут вниз, вертикальные − вправо.</para>
+      <para>Полосы в <filename>.xls</filename>- и <filename>.xlsx</filename>-отчете могут быть двух видов: горизонтальные и вертикальные. Горизонтальные растут вниз, вертикальные − вправо.</para>
       <para>Горизонтальные полосы могут содержать вложенные полосы. Поэтому необходимо для вложенных полос создавать именованные регионы непосредственно под регионами, соответствующими родительским полосам.</para>
       <para>Вертикальные полосы  вложенных полос иметь не могут.</para>
       <para><emphasis role="bold">Задание выходных параметров</emphasis></para>
@@ -149,8 +175,8 @@ return [[&apos;userName&apos;: user.name,
 Шаблон может содержать картинки и формулы. Они должны целиком лежать в некотором именованном регионе.</para>
     </section>
     <section>
-      <title>doc шаблон</title>
-      <para><filename>doc</filename> шаблон создается в с помощью <application>Microsoft Office</application> или <application>OpenOffice</application> и должен быть файлом в формате <filename>odt/doc</filename> (или ином, сохраняющем названия таблиц).  Отчет с doc-шаблоном может отрисовываться в doc-файл или pdf-файл.</para>
+      <title>Шаблон .odt</title>
+      <para><filename>.odt</filename>-шаблон создается с помощью <application>OpenOffice</application>.  Отчет с .odt-шаблоном может отрисовываться в .doc-файл или .pdf-файл.</para>
       <para><emphasis role="bold">Именование таблиц</emphasis></para>
       <para>Имя таблицы должно соответствовать имени полосы, которая в нее отрисовывается.</para>
       <tip>
@@ -188,37 +214,32 @@ return [[&apos;userName&apos;: user.name,
         <para>В поле <guilabel>Название</guilabel> можно ввести новое название таблицы.</para>
       </tip>
       <para><emphasis role="bold">Задание выходных параметров</emphasis></para>
-      <para>В doc-шаблоне <glossterm linkend="glossary_alias_id">алиасы</glossterm> могут быть двух  видов − в таблицах и в тексте. В тексте алиас должен иметь вид <code>${имя полосы.имя параметра}</code>. В таблице алиас должен иметь вид <code>${имя параметра}</code>. Текст может содержать форматирование, а в ячейках таблиц может содержаться несколько алиасов.</para>
+      <para>В <filename>.odt</filename>-шаблоне <glossterm linkend="glossary_alias_id">алиасы</glossterm> могут быть двух  видов − в таблицах и в тексте. В тексте алиас должен иметь вид <code>${имя полосы.имя параметра}</code>. В таблице алиас должен иметь вид <code>${имя параметра}</code>. Текст может содержать форматирование, а в ячейках таблиц может содержаться несколько алиасов.</para>
       <warning>
         <para>Таблица с <glossterm linkend="glossary_alias_id">алиасами</glossterm> должна содержать либо одну, либо две строки. Если строк в таблице две, то алиасы должны находиться во второй. Первая должна быть пустой, или содержать фиксированный текст. </para>
       </warning>
     </section>
     <section>
-      <title>Специальные объекты в документе</title>
-      <para><emphasis role="bold">Специальные объекты в документе</emphasis></para>
-      <orderedlist>
-        <listitem>
-          <para>Изображения</para>
-          <para>Форматы позволяют вставлять изображения в документы. Для этого выходное значение должно быть строкой URL для доступа к изображению, а в формате значения должен быть задан формат: <code>${image:&lt;Width&gt;x&lt;Height&gt;}</code> , например <code>${image:200x300}</code>.</para>
-        </listitem>
-        <listitem>
-          <para>HTML блоки</para>
-          <para>Для вставки необходимо возвращать в выходном значении html разметку, а в формате значения указать формат <code>${html}</code>. В значении возвращается только содержимое <code>&lt;body&gt;Содержимое&lt;/body&gt;</code>, разметка дополняется до документа автоматически. Кодировка всех блоков <code>UTF-8</code>. CSS и атрибут <literal>style</literal> не поддерживаются.</para>
-        </listitem>
-      </orderedlist>
+      <title>Шаблон .doc</title>
+      <para><filename>.doc</filename>-шаблон создается с помощью <application>OpenOffice</application> или <application>Microsoft Office</application>. Он аналогичен  <filename>.odt</filename>-шаблону за исключением того, что  не поддерживает работу с таблицами. </para>
     </section>
     <section>
-      <title>HTML шаблон</title>
-      <para>HTML-шаблон должен быть простым текстовым файлом (html/htm/txt) в кодировке <code>UTF-8</code> (без <code>BOM</code>). Для форматирования в шаблоне можно использовать тэги <application>FreeMarker</application> (Более подробно о <application>FreeMarker</application> можно прочитать на сайте <ulink url="http://freemarker.org/">http://freemarker.org/</ulink>). 
+      <title>Шаблон .docx</title>
+      <para><filename>.docx</filename>-шаблон создается с помощью <application>Microsoft Office</application>. </para>
+      <para>В <filename>.docx</filename>-шаблоне аналогично .<filename>odt</filename>-шаблону <glossterm linkend="glossary_alias_id">алиасы</glossterm> могут быть двух  видов − в таблицах и в тексте. </para>
+    </section>
+    <section>
+      <title>Шаблон .html</title>
+      <para><filename>.html</filename>-шаблон должен быть файлом c расширением <filename>.html</filename> в кодировке <code>UTF-8</code> (без <code>BOM</code>). Для форматирования в шаблоне можно использовать тэги <application>FreeMarker</application> (Более подробно о <application>FreeMarker</application> можно прочитать на сайте <ulink url="http://freemarker.org/">http://freemarker.org/</ulink>). 
 Модель документа имеет следующую структуру:</para>
       <programlisting>Band { 
-      bands [ bandName : [ Band, .. ], .. ] 
+      bands [ bandName : [ band, .. ], .. ] 
       fields [ fieldName : fieldValue, .. ] 
 }</programlisting>
-      <para>Например, для доступа к полю <code>name</code> в полосе <code>band1</code> в нулевой строке выборки используется путь:</para>
-      <programlisting>Root.bands.band1[0].fields.name</programlisting>
+      <para>Например, для доступа к полю <code>name</code> в полосе <code>band</code> в нулевой строке выборки используется путь:</para>
+      <programlisting>Root.bands.band[0].fields.name</programlisting>
       <para>Для удобства в шаблоне можно использовать присваивание <parameter>assign</parameter>:</para>
-      <programlisting>&lt;#assign Table1Header = Root.bands.HeaderBand&gt;</programlisting>
+      <programlisting>&lt;#assign TableHeader = Root.bands.HeaderBand&gt;</programlisting>
       <para><emphasis role="bold">Структура шаблона</emphasis></para>
       <programlisting>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
 &lt;!DOCTYPE html PUBLIC &quot;-//W3C//DTD XHTML 1.1//EN&quot; &quot;http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd&quot;&gt;
@@ -365,27 +386,89 @@ return [[&apos;userName&apos;: user.name,
         </varlistentry>
       </variablelist>
       <para><emphasis role="bold">Использование рендеринга HTML в PDF</emphasis></para>
-      <para>Отчеты, имеющие формат шаблона HTML и формат вывода pdf, не всегда корректно отображают шрифты. Для решения этой проблемы добавьте в каталог <filename>conf</filename> приложения директорию <filename>/cuba/fonts/</filename> с необходимыми <filename>*.ttf</filename> шрифтами. Второй способ − использовать системные шрифты с помощью установки  свойства <property>cuba.reporting.fontsDir</property>=<literal>C:/Windows/Fonts</literal></para>
+      <para>Отчеты, имеющие формат шаблона <filename>.html</filename> и формат вывода <filename>.pdf</filename>, не всегда корректно отображают шрифты. Для решения этой проблемы добавьте в каталог <filename>conf</filename> приложения директорию <filename>/cuba/fonts/</filename> с необходимыми <filename>.ttf</filename>-шрифтами. Второй способ − использовать системные шрифты с помощью установки  свойства <property>cuba.reporting.fontsDir</property>=<literal>C:/Windows/Fonts</literal></para>
+    </section>
+    <section>
+      <title>Шаблон .ftl</title>
+      <para>Для форматирования  <filename>.ftl</filename>-шаблонов используются тэги FreeMarker.</para>
+    </section>
+    <section>
+      <title>Шаблон, определяемый классом</title>
+      <para> Шаблоны, определяемые классом используются в тех случаях, когда выбирать данные с помощью  SQL или Groovy слишком сложно  или невозможно. Например, в случаях, когда отчет представляет собой результат объединения нескольких других отчетов. </para>
+      <para>Класс, определяющий шаблон должен реализовывать интерфейс <code>com.haulmont.yarg.formatters.CustomReport</code>.</para>
+      <para>Ниже приведен пример простого шаблона, определяемого классом. Он представляет собой имя и фамилию выбранного автора. Создайте в модуле <structname>core</structname> класс <code>TemplateExample</code>. Его код приведен ниже. </para>
+      <programlisting>import com.haulmont.yarg.structure.BandData;
+import com.haulmont.yarg.structure.Report;
+import com.sample.library.entity.Author;
+
+import java.io.Serializable;
+import java.util.Map;
+
+public class TemplateExample implements CustomReport{
+
+    @Override
+    public byte[] createReport(Report report, BandData rootBand, Map&lt;String, Object&gt; params) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(&quot;&lt;html&gt;&lt;body&gt;&quot;);
+        Author author = (Author) params.get(&quot;author&quot;);
+        sb.append(author.getFirstName()).append(&quot; &quot;).append(author.getLastName());
+        sb.append(&quot;&lt;/body&gt;&lt;/html&gt;&quot;);
+        return sb.toString().getBytes();  
+    }
+}</programlisting>
+      <para>В созданном классе переопределен метод <code>createReport</code>. Он возвращает файл отчета в виде массива байтов. Его параметрами являются </para>
+      <itemizedlist>
+        <listitem>
+          <para><code>Report report </code>- отчет, для которого мы создаем шаблон;</para>
+        </listitem>
+        <listitem>
+          <para><code>BandData rootBand</code> - данные, полученные из корневой полосы; </para>
+        </listitem>
+        <listitem>
+          <para><code>Map&lt;String, Object&gt; params</code> - параметры, определенные для шаблона.</para>
+        </listitem>
+      </itemizedlist>
     </section>
   </section>
   <section>
     <title>Задание входных параметров отчета</title>
-    <para>Отчет может иметь параметры, которые используются источниками данных для извлечения данных.  Параметр должен иметь <glossterm linkend="glossary_alias_id">алиас</glossterm> и имя. Имя параметра отображается на экране ввода параметров, алиас используется источниками данных. Параметры могут быть следующих типов: дата, время, дата и время, текст, булевский тип, число, перечисление, объект, список объектов. Параметры могут быть обязательными или не обязательными. Если тип параметра − объект или группа объектов, существует возможность задать экран выбора сущностей. Поддерживается возможность локализации параметров. В строках локализации сначала указывается локаль, затем локализованное значение:</para>
-    <programlisting>en=Name
-ru=Имя</programlisting>
+    <para>Отчет может иметь параметры, которые используются наборами данных для извлечения данных.  </para>
+    <figure>
+      <title>Редактор параметров отчета</title>
+      <mediaobject>
+        <imageobject>
+          <imagedata align="center" fileref="img/parametersEditor.png"/>
+        </imageobject>
+      </mediaobject>
+    </figure>
+    <para>Параметр обязательно должен иметь <glossterm linkend="glossary_alias_id">алиас</glossterm>, имя и тип. Имя параметра отображается на экране ввода параметров, алиас используется источниками данных. Параметры могут быть следующих типов: дата, время, дата и время, текст, булевский тип, число, перечисление, объект, список объектов. Параметры могут быть обязательными или не обязательными. Если тип параметра − объект или группа объектов, существует возможность задать экран выбора сущностей. Для локализации параметра необходимо перейти на вкладку <guilabel>Локализация</guilabel> и в поле <guilabel>Строки локализации</guilabel> ввести значение следующего формата:</para>
+    <programlisting>&lt;название локали&gt;=&lt;название параметра на языке локали&gt;</programlisting>
   </section>
   <section>
     <title>Задание форматирования значений выходных параметров отчета</title>
     <para>Для каждого из выходных значений отчёта можно задать форматирование. Для этого нужно добавить элемент-форматтер, где указать полное имя выходного параметра (путь от корня, например <code>Test.name</code>, <code>Test</code> − имя полосы, <code>name</code> − имя параметра) и выбрать строку форматирования из списка часто используемых форматов для чисел и дат или задать этот формат самостоятельно.  Для чисел применяется <code>DecimalFormat</code> (более подробно о <code>DecimalFormat</code> можно прочитать на сайте <ulink url="http://docs.oracle.com/javase/6/docs/api/java/text/DecimalFormat.html">http://docs.oracle.com/javase/6/docs/api/java/text/DecimalFormat.html</ulink>), для дат − <code>SimpleDateFormat</code> (более подробно о <code>DecimalFormat</code> можно прочитать на сайте <ulink url="http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html">http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html).</ulink></para>
+    <figure>
+      <title>Редактор формата</title>
+      <mediaobject>
+        <imageobject>
+          <imagedata align="center" fileref="img/formatEditor.png"/>
+        </imageobject>
+      </mediaobject>
+    </figure>
+    <para>Форматы позволяют вставлять в документ изображения и html-блоки.</para>
+    <itemizedlist>
+      <listitem>
+        <para>Для вставки изображения выходное значение должно быть строкой URL для доступа к нему, а в формате значения строка форматирования должна иметь вид: <code>${image:&lt;Width&gt;x&lt;Height&gt;}</code>, например <code>${image:200x300}</code>.</para>
+      </listitem>
+      <listitem>
+        <para>Для вставки html-блока необходимо возвращать в выходном значении html-разметку, а в формате значения выбрать <code>${html}</code> в качестве строки форматирования. В выходном значении тэги верхнего уровня до <code>&lt;body&gt;</code> включительно могут быть опущены. При необходимости произойдет автоматическое дополнение недостающих тегов верхнего уровня. Кодировка всех блоков <code>UTF-8</code>. CSS и атрибут <literal>style</literal> не поддерживаются.</para>
+      </listitem>
+    </itemizedlist>
   </section>
   <section>
     <title>Разграничение прав доступа к отчетам</title>
     <para>Отчеты можно привязывать к экранам и\или ролям пользователей. Для этого необходимо на вкладке <guilabel>Экраны и роли</guilabel> добавить экраны, с которых можно вызывать отчет, и роли пользователей, которым позволено это делать. По умолчанию отчет может вызываться из любых экранов и любыми ролями. Если экран или роль заданы явно, то отчет может быть вызван только из этого экрана или только данной ролью.</para>
   </section>
-  <section>
-    <title>Локализация отчетов</title>
-    <para>Имена отчетов можно локализовать. Строки локализации задаются в виде</para>
-    <programlisting>en=Name
-ru=Имя</programlisting>
-  </section>
+  <section><title>Локализация отчетов</title>Имена отчетов можно локализовать. Для этого необходимо перейти на вкладку <guilabel>Локализация</guilabel> и ввести в поле <guilabel>Строки локализации</guilabel> значение следующего формата: <programlisting>&lt;название локали&gt;=&lt;название отчета на языке локали&gt;</programlisting>Пример:<programlisting>en=Books by author
+ru=Книги по автору</programlisting></section>
 </chapter>

@@ -7,7 +7,7 @@
     <title>Окно управления отчетами системы</title>
     <mediaobject>
       <imageobject>
-        <imagedata align="center" fileref="img/reports.png" contentwidth="50%" width="50%"/>
+        <imagedata align="center" fileref="img/reports.png" width="90%"/>
       </imageobject>
     </mediaobject>
   </figure>
@@ -25,7 +25,7 @@
         <title>Окно подтверждения удаления</title>
         <mediaobject>
           <imageobject>
-            <imagedata align="center" fileref="img/removeConfirmation.png" contentwidth="70%"/>
+            <imagedata align="center" fileref="img/removeConfirmation.png"/>
           </imageobject>
         </mediaobject>
       </figure>
@@ -39,7 +39,7 @@
         <title>Импорт отчета</title>
         <mediaobject>
           <imageobject>
-            <imagedata align="center" fileref="img/importReport.png" contentwidth="90%"/>
+            <imagedata align="center" fileref="img/importReport.png"/>
           </imageobject>
         </mediaobject>
       </figure>
@@ -53,16 +53,13 @@
     <listitem>
       <para><guibutton>Выполнить</guibutton> − по нажатию на эту кнопку происходит запуск отчета.</para>
     </listitem>
-    <listitem>
-      <para><guibutton>Добавить в набор</guibutton> − добавляет отчет в набор.</para>
-    </listitem>
   </itemizedlist>
   <para>В нижней области вкладки располагается таблица с колонками <guilabel>Группа</guilabel>, <guilabel>Имя отчета</guilabel> и <guilabel>Код отчета</guilabel>, содержащая уже созданные в системе отчеты.</para>
   <para>Остановимся подробнее на описании экрана редактора отчета. Перейти в него можно по нажатию на кнопку <guibutton>Создать</guibutton> или на кнопку <guibutton>Изменить</guibutton>.</para>
   <para>Экран редактора отчета содержит в себе следующие вкладки:</para>
   <itemizedlist>
     <listitem>
-      <para>Параметры отчета</para>
+      <para>Структура отчета</para>
     </listitem>
     <listitem>
       <para>Параметры и форматы</para>
@@ -86,7 +83,7 @@
       <para><guibutton>ОК</guibutton></para>
     </listitem>
     <listitem>
-      <para><guibutton>Сохранить и запустить</guibutton></para>
+      <para><guibutton>Сохранить и Выполнить</guibutton></para>
     </listitem>
     <listitem>
       <para><guibutton>Отмена</guibutton></para>
@@ -101,7 +98,7 @@
     </mediaobject>
   </figure>
   <section>
-    <title>Вкладка Параметры отчета</title>
+    <title>Вкладка Структура отчета</title>
     <para>На этой вкладке содержатся основные параметры отчета. </para>
     <itemizedlist>
       <listitem>
@@ -118,7 +115,7 @@
             </imageobject>
           </inlinemediaobject> можно сохранить файл выбранного шаблона. Загрузить новый файл шаблона можно по кнопке <inlinemediaobject><imageobject>
               <imagedata fileref="img/upload.png"/>
-            </imageobject>. </inlinemediaobject> Кнопка   <inlinemediaobject>
+            </imageobject> . </inlinemediaobject> Кнопка   <inlinemediaobject>
             <imageobject>
               <imagedata fileref="img/view.png"/>
             </imageobject>
@@ -134,7 +131,7 @@
           <title>Список выбора группы</title>
           <mediaobject>
             <imageobject>
-              <imagedata align="center" fileref="img/reporting_ui_7.png" contentwidth="40%"/>
+              <imagedata align="center" fileref="img/groupSelector.png"/>
             </imageobject>
           </mediaobject>
         </figure>
@@ -151,7 +148,7 @@
             <imageobject>
               <imagedata fileref="img/remove.png"/>
             </imageobject>
-          </inlinemediaobject>. Полосы отчета можно перемещать друг относительно друга с помощью кнопок  <inlinemediaobject>
+          </inlinemediaobject> на панели <guilabel>Полосы отчета</guilabel>. Полосы отчета можно перемещать друг относительно друга с помощью кнопок  <inlinemediaobject>
             <imageobject>
               <imagedata fileref="img/up.png"/>
             </imageobject>
@@ -159,35 +156,41 @@
             <imageobject>
               <imagedata fileref="img/down.png"/>
             </imageobject>
-          </inlinemediaobject>.</para>
-        <para>Для того, чтобы создать набор данных для полосы, необходимо выделить нужную полосу и нажать на кнопку <inlinemediaobject>
+          </inlinemediaobject>. Вид редактора полосы отчета представлен на рисунке ниже.</para>
+        <figure>
+          <title>Редактор полосы отчета</title>
+          <mediaobject>
             <imageobject>
-              <imagedata fileref="img/create.png"/>
+              <imagedata align="center" fileref="img/reportEditor_bandCreator.png" width="85%"/>
             </imageobject>
-          </inlinemediaobject> на панели <guilabel>Свойства полосы</guilabel>.</para>
-        <para>После нажатия на кнопку <guibutton>Создать</guibutton> откроется окно, представленное на рисунке.</para>
-        <para>Для полосы необходимо задать имя полосы в поле <guilabel>Имя</guilabel>, а также выбрать ориентацию полосы из выпадающего списка выбора <guilabel>Ориентация</guilabel>.</para>
+          </mediaobject>
+        </figure>
+        <para>Для полосы необходимо задать имя  в соответствующем поле на панели <guilabel>Свойства полосы</guilabel>, а также выбрать ориентацию полосы из соответствующего выпадающего списка выбора.</para>
         <figure>
           <title>Поле выбора ориентации полосы</title>
           <mediaobject>
             <imageobject>
-              <imagedata align="center" fileref="img/reporting_ui_16.png" contentwidth="50%"/>
+              <imagedata align="center" fileref="img/reporting_ui_16.png"/>
             </imageobject>
           </mediaobject>
         </figure>
-        <para>Чтобы создать источник данных для полосы, нужно нажать на кнопку <guibutton>Создать</guibutton>. Для одной полосы можно создать несколько источников данных. После того как источник данных для полосы был создан, нужно выделить его в таблице источников данных. После этого имя источника и тип источника отобразятся в панели справа. Тип источника данных можно изменить с помощью выпадающего списка выбора <guilabel>Тип</guilabel>.</para>
+        <para>Для того, чтобы создать набор данных для полосы, необходимо выделить нужную полосу и нажать на кнопку <inlinemediaobject>
+            <imageobject>
+              <imagedata fileref="img/create.png"/>
+            </imageobject>
+          </inlinemediaobject> на панели <guilabel>Свойства полосы</guilabel>. Для одной полосы можно создать несколько наборов данных. Таблица наборов данных является редактируемой и позволяет менять имя и тип набора данных. Возможные типы набора данных представлены на рисунке ниже.</para>
         <figure>
-          <title>Список выбора типа источника данных</title>
+          <title>Список выбора типа набора данных</title>
           <mediaobject>
             <imageobject>
-              <imagedata align="center" fileref="img/reporting_ui_17.png" contentwidth="40%"/>
+              <imagedata align="center" fileref="img/reporting_ui_17.png"/>
             </imageobject>
           </mediaobject>
         </figure>
         <warning>
-          <para>Имена полос, источников данных и извлекаемых параметров должны содержать только латинские буквы, цифры или символ подчеркивания.</para>
+          <para>Имена полос, наборов данных и извлекаемых параметров должны содержать только латинские буквы, цифры или символ подчеркивания.</para>
         </warning>
-        <para>Если в качестве типа источника данных был выбран <userinput>SQL</userinput> или <userinput>JPQL</userinput>, в поле <guilabel>Текст</guilabel> необходимо вписать текст запроса. При этом при написании запроса <userinput>JPQL</userinput> предоставляется возможность выбирать имя сущности, из которой делается выборка, а также названия полей сущности. Делается это с помощью комбинации клавиш <keycombo>
+        <para>Если в качестве типа набора данных был выбран <userinput>SQL</userinput> или <userinput>JPQL</userinput>, в поле <guilabel>Скрипт</guilabel> необходимо вписать текст запроса. При этом при написании запроса <userinput>JPQL</userinput> предоставляется возможность выбирать имя сущности, из которой делается выборка, а также названия полей сущности. Делается это с помощью комбинации клавиш <keycombo>
             <keycap>CTRL</keycap>
             <keycap>SPACE</keycap>
           </keycombo>. После нажатия данной комбинации на экране появляется список выбора, в котором пользователю предлагается выбрать одну из сущностей системы. Чтобы автозавершение сработало для полей сущности, нужно после алиаса сущности поставить точку и затем нажать <keycombo>
@@ -198,12 +201,12 @@
           <title>Автозавершение имен объектов в окне редактора запроса</title>
           <mediaobject>
             <imageobject>
-              <imagedata align="center" fileref="img/reporting_ui_18.png" contentwidth="90%"/>
+              <imagedata align="center" fileref="img/reporting_ui_18.png"/>
             </imageobject>
           </mediaobject>
         </figure>
-        <para>Если в качестве типа был выбран <userinput>Groovy</userinput>, то в поле <guilabel>Текст</guilabel> нужно вписать скрипт, возвращающий данные.</para>
-        <para>Если в  качестве типа был выбран тип <userinput>Связанная сущность</userinput> или <userinput>Группа связанных сущностей</userinput>, то вместо поля <guilabel>Текст</guilabel> будет отображено поле <guilabel>Имя параметра для связанной сущности</guilabel> или <guilabel>Имя параметра для списка сущностей</guilabel> соответственно. В этих полях нужно ввести имя параметра, который был определен на панели <guilabel>Параметры</guilabel> главного окна редактора отчета.</para>
+        <para>Если в качестве типа был выбран <userinput>Groovy</userinput>, то в поле <guilabel>Скрипт</guilabel> нужно вписать скрипт, возвращающий данные.</para>
+        <para>Если в  качестве типа был выбран тип <userinput>Связанная сущность</userinput> или <userinput>Группа связанных сущностей</userinput>, то вместо поля <guilabel>Скрипт</guilabel> будет отображено поле <guilabel>Имя параметра для связанной сущности</guilabel> или <guilabel>Имя параметра для списка сущностей</guilabel> соответственно. В этих полях нужно ввести имя параметра, который был определен на панели <guilabel>Параметры</guilabel> вкладки <guilabel>Параметры и форматы</guilabel>.</para>
       </listitem>
     </itemizedlist>
   </section>
@@ -213,7 +216,7 @@
       <title>Вкладка Параметры и форматы</title>
       <mediaobject>
         <imageobject>
-          <imagedata align="center" fileref="img/reportEditor_parameters&amp;formats.png" contentwidth="50%"/>
+          <imagedata align="center" fileref="img/reportEditor_parameters&amp;formats.png"/>
         </imageobject>
       </mediaobject>
     </figure>
@@ -226,7 +229,7 @@
             <title>Окно редактора параметров отчета</title>
             <mediaobject>
               <imageobject>
-                <imagedata align="center" fileref="img/parametersEditor.png" contentwidth="80%"/>
+                <imagedata align="center" fileref="img/parametersEditor.png"/>
               </imageobject>
             </mediaobject>
           </figure>
@@ -389,6 +392,6 @@
       </mediaobject>
     </figure>
     <para>Для того чтобы это сделать, нужно в поле <guilabel>Строки локализации</guilabel> ввести локализованное значение следующего формата: </para>
-    <para><code>&lt;название локали&gt;=&lt;название отчета на языке локали&gt;</code></para>
+    <para><programlisting>&lt;название локали&gt;=&lt;название отчета на языке локали&gt;</programlisting></para>
   </section>
 </chapter>

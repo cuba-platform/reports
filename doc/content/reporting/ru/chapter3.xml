@@ -9,9 +9,6 @@
     <listitem>
       <para><link linkend="report2_id">Отчет <guilabel>Книги по автору</guilabel></link></para>
     </listitem>
-    <listitem>
-      <para><link linkend="report4_id">Отчет <guilabel>По согласуемым документам</guilabel> (на примере системы <trademark>ТЕЗИС</trademark>)</link></para>
-    </listitem>
   </orderedlist>
   <section id="report1_id">
     <title>Отчет с шаблоном *.odt</title>
@@ -66,7 +63,11 @@
       </mediaobject>
     </figure>
     <para>В поле <guilabel>Строки локализации</guilabel> введите значение <userinput>ru=Издательство</userinput> и нажмите на кнопку <guibutton>ОК.</guibutton></para>
-    <para>Далее приступим к созданию полос отчета. Для создания новой полосы выделите корневую полосу отчета <guilabel>Root</guilabel> и нажмите на кнопку <guibutton>Создать</guibutton>.</para>
+    <para>Далее приступим к созданию полос отчета. Для создания новой полосы выделите корневую полосу отчета <guilabel>Root</guilabel> и нажмите на кнопку <inlinemediaobject>
+        <imageobject>
+          <imagedata fileref="img/create.png"/>
+        </imageobject>
+      </inlinemediaobject>.</para>
     <figure>
       <title>Окно создания полос отчета</title>
       <mediaobject>
@@ -80,7 +81,7 @@
       <title>Создание полосы header</title>
       <mediaobject>
         <imageobject>
-          <imagedata align="center" fileref="img/example_odt_headerBandCreating.png" contentwidth="30%"/>
+          <imagedata align="center" fileref="img/example_odt_headerBandCreating.png" width="85%"/>
         </imageobject>
       </mediaobject>
     </figure>
@@ -92,8 +93,8 @@ WHERE publisher.id=${publisher} AND publication.year=${year}</programlisting>
       <para>Обратите внимание, что <glossterm linkend="glossary_alias_id">алиасы</glossterm> в запросе называются так же, как в создаваемом шаблоне. В  качестве идентификатора сущности <code>library$Publisher</code> передается входной параметр <code>publisher</code>, заключенный в конструкцию <code>${}</code> − <code>${publisher}</code>, а в качестве заданного года издания передается параметр <code>${year}</code>.</para>
     </warning>
     <tip>
-      <para>В SQL-запросе использование алиасов необязательно. В этом случае формат задания атрибутов  вшаблоне будет следующим:</para>
-      <para><code>&lt;имя полосы&gt;.&lt;имя атрибута в таблице&gt;</code></para>
+      <para>В SQL-запросе использование алиасов необязательно. В этом случае формат задания атрибутов  в шаблоне будет следующим:</para>
+      <para><programlisting>&lt;имя полосы&gt;.&lt;имя атрибута в таблице&gt;</programlisting></para>
       <para>Вид шаблона отчета представлен на рисунке ниже.</para>
       <figure>
         <title>Шаблон отчета без использвоания алиасов</title>
@@ -103,25 +104,24 @@ WHERE publisher.id=${publisher} AND publication.year=${year}</programlisting>
           </imageobject>
         </mediaobject>
       </figure>
-      <para>Вид полосы отчета header представлен на рисунке ниже.</para>
-      <figure>
-        <title>Полоса отчета header без использования алиасов</title>
-        <mediaobject>
-          <imageobject>
-            <imagedata align="center" fileref="img/example_odt_headerBandCreatingWithoutAliases.png"/>
-          </imageobject>
-        </mediaobject>
-      </figure>
+      <para>Текст SQL-запроса для полосы отчета header:</para>
+      <programlisting>SELECT publisher.name, publication.year
+FROM library_publisher publisher JOIN library_book_publication publication ON publisher.id=publication.publisher_id
+WHERE publisher.id=${publisher} AND publication.year=${year}</programlisting>
       <para>Если  в SQL-запросе используются алиасы и в качестве СУБД используется PostgreSQL, то необходимо обернуть имена алиасов в двойные кавычки. </para>
     </tip>
     <para>Текст SQL-запроса для получения выбранных пользователем параметров выглядит несколько громоздко. В данном случае лучше использовать более компактный Groovy-скрипт:</para>
     <programlisting>[[&apos;p_name&apos; : (params[&apos;publisher&apos;].name)]]</programlisting>
-    <para>После создания полосы отчета <guilabel>header</guilabel> создадим полосу отчета <guilabel>books</guilabel>. Для этого выделите корневую полосу отчета <guilabel>Root</guilabel> и нажмите на кнопку <guibutton>Создать</guibutton>. Далее заполните поля источника данных в соответствии с рисунком.</para>
+    <para>После создания полосы отчета <guilabel>header</guilabel> создадим полосу отчета <guilabel>books</guilabel>. Для этого выделите корневую полосу отчета <guilabel>Root</guilabel> и нажмите на кнопку <inlinemediaobject>
+        <imageobject>
+          <imagedata fileref="img/create.png"/>
+        </imageobject>
+      </inlinemediaobject>. Далее заполните поля источника данных в соответствии с рисунком.</para>
     <figure>
       <title>Создание полосы books</title>
       <mediaobject>
         <imageobject>
-          <imagedata align="center" fileref="img/example_odt_booksBandCreating.png" scale="85"/>
+          <imagedata align="center" fileref="img/example_odt_booksBandCreating.png" width="85%" depth="85%"/>
         </imageobject>
       </mediaobject>
     </figure>
@@ -134,13 +134,13 @@ JOIN library_publisher publisher ON publication.publisher_id=publisher.id
 WHERE publisher.id=${publisher} AND publication.year=${year}</programlisting>
     <para>После создания полос перейдите на вкладку <guilabel>Локализация</guilabel> редактора отчетов и введите в поле <guilabel>Строки локализации </guilabel>следующее:</para>
     <para><userinput>ru=Книги, выпущенные издателем в определенном году</userinput></para>
-    <para>После этого нажмите на  кнопку <guibutton>Сохранить и Запустить</guibutton>, если вы хотите запустить отчет сразу после заполнения из кнопок, или на одну из кнопок <guibutton>ОК и Закрыть</guibutton> или <guibutton>OK</guibutton>. Новый отчет создан и сохранен в базе данных.</para>
+    <para>После этого нажмите на  кнопку <guibutton>Сохранить и Выполнить</guibutton>, если вы хотите запустить отчет сразу после заполнения из кнопок, или на одну из кнопок <guibutton>ОК и Закрыть</guibutton> или <guibutton>OK</guibutton>. Новый отчет создан и сохранен в базе данных.</para>
     <para>Чтобы запустить сохраненный отчет на выполнение вернитесь на вкладку <guilabel>Список отчетов</guilabel> (<guimenu>Отчеты</guimenu> −&gt; <guimenu>Отчеты</guimenu>). </para>
     <figure>
       <title>Запуск отчета</title>
       <mediaobject>
         <imageobject>
-          <imagedata align="center" fileref="img/example_odt_runReport.png" contentwidth="80%"/>
+          <imagedata align="center" fileref="img/example_odt_runReport.png"/>
         </imageobject>
       </mediaobject>
     </figure>
@@ -149,15 +149,15 @@ WHERE publisher.id=${publisher} AND publication.year=${year}</programlisting>
       <title>Окно ввода параметров отчета</title>
       <mediaobject>
         <imageobject>
-          <imagedata align="center" fileref="img/example_odt_runing.png" contentwidth="83%"/>
+          <imagedata align="center" fileref="img/example_odt_runing.png" contentwidth="90%"/>
         </imageobject>
       </mediaobject>
     </figure>
-    <para>В поле <guilabel>Издатель</guilabel> нажмите на кнопку <inlinemediaobject>
+    <para>В поле <guilabel>Издательство</guilabel> нажмите на кнопку <inlinemediaobject>
         <imageobject>
           <imagedata fileref="img/dots.png"/>
         </imageobject>
-      </inlinemediaobject>. В открывшемся окне со списком издателей выберите одного. Задайте необходимый год издания и нажмите на кнопку <guibutton>Печатать отчет</guibutton> в окне ввода параметров отчета.</para>
+      </inlinemediaobject>. В открывшемся окне со списком издательств выберите одно. Задайте необходимый год издания и нажмите на кнопку <guibutton>Печатать отчет</guibutton> в окне ввода параметров отчета.</para>
     <para>Выгруженный отчет представлен на рисунке ниже.</para>
     <figure>
       <title>Выгруженный отчет</title>
@@ -201,7 +201,7 @@ WHERE publisher.id=${publisher} AND publication.year=${year}</programlisting>
       <title>Именованный регион publisher</title>
       <mediaobject>
         <imageobject>
-          <imagedata align="center" fileref="img/publisherTemplate.png" contentwidth="70%"/>
+          <imagedata align="center" fileref="img/publisherTemplate.png"/>
         </imageobject>
       </mediaobject>
     </figure>
@@ -262,7 +262,7 @@ WHERE publisher.id=${publisher} AND publication.year=${year}</programlisting>
       <title>Создание полосы header</title>
       <mediaobject>
         <imageobject>
-          <imagedata align="center" fileref="img/example_xls_headerBandCreating.png" contentwidth="70%"/>
+          <imagedata align="center" fileref="img/example_xls_headerBandCreating.png" width="85%"/>
         </imageobject>
       </mediaobject>
     </figure>
@@ -276,7 +276,7 @@ WHERE publisher.id=${publisher} AND publication.year=${year}</programlisting>
       <title>Создание полосы book</title>
       <mediaobject>
         <imageobject>
-          <imagedata align="center" fileref="img/example_xls_bookBandCreating.png" contentwidth="70%"/>
+          <imagedata align="center" fileref="img/example_xls_bookBandCreating.png" width="85%"/>
         </imageobject>
       </mediaobject>
     </figure>
@@ -290,7 +290,7 @@ where bp.book_id = ${book.book_id}</programlisting>
       <title>Создание полосы publisher</title>
       <mediaobject>
         <imageobject>
-          <imagedata align="center" fileref="img/example_xls_publisherBandCreating.png" contentwidth="70%"/>
+          <imagedata align="center" fileref="img/example_xls_publisherBandCreating.png" width="85%"/>
         </imageobject>
       </mediaobject>
     </figure>
@@ -303,7 +303,7 @@ where bp.book_id = ${book.book_id}</programlisting>
       <title>Создание полосы publication</title>
       <mediaobject>
         <imageobject>
-          <imagedata align="center" fileref="img/example_xls_publicationBandCreating.png" contentwidth="70%"/>
+          <imagedata align="center" fileref="img/example_xls_publicationBandCreating.png" width="85%"/>
         </imageobject>
       </mediaobject>
     </figure>
@@ -315,13 +315,13 @@ where bp.publisher_id = ${publisher.publisher_id} and bp.book_id = ${book.book_i
 group by ld.name</programlisting>
     <para>После создания полос перейдите на вкладку <guilabel>Локализация</guilabel> редактора отчетов и введите в поле <guilabel>Строки локализации </guilabel>следующее:</para>
     <para><userinput>ru=Книги по автору</userinput></para>
-    <para>После этого сохраните отчет, нажав на одну из кнопок <guibutton>ОК и Закрыть</guibutton>, <guibutton>ОК</guibutton>, <guibutton>Сохранить и Запустить</guibutton>. В последнем случае отчет будет запущен сразу после сохранения. Новый отчет создан и сохранен в базе данных.</para>
+    <para>После этого сохраните отчет, нажав на одну из кнопок <guibutton>ОК и Закрыть</guibutton>, <guibutton>ОК</guibutton>, <guibutton>Сохранить и Выполнить</guibutton>. В последнем случае отчет будет запущен сразу после сохранения. Новый отчет создан и сохранен в базе данных.</para>
     <para>Чтобы запустить отчет на выполнение вернитесь на вкладку <guilabel>Список отчетов</guilabel> (<guimenu>Отчеты</guimenu> −&gt; <guimenu>Отчеты</guimenu>). </para>
     <figure>
       <title>Выполнение отчета</title>
       <mediaobject>
         <imageobject>
-          <imagedata align="center" fileref="img/example_xls_runReport.png" contentwidth="70%"/>
+          <imagedata align="center" fileref="img/example_xls_runReport.png" width="85%"/>
         </imageobject>
       </mediaobject>
     </figure>
@@ -346,229 +346,6 @@ group by ld.name</programlisting>
       <mediaobject>
         <imageobject>
           <imagedata align="center" fileref="img/example_xls_result.png"/>
-        </imageobject>
-      </mediaobject>
-    </figure>
-  </section>
-  <section id="report4_id">
-    <title>Простой отчет с шаблоном *.xls в системе ТЕЗИС</title>
-    <para>Данный отчет представляет собой информацию о  документах, находящихся на согласовании у пользователя, который задается параметром отчета.</para>
-    <para>Начнем формирование отчета с создания шаблона. Для этого откройте <application>OpenOffice.org Calc</application>. Создайте в файле следующий шаблон отчета, представленный на рисунке.</para>
-    <figure>
-      <title>Создание шаблона отчета</title>
-      <mediaobject>
-        <imageobject>
-          <imagedata align="center" fileref="img/example4_1.png"/>
-        </imageobject>
-      </mediaobject>
-    </figure>
-    <para>Задайте именованные регионы согласно изображениям, представленным ниже.</para>
-    <figure>
-      <title>Именованный регион Header</title>
-      <mediaobject>
-        <imageobject>
-          <imagedata align="center" fileref="img/example4_2.png" contentwidth="80%"/>
-        </imageobject>
-      </mediaobject>
-    </figure>
-    <figure>
-      <title>Именованный регион User</title>
-      <mediaobject>
-        <imageobject>
-          <imagedata align="center" fileref="img/example4_3.png"/>
-        </imageobject>
-      </mediaobject>
-    </figure>
-    <figure>
-      <title>Именованный регион Date</title>
-      <mediaobject>
-        <imageobject>
-          <imagedata align="center" fileref="img/example4_4.png"/>
-        </imageobject>
-      </mediaobject>
-    </figure>
-    <figure>
-      <title>Именованный регион HeaderOfTable</title>
-      <mediaobject>
-        <imageobject>
-          <imagedata align="center" fileref="img/example4_5.png"/>
-        </imageobject>
-      </mediaobject>
-    </figure>
-    <figure>
-      <title>Именованный регион Band</title>
-      <mediaobject>
-        <imageobject>
-          <imagedata align="center" fileref="img/example4_6.png"/>
-        </imageobject>
-      </mediaobject>
-    </figure>
-    <figure>
-      <title>Именованный регион Band_2</title>
-      <mediaobject>
-        <imageobject>
-          <imagedata align="center" fileref="img/example4_7.png"/>
-        </imageobject>
-      </mediaobject>
-    </figure>
-    <figure>
-      <title>Именованный регион Band_2_red</title>
-      <mediaobject>
-        <imageobject>
-          <imagedata align="center" fileref="img/example4_8.png"/>
-        </imageobject>
-      </mediaobject>
-    </figure>
-    <para>Сохраните шаблон отчета, назвав его <filename>forEndorsement.xls</filename>.</para>
-    <para>Далее зайдите в подсистему создания отчетов и нажмите на кнопку <guibutton>Создать</guibutton>.</para>
-    <para>В поле <guilabel>Имя</guilabel> введите имя отчета − <userinput>Отчет по согласуемым документам</userinput>, в качестве типа вывода отчета выберите значение <userinput>Простой отчет</userinput>. </para>
-    <figure>
-      <title>Окно создания отчета</title>
-      <mediaobject>
-        <imageobject>
-          <imagedata align="center" fileref="img/example4_9.png" contentwidth="85%"/>
-        </imageobject>
-      </mediaobject>
-    </figure>
-    <para>Далее на панели <guilabel>Шаблоны</guilabel> нажмите на кнопку <guibutton>Создать</guibutton>. После этого откроется диалоговое окно, представленное на рисунке.</para>
-    <figure>
-      <title/>
-      <mediaobject>
-        <imageobject>
-          <imagedata align="center" fileref="img/example4_10.png" contentwidth="80%"/>
-        </imageobject>
-      </mediaobject>
-    </figure>
-    <para>В качестве кода шаблона оставьте значение по умолчанию, в поле <guilabel>Тип вывода</guilabel> выберите значение <userinput>Xls</userinput>. Далее нажмите на кнопку <guibutton>Загрузить</guibutton> и в открывшемся окне укажите путь к созданному ранее шаблону <filename>forEndorsement.xls</filename>.</para>
-    <para>Далее создадим входные параметры отчета. Очевидно, входным параметром будет являться пользователь, выбранный из списка пользователей. Для создания параметра нажмите на кнопку <guibutton>Создать</guibutton> на панели <guilabel>Параметры</guilabel>. </para>
-    <figure>
-      <title>Окно редактора параметра User</title>
-      <mediaobject>
-        <imageobject>
-          <imagedata align="center" fileref="img/example4_11.png" contentwidth="80%"/>
-        </imageobject>
-      </mediaobject>
-    </figure>
-    <para>Заполните поля параметра. В поле <guilabel>Имя параметра</guilabel> введите <userinput>Пользователь</userinput>, в качестве <glossterm linkend="glossary_alias_id">алиаса</glossterm> параметра укажите <userinput>user</userinput>. Выберите тип параметра <userinput>Объект</userinput> из списка типов. Далее установите флажок  <guilabel>Обязательный параметр?</guilabel>. В качестве сущности выберите <userinput>User</userinput> из списка сущностей. В списке экранов выбора сущности найдите экран <userinput>sec$User.browse</userinput>.</para>
-    <para>Далее приступим к созданию полос отчета. Для создания новой полосы выделите корневую полосу отчета <guilabel>Root</guilabel> и нажмите на кнопку <guibutton>Создать</guibutton>.</para>
-    <figure>
-      <title>Создание полос отчета</title>
-      <mediaobject>
-        <imageobject>
-          <imagedata align="center" fileref="img/example1_6.png"/>
-        </imageobject>
-      </mediaobject>
-    </figure>
-    <para>Заполните поля источника данных значениями, приведенными на рисунке.</para>
-    <figure>
-      <title>Создание полосы User</title>
-      <mediaobject>
-        <imageobject>
-          <imagedata align="center" fileref="img/example4_12.png"/>
-        </imageobject>
-      </mediaobject>
-    </figure>
-    <para>Текст запроса JPQL:</para>
-    <programlisting>select u.name as user from sec$User u where u.id = ${user}</programlisting>
-    <warning>
-      <para>Обратите внимание, что <glossterm linkend="glossary_alias_id">алиас</glossterm> в запросе называется также, как в созданном шаблоне, а для фильтрации значений передается входной параметр отчета <code>${user}</code>.</para>
-    </warning>
-    <para>После создания полосы отчета <guilabel>User</guilabel> создайте  полосу отчета <guilabel>Date</guilabel>. </para>
-    <figure>
-      <title>Создание полосы Date</title>
-      <mediaobject>
-        <imageobject>
-          <imagedata align="center" fileref="img/example4_13.png"/>
-        </imageobject>
-      </mediaobject>
-    </figure>
-    <para>Далее создайте полосу отчета <guilabel>Band</guilabel>, в которую будут выгружаться основные данные отчета.</para>
-    <figure>
-      <title>Создание полосы Band</title>
-      <mediaobject>
-        <imageobject>
-          <imagedata align="center" fileref="img/example4_14.png"/>
-        </imageobject>
-      </mediaobject>
-    </figure>
-    <para>Текст запроса JPQL:</para>
-    <programlisting>select wa.card.description as name, wa.dueDate as planDate from wf$Assignment wa 
-where wa.user.id=${user} and wa.name = &apos;Endorsement&apos;
-and wa.finished is null</programlisting>
-    <para>Далее создадим полосу отчета <guilabel>Band_2</guilabel>, в которой будет проводиться подсчет общего количества документов, находящихся на согласовании у пользователя.</para>
-    <figure>
-      <title>Создание полосы Band_2</title>
-      <mediaobject>
-        <imageobject>
-          <imagedata align="center" fileref="img/example4_15.png"/>
-        </imageobject>
-      </mediaobject>
-    </figure>
-    <para>Текст запроса JPQL:</para>
-    <programlisting>select count(wa.id) as total from wf$Assignment wa where wa.user.id=${user} 
-and wa.name = &apos;Endorsement&apos; and wa.finished is null</programlisting>
-    <para>Далее создадим полосу отчета <guilabel>Band_2_red</guilabel>, в которой будет проводиться подсчет  количества документов, находящихся на согласовании у пользователя, срок которых истек.</para>
-    <figure>
-      <title>Создание полосы Band_2_red</title>
-      <mediaobject>
-        <imageobject>
-          <imagedata align="center" fileref="img/example4_16.png"/>
-        </imageobject>
-      </mediaobject>
-    </figure>
-    <para>Текст запроса SQL:</para>
-    <programlisting>select count(WA.ID) as overdue from WF_ASSIGNMENT WA left outer join SEC_USER SU 
-on (WA.USER_ID=SU.ID) where SU.ID=${user} and WA.NAME= &apos;Endorsement&apos;
-and WA.FINISHED is null and WA.DUE_DATE&lt;now()</programlisting>
-    <para>После создания полос отчета создайте пустые полосы отчета и расположите их в порядке, определенном на рисунке. </para>
-    <figure>
-      <title>Полосы отчета</title>
-      <mediaobject>
-        <imageobject>
-          <imagedata align="center" fileref="img/example4_17.png"/>
-        </imageobject>
-      </mediaobject>
-    </figure>
-    <para>Полосы отчета пустые, так как в соответствующие им именованные регионы шаблона не требуется выводить данные из базы данных.</para>
-    <para>После этого нажмите на кнопку <guibutton>ОК</guibutton>. Новый отчет создан и сохранен в базе данных.</para>
-    <para>Запустим отчет на выполнение. Для этого вернитесь на вкладку <guilabel>Список отчетов</guilabel> (<guimenu>Отчеты</guimenu> −&gt; <guimenu>Отчеты</guimenu>). </para>
-    <figure>
-      <title>Выполнение отчета</title>
-      <mediaobject>
-        <imageobject>
-          <imagedata align="center" fileref="img/example4_18.png"/>
-        </imageobject>
-      </mediaobject>
-    </figure>
-    <para>Выделите отчет <guilabel>Отчет по согласуемым документам</guilabel> в списке отчетов и нажмите на кнопку <guibutton>Выполнить</guibutton>. После этого откроется окно ввода параметров отчета. Данное окно представлено на рисунке.</para>
-    <figure>
-      <title>Окно ввода параметров отчета</title>
-      <mediaobject>
-        <imageobject>
-          <imagedata align="center" fileref="img/example4_19.png"/>
-        </imageobject>
-      </mediaobject>
-    </figure>
-    <para>Выберите пользователя, у которого Вы хотели бы просмотреть документы, находящиеся на согласовании, с помощью кнопки <inlinemediaobject>
-        <imageobject>
-          <imagedata fileref="img/dots.png"/>
-        </imageobject>
-      </inlinemediaobject>. </para>
-    <para>После этого нажмите на кнопку <guibutton>Печатать отчет</guibutton> в окне ввода параметров отчета.</para>
-    <figure>
-      <title>Печать отчета</title>
-      <mediaobject>
-        <imageobject>
-          <imagedata align="center" fileref="img/example4_20.png"/>
-        </imageobject>
-      </mediaobject>
-    </figure>
-    <para>Выгруженный отчет представлен на рисунке ниже.</para>
-    <figure>
-      <title>Выгруженный отчет</title>
-      <mediaobject>
-        <imageobject>
-          <imagedata align="center" fileref="img/example4_21.png"/>
         </imageobject>
       </mediaobject>
     </figure>
