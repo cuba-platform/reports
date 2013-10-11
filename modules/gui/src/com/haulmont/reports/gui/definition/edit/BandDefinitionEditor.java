@@ -63,6 +63,13 @@ public class BandDefinitionEditor extends AbstractEditor implements Suggester {
     @Inject
     protected TextField name;
 
+    @Inject
+    protected Companion companion;
+
+    public interface Companion {
+        void initDatasetsTable(Table table);
+    }
+
     @Override
     protected void initItem(Entity item) {
         BandDefinition definition = (BandDefinition) item;
@@ -124,6 +131,10 @@ public class BandDefinitionEditor extends AbstractEditor implements Suggester {
                 selectFirstDataset();
             }
         });
+
+        if (companion != null) {
+            companion.initDatasetsTable(dataSets);
+        }
     }
 
     protected void updateRequiredIndicators(BandDefinition item) {

@@ -12,6 +12,10 @@
         focusComponent="name"
         >
 
+    <companions>
+        <desktop class="com.haulmont.reports.desktop.gui.BandDefinitionEditorCompanion"/>
+    </companions>
+
     <dsContext>
         <datasource
                 id="bandDefinitionDs"
