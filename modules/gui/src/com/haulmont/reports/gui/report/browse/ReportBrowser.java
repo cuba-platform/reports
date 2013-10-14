@@ -4,15 +4,21 @@
  */
 package com.haulmont.reports.gui.report.browse;
 
+import com.haulmont.cuba.core.entity.Entity;
+import com.haulmont.cuba.core.global.Metadata;
 import com.haulmont.cuba.gui.AppConfig;
 import com.haulmont.cuba.gui.WindowManager;
 import com.haulmont.cuba.gui.app.core.file.FileUploadDialog;
 import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.components.actions.ItemTrackingAction;
+import com.haulmont.cuba.gui.data.Datasource;
 import com.haulmont.cuba.gui.export.ByteArrayDataProvider;
 import com.haulmont.cuba.gui.export.ExportDisplay;
 import com.haulmont.cuba.gui.export.ExportFormat;
 import com.haulmont.cuba.gui.upload.FileUploadingAPI;
+import com.haulmont.cuba.security.entity.EntityOp;
+import com.haulmont.cuba.security.entity.User;
+import com.haulmont.cuba.security.global.UserSession;
 import com.haulmont.reports.app.service.ReportService;
 import com.haulmont.reports.entity.Report;
 import com.haulmont.reports.gui.ReportGuiManager;
@@ -54,10 +60,18 @@ public class ReportBrowser extends AbstractLookup {
     @Named("table")
     protected Table reportsTable;
 
+    @Inject
+    protected UserSession userSession;
+
+    @Inject
+    protected Metadata metadata;
+
     @Override
     public void init(Map<String, Object> params) {
         super.init(params);
 
+        final boolean hasPermissionsToCreateReports =
+                userSession.isEntityOpPermitted(metadata.getClassNN(User.class), EntityOp.CREATE);
 
         copyReport.setAction(new ItemTrackingAction("copy") {
             @Override
@@ -70,7 +84,13 @@ public class ReportBrowser extends AbstractLookup {
                     showNotification(getMessage("notification.selectReport"), NotificationType.HUMANIZED);
                 }
             }
-        });
+
+            @Override
+            public boolean isApplicableTo(Datasource.State state, Entity item) {
+                return super.isApplicableTo(state, item) && hasPermissionsToCreateReports;
+            }
+        }
+        );
 
         runReport.setAction(new ItemTrackingAction("runReport") {
             @Override
@@ -108,6 +128,8 @@ public class ReportBrowser extends AbstractLookup {
                 });
             }
         });
+
+        importReport.setEnabled(hasPermissionsToCreateReports);
 
         exportReport.setAction(new ItemTrackingAction("export") {
             @Override
