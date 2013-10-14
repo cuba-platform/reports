@@ -191,7 +191,12 @@ public class ReportEditor extends AbstractEditor<Report> {
 
         bandTree.getDatasource().refresh();
         bandTree.expandTree();
-        bandEditor.setEnabled(false);
+
+        bandEditor.setBandDefinition(bandTree.<BandDefinition>getSingleSelected());
+        if (bandTree.getSingleSelected() == null
+                || bandTree.getSingleSelected().equals(getItem().getRootBandDefinition())) {
+            bandEditor.setEnabled(false);
+        }
     }
 
     @Override
