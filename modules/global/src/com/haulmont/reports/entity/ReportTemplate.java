@@ -23,11 +23,13 @@ import java.io.InputStream;
 @Entity(name = "report$ReportTemplate")
 @Table(name = "REPORT_TEMPLATE")
 @SystemLevel
-@NamePattern("(%s) %s|code,name")
+@NamePattern("#getCaption|code,name,customClass")
 @SuppressWarnings("unused")
 public class ReportTemplate extends BaseReportEntity implements com.haulmont.yarg.structure.ReportTemplate {
 
     private static final long serialVersionUID = 3692751073234357754L;
+
+    public static final String NAME_FORMAT = "(%s) %s";
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "REPORT_ID", nullable = false)
@@ -114,7 +116,7 @@ public class ReportTemplate extends BaseReportEntity implements com.haulmont.yar
         this.name = name;
     }
 
-    public String getExt(){
+    public String getExt() {
         return StringUtils.substringAfterLast(name, ".");
     }
 
@@ -159,5 +161,13 @@ public class ReportTemplate extends BaseReportEntity implements com.haulmont.yar
 
     public void setCustomReport(CustomReport customReport) {
         this.customReport = customReport;
+    }
+
+    public String getCaption() {
+        if (isCustom()) {
+            return String.format(NAME_FORMAT, code, customClass);
+        } else {
+            return String.format(NAME_FORMAT, code, name);
+        }
     }
 }
