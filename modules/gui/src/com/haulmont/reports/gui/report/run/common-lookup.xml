@@ -16,7 +16,7 @@
     <dsContext>
     </dsContext>
 
-    <layout expandLayout="true" expand="vbox">
+    <layout expand="mainPane">
         <vbox id="mainPane">
         </vbox>
     </layout>

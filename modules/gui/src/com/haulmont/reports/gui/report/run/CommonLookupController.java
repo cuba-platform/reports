@@ -69,9 +69,9 @@ public class CommonLookupController extends AbstractLookup {
         });
 
         table.setMultiSelect(true);
-
+        table.setWidth("100%");
+        table.setHeight("100%");
         mainPane.add(table);
-        mainPane.expand(table, "100%", "100%");
 
         table.refresh();
 
