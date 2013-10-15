@@ -15,6 +15,7 @@ import com.haulmont.cuba.core.entity.FileDescriptor;
 import com.haulmont.cuba.core.global.*;
 import com.haulmont.reports.app.ParameterPrototype;
 import com.haulmont.reports.entity.*;
+import com.haulmont.reports.exception.FailedToLoadTemplateClassException;
 import com.haulmont.reports.exception.ReportingException;
 import com.haulmont.yarg.formatters.CustomReport;
 import com.haulmont.yarg.reporting.ReportOutputDocument;
@@ -164,6 +165,9 @@ public class ReportingBean implements ReportingApi {
 
             if (template.isCustom()) {
                 Class<Object> reportClass = scripting.loadClass(template.getCustomClass());
+                if (reportClass == null) {
+                    throw new FailedToLoadTemplateClassException(template.getCustomClass());
+                }
                 template.setCustomReport((CustomReport) reportClass.newInstance());
             }
 

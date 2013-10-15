@@ -11,6 +11,7 @@ import com.haulmont.cuba.desktop.App;
 import com.haulmont.cuba.desktop.exception.AbstractExceptionHandler;
 import com.haulmont.cuba.gui.components.IFrame;
 import com.haulmont.reports.exception.FailedToConnectToOpenOfficeException;
+import com.haulmont.reports.exception.FailedToLoadTemplateClassException;
 import com.haulmont.reports.exception.ReportingException;
 import com.haulmont.reports.exception.UnsupportedFormatException;
 
@@ -28,7 +29,8 @@ public class ReportExceptionHandler extends AbstractExceptionHandler {
         super(
                 ReportingException.class.getName(),
                 FailedToConnectToOpenOfficeException.class.getName(),
-                UnsupportedFormatException.class.getName()
+                UnsupportedFormatException.class.getName(),
+                FailedToLoadTemplateClassException.class.getName()
         );
     }
 
@@ -39,6 +41,8 @@ public class ReportExceptionHandler extends AbstractExceptionHandler {
             messageCode = "reportException.failedConnectToOffice";
         } else if (UnsupportedFormatException.class.getName().equals(className)) {
             messageCode = "reportException.unsupportedFileFormat";
+        } else if (FailedToLoadTemplateClassException.class.getName().equals(className)) {
+            messageCode = "reportException.failedToLoadTemplateClass";
         }
         String msg = AppBeans.get(Messages.class).getMessage(getClass(), messageCode);
         App.getInstance().getMainFrame().showNotification(msg, IFrame.NotificationType.ERROR);
