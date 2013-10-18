@@ -412,7 +412,7 @@ public class ReportEditor extends AbstractEditor<Report> {
             @Override
             public void itemChanged(Datasource<BandDefinition> ds, BandDefinition prevItem, BandDefinition item) {
                 bandEditor.setBandDefinition(item);
-                bandEditor.setEnabled(!(item == null || item.getReport().getRootBandDefinition().equals(item)));
+                bandEditor.setEnabled(!(item == null || getItem().getRootBandDefinition().equals(item)));
 
                 availableParentBandsDs.clear();
                 if (item != null) {
