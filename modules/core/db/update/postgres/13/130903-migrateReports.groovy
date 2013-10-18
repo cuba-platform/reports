@@ -246,6 +246,7 @@ postUpdate.add({
             }
 
             for (BandDefinition band : report.bands) {
+                band.setReport(report)
                 if (band.parentBandDefinition) {
                     BandDefinition parentBand = map[band.parentBandDefinition.id]
                     if (parentBand != null) {
