@@ -16,10 +16,7 @@ import com.haulmont.cuba.gui.data.CollectionDatasource;
 import com.haulmont.cuba.gui.data.Datasource;
 import com.haulmont.cuba.gui.data.impl.DatasourceImplementation;
 import com.haulmont.cuba.gui.data.impl.DsListenerAdapter;
-import com.haulmont.reports.entity.BandDefinition;
-import com.haulmont.reports.entity.DataSet;
-import com.haulmont.reports.entity.DataSetType;
-import com.haulmont.reports.entity.Orientation;
+import com.haulmont.reports.entity.*;
 import org.apache.commons.collections.CollectionUtils;
 
 import javax.annotation.Nullable;
@@ -38,6 +35,9 @@ public class BandDefinitionEditor extends AbstractEditor implements Suggester {
 
     @Inject
     private CollectionDatasource<DataSet, UUID> dataSetsDs;
+
+    @Inject
+    private Datasource<Report> reportDs;
 
     @Inject
     protected Table dataSets;
@@ -138,7 +138,7 @@ public class BandDefinitionEditor extends AbstractEditor implements Suggester {
     }
 
     protected void updateRequiredIndicators(BandDefinition item) {
-        boolean required = !(item == null || item.getReport().getRootBandDefinition().equals(item));
+        boolean required = !(item == null || reportDs.getItem().getRootBandDefinition().equals(item));
         parentBand.setRequired(required);
         orientation.setRequired(required);
         name.setRequired(item != null);
