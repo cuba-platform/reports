@@ -8,6 +8,7 @@ package com.haulmont.reports;
 import com.haulmont.chile.core.model.utils.InstanceUtils;
 import com.haulmont.cuba.core.EntityManager;
 import com.haulmont.cuba.core.Persistence;
+import com.haulmont.cuba.core.Query;
 import com.haulmont.cuba.core.Transaction;
 import com.haulmont.cuba.core.app.FileStorageAPI;
 import com.haulmont.cuba.core.entity.Entity;
@@ -181,7 +182,6 @@ public class ReportingBean implements ReportingApi {
         source = reloadEntity(source, REPORT_EDIT_VIEW_NAME);
         Report copiedReport = (Report) InstanceUtils.copy(source);
 
-        copiedReport.setName("(Copy)" + source.getName());
         copiedReport.setId(uuidSource.createUuid());
         copiedReport.setTemplates(null);
 
@@ -201,6 +201,7 @@ public class ReportingBean implements ReportingApi {
 
         Transaction tx = persistence.createTransaction();
         try {
+            copiedReport.setName(generateReportName(source.getName(), 1));
             EntityManager em = persistence.getEntityManager();
             em.persist(copiedReport);
             for (ReportTemplate copiedTemplate : copiedTemplates) {
@@ -216,6 +217,17 @@ public class ReportingBean implements ReportingApi {
         }
 
         return copiedReport;
+    }
+
+    private String generateReportName(String sourceName, int iteration) {
+        EntityManager em = persistence.getEntityManager();
+        String reportName = String.format("%s (%s)", sourceName, iteration);
+        Query q = em.createQuery("select r from report$Report r where r.name = :name");
+        q.setParameter("name", reportName);
+        if (q.getResultList().size() > 0) {
+            return generateReportName(sourceName, ++iteration);
+        }
+        return reportName;
     }
 
 
