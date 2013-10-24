@@ -53,6 +53,7 @@ def coreModule = project(':reports-core')
 def guiModule = project(':reports-gui')
 def webModule = project(':reports-web')
 def desktopModule = project(':reports-desktop')
+def webLegacyModule = project(':reports-web6')
 
 def servletApi = [group: 'org.apache.tomcat', name: 'servlet-api', version: '6.0.20']
 def postgres = [group: 'postgresql', name: 'postgresql', version: '9.0-801.jdbc4']
@@ -62,7 +63,7 @@ def asm = [group: 'asm', name: 'asm', version: '3.2']
 
 def baseVersion = artifactVersion + (isSnapshot ? '-SNAPSHOT' : '')
 
-configure([globalModule, coreModule, guiModule, webModule, desktopModule]) {
+configure([globalModule, coreModule, guiModule, webModule, webLegacyModule, desktopModule]) {
     apply(plugin: 'java')
     apply(plugin: 'idea')
     apply(plugin: 'maven')
@@ -180,6 +181,8 @@ configure(webModule) {
     task deploy(dependsOn: assemble, type: CubaDeployment) {
         appName = 'app'
         appJars('cuba-global', 'cuba-client', 'cuba-gui', 'cuba-web',
+                'vaadin-server', 'vaadin-shared-deps', 'vaadin-shared', 'vaadin-theme-compiler',
+                'aceeditor', 'popupbutton',
                 'reports-global', 'reports-gui', 'reports-web')
     }
 	
@@ -210,6 +213,36 @@ task restart(dependsOn: ['stop', ':reports-core:deploy', ':reports-web:deploy'],
         }
     }
     start.execute()
+}
+
+configure(webLegacyModule) {
+    configurations {
+        webcontent
+    }
+
+    dependencies {
+        compile(globalModule)
+        compile(guiModule)
+        compile(group: 'com.haulmont.cuba', name: 'cuba-web6', version: baseVersion)
+        webcontent(group: 'com.haulmont.cuba', name: 'cuba-web6', version: baseVersion, classifier: 'web', ext: 'zip')
+    }
+
+    task deploy(dependsOn: assemble, type: CubaDeployment) {
+        appName = 'app6'
+        appJars('cuba-global', 'cuba-client', 'cuba-gui', 'cuba-web6',
+                'vaadin', 'popupbutton',
+                'reports-global', 'reports-gui', 'reports-web')
+    }
+
+    task webArchive(type: Zip) {
+        from file('web')
+        exclude '**/web.xml', '**/app.properties'
+        classifier = 'web'
+    }
+
+    artifacts {
+        archives webArchive
+    }
 }
 
 /***************************** Documentation  *****************************/
