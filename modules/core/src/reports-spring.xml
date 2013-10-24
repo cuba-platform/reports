@@ -77,6 +77,8 @@
     <bean id="reports_MBeanExporter" class="com.haulmont.cuba.core.sys.jmx.MBeanExporter" lazy-init="false">
         <property name="beans">
             <map>
+                <entry key="${cuba.webContextName}.cuba:type=CubaOfficeIntegration"
+                       value-ref="reporting_lib_OfficeIntegration"/>
             </map>
         </property>
     </bean>

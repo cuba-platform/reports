@@ -24,7 +24,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-public class CubaOfficeIntegration extends OfficeIntegration {
+public class CubaOfficeIntegration extends OfficeIntegration implements CubaOfficeIntegrationMBean {
     public CubaOfficeIntegration(String openOfficePath, Integer... ports) {
         super(openOfficePath, ports);
     }
