@@ -68,7 +68,7 @@ public class ReportingBean implements ReportingApi {
     protected Scripting scripting;
 
     @Inject
-    protected ReportImportExport reportImportExport;
+    protected ReportImportExportAPI reportImportExport;
 
     @Inject
     protected UuidSource uuidSource;

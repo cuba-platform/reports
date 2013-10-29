@@ -1,0 +1,104 @@
+<report>
+  <id>45eb35ba-0432-4d67-b699-dfe22d008ed6</id>
+  <createTs>2013-09-26 13:09:34.240 UTC</createTs>
+  <createdBy>admin</createdBy>
+  <version>3</version>
+  <updateTs>2013-09-26 15:32:08.749 UTC</updateTs>
+  <updatedBy>u1</updatedBy>
+  <name>Simple docx</name>
+  <group>
+    <id>4e083530-0b9c-11e1-9b41-6bdaa41bff94</id>
+    <createTs>2013-08-28 14:11:33.781 UTC</createTs>
+    <createdBy>admin</createdBy>
+    <version>0</version>
+    <title>General</title>
+    <code>ReportGroup.default</code>
+    <localeNames>en=General 
+ru=Общие</localeNames>
+    <localeName>General </localeName>
+  </group>
+  <defaultTemplate>
+    <id>a1415587-523b-44ba-987c-3bc63454575f</id>
+    <createTs>2013-09-26 13:09:34.240 UTC</createTs>
+    <createdBy>admin</createdBy>
+    <version>1</version>
+    <updateTs>2013-09-26 13:09:34.240 UTC</updateTs>
+    <report reference="../.."/>
+    <reportOutputType>40</reportOutputType>
+    <code>DEFAULT</code>
+    <customFlag>false</customFlag>
+    <customClass></customClass>
+    <name>test.docx</name>
+  </defaultTemplate>
+  <reportType>10</reportType>
+  <templates>
+    <template reference="../../defaultTemplate"/>
+  </templates>
+  <localeName>Simple docx</localeName>
+  <rootBandDefinition>
+    <uuid>f9148d57-2124-4fc5-965f-772eb9a5ee98</uuid>
+    <name>Root</name>
+    <report>
+      <id>45eb35ba-0432-4d67-b699-dfe22d008ed6</id>
+      <name>Simple docx</name>
+      <group>
+        <id>4e083530-0b9c-11e1-9b41-6bdaa41bff94</id>
+        <createTs>2013-08-28 14:11:33.781 UTC</createTs>
+        <version>0</version>
+        <title>General</title>
+        <code>ReportGroup.default</code>
+        <localeNames>en=General 
+ru=Общие</localeNames>
+        <localeName>General </localeName>
+      </group>
+      <defaultTemplate>
+        <id>a1415587-523b-44ba-987c-3bc63454575f</id>
+        <report reference="../.."/>
+        <reportOutputType>40</reportOutputType>
+        <code>DEFAULT</code>
+        <customFlag>false</customFlag>
+        <customClass></customClass>
+        <name>test.docx</name>
+      </defaultTemplate>
+      <reportType>10</reportType>
+      <templates>
+        <template reference="../../defaultTemplate"/>
+      </templates>
+      <rootBandDefinition reference="../.."/>
+      <bands>
+        <band reference="../../.."/>
+      </bands>
+      <inputParameters/>
+      <valuesFormats/>
+      <reportScreens/>
+      <roles>
+        <com.haulmont.cuba.security.entity.Role>
+          <id>9380790b-393f-49b4-9a5d-5dead300daab</id>
+          <version>2</version>
+          <name>Credit Card Administrator</name>
+          <description>Full access to credit card functionality</description>
+          <type>0</type>
+        </com.haulmont.cuba.security.entity.Role>
+      </roles>
+    </report>
+    <childrenBandDefinitions/>
+    <dataSets>
+      <dataSet>
+        <uuid>e032e696-a9ab-410b-991c-e61c9008b0fa</uuid>
+        <name>Root</name>
+        <text>return [[&apos;date&apos; : new Date()]]</text>
+        <type>30</type>
+        <entityParamName>entity</entityParamName>
+        <listEntitiesParamName>entities</listEntitiesParamName>
+        <bandDefinition reference="../../.."/>
+      </dataSet>
+    </dataSets>
+    <orientation>0</orientation>
+    <position>0</position>
+  </rootBandDefinition>
+  <bands reference="../rootBandDefinition/report/bands"/>
+  <inputParameters reference="../rootBandDefinition/report/inputParameters"/>
+  <valuesFormats reference="../rootBandDefinition/report/valuesFormats"/>
+  <reportScreens reference="../rootBandDefinition/report/reportScreens"/>
+  <roles reference="../rootBandDefinition/report/roles"/>
+</report>

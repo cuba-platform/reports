@@ -11,23 +11,23 @@ import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.FileStorageException;
 import com.haulmont.cuba.core.global.View;
 import com.haulmont.cuba.core.global.ViewRepository;
+import com.haulmont.cuba.security.app.Authenticated;
 import com.haulmont.reports.entity.Report;
 import com.haulmont.reports.entity.ReportTemplate;
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
 import javax.annotation.ManagedBean;
 import javax.inject.Inject;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.zip.CRC32;
 
 /**
@@ -35,8 +35,8 @@ import java.util.zip.CRC32;
  * @version $Id$
  */
 
-@ManagedBean
-public class ReportImportExport {
+@ManagedBean(ReportImportExportAPI.NAME)
+public class ReportImportExport implements ReportImportExportAPI, ReportImportExportMBean {
     public static final String ENCODING = "CP866";
 
     @Inject
@@ -67,6 +67,70 @@ public class ReportImportExport {
         }
         zipOutputStream.close();
         return byteArrayOutputStream.toByteArray();
+    }
+
+    public Collection<Report> importReports(byte[] zipBytes) throws IOException, FileStorageException {
+        LinkedList<Report> reports = null;
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(zipBytes);
+        ZipArchiveInputStream archiveReader;
+        archiveReader = new ZipArchiveInputStream(byteArrayInputStream);
+        while (archiveReader.getNextZipEntry() != null) {
+            if (reports == null) {
+                reports = new LinkedList<>();
+            }
+            final byte[] buffer = readBytesFromEntry(archiveReader);
+            Report report = importReport(buffer);
+            reports.add(report);
+        }
+        byteArrayInputStream.close();
+        return reports;
+    }
+
+    /**
+     * Deploys report from folder
+     * Folder should have the following structure, in other cases RuntimeException will be thrown
+     *
+     * folder
+     *      sub-folder1
+     *          report.xml
+     *          template.doc
+     *      sub-folder2
+     *          report.xml
+     *          template.docx
+     *
+     * @param path to folder with reports
+     * @return status
+     * @throws IOException
+     * @throws FileStorageException
+     */
+    @Authenticated
+    public String deployAllReportsFromPath(String path) throws IOException, FileStorageException {
+        File directory = new File(path);
+        if (directory.exists() && directory.isDirectory()) {
+            File[] subDirectories = directory.listFiles();
+            if (subDirectories != null) {
+                Map<String, Object> map = new HashMap<>();
+
+                for (File subDirectory : subDirectories) {
+                    if (subDirectory.isDirectory()) {
+                        if (!subDirectory.getName().startsWith(".")) {
+                            File[] files = subDirectory.listFiles();
+                            if (files != null) {
+                                byte[] bytes = zipSingleReportFiles(files);
+                                String name = replaceForbiddenCharacters(subDirectory.getName()) + ".zip";
+                                map.put(name, bytes);
+                            }
+                        }
+                    } else {
+                        throw new RuntimeException("Report deployment failed. Root folder should have special structure.");
+                    }
+                }
+                importReports(zipContent(map));
+                return String.format("%d reports deployed", map.size());
+            }
+        }
+
+        return "No reports deployed.";
     }
 
     /**
@@ -112,22 +176,6 @@ public class ReportImportExport {
         return byteArrayOutputStream.toByteArray();
     }
 
-    public Collection<Report> importReports(byte[] zipBytes) throws IOException, FileStorageException {
-        LinkedList<Report> reports = null;
-        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(zipBytes);
-        ZipArchiveInputStream archiveReader;
-        archiveReader = new ZipArchiveInputStream(byteArrayInputStream);
-        while (archiveReader.getNextZipEntry() != null) {
-            if (reports == null) {
-                reports = new LinkedList<>();
-            }
-            final byte[] buffer = readBytesFromEntry(archiveReader);
-            Report report = importReport(buffer);
-            reports.add(report);
-        }
-        byteArrayInputStream.close();
-        return reports;
-    }
 
     private Report importReport(byte[] zipBytes) throws IOException, FileStorageException {
         Report report = null;
@@ -171,9 +219,8 @@ public class ReportImportExport {
         }
         byteArrayInputStream.close();
 
-        Persistence persistence = AppBeans.get(Persistence.class);
-
         if (report != null) {
+            Persistence persistence = AppBeans.get(Persistence.class);
             Transaction tx = persistence.createTransaction();
             try {
                 EntityManager em = persistence.getEntityManager();
@@ -202,6 +249,44 @@ public class ReportImportExport {
         }
 
         return report;
+    }
+
+    private byte[] zipSingleReportFiles(File[] files) throws IOException {
+        Map<String, Object> map = new HashMap<>();
+        int templatesCount = 0;
+        for (File file : files) {
+            if (!file.isDirectory()) {
+                byte[] data = FileUtils.readFileToByteArray(file);
+                String name;
+                if (file.getName().endsWith(".xml")) {
+                    name = file.getName();
+                } else {
+                    name = "templates/" + templatesCount++ + "/" + file.getName();
+                }
+
+                map.put(name, data);
+            }
+        }
+
+        return zipContent(map);
+    }
+
+    private byte[] zipContent(Map<String, Object> stringObjectMap) throws IOException {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        ZipArchiveOutputStream zipOutputStream = new ZipArchiveOutputStream(byteArrayOutputStream);
+        zipOutputStream.setMethod(ZipArchiveOutputStream.STORED);
+        zipOutputStream.setEncoding(ENCODING);
+
+        for (Map.Entry<String, Object> entry : stringObjectMap.entrySet()) {
+            byte[] data = (byte[]) entry.getValue();
+            ArchiveEntry archiveEntry = newStoredEntry(entry.getKey(), data);
+            zipOutputStream.putArchiveEntry(archiveEntry);
+            zipOutputStream.write(data);
+            zipOutputStream.closeArchiveEntry();
+        }
+
+        zipOutputStream.close();
+        return byteArrayOutputStream.toByteArray();
     }
 
     private ArchiveEntry newStoredEntry(String name, byte[] data) {
