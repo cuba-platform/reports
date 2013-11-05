@@ -63,9 +63,6 @@ public class BandDefinitionEditor extends AbstractEditor implements Suggester {
     @Inject
     protected TextField name;
 
-    @Inject
-    protected Companion companion;
-
     public interface Companion {
         void initDatasetsTable(Table table);
     }
@@ -132,6 +129,7 @@ public class BandDefinitionEditor extends AbstractEditor implements Suggester {
             }
         });
 
+        BandDefinitionEditor.Companion companion = getCompanion();
         if (companion != null) {
             companion.initDatasetsTable(dataSets);
         }
