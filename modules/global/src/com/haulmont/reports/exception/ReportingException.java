@@ -5,10 +5,13 @@
 
 package com.haulmont.reports.exception;
 
+import com.haulmont.cuba.core.global.SupportedByClient;
+
 /**
  * @author artamonov
  * @version $Id$
  */
+@SupportedByClient
 public class ReportingException extends RuntimeException {
 
     public ReportingException() {

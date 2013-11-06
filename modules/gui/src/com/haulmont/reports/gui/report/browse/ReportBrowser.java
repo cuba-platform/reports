@@ -21,6 +21,7 @@ import com.haulmont.cuba.security.entity.User;
 import com.haulmont.cuba.security.global.UserSession;
 import com.haulmont.reports.app.service.ReportService;
 import com.haulmont.reports.entity.Report;
+import com.haulmont.reports.exception.ReportingException;
 import com.haulmont.reports.gui.ReportGuiManager;
 import org.apache.commons.io.FileUtils;
 
@@ -116,9 +117,20 @@ public class ReportBrowser extends AbstractLookup {
                     public void windowClosed(String actionId) {
                         if (Window.COMMIT_ACTION_ID.equals(actionId)) {
                             try {
+                                String fileName = dialog.getFileName();
+                                int extensionIndex = fileName.lastIndexOf('.');
+                                String fileExtension = fileName.substring(extensionIndex);
+
+                                if (!fileExtension.equals(".zip")) {
+                                    throw new ReportingException();
+                                }
+
                                 byte[] report = FileUtils.readFileToByteArray(fileUpload.getFile(dialog.getFileId()));
                                 fileUpload.deleteFile(dialog.getFileId());
                                 reportService.importReports(report);
+                            } catch (ReportingException re) {
+                                String msg = getMessage("reportException.unableToImportReport");
+                                showNotification(msg, NotificationType.ERROR);
                             } catch (Exception ex) {
                                 throw new RuntimeException(ex);
                             }

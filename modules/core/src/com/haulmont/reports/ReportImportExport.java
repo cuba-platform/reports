@@ -14,6 +14,7 @@ import com.haulmont.cuba.core.global.ViewRepository;
 import com.haulmont.cuba.security.app.Authenticated;
 import com.haulmont.reports.entity.Report;
 import com.haulmont.reports.entity.ReportTemplate;
+import com.haulmont.reports.exception.ReportingException;
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
@@ -89,14 +90,14 @@ public class ReportImportExport implements ReportImportExportAPI, ReportImportEx
     /**
      * Deploys report from folder
      * Folder should have the following structure, in other cases RuntimeException will be thrown
-     *
+     * <p/>
      * folder
-     *      sub-folder1
-     *          report.xml
-     *          template.doc
-     *      sub-folder2
-     *          report.xml
-     *          template.docx
+     * sub-folder1
+     * report.xml
+     * template.doc
+     * sub-folder2
+     * report.xml
+     * template.docx
      *
      * @param path to folder with reports
      * @return status
@@ -193,6 +194,10 @@ public class ReportImportExport implements ReportImportExportAPI, ReportImportEx
         }
 
         byteArrayInputStream.close();
+
+        if (report == null) {
+            throw new ReportingException();
+        }
 
         // importring template files
         // not using zipInputStream.reset here because marks not supported.
