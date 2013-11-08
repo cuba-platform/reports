@@ -84,6 +84,11 @@ public class ReportImportExport implements ReportImportExportAPI, ReportImportEx
             reports.add(report);
         }
         byteArrayInputStream.close();
+
+        if (reports == null) {
+            throw new ReportingException();
+        }
+
         return reports;
     }
 

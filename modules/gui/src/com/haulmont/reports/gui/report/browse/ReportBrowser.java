@@ -5,6 +5,8 @@
 package com.haulmont.reports.gui.report.browse;
 
 import com.haulmont.cuba.core.entity.Entity;
+import com.haulmont.cuba.core.global.AppBeans;
+import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.core.global.Metadata;
 import com.haulmont.cuba.gui.AppConfig;
 import com.haulmont.cuba.gui.WindowManager;
@@ -116,25 +118,27 @@ public class ReportBrowser extends AbstractLookup {
                     @Override
                     public void windowClosed(String actionId) {
                         if (Window.COMMIT_ACTION_ID.equals(actionId)) {
-                            try {
-                                String fileName = dialog.getFileName();
-                                int extensionIndex = fileName.lastIndexOf('.');
-                                String fileExtension = fileName.substring(extensionIndex);
+                            String fileName = dialog.getFileName();
+                            int extensionIndex = fileName.lastIndexOf('.');
+                            String fileExtension = fileName.substring(extensionIndex + 1).toUpperCase();
 
-                                if (!fileExtension.equals(".zip")) {
-                                    throw new ReportingException();
-                                }
-
-                                byte[] report = FileUtils.readFileToByteArray(fileUpload.getFile(dialog.getFileId()));
-                                fileUpload.deleteFile(dialog.getFileId());
-                                reportService.importReports(report);
-                            } catch (ReportingException re) {
-                                String msg = getMessage("reportException.unableToImportReport");
+                            if (!fileExtension.equals("ZIP")) {
+                                String msg = messages.formatMessage(getClass(), "reportException.wrongFileType", fileExtension);
                                 showNotification(msg, NotificationType.ERROR);
-                            } catch (Exception ex) {
-                                throw new RuntimeException(ex);
+
+                            } else {
+                                try {
+                                    byte[] report = FileUtils.readFileToByteArray(fileUpload.getFile(dialog.getFileId()));
+                                    fileUpload.deleteFile(dialog.getFileId());
+                                    reportService.importReports(report);
+                                } catch (ReportingException re) {
+                                    String msg = getMessage("reportException.unableToImportReport");
+                                    showNotification(msg, NotificationType.ERROR);
+                                } catch (Exception ex) {
+                                    throw new RuntimeException(ex);
+                                }
+                                reportsTable.getDatasource().refresh();
                             }
-                            reportsTable.getDatasource().refresh();
                         }
                     }
                 });
