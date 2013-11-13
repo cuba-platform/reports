@@ -86,7 +86,7 @@ public class ReportImportExport implements ReportImportExportAPI, ReportImportEx
         byteArrayInputStream.close();
 
         if (reports == null) {
-            throw new ReportingException();
+            throw new ReportingException("Unable to import reports because correct data not found in the archive");
         }
 
         return reports;
@@ -201,7 +201,7 @@ public class ReportImportExport implements ReportImportExportAPI, ReportImportEx
         byteArrayInputStream.close();
 
         if (report == null) {
-            throw new ReportingException();
+            throw new ReportingException("Unable to convert data from archive to report");
         }
 
         // importring template files
