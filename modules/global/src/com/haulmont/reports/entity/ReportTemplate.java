@@ -137,7 +137,7 @@ public class ReportTemplate extends BaseReportEntity implements com.haulmont.yar
 
     @Override
     public com.haulmont.yarg.structure.ReportOutputType getOutputType() {
-        return getReportOutputType().getOutputType();
+        return getReportOutputType() != null ? getReportOutputType().getOutputType() : null;
     }
 
     public void setOutputNamePattern(String outputNamePattern) {

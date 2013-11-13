@@ -162,9 +162,21 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
     }
 
     protected boolean validateTemplateFile() {
-        if (BooleanUtils.isNotTrue(getItem().getCustomFlag()) && getItem().getContent() == null) {
+        ReportTemplate template = getItem();
+        if (!BooleanUtils.isTrue(template.getCustomFlag()) && template.getContent() == null) {
+            StringBuilder notification = new StringBuilder(getMessage("template.uploadTemplate"));
+
+            if (StringUtils.isEmpty(template.getCode())) {
+                notification.append("\n").append(getMessage("template.codeMsg"));
+            }
+
+            if (template.getOutputType() == null) {
+                notification.append("\n").append(getMessage("template.outputTypeMsg"));
+            }
+
             showNotification(getMessage("validationFail.caption"),
-                    getMessage("template.uploadTemplate"), NotificationType.TRAY);
+                    notification.toString(), NotificationType.TRAY);
+
             return false;
         }
         return true;

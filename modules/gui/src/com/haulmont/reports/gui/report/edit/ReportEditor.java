@@ -464,10 +464,16 @@ public class ReportEditor extends AbstractEditor<Report> {
                     public void actionPerform(Component component) {
                         ReportTemplate defaultTemplate = getItem().getDefaultTemplate();
                         if (defaultTemplate != null) {
-                            ExportDisplay exportDisplay = AppConfig.createExportDisplay(ReportEditor.this);
-                            byte[] reportTemplate = defaultTemplate.getContent();
-                            exportDisplay.show(new ByteArrayDataProvider(reportTemplate),
-                                    defaultTemplate.getName(), ExportFormat.getByExtension(defaultTemplate.getExt()));
+                            if (defaultTemplate.isCustom()) {
+                                showNotification(getMessage("unableToSaveTemplateWhichDefinedWithClass"), NotificationType.WARNING);
+
+                            } else {
+                                ExportDisplay exportDisplay = AppConfig.createExportDisplay(ReportEditor.this);
+                                byte[] reportTemplate = defaultTemplate.getContent();
+                                exportDisplay.show(new ByteArrayDataProvider(reportTemplate),
+                                        defaultTemplate.getName(), ExportFormat.getByExtension(defaultTemplate.getExt()));
+                            }
+
                         } else {
                             showNotification(getMessage("notification.defaultTemplateIsEmpty"), NotificationType.HUMANIZED);
                         }
