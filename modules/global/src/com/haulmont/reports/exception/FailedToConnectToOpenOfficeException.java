@@ -4,10 +4,13 @@
  */
 package com.haulmont.reports.exception;
 
+import com.haulmont.cuba.core.global.SupportedByClient;
+
 /**
  * @author fontanenko
  * @version $Id$
  */
+@SupportedByClient
 public class FailedToConnectToOpenOfficeException extends ReportingException {
     private static final long serialVersionUID = -131512314730709035L;
 

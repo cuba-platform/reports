@@ -16,13 +16,17 @@ import com.haulmont.cuba.core.entity.FileDescriptor;
 import com.haulmont.cuba.core.global.*;
 import com.haulmont.reports.app.ParameterPrototype;
 import com.haulmont.reports.entity.*;
+import com.haulmont.reports.exception.FailedToConnectToOpenOfficeException;
 import com.haulmont.reports.exception.FailedToLoadTemplateClassException;
 import com.haulmont.reports.exception.ReportingException;
+import com.haulmont.yarg.exception.OpenOfficeException;
+import com.haulmont.yarg.exception.UnsupportedFormatException;
 import com.haulmont.yarg.formatters.CustomReport;
 import com.haulmont.yarg.reporting.ReportOutputDocument;
 import com.haulmont.yarg.reporting.ReportingAPI;
 import com.haulmont.yarg.reporting.RunParams;
 import com.haulmont.yarg.structure.ReportOutputType;
+import com.sun.star.comp.helper.BootstrapException;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.basic.DateConverter;
 import com.thoughtworks.xstream.converters.collections.CollectionConverter;
@@ -123,7 +127,6 @@ public class ReportingBean implements ReportingApi {
             zipOutputStream.closeArchiveEntry();
             zipOutputStream.close();
 
-
             ReportOutputDocument reportOutputDocument = new ReportOutputDocument(report, byteArrayOutputStream.toByteArray(), "Reports.zip", ReportOutputType.custom);
             return reportOutputDocument;
         } catch (IOException e) {
@@ -148,7 +151,7 @@ public class ReportingBean implements ReportingApi {
         return createReportDocument(report, template, params);
     }
 
-    private ReportOutputDocument createReportDocument(Report report, ReportTemplate template, Map<String, Object> params)
+    protected ReportOutputDocument createReportDocument(Report report, ReportTemplate template, Map<String, Object> params)
             throws IOException {
         try {
             List<String> prototypes = new LinkedList<>();
@@ -174,10 +177,22 @@ public class ReportingBean implements ReportingApi {
 
             return reportingApi.runReport(new RunParams(report).template(template).params(resultParams));
         } catch (InstantiationException | IllegalAccessException e) {
-            throw new ReportingException(String.format("Could not instantiate class for custom template [%s]", template.getCustomClass()), e);
+            throw new ReportingException(
+                    String.format("Could not instantiate class for custom template [%s]", template.getCustomClass()), e);
+        } catch (OpenOfficeException ooe) {
+            throw new FailedToConnectToOpenOfficeException(ooe);
+        } catch (UnsupportedFormatException fe) {
+            throw new com.haulmont.reports.exception.UnsupportedFormatException(fe);
+        } catch (com.haulmont.yarg.exception.ReportingException re) {
+            // todo degtyarjov fix exceptions overriding in Reporting #PL-3233
+            if (re.getCause() instanceof BootstrapException)
+                throw new FailedToConnectToOpenOfficeException(re.getCause());
+
+            throw new ReportingException(re);
         }
     }
 
+    @Override
     public Report copyReport(Report source) {
         source = reloadEntity(source, REPORT_EDIT_VIEW_NAME);
         Report copiedReport = (Report) InstanceUtils.copy(source);
@@ -219,7 +234,7 @@ public class ReportingBean implements ReportingApi {
         return copiedReport;
     }
 
-    private String generateReportName(String sourceName, int iteration) {
+    protected String generateReportName(String sourceName, int iteration) {
         EntityManager em = persistence.getEntityManager();
         String reportName = String.format("%s (%s)", sourceName, iteration);
         Query q = em.createQuery("select r from report$Report r where r.name = :name");
@@ -229,7 +244,6 @@ public class ReportingBean implements ReportingApi {
         }
         return reportName;
     }
-
 
     @Override
     public byte[] exportReports(Collection<Report> reports) throws IOException, FileStorageException {
@@ -259,14 +273,14 @@ public class ReportingBean implements ReportingApi {
         return createAndSaveReportDocument(report, template, params, fileName);
     }
 
-    private FileDescriptor createAndSaveReportDocument(Report report, ReportTemplate template, Map<String, Object> params, String fileName) throws IOException {
+    protected FileDescriptor createAndSaveReportDocument(Report report, ReportTemplate template, Map<String, Object> params, String fileName) throws IOException {
         byte[] reportData = createReportDocument(report, template, params).getContent();
         String ext = template.getReportOutputType().toString().toLowerCase();
 
         return saveReport(reportData, fileName, ext);
     }
 
-    private FileDescriptor saveReport(byte[] reportData, String fileName, String ext) throws IOException {
+    protected FileDescriptor saveReport(byte[] reportData, String fileName, String ext) throws IOException {
         FileDescriptor file = new FileDescriptor();
         file.setCreateDate(timeSource.currentTimestamp());
         file.setName(fileName + "." + ext);
@@ -295,12 +309,14 @@ public class ReportingBean implements ReportingApi {
         return reportImportExport.importReports(zipBytes);
     }
 
+    @Override
     public String convertToXml(Report report) {
         XStream xStream = createXStream();
         String xml = xStream.toXML(report);
         return xml;
     }
 
+    @Override
     public Report convertToReport(String xml) {
         XStream xStream = createXStream();
         return (Report) xStream.fromXML(xml);
@@ -342,8 +358,7 @@ public class ReportingBean implements ReportingApi {
         return xStream;
     }
 
-
-    private <T extends Entity> T reloadEntity(T entity, String viewName) {
+    protected <T extends Entity> T reloadEntity(T entity, String viewName) {
         Transaction tx = persistence.createTransaction();
         try {
             EntityManager em = persistence.getEntityManager();
