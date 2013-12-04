@@ -7,13 +7,11 @@ package com.haulmont.reports.web.exception;
 import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.gui.components.IFrame;
+import com.haulmont.cuba.web.App;
 import com.haulmont.cuba.web.exception.AbstractExceptionHandler;
 import com.haulmont.reports.exception.FailedToConnectToOpenOfficeException;
 import com.haulmont.reports.exception.FailedToLoadTemplateClassException;
-import com.haulmont.reports.exception.ReportingException;
-import com.haulmont.cuba.web.App;
 import com.haulmont.reports.exception.UnsupportedFormatException;
-import com.vaadin.ui.Window;
 
 import javax.annotation.Nullable;
 
@@ -27,10 +25,7 @@ public class ReportExceptionHandler extends AbstractExceptionHandler {
 
     public ReportExceptionHandler() {
         super(
-                ReportingException.class.getName(),
-                FailedToConnectToOpenOfficeException.class.getName(),
-                UnsupportedFormatException.class.getName(),
-                FailedToLoadTemplateClassException.class.getName()
+                FailedToConnectToOpenOfficeException.class.getName()
         );
     }
 

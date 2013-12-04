@@ -12,7 +12,6 @@ import com.haulmont.cuba.desktop.exception.AbstractExceptionHandler;
 import com.haulmont.cuba.gui.components.IFrame;
 import com.haulmont.reports.exception.FailedToConnectToOpenOfficeException;
 import com.haulmont.reports.exception.FailedToLoadTemplateClassException;
-import com.haulmont.reports.exception.ReportingException;
 import com.haulmont.reports.exception.UnsupportedFormatException;
 
 import javax.annotation.Nullable;
@@ -27,10 +26,7 @@ public class ReportExceptionHandler extends AbstractExceptionHandler {
 
     public ReportExceptionHandler() {
         super(
-                ReportingException.class.getName(),
-                FailedToConnectToOpenOfficeException.class.getName(),
-                UnsupportedFormatException.class.getName(),
-                FailedToLoadTemplateClassException.class.getName()
+                FailedToConnectToOpenOfficeException.class.getName()
         );
     }
 
