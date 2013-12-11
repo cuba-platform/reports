@@ -131,11 +131,9 @@ public class ReportBrowser extends AbstractLookup {
                                     byte[] report = FileUtils.readFileToByteArray(fileUpload.getFile(dialog.getFileId()));
                                     fileUpload.deleteFile(dialog.getFileId());
                                     reportService.importReports(report);
-                                } catch (ReportingException re) {
+                                } catch (Exception e) {
                                     String msg = getMessage("reportException.unableToImportReport");
-                                    showNotification(msg, NotificationType.ERROR);
-                                } catch (Exception ex) {
-                                    throw new RuntimeException(ex);
+                                    showNotification(msg, e.toString(), NotificationType.ERROR);
                                 }
                                 reportsTable.getDatasource().refresh();
                             }
