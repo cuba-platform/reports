@@ -56,14 +56,16 @@ public class JpqlDataLoaderQueryTransformationTest extends JpqlDataDataLoader {
         AbstractDbDataLoader.QueryPack queryPack = prepareQuery(query, new BandData(""), params);
         System.out.println(queryPack.getQuery());
         Assert.assertFalse(queryPack.getQuery().contains("${"));
+        Assert.assertEquals(1, StringUtils.countMatches(queryPack.getQuery(), "?"));
+
         params.put("param1", "123");
         queryPack = prepareQuery(query, new BandData(""), params);
         System.out.println(queryPack.getQuery());
-        Assert.assertEquals(1, StringUtils.countMatches(queryPack.getQuery(), "?"));
+        Assert.assertEquals(2, StringUtils.countMatches(queryPack.getQuery(), "?"));
 
         params.put("param2", "123");
         queryPack = prepareQuery(query, new BandData(""), params);
         System.out.println(queryPack.getQuery());
-        Assert.assertEquals(2, StringUtils.countMatches(queryPack.getQuery(), "?"));
+        Assert.assertEquals(3, StringUtils.countMatches(queryPack.getQuery(), "?"));
     }
 }
