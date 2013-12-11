@@ -9,12 +9,19 @@ import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.desktop.App;
 import com.haulmont.cuba.desktop.exception.AbstractExceptionHandler;
-import com.haulmont.cuba.gui.components.IFrame;
+import com.haulmont.cuba.desktop.sys.DialogWindow;
 import com.haulmont.reports.exception.FailedToConnectToOpenOfficeException;
 import com.haulmont.reports.exception.FailedToLoadTemplateClassException;
+import com.haulmont.reports.exception.ReportingException;
 import com.haulmont.reports.exception.UnsupportedFormatException;
+import org.jdesktop.swingx.JXErrorPane;
+import org.jdesktop.swingx.error.ErrorInfo;
 
 import javax.annotation.Nullable;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 /**
  * Handles reporting exceptions.
@@ -26,21 +33,53 @@ public class ReportExceptionHandler extends AbstractExceptionHandler {
 
     public ReportExceptionHandler() {
         super(
-                FailedToConnectToOpenOfficeException.class.getName()
+                ReportingException.class.getName(),
+                FailedToConnectToOpenOfficeException.class.getName(),
+                UnsupportedFormatException.class.getName(),
+                FailedToLoadTemplateClassException.class.getName()
         );
     }
 
     @Override
     protected void doHandle(Thread thread, String className, String message, @Nullable Throwable throwable) {
-        String messageCode = "reportException.message";
-        if (FailedToConnectToOpenOfficeException.class.getName().equals(className)) {
-            messageCode = "reportException.failedConnectToOffice";
-        } else if (UnsupportedFormatException.class.getName().equals(className)) {
-            messageCode = "reportException.unsupportedFileFormat";
-        } else if (FailedToLoadTemplateClassException.class.getName().equals(className)) {
-            messageCode = "reportException.failedToLoadTemplateClass";
+        Messages messages = AppBeans.get(Messages.class);
+
+        JXErrorPane errorPane = new JXErrorPane();
+        ErrorInfo errorInfo = new ErrorInfo(
+                messages.getMessage(getClass(), "reportException.message"), message,
+                null, null, throwable, null, null);
+        errorPane.setErrorInfo(errorInfo);
+        JDialog dialog = JXErrorPane.createDialog(App.getInstance().getMainFrame(), errorPane);
+        dialog.setMinimumSize(new Dimension(600, (int) dialog.getMinimumSize().getHeight()));
+
+        final DialogWindow lastDialogWindow = getLastDialogWindow();
+        dialog.addWindowListener(
+                new WindowAdapter() {
+                    @Override
+                    public void windowClosed(WindowEvent e) {
+                        if (lastDialogWindow != null)
+                            lastDialogWindow.enableWindow();
+                        else
+                            App.getInstance().getMainFrame().activate();
+                    }
+                }
+        );
+        dialog.setModal(false);
+
+        if (lastDialogWindow != null)
+            lastDialogWindow.disableWindow(null);
+        else
+            App.getInstance().getMainFrame().deactivate(null);
+
+        dialog.setVisible(true);
+   }
+
+    private DialogWindow getLastDialogWindow() {
+        try {
+            return App.getInstance().getMainFrame().getWindowManager().getLastDialogWindow();
+        } catch (Exception e) {
+            // this may happen in case of initialization error
+            return null;
         }
-        String msg = AppBeans.get(Messages.class).getMessage(getClass(), messageCode);
-        App.getInstance().getMainFrame().showNotification(msg, IFrame.NotificationType.ERROR);
     }
 }

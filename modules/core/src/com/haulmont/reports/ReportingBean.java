@@ -35,6 +35,7 @@ import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 
 import javax.annotation.ManagedBean;
 import javax.inject.Inject;
@@ -180,15 +181,24 @@ public class ReportingBean implements ReportingApi {
             throw new ReportingException(
                     String.format("Could not instantiate class for custom template [%s]", template.getCustomClass()), e);
         } catch (OpenOfficeException ooe) {
-            throw new FailedToConnectToOpenOfficeException(ooe);
+            throw new FailedToConnectToOpenOfficeException(ooe.getMessage());
         } catch (UnsupportedFormatException fe) {
-            throw new com.haulmont.reports.exception.UnsupportedFormatException(fe);
+            throw new com.haulmont.reports.exception.UnsupportedFormatException(fe.getMessage());
         } catch (com.haulmont.yarg.exception.ReportingException re) {
             // todo degtyarjov fix exceptions overriding in Reporting #PL-3233
             if (re.getCause() instanceof BootstrapException)
-                throw new FailedToConnectToOpenOfficeException(re.getCause());
+                throw new FailedToConnectToOpenOfficeException(re.getCause().getMessage());
 
-            throw new ReportingException(re);
+            //noinspection unchecked
+            List<Throwable> list = ExceptionUtils.getThrowableList(re);
+            StringBuilder sb = new StringBuilder();
+            for (Iterator<Throwable> it = list.iterator(); it.hasNext(); ) {
+                sb.append(it.next().getMessage());
+                if (it.hasNext())
+                    sb.append("\n");
+            }
+
+            throw new ReportingException(sb.toString());
         }
     }
 
