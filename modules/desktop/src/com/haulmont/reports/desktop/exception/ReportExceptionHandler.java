@@ -10,6 +10,7 @@ import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.desktop.App;
 import com.haulmont.cuba.desktop.exception.AbstractExceptionHandler;
 import com.haulmont.cuba.desktop.sys.DialogWindow;
+import com.haulmont.cuba.gui.components.IFrame;
 import com.haulmont.reports.exception.FailedToConnectToOpenOfficeException;
 import com.haulmont.reports.exception.FailedToLoadTemplateClassException;
 import com.haulmont.reports.exception.ReportingException;
@@ -44,34 +45,39 @@ public class ReportExceptionHandler extends AbstractExceptionHandler {
     protected void doHandle(Thread thread, String className, String message, @Nullable Throwable throwable) {
         Messages messages = AppBeans.get(Messages.class);
 
-        JXErrorPane errorPane = new JXErrorPane();
-        ErrorInfo errorInfo = new ErrorInfo(
-                messages.getMessage(getClass(), "reportException.message"), message,
-                null, null, throwable, null, null);
-        errorPane.setErrorInfo(errorInfo);
-        JDialog dialog = JXErrorPane.createDialog(App.getInstance().getMainFrame(), errorPane);
-        dialog.setMinimumSize(new Dimension(600, (int) dialog.getMinimumSize().getHeight()));
+        if (FailedToConnectToOpenOfficeException.class.getName().equals(className)) {
+            String msg = messages.getMessage(getClass(), "reportException.failedConnectToOffice");
+            App.getInstance().getMainFrame().getWindowManager().showNotification(msg, IFrame.NotificationType.ERROR);
+        } else {
+            JXErrorPane errorPane = new JXErrorPane();
+            ErrorInfo errorInfo = new ErrorInfo(
+                    messages.getMessage(getClass(), "reportException.message"), message,
+                    null, null, throwable, null, null);
+            errorPane.setErrorInfo(errorInfo);
+            JDialog dialog = JXErrorPane.createDialog(App.getInstance().getMainFrame(), errorPane);
+            dialog.setMinimumSize(new Dimension(600, (int) dialog.getMinimumSize().getHeight()));
 
-        final DialogWindow lastDialogWindow = getLastDialogWindow();
-        dialog.addWindowListener(
-                new WindowAdapter() {
-                    @Override
-                    public void windowClosed(WindowEvent e) {
-                        if (lastDialogWindow != null)
-                            lastDialogWindow.enableWindow();
-                        else
-                            App.getInstance().getMainFrame().activate();
+            final DialogWindow lastDialogWindow = getLastDialogWindow();
+            dialog.addWindowListener(
+                    new WindowAdapter() {
+                        @Override
+                        public void windowClosed(WindowEvent e) {
+                            if (lastDialogWindow != null)
+                                lastDialogWindow.enableWindow();
+                            else
+                                App.getInstance().getMainFrame().activate();
+                        }
                     }
-                }
-        );
-        dialog.setModal(false);
+            );
+            dialog.setModal(false);
 
-        if (lastDialogWindow != null)
-            lastDialogWindow.disableWindow(null);
-        else
-            App.getInstance().getMainFrame().deactivate(null);
+            if (lastDialogWindow != null)
+                lastDialogWindow.disableWindow(null);
+            else
+                App.getInstance().getMainFrame().deactivate(null);
 
-        dialog.setVisible(true);
+            dialog.setVisible(true);
+        }
    }
 
     private DialogWindow getLastDialogWindow() {
