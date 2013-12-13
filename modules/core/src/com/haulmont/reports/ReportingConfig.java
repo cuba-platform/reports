@@ -53,4 +53,13 @@ public interface ReportingConfig extends Config {
      */
     @Property("cuba.reporting.fontsDir")
     String getPdfFontsDirectory();
+
+    /**
+     * @return The option which enforces standard data extractor to put empty row in each band if no data has been selected
+     * In summary this option says - would table linked with empty band have at least one empty row or not.
+     */
+    @Property("cuba.reporting.putEmptyRowIfNoDataSelected")
+    @DefaultBoolean(true)
+    Boolean getPutEmptyRowIfNoDataSelected();
+    void setPutEmptyRowIfNoDataSelected(Boolean putEmptyRowIfNoDataSelected);
 }

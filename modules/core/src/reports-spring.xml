@@ -14,7 +14,8 @@
 
     <bean id="reporting_lib_Scripting" class="com.haulmont.reports.libintegration.ReportingScriptingImpl"/>
     <bean id="reporting_lib_SqlParametersConverter" class="com.haulmont.reports.libintegration.SqlParametersConverter"/>
-    <bean id="reporting_lib_JpqlParametersConverter" class="com.haulmont.reports.libintegration.JpqlParametersConverter"/>
+    <bean id="reporting_lib_JpqlParametersConverter"
+          class="com.haulmont.reports.libintegration.JpqlParametersConverter"/>
 
     <bean id="reporting_lib_GroovyDataLoader" class="com.haulmont.yarg.loaders.impl.GroovyDataLoader">
         <constructor-arg ref="reporting_lib_Scripting"/>
@@ -68,9 +69,14 @@
         </property>
     </bean>
 
+    <bean name="reporting_lib_DataExtractor" class="com.haulmont.reports.libintegration.CubaDataExtractorImpl">
+        <constructor-arg ref="reporting_lib_LoaderFactory"/>
+    </bean>
+
     <bean id="reporting_lib_Reporting" class="com.haulmont.yarg.reporting.Reporting">
         <property name="formatterFactory" ref="reporting_lib_FormatterFactory"/>
         <property name="loaderFactory" ref="reporting_lib_LoaderFactory"/>
+        <property name="dataExtractor" ref="reporting_lib_DataExtractor"/>
     </bean>
 
     <!-- MBeans registration -->
