@@ -12,6 +12,10 @@ import com.haulmont.yarg.reporting.DataExtractorImpl;
 
 import javax.inject.Inject;
 
+/**
+ * @author degtyarjov
+ * @version $Id$
+ */
 public class CubaDataExtractorImpl extends DataExtractorImpl {
     @Inject
     protected Configuration configuration;

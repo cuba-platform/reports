@@ -5,11 +5,18 @@
 
 package com.haulmont.reports.libintegration;
 
+/**
+ * @author degtyarjov
+ * @version $Id$
+ */
 public interface CubaOfficeIntegrationMBean {
+
     public void setTimeoutInSeconds(Integer timeoutInSeconds);
-    public void setDisplayDeviceAvailable(Boolean displayDeviceAvailable);
     public Integer getTimeoutInSeconds();
+
+    public void setDisplayDeviceAvailable(Boolean displayDeviceAvailable);
     public Boolean isDisplayDeviceAvailable();
+
     public String getAvailablePorts();
     public void hardReloadAccessPorts();
 }

@@ -11,7 +11,12 @@ import com.haulmont.yarg.formatters.impl.DefaultFormatProvider;
 
 import javax.inject.Inject;
 
+/**
+ * @author degtyarjov
+ * @version $Id$
+ */
 public class CubaFieldFormatProvider implements DefaultFormatProvider {
+
     @Inject
     protected UserSessionSource userSessionSource;
 

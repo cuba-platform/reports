@@ -21,6 +21,7 @@ import java.util.Map;
  * @version $Id$
  */
 public class SingleEntityDataLoader implements ReportDataLoader {
+
     public static final String DEFAULT_ENTITY_PARAM_NAME = "entity";
 
     @Override

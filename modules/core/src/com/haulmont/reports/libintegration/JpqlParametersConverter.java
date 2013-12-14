@@ -23,9 +23,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * @author degtyarjov
+ * @version $Id$
+ */
 public class JpqlParametersConverter implements ReportParametersConverter {
+
     @Inject
-    private Persistence persistence;
+    protected Persistence persistence;
 
     @Override
     public <T> T convert(Object input) {

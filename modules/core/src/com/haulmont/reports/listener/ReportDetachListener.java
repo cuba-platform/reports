@@ -11,7 +11,12 @@ import com.haulmont.reports.ReportingApi;
 import com.haulmont.reports.entity.Report;
 import org.apache.commons.lang.StringUtils;
 
+/**
+ * @author degtyarjov
+ * @version $Id$
+ */
 public class ReportDetachListener implements BeforeDetachEntityListener<Report> {
+
     @Override
     public void onBeforeDetach(Report entity, EntityManager entityManager) {
         if (StringUtils.isNotBlank(entity.getXml())) {

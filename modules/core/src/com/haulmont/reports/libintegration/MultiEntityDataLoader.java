@@ -22,6 +22,7 @@ import java.util.Map;
  * @version $Id$
  */
 public class MultiEntityDataLoader implements ReportDataLoader {
+
     public static final String DEFAULT_LIST_ENTITIES_PARAM_NAME = "entities";
 
     @Override

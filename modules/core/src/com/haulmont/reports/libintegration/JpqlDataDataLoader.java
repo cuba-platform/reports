@@ -24,6 +24,10 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * @author degtyarjov
+ * @version $Id$
+ */
 public class JpqlDataDataLoader extends AbstractDbDataLoader implements ReportDataLoader {
     @Inject
     private Persistence persistence;

@@ -16,6 +16,10 @@ import com.haulmont.yarg.util.groovy.Scripting;
 import javax.inject.Inject;
 import java.util.Map;
 
+/**
+ * @author degtyarjov
+ * @version $Id$
+ */
 public class ReportingScriptingImpl implements Scripting {
 
     @Inject

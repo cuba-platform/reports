@@ -35,7 +35,6 @@ import java.util.zip.CRC32;
  * @author degtyarjov
  * @version $Id$
  */
-
 @ManagedBean(ReportImportExportAPI.NAME)
 public class ReportImportExport implements ReportImportExportAPI, ReportImportExportMBean {
     public static final String ENCODING = "CP866";
