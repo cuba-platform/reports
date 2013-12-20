@@ -112,7 +112,6 @@ public class InputParametersController extends AbstractWindow {
                 Map<String, Object> collectedParams = collectParameters(parameterComponents);
                 reportGuiManager.printReport(report, collectedParams, templateCode, outputFileName);
             } catch (ValidationException e) {
-                showNotification(getMessage("input.requiredParametersNotSet"), IFrame.NotificationType.WARNING);
             }
         }
     }
