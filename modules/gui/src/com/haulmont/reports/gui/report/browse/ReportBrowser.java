@@ -5,13 +5,12 @@
 package com.haulmont.reports.gui.report.browse;
 
 import com.haulmont.cuba.core.entity.Entity;
-import com.haulmont.cuba.core.global.AppBeans;
-import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.core.global.Metadata;
 import com.haulmont.cuba.gui.AppConfig;
 import com.haulmont.cuba.gui.WindowManager;
 import com.haulmont.cuba.gui.app.core.file.FileUploadDialog;
 import com.haulmont.cuba.gui.components.*;
+import com.haulmont.cuba.gui.components.actions.CreateAction;
 import com.haulmont.cuba.gui.components.actions.ItemTrackingAction;
 import com.haulmont.cuba.gui.data.Datasource;
 import com.haulmont.cuba.gui.export.ByteArrayDataProvider;
@@ -23,7 +22,6 @@ import com.haulmont.cuba.security.entity.User;
 import com.haulmont.cuba.security.global.UserSession;
 import com.haulmont.reports.app.service.ReportService;
 import com.haulmont.reports.entity.Report;
-import com.haulmont.reports.exception.ReportingException;
 import com.haulmont.reports.gui.ReportGuiManager;
 import org.apache.commons.io.FileUtils;
 
@@ -61,7 +59,7 @@ public class ReportBrowser extends AbstractLookup {
     protected Button copyReport;
 
     @Named("table")
-    protected Table reportsTable;
+    protected GroupTable reportsTable;
 
     @Inject
     protected UserSession userSession;
@@ -92,8 +90,7 @@ public class ReportBrowser extends AbstractLookup {
             public boolean isApplicableTo(Datasource.State state, Entity item) {
                 return super.isApplicableTo(state, item) && hasPermissionsToCreateReports;
             }
-        }
-        );
+        });
 
         runReport.setAction(new ItemTrackingAction("runReport") {
             @Override
@@ -104,7 +101,7 @@ public class ReportBrowser extends AbstractLookup {
                     if (report.getInputParameters() != null && report.getInputParameters().size() > 0) {
                         openWindow("report$inputParameters", WindowManager.OpenType.DIALOG, Collections.<String, Object>singletonMap("report", report));
                     } else {
-                        reportGuiManager.printReport(report, Collections.<String, Object>emptyMap());
+                        reportGuiManager.printReport(report, Collections.<String, Object>emptyMap(), ReportBrowser.this);
                     }
                 }
             }
@@ -163,5 +160,12 @@ public class ReportBrowser extends AbstractLookup {
         reportsTable.addAction(copyReport.getAction());
         reportsTable.addAction(exportReport.getAction());
         reportsTable.addAction(runReport.getAction());
+
+        reportsTable.addAction(new CreateAction(reportsTable) {
+            @Override
+            protected void afterCommit(Entity entity) {
+                reportsTable.expandPath(entity);
+            }
+        });
     }
 }

@@ -10,6 +10,7 @@ import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.gui.WindowManager;
 import com.haulmont.cuba.gui.components.AbstractAction;
 import com.haulmont.cuba.gui.components.Component;
+import com.haulmont.cuba.gui.components.IFrame;
 import com.haulmont.cuba.gui.components.Window;
 import com.haulmont.reports.entity.Report;
 import com.haulmont.reports.gui.ReportGuiManager;
@@ -19,7 +20,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkArgument;
 
 /**
  * @author artamonov
@@ -27,16 +28,16 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class RunReportAction extends AbstractAction {
 
-    private final Window window;
+    protected final IFrame window;
 
     protected Messages messages = AppBeans.get(Messages.class);
 
     protected ReportGuiManager reportGuiManager = AppBeans.get(ReportGuiManager.class);
 
-    public RunReportAction(Window window, String captionId) {
+    public RunReportAction(IFrame window, String captionId) {
         super(captionId);
 
-        checkNotNull(window);
+        checkArgument(window != null, "Can not create RunReportAction with null window");
 
         this.window = window;
     }
@@ -57,7 +58,7 @@ public class RunReportAction extends AbstractAction {
                         if (report.getInputParameters() != null && report.getInputParameters().size() > 0) {
                             openReportParamsDialog(report, window);
                         } else {
-                            reportGuiManager.printReport(report, Collections.<String, Object>emptyMap());
+                            reportGuiManager.printReport(report, Collections.<String, Object>emptyMap(), window);
                         }
                     }
                 }
@@ -70,7 +71,7 @@ public class RunReportAction extends AbstractAction {
         return messages.getMessage(window.getMessagesPack(), getId());
     }
 
-    private void openReportParamsDialog(Report report, Window window) {
+    protected void openReportParamsDialog(Report report, IFrame window) {
         window.openWindow("report$inputParameters", WindowManager.OpenType.DIALOG,
                 Collections.<String, Object>singletonMap("report", report));
     }

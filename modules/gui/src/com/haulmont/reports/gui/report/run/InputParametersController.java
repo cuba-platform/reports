@@ -80,6 +80,7 @@ public class InputParametersController extends AbstractWindow {
     @Override
     public void init(Map<String, Object> params) {
         super.init(params);
+
         report = (Report) params.get("report");
         linkedEntity = (Entity) params.get("entity");
         parameters = (Map<String, Object>) params.get("parameters");
@@ -110,13 +111,13 @@ public class InputParametersController extends AbstractWindow {
             try {
                 validateAll();
                 Map<String, Object> collectedParams = collectParameters(parameterComponents);
-                reportGuiManager.printReport(report, collectedParams, templateCode, outputFileName);
+                reportGuiManager.printReport(report, collectedParams, templateCode, outputFileName, this);
             } catch (ValidationException e) {
             }
         }
     }
 
-    private Map<String, Object> collectParameters(HashMap<String, Field> parameterComponents)
+    protected Map<String, Object> collectParameters(HashMap<String, Field> parameterComponents)
             throws com.haulmont.cuba.gui.components.ValidationException {
 
         Map<String, Object> parameters = new HashMap<>();
@@ -129,7 +130,7 @@ public class InputParametersController extends AbstractWindow {
         return parameters;
     }
 
-    private void createComponent(ReportInputParameter parameter, int currentGridRow) {
+    protected void createComponent(ReportInputParameter parameter, int currentGridRow) {
         Field field = fieldCreationMapping.get(parameter.getType()).createField(parameter);
         field.setRequiredMessage(formatMessage("error.paramIsRequiredButEmpty", parameter.getLocName()));
 
@@ -162,7 +163,7 @@ public class InputParametersController extends AbstractWindow {
         parametersGrid.add(field, 1, currentGridRow);
     }
 
-    private class DateFieldCreator implements FieldCreator {
+    protected class DateFieldCreator implements FieldCreator {
 
         @Override
         public Field createField(ReportInputParameter parameter) {
@@ -173,7 +174,7 @@ public class InputParametersController extends AbstractWindow {
         }
     }
 
-    private class DateTimeFieldCreator implements FieldCreator {
+    protected class DateTimeFieldCreator implements FieldCreator {
 
         @Override
         public Field createField(ReportInputParameter parameter) {
@@ -184,7 +185,7 @@ public class InputParametersController extends AbstractWindow {
         }
     }
 
-    private class TimeFieldCreator implements FieldCreator {
+    protected class TimeFieldCreator implements FieldCreator {
 
         @Override
         public Field createField(ReportInputParameter parameter) {
@@ -192,7 +193,7 @@ public class InputParametersController extends AbstractWindow {
         }
     }
 
-    private class CheckBoxCreator implements FieldCreator {
+    protected class CheckBoxCreator implements FieldCreator {
 
         @Override
         public Field createField(ReportInputParameter parameter) {
@@ -200,7 +201,7 @@ public class InputParametersController extends AbstractWindow {
         }
     }
 
-    private class TextFieldCreator implements FieldCreator {
+    protected class TextFieldCreator implements FieldCreator {
 
         @Override
         public Field createField(ReportInputParameter parameter) {
@@ -208,7 +209,7 @@ public class InputParametersController extends AbstractWindow {
         }
     }
 
-    private class NumericFieldCreator implements FieldCreator {
+    protected class NumericFieldCreator implements FieldCreator {
 
         @Override
         public Field createField(ReportInputParameter parameter) {
@@ -219,7 +220,7 @@ public class InputParametersController extends AbstractWindow {
         }
     }
 
-    private class EnumFieldCreator implements FieldCreator {
+    protected class EnumFieldCreator implements FieldCreator {
 
         @Override
         public Field createField(ReportInputParameter parameter) {
@@ -246,7 +247,7 @@ public class InputParametersController extends AbstractWindow {
         }
     }
 
-    private class SingleFieldCreator implements FieldCreator {
+    protected class SingleFieldCreator implements FieldCreator {
 
         @Override
         public Field createField(ReportInputParameter parameter) {
@@ -287,7 +288,7 @@ public class InputParametersController extends AbstractWindow {
         }
     }
 
-    private class MultiFieldCreator implements FieldCreator {
+    protected class MultiFieldCreator implements FieldCreator {
 
         @Override
         public Field createField(final ReportInputParameter parameter) {

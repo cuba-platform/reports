@@ -27,7 +27,8 @@ import java.util.UUID;
  * @version $Id$
  */
 public class ReportRun extends AbstractLookup {
-    private static final String RUN_ACTION_ID = "runReport";
+
+    protected static final String RUN_ACTION_ID = "runReport";
 
     @Inject
     protected Table reportsTable;
@@ -48,7 +49,6 @@ public class ReportRun extends AbstractLookup {
         if (reports == null) {
             reports = reportGuiManager.getAvailableReports(null, userSessionSource.getUserSession().getUser(), null, false);
         }
-
 
         if (CollectionUtils.isNotEmpty(reports)) {
             for (Report report : reports) {
