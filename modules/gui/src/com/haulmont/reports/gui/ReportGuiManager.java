@@ -141,7 +141,7 @@ public class ReportGuiManager {
      * Print report synchronously
      */
     public void printReportSync(Report report, Map<String, Object> params,
-                                   String templateCode, String outputFileName, @Nullable IFrame window) {
+                                @Nullable String templateCode, @Nullable String outputFileName, @Nullable IFrame window) {
         try {
             ReportOutputDocument document;
             if (StringUtils.isBlank(templateCode)) {
