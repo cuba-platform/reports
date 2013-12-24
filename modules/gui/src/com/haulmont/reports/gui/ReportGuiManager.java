@@ -116,6 +116,10 @@ public class ReportGuiManager {
         printReportSync(report, params, templateCode, outputFileName, null);
     }
 
+    public void printReport(Report report, Map<String, Object> params) {
+        printReportSync(report, params, null, null, null);
+    }
+
     public void printReport(Report report, Map<String, Object> params, IFrame window) {
         printReport(report, params, null, null, window);
     }
