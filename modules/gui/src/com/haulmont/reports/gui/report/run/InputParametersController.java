@@ -105,26 +105,20 @@ public class InputParametersController extends AbstractWindow {
         }
     }
 
-    @SuppressWarnings("unused")
     public void printReport() {
         if (report != null) {
-            try {
-                validateAll();
-                Map<String, Object> collectedParams = collectParameters(parameterComponents);
-                reportGuiManager.printReport(report, collectedParams, templateCode, outputFileName, this);
-            } catch (ValidationException e) {
+            if (validateAll()) {
+                reportGuiManager.printReport(report,
+                        collectParameters(parameterComponents), templateCode, outputFileName, this);
             }
         }
     }
 
-    protected Map<String, Object> collectParameters(HashMap<String, Field> parameterComponents)
-            throws com.haulmont.cuba.gui.components.ValidationException {
-
+    protected Map<String, Object> collectParameters(HashMap<String, Field> parameterComponents) {
         Map<String, Object> parameters = new HashMap<>();
         for (String paramName : parameterComponents.keySet()) {
-            Field _field = parameterComponents.get(paramName);
-            _field.validate();
-            Object value = _field.getValue();
+            Field parameterField = parameterComponents.get(paramName);
+            Object value = parameterField.getValue();
             parameters.put(paramName, value);
         }
         return parameters;
