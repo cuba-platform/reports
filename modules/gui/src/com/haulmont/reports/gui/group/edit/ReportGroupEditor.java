@@ -11,6 +11,7 @@ import java.util.Map;
 
 /**
  * @author artamonov
+ * @version $Id$
  */
 public class ReportGroupEditor extends AbstractEditor {
 

@@ -3,14 +3,12 @@
   ~ Use is subject to license terms, see http://www.cuba-platform.com/license for details.
   -->
 
-<window
-        xmlns="http://schemas.haulmont.com/cuba/5.0/window.xsd"
+<window xmlns="http://schemas.haulmont.com/cuba/5.0/window.xsd"
         class="com.haulmont.reports.gui.group.edit.ReportGroupEditor"
         datasource="groupDs"
         caption="msg://reportGroupEditor"
         messagesPack="com.haulmont.reports.gui"
-        focusComponent="groupProps"
-        >
+        focusComponent="groupProps">
 
     <dsContext>
         <datasource id="groupDs" class="com.haulmont.reports.entity.ReportGroup" view="_local"/>
@@ -18,13 +16,13 @@
 
     <layout expand="windowActions" spacing="true">
         <label value="msg://groupProperties" stylename="h2"/>
-        <fieldGroup id="groupProps" datasource="groupDs">
-            <field id="title" required="true"/>
-            <field id="code"/>
+        <fieldGroup id="groupProps" datasource="groupDs" width="100%">
+            <field id="title" required="true" width="100%"/>
+            <field id="code" width="100%"/>
         </fieldGroup>
         <label value="msg://groupLocaleCaption" stylename="h2"/>
         <textArea id="localeTextField" datasource="groupDs"
-                  property="localeNames" height="100px" width="100%" rows="5" cols="30"/>
+                  property="localeNames" height="100px" width="100%" rows="5"/>
         <iframe id="windowActions" screen="editWindowActions"/>
     </layout>
 </window>
