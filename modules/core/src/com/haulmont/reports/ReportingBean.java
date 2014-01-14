@@ -23,6 +23,7 @@ import com.haulmont.yarg.exception.OpenOfficeException;
 import com.haulmont.yarg.exception.UnsupportedFormatException;
 import com.haulmont.yarg.formatters.CustomReport;
 import com.haulmont.yarg.reporting.ReportOutputDocument;
+import com.haulmont.yarg.reporting.ReportOutputDocumentImpl;
 import com.haulmont.yarg.reporting.ReportingAPI;
 import com.haulmont.yarg.reporting.RunParams;
 import com.haulmont.yarg.structure.ReportOutputType;
@@ -128,7 +129,7 @@ public class ReportingBean implements ReportingApi {
             zipOutputStream.closeArchiveEntry();
             zipOutputStream.close();
 
-            ReportOutputDocument reportOutputDocument = new ReportOutputDocument(report, byteArrayOutputStream.toByteArray(), "Reports.zip", ReportOutputType.custom);
+            ReportOutputDocument reportOutputDocument = new ReportOutputDocumentImpl(report, byteArrayOutputStream.toByteArray(), "Reports.zip", ReportOutputType.custom);
             return reportOutputDocument;
         } catch (IOException e) {
             throw new ReportingException("An error occurred while zipping report contents", e);
