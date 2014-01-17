@@ -31,13 +31,13 @@ import java.util.*;
 public class BandDefinitionEditor extends AbstractEditor implements Suggester {
 
     @Inject
-    private Datasource<BandDefinition> bandDefinitionDs;
+    protected Datasource<BandDefinition> bandDefinitionDs;
 
     @Inject
-    private CollectionDatasource<DataSet, UUID> dataSetsDs;
+    protected CollectionDatasource<DataSet, UUID> dataSetsDs;
 
     @Inject
-    private Datasource<Report> reportDs;
+    protected Datasource<Report> reportDs;
 
     @Inject
     protected Table dataSets;
@@ -163,20 +163,23 @@ public class BandDefinitionEditor extends AbstractEditor implements Suggester {
             public void itemChanged(Datasource ds, @Nullable DataSet prevItem, @Nullable DataSet item) {
                 if (item != null) {
                     applyType(item.getType());
+                } else {
+                    hideEditComponents();
                 }
-                textBox.setVisible(item != null);
             }
         });
 
+        hideEditComponents();
+    }
+
+    protected void hideEditComponents() {
         textBox.setVisible(false);
         entityBox.setVisible(false);
         entitiesBox.setVisible(false);
     }
 
-    private void applyType(DataSetType dsType) {
-        textBox.setVisible(false);
-        entityBox.setVisible(false);
-        entitiesBox.setVisible(false);
+    protected void applyType(DataSetType dsType) {
+        hideEditComponents();
 
         if (dsType != null) {
             switch (dsType) {
@@ -217,7 +220,7 @@ public class BandDefinitionEditor extends AbstractEditor implements Suggester {
         }
     }
 
-    void selectFirstDataset() {
+    protected void selectFirstDataset() {
         dataSetsDs.refresh();
         if (!dataSetsDs.getItemIds().isEmpty()) {
             Entity item = dataSetsDs.getItem(dataSetsDs.getItemIds().iterator().next());
