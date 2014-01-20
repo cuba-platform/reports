@@ -115,6 +115,8 @@ public class BandDefinitionEditor extends AbstractEditor implements Suggester {
                     selectedBand.getDataSets().add(dataset);
                     dataSetsDs.addItem(dataset);
                     dataSetsDs.setItem(dataset);
+
+                    dataSets.setSelected(dataset);
                 }
             }
         });
