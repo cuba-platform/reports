@@ -790,14 +790,14 @@ public class ReportEditor extends AbstractEditor<Report> {
             public void actionPerform(Component component) {
                 ReportTemplate template = templatesTable.getSingleSelected();
                 if (template != null) {
-                    template.getReport().setDefaultTemplate(template);
+                    getItem().setDefaultTemplate(template);
                 }
                 updateApplicableTo(false);
             }
 
             @Override
             public boolean isApplicableTo(Datasource.State state, Entity item) {
-                return super.isApplicableTo(state, item) && getItem().getDefaultTemplate() != item;
+                return super.isApplicableTo(state, item) && !ObjectUtils.equals(getItem().getDefaultTemplate(), item);
             }
         });
     }
