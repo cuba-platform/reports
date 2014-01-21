@@ -4,6 +4,8 @@
  */
 package com.haulmont.reports.gui.report.edit;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.chile.core.model.MetaPropertyPath;
 import com.haulmont.cuba.core.app.FileStorageService;
@@ -33,7 +35,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.File;
@@ -617,7 +618,7 @@ public class ReportEditor extends AbstractEditor<Report> {
                 orderBandDefinitions(parentDefinition);
 
                 BandDefinition newBandDefinition = new BandDefinition();
-                newBandDefinition.setName("new Band");
+                newBandDefinition.setName("new Band " + (parentDefinition.getChildrenBandDefinitions().size() + 1));
                 newBandDefinition.setOrientation(Orientation.HORIZONTAL);
                 newBandDefinition.setParentBandDefinition(parentDefinition);
                 if (parentDefinition.getChildrenBandDefinitions() != null) {
@@ -876,13 +877,29 @@ public class ReportEditor extends AbstractEditor<Report> {
         }
 
         if (CollectionUtils.isNotEmpty(getItem().getRootBandDefinition().getChildrenBandDefinitions())) {
+            Multimap<String, BandDefinition> names = ArrayListMultimap.create();
+            names.put(getItem().getRootBand().getName(), getItem().getRootBandDefinition());
+
             for (BandDefinition band : getItem().getRootBandDefinition().getChildrenBandDefinitions()) {
-                validateBand(errors, band);
+                validateBand(errors, band, names);
+            }
+
+            checkForNameDuplication(errors, names);
+        }
+    }
+
+    protected void checkForNameDuplication(ValidationErrors errors, Multimap<String, BandDefinition> names) {
+        for (String name : names.keySet()) {
+            Collection<BandDefinition> bandDefinitionsWithsSameNames = names.get(name);
+            if (bandDefinitionsWithsSameNames != null && bandDefinitionsWithsSameNames.size() > 1) {
+                errors.add(formatMessage("error.bandNamesDuplicated", name));
             }
         }
     }
 
-    protected void validateBand(ValidationErrors errors, BandDefinition band) {
+    protected void validateBand(ValidationErrors errors, BandDefinition band, Multimap<String, BandDefinition> names) {
+        names.put(band.getName(), band);
+
         if (StringUtils.isBlank(band.getName())) {
             errors.add(getMessage("error.bandNameNull"));
         }
@@ -913,7 +930,7 @@ public class ReportEditor extends AbstractEditor<Report> {
 
         if (CollectionUtils.isNotEmpty(band.getChildrenBandDefinitions())) {
             for (BandDefinition child : band.getChildrenBandDefinitions()) {
-                validateBand(errors, child);
+                validateBand(errors, child, names);
             }
         }
     }
