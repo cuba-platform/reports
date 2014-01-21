@@ -505,6 +505,7 @@ public class ReportEditor extends AbstractEditor<Report> {
                                             byte[] data = FileUtils.readFileToByteArray(file);
                                             defaultTemplate.setContent(data);
                                             defaultTemplate.setName(dialog.getFileName());
+                                            templatesDs.modifyItem(defaultTemplate);
                                         } catch (IOException e) {
                                             throw new RuntimeException(String.format(
                                                     "An error occurred while uploading file for template [%s]",
