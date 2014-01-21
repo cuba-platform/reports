@@ -767,7 +767,18 @@ public class ReportEditor extends AbstractEditor<Report> {
             }
         });
         templatesTable.addAction(new EditAction(templatesTable, OpenType.DIALOG));
-        templatesTable.addAction(new RemoveAction(templatesTable, false));
+        templatesTable.addAction(new RemoveAction(templatesTable, false) {
+            @Override
+            protected void afterRemove(Set selected) {
+                super.afterRemove(selected);
+
+                Report report = getItem();
+                ReportTemplate defaultTemplate = report.getDefaultTemplate();
+                if (defaultTemplate != null && selected.contains(defaultTemplate)) {
+                    report.setDefaultTemplate(null);
+                }
+            }
+        });
 
         templatesTable.addAction(new ItemTrackingAction("defaultTemplate") {
             @Override
