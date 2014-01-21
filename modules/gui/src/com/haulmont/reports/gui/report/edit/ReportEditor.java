@@ -33,6 +33,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.File;
@@ -430,10 +431,23 @@ public class ReportEditor extends AbstractEditor<Report> {
             @Override
             public void valueChanged(BandDefinition source, String property, Object prevValue, Object value) {
                 if ("parentBandDefinition".equals(property)) {
+                    BandDefinition previousParent = (BandDefinition) prevValue;
+                    BandDefinition parent = (BandDefinition) value;
+
                     if (value == source) {
-                        source.setParentBandDefinition((BandDefinition) prevValue);
+                        source.setParentBandDefinition(previousParent);
                     } else {
                         treeDs.refresh();
+                        previousParent.getChildrenBandDefinitions().remove(source);
+                        parent.getChildrenBandDefinitions().add(source);
+                    }
+
+                    if (prevValue != null) {
+                        orderBandDefinitions(previousParent);
+                    }
+
+                    if (value != null) {
+                        orderBandDefinitions(parent);
                     }
                 }
                 treeDs.modifyItem(source);
