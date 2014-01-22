@@ -16,15 +16,19 @@ import java.util.Map;
  */
 public class ParameterPrototype implements Serializable {
 
-    private static final long serialVersionUID = 2654220919728705511L;
+    protected static final long serialVersionUID = 2654220919728705511L;
 
-    private String paramName;
+    protected String paramName;
 
-    private String queryString;
+    protected String queryString;
 
-    private String viewName;
+    protected String viewName;
 
-    private String metaClassName;
+    protected String metaClassName;
+
+    protected Integer firstResult;
+
+    protected Integer maxResults;
 
     private Map<String, Object> queryParams;
 
@@ -80,5 +84,21 @@ public class ParameterPrototype implements Serializable {
 
     public void setUseSecurityConstraints(boolean useSecurityConstraints) {
         this.useSecurityConstraints = useSecurityConstraints;
+    }
+
+    public Integer getFirstResult() {
+        return firstResult;
+    }
+
+    public void setFirstResult(Integer firstResult) {
+        this.firstResult = firstResult;
+    }
+
+    public Integer getMaxResults() {
+        return maxResults;
+    }
+
+    public void setMaxResults(Integer maxResults) {
+        this.maxResults = maxResults;
     }
 }

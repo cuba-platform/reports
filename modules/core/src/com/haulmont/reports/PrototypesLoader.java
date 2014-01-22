@@ -71,6 +71,16 @@ public class PrototypesLoader {
             }
         }
 
+        query.setFirstResult(parameterPrototype.getFirstResult());
+
+        if (parameterPrototype.getMaxResults() != null && !parameterPrototype.getMaxResults().equals(0)) {
+            query.setMaxResults(parameterPrototype.getMaxResults());
+        } else {
+            Configuration configuration = AppBeans.get(Configuration.NAME);
+            ReportingConfig config = configuration.getConfig(ReportingConfig.class);
+            query.setMaxResults(config.getParameterPrototypeQueryLimit());
+        }
+
         List queryResult;
         try {
             queryResult = query.getResultList();

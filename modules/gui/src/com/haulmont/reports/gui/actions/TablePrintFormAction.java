@@ -122,10 +122,13 @@ public class TablePrintFormAction extends AbstractPrintFormAction {
 
         ParameterPrototype parameterPrototype = new ParameterPrototype("");//todo
         parameterPrototype.setMetaClassName(metaClass.getFullName());
-        parameterPrototype.setQueryString(loadContext.getQuery().getQueryString());
-        parameterPrototype.setQueryParams(loadContext.getQuery().getParameters());
+        LoadContext.Query query = loadContext.getQuery();
+        parameterPrototype.setQueryString(query.getQueryString());
+        parameterPrototype.setQueryParams(query.getParameters());
         parameterPrototype.setViewName(loadContext.getView().getName());
         parameterPrototype.setUseSecurityConstraints(loadContext.isUseSecurityConstraints());
+        parameterPrototype.setFirstResult(query.getFirstResult());
+        parameterPrototype.setMaxResults(query.getMaxResults());
 
         openRunReportScreen(window, parameterPrototype, javaClassName);
     }

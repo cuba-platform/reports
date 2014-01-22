@@ -62,4 +62,11 @@ public interface ReportingConfig extends Config {
     @DefaultBoolean(true)
     Boolean getPutEmptyRowIfNoDataSelected();
     void setPutEmptyRowIfNoDataSelected(Boolean putEmptyRowIfNoDataSelected);
+
+    /**
+     * @return Default limit used if parameter prototype object does not specify limit itself
+     */
+    @Property("cuba.reporting.parameterPrototype.queryLimit")
+    @DefaultInteger(1000)
+    Integer getParameterPrototypeQueryLimit();
 }
