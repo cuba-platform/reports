@@ -27,7 +27,6 @@ import com.haulmont.yarg.reporting.ReportOutputDocumentImpl;
 import com.haulmont.yarg.reporting.ReportingAPI;
 import com.haulmont.yarg.reporting.RunParams;
 import com.haulmont.yarg.structure.ReportOutputType;
-import com.sun.star.comp.helper.BootstrapException;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.basic.DateConverter;
 import com.thoughtworks.xstream.converters.collections.CollectionConverter;
@@ -129,7 +128,8 @@ public class ReportingBean implements ReportingApi {
             zipOutputStream.closeArchiveEntry();
             zipOutputStream.close();
 
-            ReportOutputDocument reportOutputDocument = new ReportOutputDocumentImpl(report, byteArrayOutputStream.toByteArray(), "Reports.zip", ReportOutputType.custom);
+            ReportOutputDocument reportOutputDocument =
+                    new ReportOutputDocumentImpl(report, byteArrayOutputStream.toByteArray(), "Reports.zip", ReportOutputType.custom);
             return reportOutputDocument;
         } catch (IOException e) {
             throw new ReportingException("An error occurred while zipping report contents", e);
@@ -180,16 +180,13 @@ public class ReportingBean implements ReportingApi {
             return reportingApi.runReport(new RunParams(report).template(template).params(resultParams));
         } catch (InstantiationException | IllegalAccessException e) {
             throw new ReportingException(
-                    String.format("Could not instantiate class for custom template [%s]", template.getCustomClass()), e);
+                    String.format("Could not instantiate class for custom template [%s]. Report name [%s]",
+                            template.getCustomClass(), report.getName()), e);
         } catch (OpenOfficeException ooe) {
             throw new FailedToConnectToOpenOfficeException(ooe.getMessage());
         } catch (UnsupportedFormatException fe) {
             throw new com.haulmont.reports.exception.UnsupportedFormatException(fe.getMessage());
         } catch (com.haulmont.yarg.exception.ReportingException re) {
-            // todo degtyarjov fix exceptions overriding in Reporting #PL-3233
-            if (re.getCause() instanceof BootstrapException)
-                throw new FailedToConnectToOpenOfficeException(re.getCause().getMessage());
-
             //noinspection unchecked
             List<Throwable> list = ExceptionUtils.getThrowableList(re);
             StringBuilder sb = new StringBuilder();
@@ -369,6 +366,7 @@ public class ReportingBean implements ReportingApi {
         return xStream;
     }
 
+    @SuppressWarnings("unchecked")
     protected <T extends Entity> T reloadEntity(T entity, String viewName) {
         Transaction tx = persistence.createTransaction();
         try {

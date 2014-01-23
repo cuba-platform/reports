@@ -9,7 +9,7 @@ import com.haulmont.cuba.core.EntityManager;
 import com.haulmont.cuba.core.Persistence;
 import com.haulmont.cuba.core.Query;
 import com.haulmont.cuba.core.Transaction;
-import com.haulmont.reports.exception.ReportDataLoaderException;
+import com.haulmont.yarg.exception.DataLoadingException;
 import com.haulmont.yarg.loaders.ReportDataLoader;
 import com.haulmont.yarg.loaders.impl.AbstractDbDataLoader;
 import com.haulmont.yarg.structure.BandData;
@@ -71,7 +71,7 @@ public class JpqlDataDataLoader extends AbstractDbDataLoader implements ReportDa
             queryResult = select.getResultList();
             tx.commit();
         } catch (Exception e) {
-            throw new ReportDataLoaderException(e);
+            throw new DataLoadingException(e);
         } finally {
             tx.end();
         }
