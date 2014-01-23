@@ -3,7 +3,7 @@
   ~ Use is subject to license terms, see http://www.cuba-platform.com/license for details.
   -->
 
-<window xmlns="http://schemas.haulmont.com/cuba/5.0/window.xsd">
+<window xmlns="http://schemas.haulmont.com/cuba/5.2/window.xsd">
     <layout spacing="true" expand="valuesFormatsTable">
         <label value="msg://report.valuesFormats" stylename="h2"/>
         <table id="valuesFormatsTable" sortable="true" width="100%"
