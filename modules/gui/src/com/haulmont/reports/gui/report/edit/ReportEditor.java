@@ -555,6 +555,9 @@ public class ReportEditor extends AbstractEditor<Report> {
                                     ReportTemplate item = (ReportTemplate) editor.getItem();
                                     templatesDs.addItem(item);
                                     getItem().setDefaultTemplate(item);
+                                    //Workaround to disable button after default template setting
+                                    Action defaultTemplate = templatesTable.getAction("defaultTemplate");
+                                    defaultTemplate.refreshState();
                                 }
                             }
                         });
@@ -813,6 +816,12 @@ public class ReportEditor extends AbstractEditor<Report> {
             @Override
             public boolean isApplicableTo(Datasource.State state, Entity item) {
                 return super.isApplicableTo(state, item) && !ObjectUtils.equals(getItem().getDefaultTemplate(), item);
+            }
+
+            @Override
+            public void refreshState() {
+                super.refreshState();
+                updateApplicableTo(isApplicableTo(templatesDs.getState(), templatesDs.getState() == Datasource.State.VALID ? templatesDs.getItem() : null));
             }
         });
     }
