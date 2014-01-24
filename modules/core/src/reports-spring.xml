@@ -52,7 +52,7 @@
     <bean id="reporting_lib_CubaFieldFormatProvider" class="com.haulmont.reports.libintegration.CubaFieldFormatProvider"/>
 
     <bean id="reporting_lib_FormatterFactory"
-          class="com.haulmont.yarg.formatters.factory.DefaultFormatterFactory">
+          class="com.haulmont.reports.libintegration.CubaFormatterFactory">
         <property name="officeIntegration" ref="reporting_lib_OfficeIntegration"/>
         <property name="defaultFormatProvider" ref="reporting_lib_CubaFieldFormatProvider"/>
     </bean>
