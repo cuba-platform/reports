@@ -17,7 +17,7 @@
     <bean id="reporting_lib_JpqlParametersConverter"
           class="com.haulmont.reports.libintegration.JpqlParametersConverter"/>
 
-    <bean id="reporting_lib_GroovyDataLoader" class="com.haulmont.yarg.loaders.impl.GroovyDataLoader">
+    <bean id="reporting_lib_GroovyDataLoader" class="com.haulmont.reports.libintegration.CubaGroovyDataLoader">
         <constructor-arg ref="reporting_lib_Scripting"/>
     </bean>
     <bean id="reporting_lib_SqlDataLoader" class="com.haulmont.yarg.loaders.impl.SqlDataLoader">
