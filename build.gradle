@@ -117,7 +117,8 @@ configure(globalModule) {
     }
 
     dependencies {
-        compile(group: 'com.haulmont.yarg', name: 'yarg', version: '1.0-SNAPSHOT') {
+        compile(group: 'com.haulmont.thirdparty', name: 'core-renderer', version: 'R8')
+		compile(group: 'com.haulmont.yarg', name: 'yarg', version: '1.0-SNAPSHOT') {
             exclude group: 'org.codehaus.groovy'
         }
     }
