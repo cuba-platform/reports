@@ -85,12 +85,21 @@ public class BandDefinitionEditor extends AbstractEditor implements Suggester {
 
         dataSets.addAction(new RemoveAction(dataSets, false) {
             @Override
+            public String getDescription() {
+                return getMessage("description.removeDataSet");
+            }
+
+            @Override
             public String getCaption() {
                 return "";
             }
         });
 
         dataSets.addAction(new AbstractAction("create") {
+            @Override
+            public String getDescription() {
+                return getMessage("description.createDataSet");
+            }
 
             @Override
             public String getCaption() {

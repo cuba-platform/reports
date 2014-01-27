@@ -466,8 +466,13 @@ public class ReportEditor extends AbstractEditor<Report> {
                 lookupPickerField.addAction(new AbstractAction("download") {
 
                     @Override
+                    public String getDescription() {
+                        return getMessage("description.downloadTemplate");
+                    }
+
+                    @Override
                     public String getCaption() {
-                        return getMessage("report.download");
+                        return null;
                     }
 
                     @Override
@@ -497,8 +502,13 @@ public class ReportEditor extends AbstractEditor<Report> {
 
                 lookupPickerField.addAction(new AbstractAction("upload") {
                     @Override
+                    public String getDescription() {
+                        return getMessage("description.uploadTemplate");
+                    }
+
+                    @Override
                     public String getCaption() {
-                        return getMessage("report.upload");
+                        return null;
                     }
 
                     @Override
@@ -538,6 +548,11 @@ public class ReportEditor extends AbstractEditor<Report> {
                 lookupPickerField.addAction(new AbstractAction("create") {
 
                     @Override
+                    public String getDescription() {
+                        return getMessage("description.createTemplate");
+                    }
+
+                    @Override
                     public String getIcon() {
                         return "icons/plus-btn.png";
                     }
@@ -565,6 +580,11 @@ public class ReportEditor extends AbstractEditor<Report> {
                 });
 
                 lookupPickerField.addAction(new AbstractAction("edit") {
+                    @Override
+                    public String getDescription() {
+                        return getMessage("description.editTemplate");
+                    }
+
                     @Override
                     public String getIcon() {
                         return "icons/reports-template-view.png";
@@ -600,6 +620,11 @@ public class ReportEditor extends AbstractEditor<Report> {
         ((HierarchicalPropertyDatasourceImpl) treeDs).setSortPropertyName("position");
 
         createBandDefinitionButton.setAction(new AbstractAction("create") {
+            @Override
+            public String getDescription() {
+                return getMessage("description.createBand");
+            }
+
             @Override
             public String getCaption() {
                 return "";
@@ -640,6 +665,11 @@ public class ReportEditor extends AbstractEditor<Report> {
         });
 
         removeBandDefinitionButton.setAction(new RemoveAction(bandTree, false, "generalFrame.removeBandDefinition") {
+            @Override
+            public String getDescription() {
+                return getMessage("description.removeBand");
+            }
+
             @Override
             public String getCaption() {
                 return "";
@@ -691,6 +721,11 @@ public class ReportEditor extends AbstractEditor<Report> {
 
         bandUpButton.setAction(new ItemTrackingAction("generalFrame.up") {
             @Override
+            public String getDescription() {
+                return getMessage("description.moveUp");
+            }
+
+            @Override
             public String getCaption() {
                 return "";
             }
@@ -722,6 +757,11 @@ public class ReportEditor extends AbstractEditor<Report> {
         });
 
         bandDownButton.setAction(new ItemTrackingAction("generalFrame.down") {
+            @Override
+            public String getDescription() {
+                return getMessage("description.moveDown");
+            }
+
             @Override
             public String getCaption() {
                 return "";
