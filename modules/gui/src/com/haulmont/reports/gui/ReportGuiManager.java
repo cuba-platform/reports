@@ -9,6 +9,7 @@ import com.haulmont.cuba.core.app.DataService;
 import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.Configuration;
 import com.haulmont.cuba.core.global.LoadContext;
+import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.gui.AppConfig;
 import com.haulmont.cuba.gui.WindowManager;
 import com.haulmont.cuba.gui.backgroundwork.BackgroundWorkWindow;
@@ -50,6 +51,9 @@ public class ReportGuiManager {
 
     @Inject
     protected ReportService reportService;
+
+    @Inject
+    protected Messages messages;
 
     public void runReport(Report report, IFrame window) {
         if (report == null) {
@@ -196,7 +200,10 @@ public class ReportGuiManager {
             }
         };
 
-        BackgroundWorkWindow.show(task, true);
+        String caption = messages.getMessage(getClass(), "runReportBackgroundTitle");
+        String description = messages.getMessage(getClass(), "runReportBackgroundMessage");
+
+        BackgroundWorkWindow.show(task, caption, description, true);
     }
 
     public List<Report> getAvailableReports(@Nullable String screenId, @Nullable User user,
@@ -277,7 +284,10 @@ public class ReportGuiManager {
             }
         };
 
-        BackgroundWorkWindow.show(task, true);
+        String caption = messages.getMessage(getClass(), "runReportBackgroundTitle");
+        String description = messages.getMessage(getClass(), "runReportBackgroundMessage");
+
+        BackgroundWorkWindow.show(task, caption, description, true);
     }
 
     /**
