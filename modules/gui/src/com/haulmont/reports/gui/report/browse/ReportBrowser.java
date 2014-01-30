@@ -5,6 +5,7 @@
 package com.haulmont.reports.gui.report.browse;
 
 import com.haulmont.cuba.core.entity.Entity;
+import com.haulmont.cuba.core.global.FileStorageException;
 import com.haulmont.cuba.core.global.Metadata;
 import com.haulmont.cuba.gui.AppConfig;
 import com.haulmont.cuba.gui.WindowManager;
@@ -27,6 +28,7 @@ import org.apache.commons.io.FileUtils;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -99,7 +101,14 @@ public class ReportBrowser extends AbstractLookup {
                 if (report != null) {
                     report = getDsContext().getDataSupplier().reload(report, "report.edit");
                     if (report.getInputParameters() != null && report.getInputParameters().size() > 0) {
-                        openWindow("report$inputParameters", WindowManager.OpenType.DIALOG, Collections.<String, Object>singletonMap("report", report));
+                        Window paramsWindow = openWindow("report$inputParameters", WindowManager.OpenType.DIALOG,
+                                Collections.<String, Object>singletonMap("report", report));
+                        paramsWindow.addListener(new CloseListener() {
+                            @Override
+                            public void windowClosed(String actionId) {
+                                reportsTable.requestFocus();
+                            }
+                        });
                     } else {
                         reportGuiManager.printReport(report, Collections.<String, Object>emptyMap(), ReportBrowser.this);
                     }
@@ -135,6 +144,8 @@ public class ReportBrowser extends AbstractLookup {
                                 reportsTable.getDatasource().refresh();
                             }
                         }
+
+                        reportsTable.requestFocus();
                     }
                 });
             }
@@ -147,11 +158,11 @@ public class ReportBrowser extends AbstractLookup {
             public void actionPerform(Component component) {
                 Set<Report> reports = reportsTable.getSelected();
                 if ((reports != null) && (!reports.isEmpty())) {
+                    ExportDisplay exportDisplay = AppConfig.createExportDisplay(ReportBrowser.this);
                     try {
-                        ExportDisplay exportDisplay = AppConfig.createExportDisplay(ReportBrowser.this);
-                        exportDisplay.show(
-                                new ByteArrayDataProvider(reportService.exportReports(reports)), "Reports", ExportFormat.ZIP);
-                    } catch (Exception e) {
+                        ByteArrayDataProvider provider = new ByteArrayDataProvider(reportService.exportReports(reports));
+                        exportDisplay.show(provider, "Reports", ExportFormat.ZIP);
+                    } catch (IOException | FileStorageException e) {
                         throw new RuntimeException(e);
                     }
                 }

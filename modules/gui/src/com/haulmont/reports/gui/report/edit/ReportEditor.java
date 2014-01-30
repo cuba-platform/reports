@@ -12,14 +12,19 @@ import com.haulmont.cuba.core.app.FileStorageService;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.global.*;
 import com.haulmont.cuba.gui.AppConfig;
-import com.haulmont.cuba.gui.WindowManager;
 import com.haulmont.cuba.gui.WindowManager.OpenType;
 import com.haulmont.cuba.gui.app.core.file.FileUploadDialog;
 import com.haulmont.cuba.gui.components.*;
-import com.haulmont.cuba.gui.components.actions.*;
+import com.haulmont.cuba.gui.components.actions.CreateAction;
+import com.haulmont.cuba.gui.components.actions.EditAction;
+import com.haulmont.cuba.gui.components.actions.ItemTrackingAction;
+import com.haulmont.cuba.gui.components.actions.RemoveAction;
 import com.haulmont.cuba.gui.config.WindowConfig;
 import com.haulmont.cuba.gui.config.WindowInfo;
-import com.haulmont.cuba.gui.data.*;
+import com.haulmont.cuba.gui.data.CollectionDatasource;
+import com.haulmont.cuba.gui.data.Datasource;
+import com.haulmont.cuba.gui.data.DsContext;
+import com.haulmont.cuba.gui.data.HierarchicalDatasource;
 import com.haulmont.cuba.gui.data.impl.*;
 import com.haulmont.cuba.gui.export.ByteArrayDataProvider;
 import com.haulmont.cuba.gui.export.ExportDisplay;
@@ -52,12 +57,6 @@ public class ReportEditor extends AbstractEditor<Report> {
 
     @Named("generalFrame.bandEditor")
     protected BandDefinitionEditor bandEditor;
-
-    @Named("generalFrame.bandEditor.name")
-    protected TextField bandName;
-
-    @Named("generalFrame.bandEditor.orientation")
-    protected LookupField bandOrientation;
 
     @Named("generalFrame.bandEditor.parentBand")
     protected LookupField parentBand;
@@ -486,17 +485,17 @@ public class ReportEditor extends AbstractEditor<Report> {
                         if (defaultTemplate != null) {
                             if (defaultTemplate.isCustom()) {
                                 showNotification(getMessage("unableToSaveTemplateWhichDefinedWithClass"), NotificationType.WARNING);
-
                             } else {
                                 ExportDisplay exportDisplay = AppConfig.createExportDisplay(ReportEditor.this);
                                 byte[] reportTemplate = defaultTemplate.getContent();
                                 exportDisplay.show(new ByteArrayDataProvider(reportTemplate),
                                         defaultTemplate.getName(), ExportFormat.getByExtension(defaultTemplate.getExt()));
                             }
-
                         } else {
                             showNotification(getMessage("notification.defaultTemplateIsEmpty"), NotificationType.HUMANIZED);
                         }
+
+                        lookupPickerField.requestFocus();
                     }
                 });
 
@@ -537,6 +536,7 @@ public class ReportEditor extends AbstractEditor<Report> {
                                                     defaultTemplate.getCode()));
                                         }
                                     }
+                                    lookupPickerField.requestFocus();
                                 }
                             });
                         } else {
@@ -574,6 +574,7 @@ public class ReportEditor extends AbstractEditor<Report> {
                                     Action defaultTemplate = templatesTable.getAction("defaultTemplate");
                                     defaultTemplate.refreshState();
                                 }
+                                lookupPickerField.requestFocus();
                             }
                         });
                     }
@@ -604,6 +605,7 @@ public class ReportEditor extends AbstractEditor<Report> {
                                         getItem().setDefaultTemplate(item);
                                         templatesDs.modifyItem(item);
                                     }
+                                    lookupPickerField.requestFocus();
                                 }
                             });
                         } else {
@@ -661,6 +663,8 @@ public class ReportEditor extends AbstractEditor<Report> {
 
                 treeDs.refresh();
                 tree.expandTree();
+
+                tree.requestFocus();
             }
         });
 
@@ -682,7 +686,6 @@ public class ReportEditor extends AbstractEditor<Report> {
 
             @Override
             protected void doRemove(Set selected, boolean autocommit) {
-
                 if (selected != null) {
                     removeChildrenCascade(selected);
                     for (Object object : selected) {
@@ -692,6 +695,7 @@ public class ReportEditor extends AbstractEditor<Report> {
                         }
                     }
                 }
+                tree.requestFocus();
             }
 
             private void removeChildrenCascade(Collection selected) {
@@ -810,8 +814,15 @@ public class ReportEditor extends AbstractEditor<Report> {
             public void actionPerform(Component component) {
                 if (ReportEditor.this.commit()) {
                     postInit();
-                    ReportEditor.this.openWindow("report$inputParameters", WindowManager.OpenType.DIALOG,
+
+                    Window runRindow = openWindow("report$inputParameters", OpenType.DIALOG,
                             Collections.<String, Object>singletonMap("report", getItem()));
+                    runRindow.addListener(new CloseListener() {
+                        @Override
+                        public void windowClosed(String actionId) {
+                            tree.requestFocus();
+                        }
+                    });
                 }
             }
         });
@@ -851,6 +862,7 @@ public class ReportEditor extends AbstractEditor<Report> {
                     getItem().setDefaultTemplate(template);
                 }
                 updateApplicableTo(false);
+                templatesTable.requestFocus();
             }
 
             @Override
@@ -861,7 +873,8 @@ public class ReportEditor extends AbstractEditor<Report> {
             @Override
             public void refreshState() {
                 super.refreshState();
-                updateApplicableTo(isApplicableTo(templatesDs.getState(), templatesDs.getState() == Datasource.State.VALID ? templatesDs.getItem() : null));
+                updateApplicableTo(isApplicableTo(templatesDs.getState(),
+                        templatesDs.getState() == Datasource.State.VALID ? templatesDs.getItem() : null));
             }
         });
     }
@@ -882,11 +895,11 @@ public class ReportEditor extends AbstractEditor<Report> {
             for (int i = 0, childrenBandDefinitionsSize = childrenBandDefinitions.size(); i < childrenBandDefinitionsSize; i++) {
                 BandDefinition bandDefinition = childrenBandDefinitions.get(i);
                 bandDefinition.setPosition(i);
-
             }
         }
     }
 
+    @Override
     protected boolean preCommit() {
         addCommitListeners();
 
@@ -914,7 +927,6 @@ public class ReportEditor extends AbstractEditor<Report> {
 
             @Override
             public void afterCommit(CommitContext context, Set<Entity> result) {
-
             }
         });
     }
