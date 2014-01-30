@@ -59,7 +59,7 @@ public class PrototypesLoader {
         Query query = entityManager.createQuery(parameterPrototype.getQueryString());
 
         if (parameterPrototype.isUseSecurityConstraints()) {
-            boolean constraintsApplied = security.applyConstraints(query, metaClass.getName());
+            boolean constraintsApplied = security.applyConstraints(query);
             if (constraintsApplied)
                 log.debug("Constraints applyed: " + printQuery(query.getQueryString()));
         }
