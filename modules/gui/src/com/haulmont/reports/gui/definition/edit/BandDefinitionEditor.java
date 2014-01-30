@@ -28,7 +28,7 @@ import java.util.*;
  * @author degtyarjov
  * @version $Id$
  */
-public class BandDefinitionEditor extends AbstractEditor implements Suggester {
+public class BandDefinitionEditor extends AbstractEditor<BandDefinition> implements Suggester {
 
     @Inject
     protected Datasource<BandDefinition> bandDefinitionDs;
@@ -68,10 +68,8 @@ public class BandDefinitionEditor extends AbstractEditor implements Suggester {
     }
 
     @Override
-    protected void initItem(Entity item) {
-        BandDefinition definition = (BandDefinition) item;
-        if (PersistenceHelper.isNew(item))
-            definition.setOrientation(Orientation.HORIZONTAL);
+    protected void initNewItem(BandDefinition item) {
+        item.setOrientation(Orientation.HORIZONTAL);
     }
 
     @Override

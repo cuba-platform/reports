@@ -54,7 +54,7 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
     }
 
     @Override
-    protected void initItem(ReportTemplate template) {
+    protected void initNewItem(ReportTemplate template) {
         if (StringUtils.isEmpty(template.getCode())) {
             Report report = template.getReport();
             if (report != null) {

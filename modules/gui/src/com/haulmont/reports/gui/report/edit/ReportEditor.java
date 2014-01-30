@@ -161,23 +161,21 @@ public class ReportEditor extends AbstractEditor<Report> {
     protected CollectionDatasource<BandDefinition, UUID> availableParentBandsDs;
 
     @Override
-    protected void initItem(Report report) {
-        if (PersistenceHelper.isNew(report)) {
-            report.setReportType(ReportType.SIMPLE);
+    protected void initNewItem(Report report) {
+        report.setReportType(ReportType.SIMPLE);
 
-            BandDefinition rootDefinition = new BandDefinition();
-            rootDefinition.setName("Root");
-            rootDefinition.setPosition(0);
-            report.setBands(new HashSet<BandDefinition>());
-            report.getBands().add(rootDefinition);
+        BandDefinition rootDefinition = new BandDefinition();
+        rootDefinition.setName("Root");
+        rootDefinition.setPosition(0);
+        report.setBands(new HashSet<BandDefinition>());
+        report.getBands().add(rootDefinition);
 
-            rootDefinition.setReport(report);
+        rootDefinition.setReport(report);
 
-            groupsDs.refresh();
-            if (groupsDs.getItemIds() != null) {
-                UUID id = groupsDs.getItemIds().iterator().next();
-                report.setGroup(groupsDs.getItem(id));
-            }
+        groupsDs.refresh();
+        if (groupsDs.getItemIds() != null) {
+            UUID id = groupsDs.getItemIds().iterator().next();
+            report.setGroup(groupsDs.getItem(id));
         }
     }
 
