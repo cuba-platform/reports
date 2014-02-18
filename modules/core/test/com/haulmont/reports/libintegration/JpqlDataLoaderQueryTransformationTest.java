@@ -35,11 +35,11 @@ public class JpqlDataLoaderQueryTransformationTest extends JpqlDataDataLoader {
                 "t.id\n" +
                 "as    blabla_id \n" +
                 "from tm$Task t";
-        List<String> outputFields = parseQueryOutputParametersNames(query);
-        System.out.println(outputFields);
+        List<OutputValue> outputFields = parseQueryOutputParametersNames(query);
         Assert.assertEquals(2, outputFields.size());
-        Assert.assertTrue(outputFields.contains("blabla_id"));
-        Assert.assertTrue(outputFields.contains("num"));
+        for (OutputValue outputField : outputFields) {
+             Assert.assertTrue(outputField.getValueName().equals("blabla_id") || outputField.getValueName().equals("num"));
+        }
     }
 
     @Test

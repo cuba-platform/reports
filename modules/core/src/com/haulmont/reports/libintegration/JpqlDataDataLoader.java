@@ -36,8 +36,8 @@ public class JpqlDataDataLoader extends AbstractDbDataLoader implements ReportDa
     private static final String ALIAS_PATTERN = "as\\s+\"?([\\w|\\d|_|\\.]+)\"?\\s*";
     private static final String OUTPUT_PARAMS_PATTERN = "(?i)" + ALIAS_PATTERN + "[,|from|" + QUERY_END + "]";
 
-    protected List<String> parseQueryOutputParametersNames(String query) {
-        ArrayList<String> result = new ArrayList<>();
+    protected List<OutputValue> parseQueryOutputParametersNames(String query) {
+        ArrayList<OutputValue> result = new ArrayList<>();
         if (!query.endsWith(";"))
             query += QUERY_END;
         else
@@ -48,14 +48,14 @@ public class JpqlDataDataLoader extends AbstractDbDataLoader implements ReportDa
         while (matcher.find()) {
             String group = matcher.group(matcher.groupCount());
             if (group != null)
-                result.add(group.trim());
+                result.add(new OutputValue(group.trim()));
         }
         return result;
     }
 
     @Override
     public List<Map<String, Object>> loadData(ReportQuery dataSet, BandData band, Map<String, Object> params) {
-        List<String> outputParameters = null;
+        List<OutputValue> outputParameters = null;
         List queryResult = null;
         Transaction tx = persistence.createTransaction();
         try {
