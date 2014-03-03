@@ -12,9 +12,11 @@ import com.haulmont.cuba.core.global.FileStorageException;
 import com.haulmont.cuba.core.global.View;
 import com.haulmont.cuba.core.global.ViewRepository;
 import com.haulmont.cuba.security.app.Authenticated;
-import com.haulmont.reports.entity.Report;
-import com.haulmont.reports.entity.ReportTemplate;
+import com.haulmont.reports.entity.*;
 import com.haulmont.reports.exception.ReportingException;
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.converters.reflection.ExternalizableConverter;
+import com.thoughtworks.xstream.mapper.MapperWrapper;
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
@@ -28,6 +30,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.*;
 import java.util.zip.CRC32;
 
@@ -192,8 +195,16 @@ public class ReportImportExport implements ReportImportExportAPI, ReportImportEx
         while (((archiveEntry = archiveReader.getNextZipEntry()) != null) && (report == null)) {
             if (archiveEntry.getName().equals("report.xml")) {
                 String xml = new String(readBytesFromEntry(archiveReader));
-                report = reportingApi.convertToReport(xml);
-                report.setXml(xml);
+                if (xml.startsWith("<Report>")) {//old versions
+                    report = legacyReportsFromXml(Report.class, xml);
+                    report.setDefaultTemplate(report.getDefaultTemplate());
+                    report.setBands(new HashSet<BandDefinition>());
+                    collectBands(report.getRootBandDefinition(), report.getBands());
+                    report.setXml(reportingApi.convertToXml(report));
+                } else {
+                    report = reportingApi.convertToReport(xml);
+                    report.setXml(xml);
+                }
             }
         }
 
@@ -327,6 +338,53 @@ public class ReportImportExport implements ReportImportExportAPI, ReportImportEx
             return report;
         } finally {
             tx.end();
+        }
+    }
+
+    protected  <T> T legacyReportsFromXml(Class clazz, String xml) {
+        XStream xStream = createLegacyReportsXStream(clazz);
+        Object o = xStream.fromXML(xml);
+        return (T) o;
+    }
+
+    protected XStream createLegacyReportsXStream(Class clazz) {
+        XStream xStream = new XStream() {
+            @Override
+            protected MapperWrapper wrapMapper(MapperWrapper next) {
+                return new MapperWrapper(next) {
+                    @Override
+                    public boolean shouldSerializeMember(Class definedIn, String fieldName) {
+                        if (definedIn == Object.class) {
+                            return false;
+                        }
+                        return super.shouldSerializeMember(definedIn, fieldName);
+                    }
+                };
+            }
+        };
+
+        xStream.aliasField("id", BandDefinition.class, "uuid");
+        xStream.aliasField("id", DataSet.class, "uuid");
+        xStream.aliasField("id", ReportInputParameter.class, "uuid");
+        xStream.aliasField("id", ReportValueFormat.class, "uuid");
+        xStream.aliasField("id", ReportScreen.class, "uuid");
+        xStream.getConverterRegistry().removeConverter(ExternalizableConverter.class);
+        xStream.alias(clazz.getSimpleName(), clazz);
+        for (Field field : clazz.getDeclaredFields()) {
+            Class cl = field.getType();
+            xStream.alias(cl.getSimpleName(), cl);
+        }
+
+        return xStream;
+    }
+
+    protected void collectBands(BandDefinition band, Set<BandDefinition> bands) {
+        bands.add(band);
+
+        if (band.getChildrenBandDefinitions() != null) {
+            for (BandDefinition childBand : band.getChildrenBandDefinitions()) {
+                collectBands(childBand, bands);
+            }
         }
     }
 }
