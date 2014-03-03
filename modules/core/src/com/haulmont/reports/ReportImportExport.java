@@ -23,6 +23,7 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 
 import javax.annotation.ManagedBean;
 import javax.inject.Inject;
@@ -197,8 +198,13 @@ public class ReportImportExport implements ReportImportExportAPI, ReportImportEx
                 String xml = new String(readBytesFromEntry(archiveReader));
                 if (xml.startsWith("<Report>")) {//old versions
                     report = legacyReportsFromXml(Report.class, xml);
-                    report.setDefaultTemplate(report.getDefaultTemplate());
-                    report.setBands(new HashSet<BandDefinition>());
+                    if (report.getDefaultTemplate() == null) {
+                        report.setDefaultTemplate(report.getTemplateByCode(ReportTemplate.DEFAULT_TEMPLATE_CODE));
+                    }
+
+                    if (report.getBands() == null) {
+                        report.setBands(new HashSet<BandDefinition>());
+                    }
                     collectBands(report.getRootBandDefinition(), report.getBands());
                     report.setXml(reportingApi.convertToXml(report));
                 } else {
@@ -232,6 +238,9 @@ public class ReportImportExport implements ReportImportExportAPI, ReportImportEx
                     if (index >= 0) {
                         ReportTemplate template = report.getTemplates().get(index);
                         template.setContent(readBytesFromEntry(archiveReader));
+                        if (StringUtils.isBlank(template.getName())) {
+                            template.setName(namePaths[2]);
+                        }
                     }
                     i++;
                 }
@@ -341,7 +350,7 @@ public class ReportImportExport implements ReportImportExportAPI, ReportImportEx
         }
     }
 
-    protected  <T> T legacyReportsFromXml(Class clazz, String xml) {
+    protected <T> T legacyReportsFromXml(Class clazz, String xml) {
         XStream xStream = createLegacyReportsXStream(clazz);
         Object o = xStream.fromXML(xml);
         return (T) o;
@@ -368,6 +377,16 @@ public class ReportImportExport implements ReportImportExportAPI, ReportImportEx
         xStream.aliasField("id", ReportInputParameter.class, "uuid");
         xStream.aliasField("id", ReportValueFormat.class, "uuid");
         xStream.aliasField("id", ReportScreen.class, "uuid");
+
+        xStream.alias("com.haulmont.cuba.report.DataSet", DataSet.class);
+        xStream.alias("com.haulmont.cuba.report.ReportTemplate", ReportTemplate.class);
+        xStream.alias("com.haulmont.cuba.report.ReportInputParameter", ReportInputParameter.class);
+        xStream.alias("com.haulmont.cuba.report.ReportValueFormat", ReportValueFormat.class);
+        xStream.alias("com.haulmont.cuba.report.BandDefinition", BandDefinition.class);
+        xStream.alias("com.haulmont.cuba.report.ReportGroup", ReportGroup.class);
+        xStream.alias("com.haulmont.cuba.report.ReportScreen", ReportScreen.class);
+        xStream.omitField(Report.class, "roles");
+
         xStream.getConverterRegistry().removeConverter(ExternalizableConverter.class);
         xStream.alias(clazz.getSimpleName(), clazz);
         for (Field field : clazz.getDeclaredFields()) {
