@@ -151,7 +151,7 @@ public class ReportImportExport implements ReportImportExportAPI, ReportImportEx
      * @throws IOException
      * @throws FileStorageException
      */
-    private byte[] exportReport(Report report) throws IOException, FileStorageException {
+    protected byte[] exportReport(Report report) throws IOException, FileStorageException {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         ZipArchiveOutputStream zipOutputStream = new ZipArchiveOutputStream(byteArrayOutputStream);
         zipOutputStream.setMethod(ZipArchiveOutputStream.STORED);
@@ -186,7 +186,7 @@ public class ReportImportExport implements ReportImportExportAPI, ReportImportEx
     }
 
 
-    private Report importReport(byte[] zipBytes) throws IOException, FileStorageException {
+    protected Report importReport(byte[] zipBytes) throws IOException, FileStorageException {
         Report report = null;
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(zipBytes);
         ZipArchiveInputStream archiveReader;
@@ -225,7 +225,7 @@ public class ReportImportExport implements ReportImportExportAPI, ReportImportEx
         byteArrayInputStream = new ByteArrayInputStream(zipBytes);
         archiveReader = new ZipArchiveInputStream(byteArrayInputStream);
 
-        if ((report != null) && (report.getTemplates() != null)) {
+        if (report.getTemplates() != null) {
             // unpack templates
             int i = 0;
             while ((archiveEntry = archiveReader.getNextZipEntry()) != null
@@ -248,39 +248,45 @@ public class ReportImportExport implements ReportImportExportAPI, ReportImportEx
         }
         byteArrayInputStream.close();
 
-        if (report != null) {
-            Persistence persistence = AppBeans.get(Persistence.class);
-            Transaction tx = persistence.createTransaction();
-            try {
-                EntityManager em = persistence.getEntityManager();
-                ReportTemplate defaultTemplate = report.getDefaultTemplate();
-                List<ReportTemplate> loadedTemplates = report.getTemplates();
-
-                report.setDefaultTemplate(null);
-                report.setTemplates(null);
-                report = em.merge(report);
-
-                List<ReportTemplate> reportTemplates = new ArrayList<>();
-                for (ReportTemplate reportTemplate : loadedTemplates) {
-                    reportTemplate.setReport(report);
-                    ReportTemplate merged = em.merge(reportTemplate);
-                    reportTemplates.add(merged);
-                    if (merged.equals(defaultTemplate)) {
-                        report.setDefaultTemplate(merged);
-                    }
-                }
-                report.setTemplates(reportTemplates);
-
-                tx.commit();
-            } finally {
-                tx.end();
-            }
-        }
-
+        report = saveReport(report);
         return report;
     }
 
-    private byte[] zipSingleReportFiles(File[] files) throws IOException {
+    protected Report saveReport(Report report) {
+        Persistence persistence = AppBeans.get(Persistence.class);
+        Transaction tx = persistence.createTransaction();
+        try {
+            EntityManager em = persistence.getEntityManager();
+            ReportTemplate defaultTemplate = report.getDefaultTemplate();
+            List<ReportTemplate> loadedTemplates = report.getTemplates();
+
+            report.setDefaultTemplate(null);
+            report.setTemplates(null);
+            if (report.getGroup() != null) {
+                ReportGroup reportGroup = em.merge(report.getGroup());
+                report.setGroup(reportGroup);
+            }
+            report = em.merge(report);
+
+            List<ReportTemplate> reportTemplates = new ArrayList<>();
+            for (ReportTemplate reportTemplate : loadedTemplates) {
+                reportTemplate.setReport(report);
+                ReportTemplate merged = em.merge(reportTemplate);
+                reportTemplates.add(merged);
+                if (merged.equals(defaultTemplate)) {
+                    report.setDefaultTemplate(merged);
+                }
+            }
+            report.setTemplates(reportTemplates);
+
+            tx.commit();
+        } finally {
+            tx.end();
+        }
+        return report;
+    }
+
+    protected byte[] zipSingleReportFiles(File[] files) throws IOException {
         Map<String, Object> map = new HashMap<>();
         int templatesCount = 0;
         for (File file : files) {
@@ -300,7 +306,7 @@ public class ReportImportExport implements ReportImportExportAPI, ReportImportEx
         return zipContent(map);
     }
 
-    private byte[] zipContent(Map<String, Object> stringObjectMap) throws IOException {
+    protected byte[] zipContent(Map<String, Object> stringObjectMap) throws IOException {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         ZipArchiveOutputStream zipOutputStream = new ZipArchiveOutputStream(byteArrayOutputStream);
         zipOutputStream.setMethod(ZipArchiveOutputStream.STORED);
@@ -318,7 +324,7 @@ public class ReportImportExport implements ReportImportExportAPI, ReportImportEx
         return byteArrayOutputStream.toByteArray();
     }
 
-    private ArchiveEntry newStoredEntry(String name, byte[] data) {
+    protected ArchiveEntry newStoredEntry(String name, byte[] data) {
         ZipArchiveEntry zipEntry = new ZipArchiveEntry(name);
         zipEntry.setSize(data.length);
         zipEntry.setCompressedSize(zipEntry.getSize());
@@ -328,15 +334,15 @@ public class ReportImportExport implements ReportImportExportAPI, ReportImportEx
         return zipEntry;
     }
 
-    private String replaceForbiddenCharacters(String fileName) {
+    protected String replaceForbiddenCharacters(String fileName) {
         return fileName.replaceAll("[\\,/,:,\\*,\",<,>,\\|]", "");
     }
 
-    private byte[] readBytesFromEntry(ZipArchiveInputStream archiveReader) throws IOException {
+    protected byte[] readBytesFromEntry(ZipArchiveInputStream archiveReader) throws IOException {
         return IOUtils.toByteArray(archiveReader);
     }
 
-    private Report reloadReport(Report report) {
+    protected Report reloadReport(Report report) {
         Transaction tx = persistence.createTransaction();
         try {
             EntityManager em = persistence.getEntityManager();
