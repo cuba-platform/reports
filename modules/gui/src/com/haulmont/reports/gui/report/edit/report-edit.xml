@@ -73,8 +73,8 @@
         </tabSheet>
         <hbox spacing="true">
             <button id="windowCommitAndClose" action="windowCommitAndClose" icon="icons/ok.png"/>
-            <button id="windowCommit" action="windowCommit" icon="icons/ok.png"/>
-            <button id="saveAndRun" icon="icons/ok.png"/>
+            <button id="windowCommit" action="windowCommit"/>
+            <button id="saveAndRun"/>
             <button id="windowClose" action="windowClose" icon="icons/cancel.png"/>
         </hbox>
     </layout>
