@@ -6,6 +6,12 @@
 
 <metadata xmlns="http://schemas.haulmont.com/cuba/5.2/metadata.xsd">
 
-    <metadata-model root-package="com.haulmont.reports"/>
+    <metadata-model root-package="com.haulmont.reports">
+        <class>com.haulmont.reports.entity.BandDefinition</class>
+        <class>com.haulmont.reports.entity.DataSet</class>
+        <class>com.haulmont.reports.entity.ReportInputParameter</class>
+        <class>com.haulmont.reports.entity.ReportScreen</class>
+        <class>com.haulmont.reports.entity.ReportValueFormat</class>
+    </metadata-model>
 
 </metadata>
