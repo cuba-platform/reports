@@ -23,9 +23,9 @@ buildscript {
     println("CUBA Platform - Reports Version ${ext.cubaVersion}")
     println("")
     
-	def docPluginVersion = '1.2.4'	
-	def DOC_PLUGIN_VERSION = 'docPluginVersion'
-	docPluginVersion = rootProject.hasProperty(DOC_PLUGIN_VERSION) ? rootProject[DOC_PLUGIN_VERSION] : docPluginVersion
+    def docPluginVersion = '1.2.5'
+    def DOC_PLUGIN_VERSION = 'docPluginVersion'
+    docPluginVersion = rootProject.hasProperty(DOC_PLUGIN_VERSION) ? rootProject[DOC_PLUGIN_VERSION] : docPluginVersion
 		
     repositories {
         mavenLocal()
