@@ -8,6 +8,7 @@ import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.chile.core.model.utils.InstanceUtils;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.global.Metadata;
+import com.haulmont.cuba.gui.ScreensHelper;
 import com.haulmont.cuba.gui.components.AbstractEditor;
 import com.haulmont.cuba.gui.components.LookupField;
 import com.haulmont.cuba.gui.config.WindowConfig;
@@ -19,7 +20,6 @@ import com.haulmont.cuba.gui.data.impl.DsListenerAdapter;
 import com.haulmont.reports.entity.ParameterType;
 import com.haulmont.reports.entity.ReportInputParameter;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.util.*;
 
@@ -67,7 +67,7 @@ public class ParameterEditor extends AbstractEditor {
     public void init(Map<String, Object> params) {
         super.init(params);
 
-        LookupField type = getComponent("type");
+        LookupField type = getComponentNN("type");
         metaClass = getComponent("metaClass");
         enumLookup = getComponent("enumeration");
         screen = getComponent("screen");
@@ -86,6 +86,7 @@ public class ParameterEditor extends AbstractEditor {
         metaClasses.addAll(classNamesToMetaNames.keySet());
         metaClass.setOptionsList(metaClasses);
         metaClass.addListener(new ValueListener() {
+            @Override
             public void valueChanged(Object source, String property, Object prevValue, Object value) {
                 String metaClassName = value != null ? classNamesToMetaNames.get(value.toString()) : null;
                 parameter.setEntityMetaClass(metaClassName);
@@ -111,7 +112,9 @@ public class ParameterEditor extends AbstractEditor {
             }
         });
 
-        Collection<WindowInfo> windowInfoCollection = windowConfig.getWindows();
+        List<WindowInfo> windowInfoCollection = new ArrayList<>(windowConfig.getWindows());
+        ScreensHelper.sortWindowInfos(windowInfoCollection);
+
         List screensList = new ArrayList();
         for (WindowInfo windowInfo : windowInfoCollection) {
             screensList.add(windowInfo.getId());

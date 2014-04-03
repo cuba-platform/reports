@@ -12,6 +12,7 @@ import com.haulmont.cuba.core.app.FileStorageService;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.global.*;
 import com.haulmont.cuba.gui.AppConfig;
+import com.haulmont.cuba.gui.ScreensHelper;
 import com.haulmont.cuba.gui.WindowManager.OpenType;
 import com.haulmont.cuba.gui.app.core.file.FileUploadDialog;
 import com.haulmont.cuba.gui.components.*;
@@ -344,21 +345,7 @@ public class ReportEditor extends AbstractEditor<Report> {
         screenTable.addAction(new RemoveAction(screenTable, false));
         List<WindowInfo> windowInfoCollection = new ArrayList<>(windowConfig.getWindows());
         // sort by screenId
-        Collections.sort(windowInfoCollection, new Comparator<WindowInfo>() {
-            @Override
-            public int compare(WindowInfo w1, WindowInfo w2) {
-                int w1DollarIndex = w1.getId().indexOf("$");
-                int w2DollarIndex = w2.getId().indexOf("$");
-
-                if ((w1DollarIndex > 0 && w2DollarIndex > 0) || (w1DollarIndex < 0 && w2DollarIndex < 0)) {
-                    return w1.getId().compareTo(w2.getId());
-                } else if (w1DollarIndex > 0) {
-                    return -1;
-                } else {
-                    return 1;
-                }
-            }
-        });
+        ScreensHelper.sortWindowInfos(windowInfoCollection);
 
         Map<String, Object> screens = new LinkedHashMap<>();
         for (WindowInfo windowInfo : windowInfoCollection) {
