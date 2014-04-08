@@ -13,6 +13,7 @@ import com.haulmont.yarg.formatters.impl.doc.connector.OfficeIntegration;
 import com.haulmont.yarg.formatters.impl.doc.connector.OfficeTask;
 import com.sun.star.comp.helper.BootstrapException;
 
+import java.lang.Exception;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -36,8 +37,9 @@ public class CubaOfficeIntegration extends OfficeIntegration implements CubaOffi
         try {
             Callable<Void> task = new Callable<Void>() {
                 @Override
-                public Void call() throws java.lang.Exception {
+                public Void call() throws Exception {
                     AppContext.setSecurityContext(securityContext);
+                    connection.open();
                     officeTask.processTaskInOpenOffice(connection.getOOResourceProvider());
                     connection.close();
                     return null;
@@ -50,7 +52,9 @@ public class CubaOfficeIntegration extends OfficeIntegration implements CubaOffi
                 throw new OpenOfficeException("Failed to connect to open office. Please check open office path " + openOfficePath, ex);
             }
             throw new RuntimeException(ex.getCause());
-        } catch (java.lang.Exception ex) {
+        } catch (OpenOfficeException ex) {
+            throw ex;
+        } catch (Exception ex) {
             throw new OpenOfficeException(ex);
         } finally {
             if (future != null) {
