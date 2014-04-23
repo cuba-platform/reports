@@ -18,7 +18,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.Transient;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * @author fedorchenko
@@ -33,15 +32,6 @@ public class ReportData extends AbstractNotPersistentEntity {
     @MetaProperty
     @Transient
     protected EntityTreeNode entityTreeRootNode;
-
-    public Report getGeneratedReport() {
-        return generatedReport;
-    }
-
-    public void setGeneratedReport(Report generatedReport) {
-        this.generatedReport = generatedReport;
-    }
-
     @MetaProperty
     @Transient
     protected Report generatedReport;
@@ -65,6 +55,14 @@ public class ReportData extends AbstractNotPersistentEntity {
     @Transient
     @OneToMany(targetEntity = RegionProperty.class)
     protected List<ReportRegion> reportRegions = new ArrayList<ReportRegion>();
+
+    public Report getGeneratedReport() {
+        return generatedReport;
+    }
+
+    public void setGeneratedReport(Report generatedReport) {
+        this.generatedReport = generatedReport;
+    }
 
     public ReportGroup getGroup() {
         return group;
@@ -98,15 +96,6 @@ public class ReportData extends AbstractNotPersistentEntity {
         this.outputFileType = outputFileType;
     }
 
-
-/*    public EntityTreeNode getCollectionEntityTreeRootNode() {
-        return collectionEntityTreeRootNode;
-    }
-
-    public void setCollectionEntityTreeRootNode(EntityTreeNode collectionEntityTreeRootNode) {
-        this.collectionEntityTreeRootNode = collectionEntityTreeRootNode;
-    }*/
-
     public String getName() {
         return name;
     }
@@ -122,14 +111,6 @@ public class ReportData extends AbstractNotPersistentEntity {
     public void setEntityTreeRootNode(EntityTreeNode entityTreeRootNode) {
         this.entityTreeRootNode = entityTreeRootNode;
     }
-
-    /*public TemplateFileType getOutputFileType() {
-        return outputFileType;
-    }
-
-    public void setOutputFileType(TemplateFileType outputFileType) {
-        this.outputFileType = outputFileType;
-    }*/
 
     public ReportOutputType getReportOutputFileType() {
         return reportOutputFileType;
@@ -149,33 +130,24 @@ public class ReportData extends AbstractNotPersistentEntity {
 
     @Transient
     public ReportData addRegion(ReportRegion region) {
-        //setChanged();
         reportRegions.add(region);
         return this;
     }
 
     @Transient
     public ReportData addRegion(int index, ReportRegion region) {
-        //setChanged();
         reportRegions.add(index, region);
         return this;
     }
 
     @Transient
     public void removeRegion(int index) {
-        //setChanged();
         reportRegions.remove(index);
     }
 
     @Transient
     public void clearRegions() {
-        //setChanged();
         reportRegions.clear();
     }
-
-    //TODO impl as Observable or change listener
-    /*public synchronized void setChanged() {
-        super.setChanged();
-    } */
 
 }

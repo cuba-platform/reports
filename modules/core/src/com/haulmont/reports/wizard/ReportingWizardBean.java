@@ -228,7 +228,6 @@ public class ReportingWizardBean implements ReportingWizardApi {
         if (ownPropsNamesList.isEmpty()) {
             return false;
         }
-        //TODO check that
         ownPropsNamesList.removeAll(CollectionUtils.collect(getWizardBlackListedProperties(), new Transformer() {
             @Override
             public Object transform(Object input) {

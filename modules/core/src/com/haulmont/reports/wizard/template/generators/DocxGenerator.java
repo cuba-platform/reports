@@ -40,7 +40,6 @@ public class DocxGenerator extends AbstractOfficeGenerator {
                 for (RegionProperty rp : reportRegion.getRegionProperties()) {
 
                     if (!isFirstHeaderCellFounded) {
-                        //TODO use yarg AbstractFormatter constants if U are good in regexps
                         tableHeaderRowData.add("##band=" + reportRegion.getNameForBand() + " " + rp.getHierarchicalLocalizedNameExceptRoot());
 
                         isFirstHeaderCellFounded = true;

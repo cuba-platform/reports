@@ -12,17 +12,11 @@ import org.apache.commons.lang.ObjectUtils;
  * @author fedorchenko
  * @version $Id$
  */
-public enum TemplateFileType implements EnumClass<Integer>{
+public enum TemplateFileType implements EnumClass<Integer> {
     HTML(30),
     DOCX(40),
     XLSX(50);
-
     private Integer id;
-
-    @Override
-    public Integer getId() {
-        return id;
-    }
 
     private TemplateFileType(Integer id) {
         this.id = id;
@@ -35,6 +29,11 @@ public enum TemplateFileType implements EnumClass<Integer>{
             }
         }
         return null;
+    }
+
+    @Override
+    public Integer getId() {
+        return id;
     }
 
 }

@@ -58,8 +58,6 @@ public class RegionEditor extends AbstractEditor<ReportRegion> {
         companion.addTreeTableDblClickListener(entityTree, reportRegionPropertiesTableDs);
         isTabulated = ((ReportRegion) WindowParams.ITEM.getEntity(params)).getIsTabulatedRegion();
         reportEntityTreeNodeDs.refresh(params);
-        //TODO add dbl click action listener for entityTree tree
-
         //TODO add disallowing of classes selection in tree
 
         if (isTabulated) {
@@ -83,7 +81,6 @@ public class RegionEditor extends AbstractEditor<ReportRegion> {
 
         entityTree.setMultiSelect(true);
         entityTree.expandTree();
-        //TODO add tree double click action
     }
 
     private void setTabulatedRegionEditorCaption(String collectionEntityName) {

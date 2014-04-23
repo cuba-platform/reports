@@ -124,7 +124,6 @@ public class HtmlGenerator implements Generator {
                 append("><br/>");
     }
 
-    //todo 2 Dmitry why lazy initialization?
     protected Configuration getFreemarkerConfiguration() {
         if (freeMarkerConfiguration == null) {
             synchronized (this) {

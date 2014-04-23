@@ -52,6 +52,7 @@ public class EntityTreeNode extends AbstractNotPersistentEntity {
 
     /**
      * Calculates depth of child nodes. Can to be used in sorting
+     *
      * @return
      */
     @MetaProperty
@@ -118,14 +119,6 @@ public class EntityTreeNode extends AbstractNotPersistentEntity {
             }
         }
     }
-
-    /*public Boolean getIsAttribute() {
-        return isAttribute;
-    }
-
-    public void setIsAttribute(Boolean isAttribute) {
-        this.isAttribute = isAttribute;
-    } */
 
     public String getLocalizedName() {
         return localizedName;
