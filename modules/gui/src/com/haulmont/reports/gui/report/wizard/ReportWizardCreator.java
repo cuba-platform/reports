@@ -49,7 +49,6 @@ import java.util.*;
 public class ReportWizardCreator extends AbstractEditor<ReportData> implements MainWizardFrame<AbstractEditor> {
 
     public static String[] IGNORED_ENTITIES_PREFIXES = new String[]{"sys$", "sec$"};
-    public static List<String> IGNORED_ENTITY_PROPERTY_PREFIXES = Arrays.asList("id", "createTs", "createdBy", "version", "updateTs", "updatedBy", "deleteTs", "deletedBy");
     //injected UI and main form descriptor fields:
     @Inject
     protected Datasource reportDataDs;
@@ -328,20 +327,16 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
                         parentEntityTreeNode.getChildren().add(newParentModelNode);
                     }
                 } else {
-                    //does we need to do security checks here? no
-                    if (!IGNORED_ENTITY_PROPERTY_PREFIXES.contains(metaProperty.getName())
-                    /*&& userSession.isEntityAttrPermitted(parentEntityTreeNode.getWrappedMetaClass(), metaProperty.getName(), EntityAttrAccess.VIEW)*/
-                            ) {
-                        if (!entityTreeHasSimpleAttrs) {
-                            entityTreeHasSimpleAttrs = true;
-                        }
-                        EntityTreeNode child = metadata.create(EntityTreeNode.class);
-                        child.setName(metaProperty.getName());
-                        child.setLocalizedName(messageTools.getPropertyCaption(metaProperty));
-                        child.setWrappedMetaProperty(metaProperty);
-                        child.setParent(parentEntityTreeNode);
-                        parentEntityTreeNode.getChildren().add(child);
+                    if (!entityTreeHasSimpleAttrs) {
+                        entityTreeHasSimpleAttrs = true;
                     }
+                    EntityTreeNode child = metadata.create(EntityTreeNode.class);
+                    child.setName(metaProperty.getName());
+                    child.setLocalizedName(messageTools.getPropertyCaption(metaProperty));
+                    child.setWrappedMetaProperty(metaProperty);
+                    child.setParent(parentEntityTreeNode);
+                    parentEntityTreeNode.getChildren().add(child);
+
                 }
 
             }
