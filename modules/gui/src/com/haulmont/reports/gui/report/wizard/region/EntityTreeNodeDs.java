@@ -28,15 +28,8 @@ public class EntityTreeNodeDs extends AbstractTreeDatasource<EntityTreeNode, UUI
         @Override
         public int compare(EntityTreeNode o1, EntityTreeNode o2) {
             //return o1.getNodeChildrenDepth().compareTo(o2.getNodeChildrenDepth());
-            if (o1.getChildren().isEmpty() && !o2.getChildren().isEmpty()) {
-                return -1;
-            } else if (o1.getChildren().isEmpty() && !o2.getChildren().isEmpty()) {
-                return 1;
-            } else if (o1.getChildren().isEmpty() && o2.getChildren().isEmpty() || !o1.getChildren().isEmpty() && !o2.getChildren().isEmpty()) {
-                Collator collator = Collator.getInstance();
-                return collator.compare(o1.getHierarchicalLocalizedNameExceptRoot(), o2.getHierarchicalLocalizedNameExceptRoot());
-            }
-            return 0;
+            Collator collator = Collator.getInstance();
+            return collator.compare(o1.getHierarchicalLocalizedNameExceptRoot(), o2.getHierarchicalLocalizedNameExceptRoot());
         }
     };
 

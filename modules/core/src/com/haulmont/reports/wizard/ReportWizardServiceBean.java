@@ -36,8 +36,8 @@ public class ReportWizardServiceBean implements ReportWizardService {
     }
 
     @Override
-    public boolean isPropertyAllowedForReportWizard(MetaProperty metaProperty) {
-        return reportingWizardApi.isPropertyAllowedForReportWizard(metaProperty);
+    public boolean isPropertyAllowedForReportWizard(MetaClass metaClass, MetaProperty metaProperty) {
+        return reportingWizardApi.isPropertyAllowedForReportWizard(metaClass, metaProperty);
     }
 
     @Override

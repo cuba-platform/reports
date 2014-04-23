@@ -291,7 +291,7 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
                 return parentEntityTreeNode;
             }
             for (com.haulmont.chile.core.model.MetaProperty metaProperty : parentEntityTreeNode.getWrappedMetaClass().getProperties()) {
-                if (!reportWizardService.isPropertyAllowedForReportWizard(metaProperty)) {
+                if (!reportWizardService.isPropertyAllowedForReportWizard(parentEntityTreeNode.getWrappedMetaClass(), metaProperty)) {
                     continue;
                 }
                 if (metaProperty.getRange().isClass()) {

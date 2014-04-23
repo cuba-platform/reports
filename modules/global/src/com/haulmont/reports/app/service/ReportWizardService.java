@@ -31,7 +31,7 @@ public interface ReportWizardService {
 
     boolean isEntityAllowedForReportWizard(MetaClass metaClass);
 
-    boolean isPropertyAllowedForReportWizard(MetaProperty metaProperty);
+    boolean isPropertyAllowedForReportWizard(MetaClass metaClass, MetaProperty metaProperty);
 
     byte[] generateTemplate(ReportData reportData, TemplateFileType templateFileType) throws TemplateGenerationException;
 }

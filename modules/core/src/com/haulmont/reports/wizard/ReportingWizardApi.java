@@ -38,5 +38,5 @@ public interface ReportingWizardApi {
 
     boolean isEntityAllowedForReportWizard(MetaClass metaClass);
 
-    boolean isPropertyAllowedForReportWizard(MetaProperty metaProperty);
+    boolean isPropertyAllowedForReportWizard(MetaClass metaClass, MetaProperty metaProperty);
 }

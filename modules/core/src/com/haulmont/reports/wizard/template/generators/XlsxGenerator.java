@@ -5,8 +5,6 @@
 
 package com.haulmont.reports.wizard.template.generators;
 
-import com.haulmont.cuba.core.global.AppBeans;
-import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.reports.entity.wizard.RegionProperty;
 import com.haulmont.reports.entity.wizard.ReportRegion;
 import org.apache.poi.ss.util.CellReference;
@@ -16,11 +14,8 @@ import org.docx4j.openpackaging.packages.SpreadsheetMLPackage;
 import org.docx4j.openpackaging.parts.PartName;
 import org.docx4j.openpackaging.parts.SpreadsheetML.WorksheetPart;
 import org.xlsx4j.sml.*;
-import sun.util.locale.LocaleUtils;
 
 import javax.xml.bind.JAXBException;
-import java.net.URI;
-import java.util.Locale;
 
 /**
  * @author fedorchenko
