@@ -82,7 +82,7 @@ public interface ReportingConfig extends Config {
 
     /**
      * Return entities that will be available for report wizard. All others entities will be ignored
-     * Note that if <b>'cuba.reporting.wizardEntitiesBlackList'<b/> is not null, this list will be used anyway
+     * Note that if <b>'cuba.reporting.wizardEntitiesBlackList'<b/> is not null, this list will be used anyway.
      * @return list of entities that available for reportWizard
      */
     @Property("cuba.reporting.wizardEntitiesWhiteList")
@@ -90,6 +90,12 @@ public interface ReportingConfig extends Config {
     String getWizardEntitiesWhiteList();
     void setWizardEntitiesWhiteList(String wizardEntitiesWhiteList);
 
+    /**
+     * Return entity properties that will not be available in report creation wizard. Format is like 'tm$Task.jbpmProcessId,tm$Task.id,...'
+     * Note that if this list is not empty, then system properties like "id, deleteTs, etc" will be available, so if U wish to hide them,
+     * put them in that property obviously
+     * @return
+     */
     @Property("cuba.reporting.wizardPropertiesBlackList")
     @DefaultString("")
     String getWizardPropertiesBlackList();

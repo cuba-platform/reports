@@ -210,10 +210,13 @@ public class ReportingWizardBean implements ReportingWizardApi {
             }
         });
 
-        ownPropsNamesList.removeAll(IGNORED_ENTITY_PROPERTIES);
-        if (ownPropsNamesList.isEmpty()) {
-            return false;
+        if (getWizardBlackListedProperties().isEmpty()) {
+            ownPropsNamesList.removeAll(IGNORED_ENTITY_PROPERTIES);
+            if (ownPropsNamesList.isEmpty()) {
+                return false;
+            }
         }
+
         ownPropsNamesList.removeAll(CollectionUtils.collect(getWizardBlackListedProperties(), new Transformer() {
             @Override
             public Object transform(Object input) {
