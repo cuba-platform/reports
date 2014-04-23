@@ -70,10 +70,25 @@ public interface ReportingConfig extends Config {
     @DefaultInteger(1000)
     Integer getParameterPrototypeQueryLimit();
 
+    /**
+     * Return entities that will not to be available for report wizard
+     * Note that if <b>'cuba.reporting.wizardEntitiesBlackList'<b/> is not null, this list will be ignored
+     * @return list of ignored entities
+     */
     @Property("cuba.reporting.wizardEntitiesBlackList")
     @DefaultString("")
     String getWizardEntitiesBlackList();
     void setWizardEntitiesBlackList(String wizardEntitiesBlackList);
+
+    /**
+     * Return entities that will be available for report wizard. All others entities will be ignored
+     * Note that if <b>'cuba.reporting.wizardEntitiesBlackList'<b/> is not null, this list will be used anyway
+     * @return list of entities that available for reportWizard
+     */
+    @Property("cuba.reporting.wizardEntitiesBlackList")
+    @DefaultString("")
+    String getWizardEntitiesWhiteList();
+    void setWizardEntitiesWhiteList(String wizardEntitiesWhiteList);
 
     @Property("cuba.reporting.wizardPropertiesBlackList")
     @DefaultString("")

@@ -7,51 +7,25 @@ package com.haulmont.reports.wizard;
 
 import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.chile.core.model.MetaProperty;
-import com.haulmont.chile.core.model.utils.InstanceUtils;
 import com.haulmont.cuba.core.EntityManager;
 import com.haulmont.cuba.core.Persistence;
-import com.haulmont.cuba.core.Query;
 import com.haulmont.cuba.core.Transaction;
-import com.haulmont.cuba.core.app.FileStorageAPI;
-import com.haulmont.cuba.core.entity.Entity;
-import com.haulmont.cuba.core.entity.FileDescriptor;
 import com.haulmont.cuba.core.entity.annotation.SystemLevel;
 import com.haulmont.cuba.core.global.*;
-import com.haulmont.reports.*;
-import com.haulmont.reports.app.ParameterPrototype;
+import com.haulmont.reports.ReportingBean;
+import com.haulmont.reports.ReportingConfig;
 import com.haulmont.reports.entity.*;
 import com.haulmont.reports.entity.wizard.*;
-import com.haulmont.reports.exception.FailedToConnectToOpenOfficeException;
-import com.haulmont.reports.exception.FailedToLoadTemplateClassException;
-import com.haulmont.reports.exception.ReportingException;
 import com.haulmont.reports.exception.TemplateGenerationException;
 import com.haulmont.reports.wizard.template.TemplateGeneratorApi;
-import com.haulmont.yarg.exception.OpenOfficeException;
-import com.haulmont.yarg.exception.UnsupportedFormatException;
-import com.haulmont.yarg.formatters.CustomReport;
-import com.haulmont.yarg.reporting.ReportOutputDocument;
-import com.haulmont.yarg.reporting.ReportOutputDocumentImpl;
-import com.haulmont.yarg.reporting.ReportingAPI;
-import com.haulmont.yarg.reporting.RunParams;
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.converters.basic.DateConverter;
-import com.thoughtworks.xstream.converters.collections.CollectionConverter;
-import com.thoughtworks.xstream.converters.reflection.ExternalizableConverter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
-import org.apache.commons.compress.archivers.ArchiveEntry;
-import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
-import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
 
 import javax.annotation.ManagedBean;
 import javax.inject.Inject;
 import javax.persistence.Embeddable;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.*;
-import java.util.zip.CRC32;
 
 /**
  * @author artamonov
@@ -214,9 +188,20 @@ public class ReportingWizardBean implements ReportingWizardApi {
                 effectiveMetaClass.getJavaClass().isAnnotationPresent(Embeddable.class) ||
                 effectiveMetaClass.getJavaClass().isAnnotationPresent(SystemLevel.class) ||
                 //&& userSession.isEntityOpPermitted(effectiveMetaClass, EntityOp.READ)
-                effectiveMetaClass.getOwnProperties().isEmpty() ||
-                getWizardBlackListedEntities().contains(effectiveMetaClass.getName())) {
+                effectiveMetaClass.getOwnProperties().isEmpty()) {
             return false;
+        }
+        List<String> whiteListedEntities = getWizardWhiteListedEntities();
+        if (!whiteListedEntities.isEmpty()) {
+            //use white list cause it has more meaningful priority
+            if (!whiteListedEntities.contains(effectiveMetaClass.getName())) {
+                return false;
+            }
+        } else {
+            //otherwise filter by a blacklist
+            if (getWizardBlackListedEntities().contains(effectiveMetaClass.getName())) {
+                return false;
+            }
         }
         Collection<Object> ownPropsNamesList = CollectionUtils.collect(effectiveMetaClass.getOwnProperties(), new Transformer() {
             @Override
@@ -224,6 +209,7 @@ public class ReportingWizardBean implements ReportingWizardApi {
                 return ((MetaProperty) input).getName();
             }
         });
+
         ownPropsNamesList.removeAll(IGNORED_ENTITY_PROPERTIES);
         if (ownPropsNamesList.isEmpty()) {
             return false;
@@ -261,6 +247,15 @@ public class ReportingWizardBean implements ReportingWizardApi {
         String entitiesBlackList = AppBeans.get(Configuration.class).getConfig(ReportingConfig.class).getWizardEntitiesBlackList();
         if (StringUtils.isNotBlank(entitiesBlackList)) {
             return Arrays.asList(StringUtils.split(entitiesBlackList, ','));
+        }
+
+        return Collections.emptyList();
+    }
+
+    protected List<String> getWizardWhiteListedEntities() {
+        String entitiesWhiteList = AppBeans.get(Configuration.class).getConfig(ReportingConfig.class).getWizardEntitiesWhiteList();
+        if (StringUtils.isNotBlank(entitiesWhiteList)) {
+            return Arrays.asList(StringUtils.split(entitiesWhiteList, ','));
         }
 
         return Collections.emptyList();
