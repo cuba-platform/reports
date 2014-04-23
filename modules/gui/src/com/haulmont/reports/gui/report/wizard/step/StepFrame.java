@@ -177,7 +177,7 @@ public class StepFrame {
 
     protected String getDefaultRequiredMessage(String name) {
         Messages messages = AppBeans.get(Messages.NAME);
-        return mainWizardFrame.formatMessage(messages.getMainMessagePack(),
+                return messages.formatMessage(messages.getMainMessagePack(),
                 "validation.required.defaultMsg", name);
     }
 }
