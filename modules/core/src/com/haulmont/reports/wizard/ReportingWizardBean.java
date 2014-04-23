@@ -238,6 +238,9 @@ public class ReportingWizardBean implements ReportingWizardApi {
         if (getWizardBlackListedProperties().contains(metaClass.getName() + "." + metaProperty.getName())) {
             return false;
         }
+        if (getWizardBlackListedProperties().isEmpty() && IGNORED_ENTITY_PROPERTIES.contains(metaProperty.getName())) {
+            return false;
+        }
         return true;
     }
 
