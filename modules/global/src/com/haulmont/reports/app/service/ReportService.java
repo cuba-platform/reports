@@ -4,10 +4,15 @@
  */
 package com.haulmont.reports.app.service;
 
+import com.haulmont.chile.core.model.MetaClass;
+import com.haulmont.chile.core.model.MetaProperty;
 import com.haulmont.cuba.core.entity.FileDescriptor;
 import com.haulmont.cuba.core.global.FileStorageException;
 import com.haulmont.reports.entity.Report;
 import com.haulmont.reports.entity.ReportTemplate;
+import com.haulmont.reports.entity.wizard.ReportData;
+import com.haulmont.reports.entity.wizard.TemplateFileType;
+import com.haulmont.reports.exception.TemplateGenerationException;
 import com.haulmont.yarg.reporting.ReportOutputDocument;
 
 import java.io.IOException;
@@ -43,7 +48,7 @@ public interface ReportService {
                                        Map<String, Object> params, String fileName) throws IOException;
 
     /**
-     * Exports all reports and their templates into one zip archive. Each report is exported into a separete zip
+     * Exports all reports and their templates into one zip archive. Each report is exported into a separate zip
      * archive with 2 files (report.xml and a template file (for example MyReport.doc)).
      * For example:
      * return byte[] (bytes of zip arhive)
@@ -79,4 +84,5 @@ public interface ReportService {
     Report copyReport(Report source);
 
     ReportOutputDocument bulkPrint(Report report, List<Map<String, Object>> paramsList);
+
 }

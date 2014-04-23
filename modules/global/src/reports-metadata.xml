@@ -12,6 +12,10 @@
         <class>com.haulmont.reports.entity.ReportInputParameter</class>
         <class>com.haulmont.reports.entity.ReportScreen</class>
         <class>com.haulmont.reports.entity.ReportValueFormat</class>
+        <class>com.haulmont.reports.entity.wizard.ReportData</class>
+        <class>com.haulmont.reports.entity.wizard.ReportRegion</class>
+        <class>com.haulmont.reports.entity.wizard.RegionProperty</class>
+        <class>com.haulmont.reports.entity.wizard.EntityTreeNode</class>
     </metadata-model>
 
 </metadata>

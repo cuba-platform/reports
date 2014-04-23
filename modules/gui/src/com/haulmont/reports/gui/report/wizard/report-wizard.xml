@@ -1,0 +1,52 @@
+<!--
+  ~ Copyright (c) 2008-2014 Haulmont. All rights reserved.
+  ~ Use is subject to license terms, see http://www.cuba-platform.com/license for details.
+  -->
+
+<window
+        xmlns="http://schemas.haulmont.com/cuba/5.2/window.xsd"
+        class="com.haulmont.reports.gui.report.wizard.ReportWizardCreator"
+        messagesPack="com.haulmont.reports.gui.report.wizard"
+        datasource="reportDataDs">
+    <dsContext>
+        <datasource
+                id="reportDataDs"
+                class="com.haulmont.reports.entity.wizard.ReportData"
+                datasourceClass="com.haulmont.reports.gui.datasource.NotPersistenceDatasource"
+                view="wizardReportData.edit">
+            <collectionDatasource id="reportRegionsDs"
+                                  property="reportRegions">
+                <collectionDatasource id="regionPropertiesDs"
+                                      property="regionProperties"/>
+            </collectionDatasource>
+
+        </datasource>
+        <collectionDatasource id="groupsDs" class="com.haulmont.reports.entity.ReportGroup" view="_local">
+            <query>
+                <![CDATA[ select rg from report$ReportGroup rg order by rg.createTs asc ]]>
+            </query>
+        </collectionDatasource>
+    </dsContext>
+
+    <layout spacing="true">
+        <vbox>
+            <iframe src="/com/haulmont/reports/gui/report/wizard/step/first-details-frame.xml" id="detailsStep"
+                    width="100%"
+                    visible="false"/>
+            <iframe src="/com/haulmont/reports/gui/report/wizard/step/intermediate-regions-frame.xml" id="regionsStep"
+                    width="100%"
+                    visible="false"/>
+            <iframe src="/com/haulmont/reports/gui/report/wizard/step/last-save-frame.xml" id="saveStep"
+                    width="100%"
+                    visible="false"/>
+            <hbox id="navBtns" align="TOP_CENTER" margin="true">
+                <buttonsPanel>
+                    <button id="bwd" caption="msg://backward"/>
+                    <button id="run" caption="msg://runReport" visible="false"/>
+                    <button id="fwd" caption="msg://forward"/>
+                    <button id="save" caption="msg://save" visible="false"/>
+                </buttonsPanel>
+            </hbox>
+        </vbox>
+    </layout>
+</window>

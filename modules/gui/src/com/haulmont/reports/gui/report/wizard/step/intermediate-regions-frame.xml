@@ -1,0 +1,28 @@
+<!--
+  ~ Copyright (c) 2008-2014 Haulmont. All rights reserved.
+  ~ Use is subject to license terms, see http://www.cuba-platform.com/license for details.
+  -->
+
+<window xmlns="http://schemas.haulmont.com/cuba/5.2/window.xsd">
+    <!--<layout expand="regions">-->
+    <layout>
+        <hbox margin="true">
+            <!--btn visibility will be switched dynamically:-->
+            <button id="addRegionDisabledBtn" caption="msg://addRegion" visible="true" enable="false"/>
+            <button id="addTabulatedRegionDisabledBtn" caption="msg://tabulatedRegion" visible="true" enable="false"/>
+            <button id="addSimpleRegionBtn" caption="msg://simpleRegion" visible="false"/>
+            <button id="addTabulatedRegionBtn" caption="msg://tabulatedRegion" visible="false"/>
+            <popupButton id="addRegionPopupBtn" caption="msg://add" visible="false"/>
+        </hbox>
+        <vbox margin="true">
+            <table id="regionsTable" multiselect="false" sortable="false" reorderingAllowed="false"
+                   columnControlVisible="false"
+                   height="300px" width="100%">
+                <columns>
+                    <column id="regionsGeneratedColumn" caption="msg://reportRegionsColumn"/>
+                </columns>
+                <rows datasource="reportRegionsDs"/>
+            </table>
+        </vbox>
+    </layout>
+</window>

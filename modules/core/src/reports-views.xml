@@ -38,4 +38,13 @@
     <view entity="report$Report" name="report.view" extends="_local">
         <property name="group" view="_local"/>
     </view>
+
+    <view entity="report$WizardReportRegion" name="wizardReportRegion.edit" extends="_local">
+        <property name="regionProperties" view="_local"/>
+    </view>
+
+    <view entity="report$WizardReportData" name="wizardReportData.edit" extends="_local">
+        <property name="reportRegions" view="wizardReportRegion.edit"/>
+    </view>
+
 </views>

@@ -5,6 +5,8 @@
 
 package com.haulmont.reports;
 
+import com.haulmont.chile.core.model.MetaClass;
+import com.haulmont.chile.core.model.MetaProperty;
 import com.haulmont.chile.core.model.utils.InstanceUtils;
 import com.haulmont.cuba.core.EntityManager;
 import com.haulmont.cuba.core.Persistence;
@@ -13,12 +15,16 @@ import com.haulmont.cuba.core.Transaction;
 import com.haulmont.cuba.core.app.FileStorageAPI;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.entity.FileDescriptor;
+import com.haulmont.cuba.core.entity.annotation.SystemLevel;
 import com.haulmont.cuba.core.global.*;
 import com.haulmont.reports.app.ParameterPrototype;
 import com.haulmont.reports.entity.*;
+import com.haulmont.reports.entity.wizard.*;
 import com.haulmont.reports.exception.FailedToConnectToOpenOfficeException;
 import com.haulmont.reports.exception.FailedToLoadTemplateClassException;
 import com.haulmont.reports.exception.ReportingException;
+import com.haulmont.reports.exception.TemplateGenerationException;
+import com.haulmont.reports.wizard.template.TemplateGeneratorApi;
 import com.haulmont.yarg.exception.OpenOfficeException;
 import com.haulmont.yarg.exception.UnsupportedFormatException;
 import com.haulmont.yarg.formatters.CustomReport;
@@ -26,11 +32,12 @@ import com.haulmont.yarg.reporting.ReportOutputDocument;
 import com.haulmont.yarg.reporting.ReportOutputDocumentImpl;
 import com.haulmont.yarg.reporting.ReportingAPI;
 import com.haulmont.yarg.reporting.RunParams;
-import com.haulmont.yarg.structure.ReportOutputType;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.basic.DateConverter;
 import com.thoughtworks.xstream.converters.collections.CollectionConverter;
 import com.thoughtworks.xstream.converters.reflection.ExternalizableConverter;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.Transformer;
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
@@ -39,6 +46,7 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 
 import javax.annotation.ManagedBean;
 import javax.inject.Inject;
+import javax.persistence.Embeddable;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.*;
@@ -51,32 +59,59 @@ import java.util.zip.CRC32;
 @ManagedBean(ReportingApi.NAME)
 public class ReportingBean implements ReportingApi {
     public static final String REPORT_EDIT_VIEW_NAME = "report.edit";
-
     protected PrototypesLoader prototypesLoader = new PrototypesLoader();
-
     @Inject
     protected Persistence persistence;
-
     @Inject
     protected Metadata metadata;
-
     @Inject
     protected FileStorageAPI fileStorageAPI;
-
     @Inject
     protected TimeSource timeSource;
-
     @Inject
     protected ReportingAPI reportingApi;
-
     @Inject
     protected Scripting scripting;
-
     @Inject
     protected ReportImportExportAPI reportImportExport;
-
     @Inject
     protected UuidSource uuidSource;
+
+    private static XStream createXStream() {
+        XStream xStream = new XStream();
+        xStream.getConverterRegistry().removeConverter(ExternalizableConverter.class);
+        xStream.registerConverter(new CollectionConverter(xStream.getMapper()) {
+            @Override
+            public boolean canConvert(Class type) {
+                return ArrayList.class.isAssignableFrom(type) ||
+                        HashSet.class.isAssignableFrom(type) ||
+                        LinkedList.class.isAssignableFrom(type) ||
+                        LinkedHashSet.class.isAssignableFrom(type);
+
+            }
+        }, XStream.PRIORITY_VERY_HIGH);
+
+        xStream.registerConverter(new DateConverter() {
+            @Override
+            public boolean canConvert(Class type) {
+                return Date.class.isAssignableFrom(type);
+            }
+        });
+
+        xStream.alias("report", Report.class);
+        xStream.alias("band", BandDefinition.class);
+        xStream.alias("dataSet", DataSet.class);
+        xStream.alias("parameter", ReportInputParameter.class);
+        xStream.alias("template", ReportTemplate.class);
+        xStream.alias("screen", ReportScreen.class);
+        xStream.alias("format", ReportValueFormat.class);
+        xStream.aliasSystemAttribute(null, "class");
+        xStream.omitField(ReportTemplate.class, "content");
+        xStream.omitField(ReportInputParameter.class, "localeName");
+        xStream.omitField(Report.class, "xml");
+
+        return xStream;
+    }
 
     @Override
     public ReportOutputDocument createReport(Report report, Map<String, Object> params) throws IOException {
@@ -129,7 +164,7 @@ public class ReportingBean implements ReportingApi {
             zipOutputStream.close();
 
             ReportOutputDocument reportOutputDocument =
-                    new ReportOutputDocumentImpl(report, byteArrayOutputStream.toByteArray(), "Reports.zip", ReportOutputType.custom);
+                    new ReportOutputDocumentImpl(report, byteArrayOutputStream.toByteArray(), "Reports.zip", com.haulmont.yarg.structure.ReportOutputType.custom);
             return reportOutputDocument;
         } catch (IOException e) {
             throw new ReportingException("An error occurred while zipping report contents", e);
@@ -242,7 +277,7 @@ public class ReportingBean implements ReportingApi {
         return copiedReport;
     }
 
-    protected String generateReportName(String sourceName, int iteration) {
+    public String generateReportName(String sourceName, int iteration) {
         EntityManager em = persistence.getEntityManager();
         String reportName = String.format("%s (%s)", sourceName, iteration);
         Query q = em.createQuery("select r from report$Report r where r.name = :name");
@@ -330,44 +365,33 @@ public class ReportingBean implements ReportingApi {
         return (Report) xStream.fromXML(xml);
     }
 
-    private static XStream createXStream() {
-        XStream xStream = new XStream();
-        xStream.getConverterRegistry().removeConverter(ExternalizableConverter.class);
-        xStream.registerConverter(new CollectionConverter(xStream.getMapper()) {
-            @Override
-            public boolean canConvert(Class type) {
-                return ArrayList.class.isAssignableFrom(type) ||
-                        HashSet.class.isAssignableFrom(type) ||
-                        LinkedList.class.isAssignableFrom(type) ||
-                        LinkedHashSet.class.isAssignableFrom(type);
-
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T extends Entity> T reloadEntity(T entity, View view) {
+        if (entity instanceof Report && ((Report) entity).getIsTmp()) {
+            return entity;
+        }
+        Transaction tx = persistence.createTransaction();
+        try {
+            EntityManager em = persistence.getEntityManager();
+            em.setView(view);
+            entity = (T) em.find(entity.getClass(), entity.getId());
+            if (entity != null) {
+                em.setView(null);
+                em.fetch(entity, view);
             }
-        }, XStream.PRIORITY_VERY_HIGH);
-
-        xStream.registerConverter(new DateConverter() {
-            @Override
-            public boolean canConvert(Class type) {
-                return Date.class.isAssignableFrom(type);
-            }
-        });
-
-        xStream.alias("report", Report.class);
-        xStream.alias("band", BandDefinition.class);
-        xStream.alias("dataSet", DataSet.class);
-        xStream.alias("parameter", ReportInputParameter.class);
-        xStream.alias("template", ReportTemplate.class);
-        xStream.alias("screen", ReportScreen.class);
-        xStream.alias("format", ReportValueFormat.class);
-        xStream.aliasSystemAttribute(null, "class");
-        xStream.omitField(ReportTemplate.class, "content");
-        xStream.omitField(ReportInputParameter.class, "localeName");
-        xStream.omitField(Report.class, "xml");
-
-        return xStream;
+            tx.commit();
+            return entity;
+        } finally {
+            tx.end();
+        }
     }
 
     @SuppressWarnings("unchecked")
     protected <T extends Entity> T reloadEntity(T entity, String viewName) {
+        if (entity instanceof Report && ((Report) entity).getIsTmp()) {
+            return entity;
+        }
         Transaction tx = persistence.createTransaction();
         try {
             EntityManager em = persistence.getEntityManager();

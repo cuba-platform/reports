@@ -18,6 +18,7 @@
         <property name="remoteServices">
             <map>
                 <entry key="report_ReportService" value="com.haulmont.reports.app.service.ReportService"/>
+                <entry key="report_ReportWizardService" value="com.haulmont.reports.app.service.ReportWizardService"/>
             </map>
         </property>
     </bean>

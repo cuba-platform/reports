@@ -8,6 +8,8 @@ import com.haulmont.chile.core.annotations.Composition;
 import com.haulmont.chile.core.annotations.MetaProperty;
 import com.haulmont.chile.core.annotations.NamePattern;
 import com.haulmont.cuba.core.entity.annotation.Listeners;
+import com.haulmont.cuba.core.entity.annotation.OnDelete;
+import com.haulmont.cuba.core.global.DeletePolicy;
 import com.haulmont.cuba.security.entity.Role;
 import com.haulmont.yarg.structure.ReportBand;
 import com.haulmont.yarg.structure.ReportFieldFormat;
@@ -31,61 +33,57 @@ import java.util.*;
 @SuppressWarnings("unused")
 public class Report extends BaseReportEntity implements com.haulmont.yarg.structure.Report {
     private static final long serialVersionUID = -2817764915661205093L;
-
     @Column(name = "NAME")
     protected String name;
-
     @Column(name = "LOCALE_NAMES")
     protected String localeNames;
-
     @Column(name = "CODE")
     protected String code;
-
     @ManyToOne
     @JoinColumn(name = "GROUP_ID")
     protected ReportGroup group;
-
     @OneToOne
     @JoinColumn(name = "DEFAULT_TEMPLATE_ID")
     protected ReportTemplate defaultTemplate;
-
     @Column(name = "REPORT_TYPE")
     protected Integer reportType;
-
     @Column(name = "XML")
     protected String xml;
-
+    //@Column(name = "IS_TMP")
+    @Transient
+    protected Boolean isTmp = Boolean.FALSE;
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "report")
     @Composition
     protected List<ReportTemplate> templates;
-
     @Transient
     protected String localeName;
-
     @Transient
     protected BandDefinition rootBandDefinition;
-
     @Transient
     @MetaProperty
     protected Set<BandDefinition> bands = new HashSet<>();
-
     @Transient
     @MetaProperty
     @Composition
     protected List<ReportInputParameter> inputParameters = new ArrayList<>();
-
     @Transient
     @MetaProperty
     @Composition
     protected List<ReportValueFormat> valuesFormats = new ArrayList<>();
-
     @Transient
     @MetaProperty
     protected List<ReportScreen> reportScreens = new ArrayList<>();
-
     @Transient
     @MetaProperty
     protected Set<Role> roles = new HashSet<>();
+
+    public Boolean getIsTmp() {
+        return isTmp;
+    }
+
+    public void setIsTmp(Boolean isTmp) {
+        this.isTmp = isTmp;
+    }
 
     @MetaProperty
     public BandDefinition getRootBandDefinition() {
@@ -233,7 +231,6 @@ public class Report extends BaseReportEntity implements com.haulmont.yarg.struct
         }
         return localeName;
     }
-
 
     @Override
     public Map<String, com.haulmont.yarg.structure.ReportTemplate> getReportTemplates() {

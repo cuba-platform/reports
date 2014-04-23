@@ -8,9 +8,8 @@ package com.haulmont.reports.libintegration;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.reports.app.EntityMap;
 import com.haulmont.reports.entity.DataSet;
-import com.haulmont.yarg.loaders.ReportDataLoader;
-import com.haulmont.yarg.structure.ReportQuery;
 import com.haulmont.yarg.structure.BandData;
+import com.haulmont.yarg.structure.ReportQuery;
 
 import java.util.Collections;
 import java.util.List;
@@ -20,7 +19,7 @@ import java.util.Map;
  * @author degtyarjov
  * @version $Id$
  */
-public class SingleEntityDataLoader implements ReportDataLoader {
+public class SingleEntityDataLoader extends AbstractEntityDataLoader {
 
     public static final String DEFAULT_ENTITY_PARAM_NAME = "entity";
 
@@ -38,8 +37,12 @@ public class SingleEntityDataLoader implements ReportDataLoader {
 
         if (entity == null) {
             throw new IllegalStateException("Input parameters don't contain 'entity' param");
+        } else {
+            entity = reloadEntityByDataSetView(dataSet, entity);
         }
 
         return Collections.singletonList((Map<String, Object>) new EntityMap((Entity) entity));
     }
+
+
 }

@@ -8,9 +8,9 @@ package com.haulmont.reports.libintegration;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.reports.app.EntityMap;
 import com.haulmont.reports.entity.DataSet;
-import com.haulmont.yarg.loaders.ReportDataLoader;
-import com.haulmont.yarg.structure.ReportQuery;
 import com.haulmont.yarg.structure.BandData;
+import com.haulmont.yarg.structure.ReportQuery;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -21,7 +21,7 @@ import java.util.Map;
  * @author degtyarjov
  * @version $Id$
  */
-public class MultiEntityDataLoader implements ReportDataLoader {
+public class MultiEntityDataLoader extends AbstractEntityDataLoader {
 
     public static final String DEFAULT_LIST_ENTITIES_PARAM_NAME = "entities";
 
@@ -33,9 +33,14 @@ public class MultiEntityDataLoader implements ReportDataLoader {
 
         if (params.containsKey(paramName)) {
             entities = params.get(paramName);
+        } else if (paramName.contains("#") && params.containsKey(StringUtils.substringBefore(paramName, "#"))) {  //TODO move sharp to constant
+            Entity entity = (Entity) params.get(StringUtils.substringBefore(paramName, "#"));
+            entity = reloadEntityByDataSetView(dataSet, entity);
+            entities = entity.getValueEx(StringUtils.substringAfter(paramName, "#"));
         } else {
             entities = params.get(DEFAULT_LIST_ENTITIES_PARAM_NAME);
         }
+
 
         if (entities == null || !(entities instanceof Collection)) {
             throw new IllegalStateException(
@@ -44,6 +49,10 @@ public class MultiEntityDataLoader implements ReportDataLoader {
         Collection<Entity> entitiesList = (Collection) entities;
         List<Map<String, Object>> resultList = new ArrayList<>();
         for (Entity entity : entitiesList) {
+            if (!paramName.contains("#")) {
+                entity = reloadEntityByDataSetView(dataSet, entity);
+            }
+
             resultList.add(new EntityMap(entity));
         }
         return resultList;

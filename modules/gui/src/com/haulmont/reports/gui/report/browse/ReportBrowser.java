@@ -13,6 +13,7 @@ import com.haulmont.cuba.gui.app.core.file.FileUploadDialog;
 import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.components.actions.CreateAction;
 import com.haulmont.cuba.gui.components.actions.ItemTrackingAction;
+import com.haulmont.cuba.gui.data.CollectionDatasource;
 import com.haulmont.cuba.gui.data.Datasource;
 import com.haulmont.cuba.gui.export.ByteArrayDataProvider;
 import com.haulmont.cuba.gui.export.ExportDisplay;
@@ -23,6 +24,7 @@ import com.haulmont.cuba.security.entity.User;
 import com.haulmont.cuba.security.global.UserSession;
 import com.haulmont.reports.app.service.ReportService;
 import com.haulmont.reports.entity.Report;
+import com.haulmont.reports.entity.wizard.ReportData;
 import com.haulmont.reports.gui.ReportGuiManager;
 import org.apache.commons.io.FileUtils;
 
@@ -32,6 +34,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * @author degtyarjov
@@ -41,33 +44,30 @@ public class ReportBrowser extends AbstractLookup {
 
     @Inject
     protected ReportGuiManager reportGuiManager;
-
     @Inject
     protected FileUploadingAPI fileUpload;
-
     @Inject
     protected ReportService reportService;
-
     @Inject
     protected Button runReport;
-
     @Named("import")
     protected Button importReport;
-
     @Named("export")
     protected Button exportReport;
-
     @Named("copy")
     protected Button copyReport;
-
+    /*@Named("wizard")
+    protected Button wizardReport;*/
     @Named("table")
     protected GroupTable reportsTable;
-
     @Inject
     protected UserSession userSession;
-
     @Inject
     protected Metadata metadata;
+    @Inject
+    protected PopupButton popupCreateBtn;
+    @Inject
+    protected CollectionDatasource<Report, UUID> reportDs;
 
     @Override
     public void init(Map<String, Object> params) {
@@ -178,5 +178,46 @@ public class ReportBrowser extends AbstractLookup {
                 reportsTable.expandPath(entity);
             }
         });
+
+        if (hasPermissionsToCreateReports) {
+            popupCreateBtn.addAction(new AbstractAction("table.Create") {
+
+                @Override
+                public void actionPerform(Component component) {
+                    openEditor("report$Report.edit", metadata.create(Report.class), WindowManager.OpenType.THIS_TAB, reportsTable.getDatasource());
+                }
+
+                @Override
+                public String getCaption() {
+                    return getMessage("actions.Create");
+                }
+            });
+            popupCreateBtn.addAction(new AbstractAction("wizard") {
+                AbstractEditor<ReportData> editor;
+
+                @Override
+                public void actionPerform(Component component) {
+                    editor = openEditor("report$Report.wizard", metadata.create(ReportData.class), WindowManager.OpenType.DIALOG, reportsTable.getDatasource());
+                    editor.addListener(new CloseListener() {
+                        @Override
+                        public void windowClosed(String actionId) {
+                            if (actionId.equals(COMMIT_ACTION_ID)){
+                                reportsTable.requestFocus();
+                                reportsTable.refresh();
+                                if (editor.getItem() != null && editor.getItem().getGeneratedReport() != null /*&& reportDs.getItems() != null && !reportDs.getItems().isEmpty()*/) {
+                                    reportsTable.setSelected(editor.getItem().getGeneratedReport());
+                                    openEditor("report$Report.edit", editor.getItem().getGeneratedReport(), WindowManager.OpenType.THIS_TAB, reportsTable.getDatasource());
+                                }
+                            }
+                        }
+                    });
+                }
+
+                @Override
+                public String getCaption() {
+                    return getMessage("report.wizard");
+                }
+            });
+        }
     }
 }

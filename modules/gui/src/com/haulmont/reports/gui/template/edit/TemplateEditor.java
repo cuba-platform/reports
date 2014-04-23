@@ -29,8 +29,6 @@ import java.util.Map;
  * @version $Id$
  */
 public class TemplateEditor extends AbstractEditor<ReportTemplate> {
-    protected static final String DEFAULT_TEMPLATE_CODE = "DEFAULT";
-
     @Inject
     protected Button templatePath;
 
@@ -59,7 +57,7 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
             Report report = template.getReport();
             if (report != null) {
                 if ((report.getTemplates() == null) || (report.getTemplates().size() == 0)) {
-                    template.setCode(DEFAULT_TEMPLATE_CODE);
+                    template.setCode(ReportTemplate.DEFAULT_TEMPLATE_CODE);
                 } else
                     template.setCode("Template_" + Integer.toString(report.getTemplates().size()));
             }

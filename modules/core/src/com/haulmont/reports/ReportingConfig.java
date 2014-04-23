@@ -69,4 +69,14 @@ public interface ReportingConfig extends Config {
     @Property("cuba.reporting.parameterPrototype.queryLimit")
     @DefaultInteger(1000)
     Integer getParameterPrototypeQueryLimit();
+
+    @Property("cuba.reporting.wizardEntitiesBlackList")
+    @DefaultString("")
+    String getWizardEntitiesBlackList();
+    void setWizardEntitiesBlackList(String wizardEntitiesBlackList);
+
+    @Property("cuba.reporting.wizardPropertiesBlackList")
+    @DefaultString("")
+    String getWizardPropertiesBlackList();
+    void setWizardPropertiesBlackList(String wizardPropertiesBlackList);
 }

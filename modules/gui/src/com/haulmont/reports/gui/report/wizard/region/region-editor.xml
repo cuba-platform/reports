@@ -1,0 +1,56 @@
+<!--
+  ~ Copyright (c) 2008-2014 Haulmont. All rights reserved.
+  ~ Use is subject to license terms, see http://www.cuba-platform.com/license for details.
+  -->
+
+<window
+        xmlns="http://schemas.haulmont.com/cuba/5.2/window.xsd"
+        class="com.haulmont.reports.gui.report.wizard.region.RegionEditor"
+        messagesPack="com.haulmont.reports.gui.report.wizard"
+        caption="msg://regionEditor"
+        datasource="reportRegionDs">
+    <companions>
+        <web class="com.haulmont.reports.web.report.wizard.region.WebRegionEditorCompanion"/>
+    </companions>
+
+    <dsContext>
+        <datasource id="reportRegionDs" class="com.haulmont.reports.entity.wizard.ReportRegion"
+                    view="wizardReportRegion.edit"
+                >
+            <!--<datasourceClass="com.haulmont.reports.gui.datasource.NotPersistenceDatasource">-->
+            <collectionDatasource id="reportRegionPropertiesTableDs" property="regionProperties"/>
+        </datasource>
+    </dsContext>
+
+    <layout expand="mainContent" spacing="true">
+        <hbox id="mainContent" width="100%" expand="treePanel">
+            <vbox id="treePanel">
+                <groupBox>
+                    <iframe id="entityTreeFrame"
+                            src="/com/haulmont/reports/gui/report/wizard/region/entity-tree-frame.xml"
+                            width="100%"/>
+                </groupBox>
+            </vbox>
+            <vbox id="btnsControlPanel" margin="true" spacing="true" width="AUTO">
+                <button id="addItem" caption="" icon="icons/right_arrow_17x25.png"
+                        width="30px"/>
+                <button id="removeItem" caption="" icon="icons/close_17x25.png" width="30px"/>
+                <button id="upItem" caption="" enable="false" icon="icons/up_17x25.png" width="30px"/>
+                <button id="downItem" caption="" enable="false" icon="icons/down_17x25.png" width="30px"/>
+            </vbox>
+            <vbox id="selectedTreeItemsPanel" width="507px">
+                <groupBox>
+                    <table id="propertiesTable" multiselect="true" sortable="false" reorderingAllowed="false"
+                           columnControlVisible="false"
+                           width="100%" height="500px">
+                        <columns>
+                            <column id="hierarchicalLocalizedName" caption="msg://properties" width="507px"/>
+                        </columns>
+                        <rows datasource="reportRegionPropertiesTableDs"/>
+                    </table>
+                </groupBox>
+            </vbox>
+        </hbox>
+        <iframe id="windowActions" screen="editWindowActions"/>
+    </layout>
+</window>

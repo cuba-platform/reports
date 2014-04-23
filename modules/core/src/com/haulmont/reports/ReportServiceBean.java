@@ -83,6 +83,7 @@ public class ReportServiceBean implements ReportService {
         return reportingApi.copyReport(source);
     }
 
+    @Override
     public ReportOutputDocument bulkPrint(Report report, List<Map<String, Object>> paramsList) {
         return reportingApi.bulkPrint(report, paramsList);
     }

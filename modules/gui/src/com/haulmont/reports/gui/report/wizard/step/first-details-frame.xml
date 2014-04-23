@@ -1,0 +1,35 @@
+<!--
+  ~ Copyright (c) 2008-2013 Haulmont. All rights reserved.
+  ~ Use is subject to license terms, see http://www.cuba-platform.com/license for details.
+  -->
+
+<window xmlns="http://schemas.haulmont.com/cuba/5.2/window.xsd">
+    <layout expand="props" width="100%">
+        <vbox id="props">
+            <grid margin="true" spacing="true" width="100%">
+                <columns>
+                    <column flex="0"/>
+                    <column flex="1"/>
+                </columns>
+                <rows>
+                    <row>
+                        <label value="msg://entity"/>
+                        <lookupField id="entity" required="true" width="100%"/>
+                    </row>
+                    <row>
+                        <label value="msg://templateFileFormat"/>
+                        <lookupField id="templateFileFormat" required="true" width="100%"/>
+                    </row>
+                    <row>
+                        <label value= "msg://reportName"/>
+                        <textField id="reportName" required="true" width="100%"/>
+                    </row>
+                    <row>
+                        <label value="msg://reportBuildType"/>
+                        <optionsGroup id="isListed" multiselect="false" orientation="vertical"/>
+                    </row>
+                </rows>
+            </grid>
+        </vbox>
+    </layout>
+</window>

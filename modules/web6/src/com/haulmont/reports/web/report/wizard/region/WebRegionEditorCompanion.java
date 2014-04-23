@@ -1,0 +1,54 @@
+/*
+ * Copyright (c) 2008-2014 Haulmont. All rights reserved.
+ * Use is subject to license terms, see http://www.cuba-platform.com/license for details.
+ */
+
+package com.haulmont.reports.web.report.wizard.region;
+
+import com.haulmont.cuba.core.global.AppBeans;
+import com.haulmont.cuba.core.global.Metadata;
+import com.haulmont.cuba.gui.components.Tree;
+import com.haulmont.cuba.gui.data.CollectionDatasource;
+import com.haulmont.cuba.web.gui.components.WebComponentsHelper;
+import com.haulmont.cuba.web.gui.data.ItemWrapper;
+import com.haulmont.reports.entity.wizard.EntityTreeNode;
+import com.haulmont.reports.entity.wizard.RegionProperty;
+import com.haulmont.reports.gui.report.wizard.region.RegionEditor;
+import com.vaadin.event.ItemClickEvent;
+import org.springframework.cglib.core.CollectionUtils;
+import org.springframework.cglib.core.Transformer;
+
+/**
+ * @author fedorchenko
+ * @version $Id$
+ */
+public class WebRegionEditorCompanion implements RegionEditor.Companion {
+    @Override
+    public void addTreeTableDblClickListener(final Tree entityTree, final CollectionDatasource reportRegionPropertiesTableDs) {
+        final com.haulmont.cuba.web.toolkit.ui.Tree webTree = (com.haulmont.cuba.web.toolkit.ui.Tree) WebComponentsHelper.unwrap(entityTree);
+        webTree.setDoubleClickMode(true);
+        webTree.addListener(new ItemClickEvent.ItemClickListener() {
+            @Override
+            public void itemClick(ItemClickEvent event) {
+                if (event.isDoubleClick()) {
+                    if (event.getItem() instanceof ItemWrapper && ((ItemWrapper) event.getItem()).getItem() instanceof EntityTreeNode) {
+                        EntityTreeNode entityTreeNode = (EntityTreeNode) ((ItemWrapper) event.getItem()).getItem();
+                        if (CollectionUtils.transform(reportRegionPropertiesTableDs.getItems(), new Transformer() {
+                            @Override
+                            public Object transform(Object o) {
+                                return ((RegionProperty) o).getEntityTreeNode();
+                            }
+                        }).contains(entityTreeNode)) {
+                            return;
+                        }
+                        Metadata metadata = AppBeans.get(Metadata.NAME);
+                        RegionProperty regionProperty = metadata.create(RegionProperty.class);
+                        regionProperty.setEntityTreeNode(entityTreeNode);
+                        regionProperty.setOrderNum((long) reportRegionPropertiesTableDs.getItemIds().size() + 1); //first element must be not zero cause later we do sorting by multiplying that values
+                        reportRegionPropertiesTableDs.addItem(regionProperty);
+                    }
+                }
+            }
+        });
+    }
+}

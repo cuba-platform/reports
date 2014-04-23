@@ -26,6 +26,7 @@ import java.io.InputStream;
 @NamePattern("#getCaption|code,name,customClass")
 @SuppressWarnings("unused")
 public class ReportTemplate extends BaseReportEntity implements com.haulmont.yarg.structure.ReportTemplate {
+    public static final String DEFAULT_TEMPLATE_CODE = "DEFAULT";
 
     private static final long serialVersionUID = 3692751073234357754L;
 
