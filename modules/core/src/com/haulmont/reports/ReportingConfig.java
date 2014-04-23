@@ -85,7 +85,7 @@ public interface ReportingConfig extends Config {
      * Note that if <b>'cuba.reporting.wizardEntitiesBlackList'<b/> is not null, this list will be used anyway
      * @return list of entities that available for reportWizard
      */
-    @Property("cuba.reporting.wizardEntitiesBlackList")
+    @Property("cuba.reporting.wizardEntitiesWhiteList")
     @DefaultString("")
     String getWizardEntitiesWhiteList();
     void setWizardEntitiesWhiteList(String wizardEntitiesWhiteList);
