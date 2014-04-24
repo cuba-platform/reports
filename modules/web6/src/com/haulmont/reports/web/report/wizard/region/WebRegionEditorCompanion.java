@@ -30,9 +30,12 @@ public class WebRegionEditorCompanion implements RegionEditor.Companion {
         webTree.addListener(new ItemClickEvent.ItemClickListener() {
             @Override
             public void itemClick(ItemClickEvent event) {
-                if (event.isDoubleClick()) {
+                if (event.isDoubleClick()) { //always false here (
                     if (event.getItem() instanceof ItemWrapper && ((ItemWrapper) event.getItem()).getItem() instanceof EntityTreeNode) {
                         EntityTreeNode entityTreeNode = (EntityTreeNode) ((ItemWrapper) event.getItem()).getItem();
+                        if (entityTreeNode.getWrappedMetaClass() != null) {
+                            return;
+                        }
                         if (CollectionUtils.transform(reportRegionPropertiesTableDs.getItems(), new Transformer() {
                             @Override
                             public Object transform(Object o) {

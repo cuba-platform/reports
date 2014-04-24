@@ -32,6 +32,9 @@ public class WebRegionEditorCompanion implements RegionEditor.Companion {
                 if (event.isDoubleClick()) {
                     if (event.getItem() instanceof ItemWrapper && ((ItemWrapper) event.getItem()).getItem() instanceof EntityTreeNode) {
                         EntityTreeNode entityTreeNode = (EntityTreeNode) ((ItemWrapper) event.getItem()).getItem();
+                        if (entityTreeNode.getWrappedMetaClass() != null) {
+                            return;
+                        }
                         if (CollectionUtils.transform(reportRegionPropertiesTableDs.getItems(), new Transformer() {
                             @Override
                             public Object transform(Object o) {
