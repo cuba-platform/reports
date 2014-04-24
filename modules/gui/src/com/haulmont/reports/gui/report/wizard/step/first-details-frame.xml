@@ -22,7 +22,7 @@
                     </row>
                     <row>
                         <label value= "msg://reportName"/>
-                        <textField id="reportName" required="true" width="100%"/>
+                        <textField id="reportName" required="true" width="100%" maxLength="255"/>
                     </row>
                     <row>
                         <label value="msg://reportBuildType"/>
