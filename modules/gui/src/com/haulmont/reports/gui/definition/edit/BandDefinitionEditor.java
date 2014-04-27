@@ -312,7 +312,7 @@ public class BandDefinitionEditor extends AbstractEditor<BandDefinition> impleme
 
 
                         if (reportRegion != null) {
-                            if (reportRegion.getRegionPropertiesRootNode() == null){
+                            if (reportRegion.getRegionPropertiesRootNode() == null) {
                                 showNotification(getMessage("dataSet.entityAliasInvalid"), NotificationType.TRAY);
                                 //without that root node region editor form will not initialized correctly and became empty. just return
                                 return;
@@ -344,7 +344,6 @@ public class BandDefinitionEditor extends AbstractEditor<BandDefinition> impleme
 
         //Detect metaclass by an alias and parameter
         protected MetaClass findMetaClassByAlias(DataSet dataSet) {
-
             MetaClass byAliasMetaClass;
             String dataSetAlias = null;
             switch (dataSet.getType()) {
@@ -378,25 +377,29 @@ public class BandDefinitionEditor extends AbstractEditor<BandDefinition> impleme
         }
 
         protected ReportRegion dataSetToReportRegion(DataSet dataSet, EntityTree entityTree) {
-            boolean isTabulated;
+            boolean isTabulatedRegion;
             View view = null;
             String collectionPropertyName;
             switch (dataSet.getType()) {
                 case SINGLE:
-                    isTabulated = false;
+                    isTabulatedRegion = false;
                     view = dataSet.getView();
                     collectionPropertyName = null;
                     break;
                 case MULTI:
-                    isTabulated = true;
+                    isTabulatedRegion = true;
                     collectionPropertyName = StringUtils.substringAfter(dataSet.getListEntitiesParamName(), "#");
+                    if (StringUtils.isBlank(collectionPropertyName) && dataSet.getListEntitiesParamName().indexOf("#")!=-1){
+                        showNotification(getMessage("dataSet.entityAliasInvalid"), NotificationType.TRAY);
+                        return null;
+                    }
                     if (StringUtils.isNotBlank(collectionPropertyName)) {
 
                         if (dataSet.getView() != null) {
                             view = findSubViewByCollectionPropertyName(dataSet.getView(), collectionPropertyName);
 
                         }
-                        if (view ==null){
+                        if (view == null) {
                             //View was never created for current dataset.
                             //We must to create minimal view that contains collection property for ability of creating ReportRegion.regionPropertiesRootNode later
                             MetaClass metaClass = entityTree.getEntityTreeRootNode().getWrappedMetaClass();
@@ -404,8 +407,7 @@ public class BandDefinitionEditor extends AbstractEditor<BandDefinition> impleme
                             if (metaProperty != null && metaProperty.getDomain() != null && metaProperty.getRange().getCardinality().isMany()) {
                                 view = new View(metaProperty.getDomain().getJavaClass());
                             } else {
-
-                                showNotification(formatMessage("dataSet.cantFindCollectionProperty",collectionPropertyName, metaClass.getName()), NotificationType.TRAY);
+                                showNotification(formatMessage("dataSet.cantFindCollectionProperty", collectionPropertyName, metaClass.getName()), NotificationType.TRAY);
                                 return null;
                             }
                         }
@@ -416,7 +418,7 @@ public class BandDefinitionEditor extends AbstractEditor<BandDefinition> impleme
                 default:
                     return null;
             }
-            return reportWizardService.createReportRegionByView(entityTree, isTabulated,
+            return reportWizardService.createReportRegionByView(entityTree, isTabulatedRegion,
                     view, collectionPropertyName);
         }
 

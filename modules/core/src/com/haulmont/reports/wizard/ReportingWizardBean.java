@@ -185,7 +185,7 @@ public class ReportingWizardBean implements ReportingWizardApi {
      */
     @Override
     public ReportRegion createReportRegionByView(EntityTree entityTree, boolean isTabulated, @Nullable View view, @Nullable String collectionPropertyName) {
-        if (collectionPropertyName != null && view == null) {
+        if (StringUtils.isNotBlank(collectionPropertyName) && view == null) {
             //without view we can`t correctly set rootNode for region which is necessary for tabulated regions for a
             // collection of entities (when alias contain #)
             log.warn("Detected incorrect parameters for createReportRegionByView method. View must not to be null if " +
