@@ -4,8 +4,13 @@
  */
 package com.haulmont.reports.gui.definition.edit;
 
+import com.haulmont.chile.core.model.MetaClass;
+import com.haulmont.chile.core.model.MetaProperty;
 import com.haulmont.cuba.core.entity.Entity;
-import com.haulmont.cuba.core.global.PersistenceHelper;
+import com.haulmont.cuba.core.global.Metadata;
+import com.haulmont.cuba.core.global.View;
+import com.haulmont.cuba.core.global.ViewProperty;
+import com.haulmont.cuba.gui.WindowManager;
 import com.haulmont.cuba.gui.autocomplete.AutoCompleteSupport;
 import com.haulmont.cuba.gui.autocomplete.JpqlSuggestionFactory;
 import com.haulmont.cuba.gui.autocomplete.Suggester;
@@ -16,8 +21,13 @@ import com.haulmont.cuba.gui.data.CollectionDatasource;
 import com.haulmont.cuba.gui.data.Datasource;
 import com.haulmont.cuba.gui.data.impl.DatasourceImplementation;
 import com.haulmont.cuba.gui.data.impl.DsListenerAdapter;
+import com.haulmont.reports.app.EntityTree;
+import com.haulmont.reports.app.service.ReportService;
+import com.haulmont.reports.app.service.ReportWizardService;
 import com.haulmont.reports.entity.*;
+import com.haulmont.reports.entity.wizard.ReportRegion;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -32,40 +42,36 @@ public class BandDefinitionEditor extends AbstractEditor<BandDefinition> impleme
 
     @Inject
     protected Datasource<BandDefinition> bandDefinitionDs;
-
     @Inject
     protected CollectionDatasource<DataSet, UUID> dataSetsDs;
-
     @Inject
     protected Datasource<Report> reportDs;
-
     @Inject
     protected Table dataSets;
-
     @Named("text")
     protected SourceCodeEditor datasetScriptField;
-
     @Named("textBox")
     protected BoxLayout textBox;
-
     @Named("entityBox")
     protected BoxLayout entityBox;
-
     @Named("entitiesBox")
     protected BoxLayout entitiesBox;
-
     @Inject
     protected LookupField orientation;
-
     @Inject
     protected LookupField parentBand;
-
     @Inject
     protected TextField name;
-
-    public interface Companion {
-        void initDatasetsTable(Table table);
-    }
+    @Inject
+    protected Button singleDataSetEditViewButton;
+    @Inject
+    protected Button multiDataSetEditViewButton;
+    @Inject
+    protected Metadata metadata;
+    @Inject
+    protected ReportService reportService;
+    @Inject
+    protected ReportWizardService reportWizardService;
 
     @Override
     protected void initNewItem(BandDefinition item) {
@@ -142,6 +148,25 @@ public class BandDefinitionEditor extends AbstractEditor<BandDefinition> impleme
         if (companion != null) {
             companion.initDatasetsTable(dataSets);
         }
+        Action editDataSetViewAction = new EditDataSetViewAction();
+        singleDataSetEditViewButton.setAction(editDataSetViewAction);
+        multiDataSetEditViewButton.setAction(editDataSetViewAction);
+    }
+
+    //TODO it is a stub for using set in some dataset change listener
+    protected void showOrHideEditDataSetViewBtn(DataSet dataSet) {
+        if (isDataSetViewEditAllowed(dataSet)) {
+            singleDataSetEditViewButton.setVisible(true);
+            singleDataSetEditViewButton.setVisible(true);
+        } else {
+            singleDataSetEditViewButton.setVisible(false);
+            singleDataSetEditViewButton.setVisible(false);
+        }
+    }
+
+    //TODO
+    protected boolean isDataSetViewEditAllowed(DataSet dataSet) {
+        return true;
     }
 
     protected void updateRequiredIndicators(BandDefinition item) {
@@ -262,6 +287,162 @@ public class BandDefinitionEditor extends AbstractEditor<BandDefinition> impleme
         //Desktop Component containers doesn't apply disable flags for child components
         for (Component component : getComponents()) {
             component.setEnabled(enabled);
+        }
+    }
+
+    public interface Companion {
+        void initDatasetsTable(Table table);
+    }
+
+    protected class EditDataSetViewAction extends AbstractAction {
+        public EditDataSetViewAction() {
+            super("editView");
+        }
+
+        @Override
+        public void actionPerform(Component component) {
+            if (dataSets.getSingleSelected() instanceof DataSet) {
+                final DataSet dataSet = dataSets.getSingleSelected();
+                if (dataSet != null && (DataSetType.SINGLE == dataSet.getType() || DataSetType.MULTI == dataSet.getType())) {
+                    MetaClass forEntityTreeModelMetaClass = findMetaClassByAlias(dataSet);
+                    if (forEntityTreeModelMetaClass != null) {
+
+                        final EntityTree entityTree = reportWizardService.buildEntityTree(forEntityTreeModelMetaClass);
+                        ReportRegion reportRegion = dataSetToReportRegion(dataSet, entityTree);
+
+
+                        if (reportRegion != null) {
+                            if (reportRegion.getRegionPropertiesRootNode() == null){
+                                showNotification(getMessage("dataSet.entityAliasInvalid"), NotificationType.TRAY);
+                                //without that root node region editor form will not initialized correctly and became empty. just return
+                                return;
+                            } else {
+                                //Open editor and convert saved in editor ReportRegion item to View
+                                Map<String, Object> editorParams = new HashMap<>();
+                                editorParams.put("asViewEditor", Boolean.TRUE);
+                                editorParams.put("rootEntity", reportRegion.getRegionPropertiesRootNode());
+                                editorParams.put("scalarOnly", Boolean.TRUE);
+
+                                final Editor regionEditor = openEditor("report$Report.regionEditor", reportRegion, WindowManager.OpenType.DIALOG, editorParams, dataSetsDs);
+                                regionEditor.addListener(new CloseListener() {
+                                    @Override
+                                    public void windowClosed(String actionId) {
+                                        if (COMMIT_ACTION_ID.equals(actionId)) {
+                                            dataSet.setView(reportRegionToView(entityTree, (ReportRegion) regionEditor.getItem()));
+                                        }
+                                    }
+                                });
+                            }
+
+                        }
+
+                    }
+                }
+
+            }
+        }
+
+        //Detect metaclass by an alias and parameter
+        protected MetaClass findMetaClassByAlias(DataSet dataSet) {
+
+            MetaClass byAliasMetaClass;
+            String dataSetAlias = null;
+            switch (dataSet.getType()) {
+                case SINGLE:
+                    dataSetAlias = dataSet.getEntityParamName();
+                    break;
+                case MULTI:
+                    dataSetAlias = dataSet.getListEntitiesParamName();
+                    break;
+            }
+
+            byAliasMetaClass = reportService.findMetaClassByDataSetEntityAlias(dataSetAlias, dataSet.getType(), dataSet.getBandDefinition().getReport().getInputParameters());
+
+            //Lets return some value
+            if (byAliasMetaClass == null) {
+                //Can`t determine parameter and its metaClass by alias
+                showNotification(getMessage("dataSet.entityAliasInvalid"), NotificationType.TRAY);
+                return null;
+                //when byAliasMetaClass is null we return also null
+            } else {
+                //Detect metaclass by current view for comparison
+                MetaClass viewMetaClass = null;
+                if (dataSet.getView() != null) {
+                    viewMetaClass = metadata.getClass(dataSet.getView().getEntityClass());
+                }
+                if (viewMetaClass != null && !byAliasMetaClass.getName().equals(viewMetaClass.getName())) {
+                    showNotification(formatMessage("dataSet.entityWasChanged", byAliasMetaClass.getName()), NotificationType.TRAY);
+                }
+                return byAliasMetaClass;
+            }
+        }
+
+        protected ReportRegion dataSetToReportRegion(DataSet dataSet, EntityTree entityTree) {
+            boolean isTabulated;
+            View view = null;
+            String collectionPropertyName;
+            switch (dataSet.getType()) {
+                case SINGLE:
+                    isTabulated = false;
+                    view = dataSet.getView();
+                    collectionPropertyName = null;
+                    break;
+                case MULTI:
+                    isTabulated = true;
+                    collectionPropertyName = StringUtils.substringAfter(dataSet.getListEntitiesParamName(), "#");
+                    if (StringUtils.isNotBlank(collectionPropertyName)) {
+
+                        if (dataSet.getView() != null) {
+                            view = findSubViewByCollectionPropertyName(dataSet.getView(), collectionPropertyName);
+
+                        }
+                        if (view ==null){
+                            //View was never created for current dataset.
+                            //We must to create minimal view that contains collection property for ability of creating ReportRegion.regionPropertiesRootNode later
+                            MetaClass metaClass = entityTree.getEntityTreeRootNode().getWrappedMetaClass();
+                            MetaProperty metaProperty = metaClass.getProperty(collectionPropertyName);
+                            if (metaProperty != null && metaProperty.getDomain() != null && metaProperty.getRange().getCardinality().isMany()) {
+                                view = new View(metaProperty.getDomain().getJavaClass());
+                            } else {
+
+                                showNotification(formatMessage("dataSet.cantFindCollectionProperty",collectionPropertyName, metaClass.getName()), NotificationType.TRAY);
+                                return null;
+                            }
+                        }
+                    } else {
+                        view = dataSet.getView();
+                    }
+                    break;
+                default:
+                    return null;
+            }
+            return reportWizardService.createReportRegionByView(entityTree, isTabulated,
+                    view, collectionPropertyName);
+        }
+
+        protected View reportRegionToView(EntityTree entityTree, ReportRegion reportRegion) {
+            return reportWizardService.createViewByReportRegions(entityTree.getEntityTreeRootNode(), Collections.singletonList(reportRegion));
+        }
+
+        public View findSubViewByCollectionPropertyName(View view, final String propertyName) {
+            if (view == null) {
+                return null;
+            }
+            for (ViewProperty viewProperty : view.getProperties()) {
+                if (propertyName.equals(viewProperty.getName())) {
+                    if (viewProperty.getView() != null) {
+                        return viewProperty.getView();
+                    }
+                }
+
+                if (viewProperty.getView() != null) {
+                    View foundedView = findSubViewByCollectionPropertyName(viewProperty.getView(), propertyName);
+                    if (foundedView != null) {
+                        return foundedView;
+                    }
+                }
+            }
+            return null;
         }
     }
 }

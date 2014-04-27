@@ -48,13 +48,10 @@ public class ReportData extends AbstractNotPersistentEntity {
     @Transient
     protected ReportOutputType outputFileType;
     @MetaProperty
-    @Transient
-    protected ReportOutputType reportOutputFileType;
-    @MetaProperty
     @Composition
     @Transient
     @OneToMany(targetEntity = RegionProperty.class)
-    protected List<ReportRegion> reportRegions = new ArrayList<ReportRegion>();
+    protected List<ReportRegion> reportRegions = new ArrayList<>();
 
     public Report getGeneratedReport() {
         return generatedReport;
@@ -110,14 +107,6 @@ public class ReportData extends AbstractNotPersistentEntity {
 
     public void setEntityTreeRootNode(EntityTreeNode entityTreeRootNode) {
         this.entityTreeRootNode = entityTreeRootNode;
-    }
-
-    public ReportOutputType getReportOutputFileType() {
-        return reportOutputFileType;
-    }
-
-    public void setReportOutputFileType(ReportOutputType reportOutputFileType) {
-        this.reportOutputFileType = reportOutputFileType;
     }
 
     public List<ReportRegion> getReportRegions() {

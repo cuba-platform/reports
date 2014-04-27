@@ -13,6 +13,7 @@ import com.haulmont.cuba.gui.export.ByteArrayDataProvider;
 import com.haulmont.cuba.gui.export.ExportDisplay;
 import com.haulmont.cuba.gui.export.ExportFormat;
 import com.haulmont.cuba.gui.upload.FileUploadingAPI;
+import com.haulmont.reports.app.service.ReportService;
 import com.haulmont.reports.entity.Report;
 import com.haulmont.reports.entity.ReportTemplate;
 import org.apache.commons.io.FileUtils;
@@ -57,7 +58,7 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
             Report report = template.getReport();
             if (report != null) {
                 if ((report.getTemplates() == null) || (report.getTemplates().size() == 0)) {
-                    template.setCode(ReportTemplate.DEFAULT_TEMPLATE_CODE);
+                    template.setCode(ReportService.DEFAULT_TEMPLATE_CODE);
                 } else
                     template.setCode("Template_" + Integer.toString(report.getTemplates().size()));
             }

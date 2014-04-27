@@ -12,6 +12,7 @@ import com.haulmont.cuba.core.global.FileStorageException;
 import com.haulmont.cuba.core.global.View;
 import com.haulmont.cuba.core.global.ViewRepository;
 import com.haulmont.cuba.security.app.Authenticated;
+import com.haulmont.reports.app.service.ReportService;
 import com.haulmont.reports.entity.*;
 import com.haulmont.reports.exception.ReportingException;
 import com.thoughtworks.xstream.XStream;
@@ -199,7 +200,7 @@ public class ReportImportExport implements ReportImportExportAPI, ReportImportEx
                 if (xml.startsWith("<Report>")) {//old versions
                     report = legacyReportsFromXml(Report.class, xml);
                     if (report.getDefaultTemplate() == null) {
-                        report.setDefaultTemplate(report.getTemplateByCode(ReportTemplate.DEFAULT_TEMPLATE_CODE));
+                        report.setDefaultTemplate(report.getTemplateByCode(ReportService.DEFAULT_TEMPLATE_CODE));
                     }
 
                     if (report.getBands() == null) {

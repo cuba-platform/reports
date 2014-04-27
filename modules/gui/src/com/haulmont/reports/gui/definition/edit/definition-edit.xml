@@ -63,15 +63,18 @@
                     <textField id="linkParameterName" width="${width}"
                                datasource="dataSetsDs" property="linkParameterName"/>
                 </vbox>
-                <vbox id="entityBox">
+                <vbox id="entityBox" spacing="true">
                     <label id="entityParamLabel" value="msg://dataSet.entityParamName"/>
+
                     <textField id="entityParamTextBox" width="${width}"
                                datasource="dataSetsDs" property="entityParamName"/>
+                    <button id="singleDataSetEditViewButton" caption="msg://dataSet.editView"/>
                 </vbox>
-                <vbox id="entitiesBox">
+                <vbox id="entitiesBox" spacing="true">
                     <label id="entitiesParamLabel" value="msg://dataSet.entitiesParamName"/>
                     <textField id="entitiesParamTextBox" width="${width}"
                                datasource="dataSetsDs" property="listEntitiesParamName"/>
+                    <button id="multiDataSetEditViewButton" caption="msg://dataSet.editView"/>
                 </vbox>
             </vbox>
         </split>

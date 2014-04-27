@@ -17,9 +17,11 @@ import com.haulmont.reports.entity.wizard.EntityTreeNode;
 import com.haulmont.reports.entity.wizard.RegionProperty;
 import com.haulmont.reports.entity.wizard.ReportRegion;
 import com.haulmont.reports.gui.components.actions.OrderableItemMoveAction;
+import org.apache.commons.lang.BooleanUtils;
 import org.springframework.cglib.core.CollectionUtils;
 import org.springframework.cglib.core.Transformer;
 
+import javax.activation.DataSource;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -37,6 +39,8 @@ public class RegionEditor extends AbstractEditor<ReportRegion> {
     @Named("entityTreeFrame.entityTree")
     protected Tree entityTree;
     @Inject
+    protected Datasource reportRegionDs;
+    @Inject
     protected Button addItem;
     @Inject
     protected Button removeItem;
@@ -50,6 +54,7 @@ public class RegionEditor extends AbstractEditor<ReportRegion> {
     protected Metadata metadata;
     protected boolean isTabulated;//if true then user perform add tabulated region action
     protected int regionEditorWindowWidth = 950;
+    protected boolean asViewEditor;
 
     @Override
     public void init(Map<String, Object> params) {
@@ -57,14 +62,18 @@ public class RegionEditor extends AbstractEditor<ReportRegion> {
         Companion companion = getCompanion();
         companion.addTreeTableDblClickListener(entityTree, reportRegionPropertiesTableDs);
         isTabulated = ((ReportRegion) WindowParams.ITEM.getEntity(params)).getIsTabulatedRegion();
+        asViewEditor = BooleanUtils.isTrue((Boolean) params.get("asViewEditor"));
         reportEntityTreeNodeDs.refresh(params);
         //TODO add disallowing of classes selection in tree
 
-        if (isTabulated) {
-            setTabulatedRegionEditorCaption(((EntityTreeNode) (params.get("rootEntity"))).getName());
-        } else {
-            setSimpleRegionEditorCaption();
+        if (!asViewEditor) {
+            if (isTabulated) {
+                setTabulatedRegionEditorCaption(((EntityTreeNode) (params.get("rootEntity"))).getName());
+            } else {
+                setSimpleRegionEditorCaption();
+            }
         }
+
         initComponents();
     }
 
@@ -73,25 +82,39 @@ public class RegionEditor extends AbstractEditor<ReportRegion> {
         super.postInit();
     }
 
-    private void initComponents() {
+    protected void initComponents() {
         initControlBtnsActions();
         addRegionPropertiesDsListener();
 
         getWindowManager().getDialogParams().setWidth(regionEditorWindowWidth);
-
+        if (asViewEditor) {
+            initAsViewEditor();
+        }
         entityTree.setMultiSelect(true);
         entityTree.expandTree();
     }
 
-    private void setTabulatedRegionEditorCaption(String collectionEntityName) {
+    protected void initAsViewEditor() {
+        reportRegionDs.setAllowCommit(false);
+        reportRegionPropertiesTableDs.setAllowCommit(false);
+        upItem.setVisible(false);
+        downItem.setVisible(false);
+        if (isTabulated) {
+            setCaption(getMessage("singleEntityDataSetViewEditor"));
+        } else {
+            setCaption(getMessage("multiEntityDataSetViewEditor"));
+        }
+    }
+
+    protected void setTabulatedRegionEditorCaption(String collectionEntityName) {
         setCaption(getMessage("tabulatedRegionEditor"));
     }
 
-    private void setSimpleRegionEditorCaption() {
+    protected void setSimpleRegionEditorCaption() {
         setCaption(getMessage("simpleRegionEditor"));
     }
 
-    private void addRegionPropertiesDsListener() {
+    protected void addRegionPropertiesDsListener() {
         reportRegionPropertiesTableDs.addListener(new CollectionDsListenerAdapter() {
             @Override
             public void itemChanged(Datasource ds, @Nullable Entity prevItem, @Nullable Entity item) {
@@ -118,7 +141,7 @@ public class RegionEditor extends AbstractEditor<ReportRegion> {
         });
     }
 
-    private void initControlBtnsActions() {
+    protected void initControlBtnsActions() {
         addItem.setAction(new AbstractAction("addItem") {
             @Override
             public void actionPerform(Component component) {

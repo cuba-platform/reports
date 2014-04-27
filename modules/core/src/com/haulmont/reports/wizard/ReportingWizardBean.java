@@ -14,15 +14,21 @@ import com.haulmont.cuba.core.entity.annotation.SystemLevel;
 import com.haulmont.cuba.core.global.*;
 import com.haulmont.reports.ReportingBean;
 import com.haulmont.reports.ReportingConfig;
+import com.haulmont.reports.app.EntityTree;
+import com.haulmont.reports.app.service.ReportService;
 import com.haulmont.reports.entity.*;
-import com.haulmont.reports.entity.wizard.*;
-import com.haulmont.reports.exception.TemplateGenerationException;
-import com.haulmont.reports.wizard.template.TemplateGeneratorApi;
+import com.haulmont.reports.entity.wizard.EntityTreeNode;
+import com.haulmont.reports.entity.wizard.RegionProperty;
+import com.haulmont.reports.entity.wizard.ReportData;
+import com.haulmont.reports.entity.wizard.ReportRegion;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import javax.annotation.ManagedBean;
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.persistence.Embeddable;
 import java.util.*;
@@ -34,7 +40,6 @@ import java.util.*;
 @ManagedBean(ReportingWizardApi.NAME)
 public class ReportingWizardBean implements ReportingWizardApi {
     public static final String ROOT_BAND_DEFINITION_NAME = "Root";
-    public static String[] IGNORED_ENTITIES_PREFIXES = new String[]{"sys$", "sec$"};
     public static List<String> IGNORED_ENTITY_PROPERTIES = Arrays.asList("id", "createTs", "createdBy", "version", "updateTs", "updatedBy", "deleteTs", "deletedBy");
     @Inject
     protected Persistence persistence;
@@ -42,6 +47,7 @@ public class ReportingWizardBean implements ReportingWizardApi {
     protected Metadata metadata;
     @Inject
     protected ReportingBean reportingBean;
+    protected Log log = LogFactory.getLog(ReportingBean.class);
 
     @Override
     public Report toReport(ReportData reportData, byte[] templateByteArray, boolean isTmp) {
@@ -66,7 +72,7 @@ public class ReportingWizardBean implements ReportingWizardApi {
         report.getInputParameters().add(reportInputParameter);
 
 
-        View parameterView = createViewOfReportDataEntityForDataSet(reportData);
+        View parameterView = createViewByReportRegions(reportData.getEntityTreeRootNode(), reportData.getReportRegions());
         BandDefinition rootReportBandDefinition = metadata.create(BandDefinition.class);
         rootReportBandDefinition.setPosition(0);
         rootReportBandDefinition.setName(ROOT_BAND_DEFINITION_NAME);
@@ -122,7 +128,7 @@ public class ReportingWizardBean implements ReportingWizardApi {
 
         ReportTemplate reportTemplate = metadata.create(ReportTemplate.class);
         reportTemplate.setReport(report);
-        reportTemplate.setCode(ReportTemplate.DEFAULT_TEMPLATE_CODE);
+        reportTemplate.setCode(ReportService.DEFAULT_TEMPLATE_CODE);
 
         reportTemplate.setName(reportData.getTemplateFileName());
         reportTemplate.setContent(templateByteArray);
@@ -150,18 +156,100 @@ public class ReportingWizardBean implements ReportingWizardApi {
         return report;
     }
 
-    protected View createViewOfReportDataEntityForDataSet(ReportData reportData) {
-        View view = new View(reportData.getEntityTreeRootNode().getWrappedMetaClass().getJavaClass());
+    @Override
+    public View createViewByReportRegions(EntityTreeNode entityTreeRootNode, List<ReportRegion> reportRegions) {
+        View view = new View(entityTreeRootNode.getWrappedMetaClass().getJavaClass());
 
         Set<String> allRegionProps = new HashSet<>();
-        for (ReportRegion reportRegion : reportData.getReportRegions()) {
+        for (ReportRegion reportRegion : reportRegions) {
             for (RegionProperty regionProperty : reportRegion.getRegionProperties()) {
                 allRegionProps.add(regionProperty.getHierarchicalName());
             }
         }
         //iterate over whole entity model
-        createViewForNode(reportData.getEntityTreeRootNode(), view, allRegionProps);
+        createViewForNode(entityTreeRootNode, view, allRegionProps);
         return view;
+    }
+
+    /**
+     * Create report region using view and whole entity model as entityTree param
+     * For creating tabulated report region for collection of entity (when used # in alias of dataset) view and
+     * parameters must to be non-nul values because otherwise necessary ReportRegion.regionPropertiesRootNode field value
+     * will be null. That value is determined by that view.
+     *
+     * @param entityTree             the whole entity tree model
+     * @param isTabulated            determine which region will be created
+     * @param view                   by that view region will be created
+     * @param collectionPropertyName must to be non-null for a tabulated region
+     * @return report region
+     */
+    @Override
+    public ReportRegion createReportRegionByView(EntityTree entityTree, boolean isTabulated, @Nullable View view, @Nullable String collectionPropertyName) {
+        if (collectionPropertyName != null && view == null) {
+            //without view we can`t correctly set rootNode for region which is necessary for tabulated regions for a
+            // collection of entities (when alias contain #)
+            log.warn("Detected incorrect parameters for createReportRegionByView method. View must not to be null if " +
+                    "collection collectionPropertyName is not null (" + collectionPropertyName + ")");
+        }
+        ReportRegion reportRegion = metadata.create(ReportRegion.class);
+
+        EntityTreeNode entityTreeRootNode = entityTree.getEntityTreeRootNode();
+
+        Map<String, EntityTreeNode> allNodesAndHierarchicalPathsMap = new HashMap<>();
+        nodesToMap(entityTreeRootNode, allNodesAndHierarchicalPathsMap);
+        boolean scalarOnly;//code below became less readable if we will use isTabulated parameter instead of that 'scalarOnly' variable
+        if (isTabulated) {
+            reportRegion.setIsTabulatedRegion(Boolean.TRUE);
+            reportRegion.setRegionPropertiesRootNode(allNodesAndHierarchicalPathsMap.get(collectionPropertyName));
+            scalarOnly = false;
+        } else {
+            reportRegion.setIsTabulatedRegion(Boolean.FALSE);
+            reportRegion.setRegionPropertiesRootNode(entityTreeRootNode);
+            scalarOnly = true;
+        }
+        if (view != null) {
+            iterateViewAndCreatePropertiesForRegion(scalarOnly, view, allNodesAndHierarchicalPathsMap, reportRegion.getRegionProperties(), collectionPropertyName, 0);
+        }
+        return reportRegion;
+    }
+    protected void iterateViewAndCreatePropertiesForRegion(final boolean scalarOnly, final View parentView, final Map<String, EntityTreeNode> allNodesAndHierarchicalPathsMap, final List<RegionProperty> regionProperties, String pathFromParentView, long propertyOrderNum) {
+        if (pathFromParentView == null) {
+            pathFromParentView = "";
+        }
+        for (ViewProperty viewProperty : parentView.getProperties()) {
+
+            if (scalarOnly) {
+                MetaClass metaClass = metadata.getClass(parentView.getEntityClass());
+                MetaProperty metaProperty = metaClass.getProperty(viewProperty.getName());
+                if (metaProperty != null && metaProperty.getRange().getCardinality().isMany()) {
+                    continue;
+                }
+            }
+
+            if (viewProperty.getView() != null) {
+                iterateViewAndCreatePropertiesForRegion(scalarOnly, viewProperty.getView(), allNodesAndHierarchicalPathsMap, regionProperties, pathFromParentView + "." + viewProperty.getName(), propertyOrderNum);
+            } else {
+                EntityTreeNode entityTreeNode = allNodesAndHierarchicalPathsMap.get(StringUtils.removeStart(pathFromParentView + "." + viewProperty.getName(), "."));
+
+                if (entityTreeNode != null) {
+                    RegionProperty regionProperty = metadata.create(RegionProperty.class);
+                    regionProperty.setOrderNum(++propertyOrderNum);
+                    regionProperty.setEntityTreeNode(entityTreeNode);
+                    regionProperties.add(regionProperty);
+                }
+            }
+        }
+    }
+
+    protected void nodesToMap(EntityTreeNode node, final Map<String, EntityTreeNode> allNodesAndHierarchicalPathsMap) {
+        if (!node.getChildren().isEmpty()) {
+            allNodesAndHierarchicalPathsMap.put(node.getHierarchicalNameExceptRoot(), node);
+            for (EntityTreeNode entityTreeNode : node.getChildren()) {
+                nodesToMap(entityTreeNode, allNodesAndHierarchicalPathsMap);
+            }
+        } else {
+            allNodesAndHierarchicalPathsMap.put(node.getHierarchicalNameExceptRoot(), node);
+        }
     }
 
     protected void createViewForNode(EntityTreeNode entityTreeNode, View parentView, final Set<String> viewPropsWhiteList) {
@@ -184,7 +272,7 @@ public class ReportingWizardBean implements ReportingWizardApi {
 
     @Override
     public boolean isEntityAllowedForReportWizard(final MetaClass effectiveMetaClass) {
-        if (StringUtils.startsWithAny(effectiveMetaClass.getName(), IGNORED_ENTITIES_PREFIXES) ||
+        if (StringUtils.startsWithAny(effectiveMetaClass.getName(), EntityTreeModelBuilder.IGNORED_ENTITIES_PREFIXES) ||
                 effectiveMetaClass.getJavaClass().isAnnotationPresent(Embeddable.class) ||
                 effectiveMetaClass.getJavaClass().isAnnotationPresent(SystemLevel.class) ||
                 //&& userSession.isEntityOpPermitted(effectiveMetaClass, EntityOp.READ)
@@ -226,10 +314,7 @@ public class ReportingWizardBean implements ReportingWizardApi {
                 return null;
             }
         }));
-        if (ownPropsNamesList.isEmpty()) {
-            return false;
-        }
-        return true;
+        return !ownPropsNamesList.isEmpty();
     }
 
     @Override
@@ -242,12 +327,6 @@ public class ReportingWizardBean implements ReportingWizardApi {
             return false;
         }
         return true;
-    }
-
-    @Override
-    public byte[] generateTemplate(ReportData reportData, TemplateFileType templateFileType) throws TemplateGenerationException {
-        TemplateGeneratorApi templateGeneratorApi = AppBeans.getPrototype(TemplateGeneratorApi.NAME, reportData, templateFileType);
-        return templateGeneratorApi.generateTemplate();
     }
 
     protected List<String> getWizardBlackListedEntities() {

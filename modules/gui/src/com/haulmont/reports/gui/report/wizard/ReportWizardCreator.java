@@ -21,6 +21,7 @@ import com.haulmont.cuba.gui.export.ExportDisplay;
 import com.haulmont.cuba.gui.export.ExportFormat;
 import com.haulmont.cuba.gui.xml.layout.ComponentsFactory;
 import com.haulmont.cuba.security.global.UserSession;
+import com.haulmont.reports.app.EntityTree;
 import com.haulmont.reports.app.service.ReportWizardService;
 import com.haulmont.reports.entity.Report;
 import com.haulmont.reports.entity.ReportGroup;
@@ -48,7 +49,6 @@ import java.util.*;
  */
 public class ReportWizardCreator extends AbstractEditor<ReportData> implements MainWizardFrame<AbstractEditor> {
 
-    public static String[] IGNORED_ENTITIES_PREFIXES = new String[]{"sys$", "sec$"};
     //injected UI and main form descriptor fields:
     @Inject
     protected Datasource reportDataDs;
@@ -106,7 +106,6 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
     @Inject
     protected ReportWizardService reportWizardService;
     //non-injected fields:
-    protected TreeModelBuilder treeModelBuilder;
     protected StepFrame detailsStepFrame;
     protected StepFrame regionsStepFrame;
     protected StepFrame saveStepFrame;
@@ -122,7 +121,6 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
     public void init(Map<String, Object> params) {
         super.init(params);
         getWindowManager().getDialogParams().setWidth(windowWidth);
-        treeModelBuilder = new TreeModelBuilder();
         stepFrameManager = new StepFrameManager(this, getStepFrames());
 
         fwdBtn.setAction(new AbstractAction("fwd") {
@@ -243,14 +241,14 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
     }
 
     /**
-     * Dead code. Must to be tested after platform fixes \com\haulmont\cuba\web\WebWindowManager.java
+     * Dead code. Must to be tested after platform fixes in com.haulmont.cuba.web.WebWindowManager
+     * Web modal editor window always closed forced, therefore that preClose method is not called
      * <p/>
      * Confirm closing without save if regions are created
-     * Web modal editor window always closed forced, therefore preClose method will not called
      */
     @Override
     public boolean preClose(String actionId) {
-        if (actionId != COMMIT_ACTION_ID && reportRegionsDs.getItems() != null) {
+        if (!COMMIT_ACTION_ID.equals(actionId) && reportRegionsDs.getItems() != null) {
             showOptionDialog(getMessage("dialogs.Confirmation"), getMessage("interruptConfirm"), MessageType.CONFIRMATION, new Action[]{
                     new DialogAction(DialogAction.Type.YES) {
                         @Override
@@ -265,13 +263,15 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
         }
         return false;
     }
-
+    /*
     protected class TreeModelBuilder {
 
-        protected int entryTreeModelMaxDeep = 3;
+        public String[] IGNORED_ENTITIES_PREFIXES = new String[]{"sys$", "sec$"};
 
-        public int getEntryTreeModelMaxDeep() {
-            return entryTreeModelMaxDeep;
+        protected int entityTreeModelMaxDeep = 3;
+
+        public int getEntityTreeModelMaxDeep() {
+            return entityTreeModelMaxDeep;
         }
 
         public EntityTreeNode buildNewEntityTreeModelAndGetRoot(MetaClass metaClass) {
@@ -285,8 +285,8 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
             return root;
         }
 
-        protected EntityTreeNode fillChildNodes(final EntityTreeNode parentEntityTreeNode, int depth, final Set<String> alreadyAddedMetaProps/*, final boolean skipCollections*/) {
-            if (depth > getEntryTreeModelMaxDeep()) {
+        protected EntityTreeNode fillChildNodes(final EntityTreeNode parentEntityTreeNode, int depth, final Set<String> alreadyAddedMetaProps) {
+            if (depth > getEntityTreeModelMaxDeep()) {
                 return parentEntityTreeNode;
             }
             for (com.haulmont.chile.core.model.MetaProperty metaProperty : parentEntityTreeNode.getWrappedMetaClass().getProperties()) {
@@ -297,8 +297,7 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
                     MetaClass metaClass = metaProperty.getRange().asClass();
                     MetaClass effectiveMetaClass = metadata.getExtendedEntities().getEffectiveMetaClass(metaClass);
                     //does we need to do security checks here? no
-                    if (!StringUtils.startsWithAny(effectiveMetaClass.getName(), IGNORED_ENTITIES_PREFIXES)
-                            /*userSession.isEntityOpPermitted(metaClass, EntityOp.READ)*/) {
+                    if (!StringUtils.startsWithAny(effectiveMetaClass.getName(), IGNORED_ENTITIES_PREFIXES)) {
                         int newDepth = depth + 1;
                         EntityTreeNode newParentModelNode = metadata.create(EntityTreeNode.class);
                         newParentModelNode.setName(metaProperty.getName());
@@ -319,7 +318,8 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
                         //System.err.println(StringUtils.leftPad("", newDepth * 2, " ") + getTreeNodeInfo(newParentModelNode) + "     |     " + getTreeNodeInfo(parentEntityTreeNode));
                         //System.err.println("");
 
-                        if (!entityTreeHasCollections && metaProperty.getRange().getCardinality().isMany() && newDepth < getEntryTreeModelMaxDeep()) {
+                        if (!entityTreeHasCollections && metaProperty.getRange().getCardinality().isMany() && newDepth < getEntityTreeModelMaxDeep()) {
+                            entityTreeHasCollections = true;//TODO set to true if only simple attributes of that collection as children exists
                             entityTreeHasCollections = true;//TODO set to true if only simple attributes of that collection as children exists
                         }
                         fillChildNodes(newParentModelNode, newDepth, alreadyAddedMetaProps);
@@ -350,6 +350,16 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
                 return parentEntityTreeNode.getWrappedMetaClass().getName() + " isMany:false";
             }
         }
+    }    */
+
+    @Override
+    public String getMessage(String key) {
+        return super.getMessage(key);
+    }
+
+    @Override
+    public String formatMessage(String key, Object... params) {
+        return super.formatMessage(key, params);
     }
 
     protected class DetailsStepFrame extends StepFrame {
@@ -407,9 +417,10 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
                                         @Override
                                         public void actionPerform(Component component) {
                                             getItem().getReportRegions().clear();
-                                            //TreeModelBuilder treeModelBuilder = new TreeModelBuilder();
-                                            getItem().setEntityTreeRootNode(treeModelBuilder.buildNewEntityTreeModelAndGetRoot((MetaClass) value));
-                                            //((RegionsStepFrame) regionsStepFrame).isAddRegionActionPerformed = false;
+                                            EntityTree entityTree = reportWizardService.buildEntityTree((MetaClass) value);
+                                            entityTreeHasSimpleAttrs = entityTree.getEntityTreeStructureInfo().isEntityTreeHasSimpleAttrs();
+                                            entityTreeHasCollections = entityTree.getEntityTreeStructureInfo().isEntityTreeHasCollections();
+                                            getItem().setEntityTreeRootNode(entityTree.getEntityTreeRootNode());
                                             entity.setValue(value);
                                         }
                                     },
@@ -420,7 +431,10 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
 
                             return prevValue;
                         } else {
-                            getItem().setEntityTreeRootNode(treeModelBuilder.buildNewEntityTreeModelAndGetRoot((MetaClass) value));
+                            EntityTree entityTree = reportWizardService.buildEntityTree((MetaClass) value);
+                            entityTreeHasSimpleAttrs = entityTree.getEntityTreeStructureInfo().isEntityTreeHasSimpleAttrs();
+                            entityTreeHasCollections = entityTree.getEntityTreeStructureInfo().isEntityTreeHasCollections();
+                            getItem().setEntityTreeRootNode(entityTree.getEntityTreeRootNode());
                             return value;
                         }
                     }
@@ -863,7 +877,6 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
                         } else {
                             convertToReportAndForceCloseWizard();
                         }
-
                     }
 
                     private void convertToReportAndForceCloseWizard() {
@@ -927,6 +940,7 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
                         break;
                     case XLSX:
                         result.put(ReportOutputType.XLSX.toString().toLowerCase(), ReportOutputType.XLSX);
+                        result.put(ReportOutputType.PDF.toString().toLowerCase(), ReportOutputType.PDF);
                         break;
                     case HTML:
                         result.put(ReportOutputType.HTML.toString().toLowerCase(), ReportOutputType.HTML);
@@ -944,15 +958,5 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
                 saveBtn.setVisible(false);
             }
         }
-    }
-
-    @Override
-    public String getMessage(String key) {
-        return super.getMessage(key);
-    }
-
-    @Override
-    public String formatMessage(String key, Object... params) {
-        return super.formatMessage(key, params);
     }
 }

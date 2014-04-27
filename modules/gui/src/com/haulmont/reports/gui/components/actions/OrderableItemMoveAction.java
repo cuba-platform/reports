@@ -46,9 +46,10 @@ public class OrderableItemMoveAction<T extends ListComponent> extends AbstractAc
     }
 
     protected void swapItems() {
-        if (listComponent.getSelected().size() <= 1) {
+        int selectedCnt = listComponent.getSelected().size();
+        if (selectedCnt == 1) {
             swapSingleItemWithNeighbour();
-        } else {
+        } else if (selectedCnt > 1) {
             moveFewItems();
         }
     }
@@ -122,7 +123,7 @@ public class OrderableItemMoveAction<T extends ListComponent> extends AbstractAc
         long lastIdxInGrp = Long.MAX_VALUE;
         long idxInGrp = 0;
 
-        Map<OrderableEntity, Long> itemAndIndexInSelectedGroup = Collections.EMPTY_MAP;//for detection new orderNum values we must to store information about size of selected groups of items
+        Map<OrderableEntity, Long> itemAndIndexInSelectedGroup = Collections.emptyMap();//for detection new orderNum values we must to store information about size of selected groups of items
         for (OrderableEntity item : allItems) {
             ++idx;
             item.setOrderNum(item.getOrderNum() * spreadKoef); //spread item indexes
@@ -144,7 +145,7 @@ public class OrderableItemMoveAction<T extends ListComponent> extends AbstractAc
                 if (!itemAndIndexInSelectedGroup.isEmpty()) {
                     //System.out.print("*midGrp size" + idxInGrp + "*");
                     updateItemOrderNums(idxInGrp, itemAndIndexInSelectedGroup, spreadKoef);
-                    itemAndIndexInSelectedGroup = Collections.EMPTY_MAP;
+                    itemAndIndexInSelectedGroup = Collections.emptyMap();
                 }
                 //reset counter values for re-use
                 idxInGrp = 0;

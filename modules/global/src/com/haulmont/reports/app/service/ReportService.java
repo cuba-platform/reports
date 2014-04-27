@@ -5,14 +5,12 @@
 package com.haulmont.reports.app.service;
 
 import com.haulmont.chile.core.model.MetaClass;
-import com.haulmont.chile.core.model.MetaProperty;
 import com.haulmont.cuba.core.entity.FileDescriptor;
 import com.haulmont.cuba.core.global.FileStorageException;
+import com.haulmont.reports.entity.DataSetType;
 import com.haulmont.reports.entity.Report;
+import com.haulmont.reports.entity.ReportInputParameter;
 import com.haulmont.reports.entity.ReportTemplate;
-import com.haulmont.reports.entity.wizard.ReportData;
-import com.haulmont.reports.entity.wizard.TemplateFileType;
-import com.haulmont.reports.exception.TemplateGenerationException;
 import com.haulmont.yarg.reporting.ReportOutputDocument;
 
 import java.io.IOException;
@@ -28,6 +26,8 @@ public interface ReportService {
     String NAME = "report_ReportService";
 
     String MAIN_VIEW_NAME = "report.edit";
+
+    String DEFAULT_TEMPLATE_CODE = "DEFAULT";
 
     ReportOutputDocument createReport(Report report,
                                       Map<String, Object> params) throws IOException;
@@ -85,4 +85,5 @@ public interface ReportService {
 
     ReportOutputDocument bulkPrint(Report report, List<Map<String, Object>> paramsList);
 
+    MetaClass findMetaClassByDataSetEntityAlias(String alias, DataSetType dataSetType, List<ReportInputParameter> reportInputParameters);
 }

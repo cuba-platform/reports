@@ -6,7 +6,6 @@
 package com.haulmont.reports;
 
 import com.haulmont.chile.core.model.MetaClass;
-import com.haulmont.chile.core.model.MetaProperty;
 import com.haulmont.chile.core.model.utils.InstanceUtils;
 import com.haulmont.cuba.core.EntityManager;
 import com.haulmont.cuba.core.Persistence;
@@ -15,16 +14,12 @@ import com.haulmont.cuba.core.Transaction;
 import com.haulmont.cuba.core.app.FileStorageAPI;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.entity.FileDescriptor;
-import com.haulmont.cuba.core.entity.annotation.SystemLevel;
 import com.haulmont.cuba.core.global.*;
 import com.haulmont.reports.app.ParameterPrototype;
 import com.haulmont.reports.entity.*;
-import com.haulmont.reports.entity.wizard.*;
 import com.haulmont.reports.exception.FailedToConnectToOpenOfficeException;
 import com.haulmont.reports.exception.FailedToLoadTemplateClassException;
 import com.haulmont.reports.exception.ReportingException;
-import com.haulmont.reports.exception.TemplateGenerationException;
-import com.haulmont.reports.wizard.template.TemplateGeneratorApi;
 import com.haulmont.yarg.exception.OpenOfficeException;
 import com.haulmont.yarg.exception.UnsupportedFormatException;
 import com.haulmont.yarg.formatters.CustomReport;
@@ -37,7 +32,7 @@ import com.thoughtworks.xstream.converters.basic.DateConverter;
 import com.thoughtworks.xstream.converters.collections.CollectionConverter;
 import com.thoughtworks.xstream.converters.reflection.ExternalizableConverter;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Transformer;
+import org.apache.commons.collections.Predicate;
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
@@ -46,7 +41,6 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 
 import javax.annotation.ManagedBean;
 import javax.inject.Inject;
-import javax.persistence.Embeddable;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.*;
@@ -384,6 +378,73 @@ public class ReportingBean implements ReportingApi {
             return entity;
         } finally {
             tx.end();
+        }
+    }
+
+    @Override
+    public MetaClass findMetaClassByDataSetEntityAlias(final String alias, final DataSetType dataSetType, final List<ReportInputParameter> reportInputParameters) {
+        if (reportInputParameters.isEmpty() || StringUtils.isBlank(alias)) {
+            return null;
+        }
+
+        String realAlias;
+        boolean isCollectionAlias;
+
+        if (DataSetType.MULTI == dataSetType) {
+
+            realAlias = StringUtils.substringBefore(alias, "#");
+        } else {
+            realAlias = alias;
+        }
+        isCollectionAlias = !alias.equals(realAlias);
+
+        class ReportInputParameterAliasFilterPredicate implements Predicate {
+            final DataSetType dataSetType;
+            final String realAlias;
+            final boolean isCollectionAlias;
+
+            ReportInputParameterAliasFilterPredicate(DataSetType dataSetType, String realAlias, boolean isCollectionAlias) {
+                this.dataSetType = dataSetType;
+                this.realAlias = realAlias;
+                this.isCollectionAlias = isCollectionAlias;
+            }
+
+            @Override
+            public boolean evaluate(Object object) {
+                ReportInputParameter filterCandidateParameter = null;
+                if (object instanceof ReportInputParameter) {
+                    filterCandidateParameter = (ReportInputParameter) object;
+                }
+                if (realAlias.equals(filterCandidateParameter.getAlias())) {
+                    if (DataSetType.MULTI == dataSetType) {
+                        //find param that is matched for a MULTI dataset
+                        if (isCollectionAlias) {
+                            if (ParameterType.ENTITY == filterCandidateParameter.getType()) {
+                                return true;
+                            }
+                        } else {
+                            if (ParameterType.ENTITY_LIST == filterCandidateParameter.getType()) {
+                                return true;
+                            }
+                        }
+                    } else if (DataSetType.SINGLE == dataSetType) {
+                        //find param that is matched for a SINGLE dataset
+                        if (ParameterType.ENTITY == filterCandidateParameter.getType()) {
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
+        }
+        Predicate predicate = new ReportInputParameterAliasFilterPredicate(dataSetType, realAlias, isCollectionAlias);
+
+        List<ReportInputParameter> filteredParams = new ArrayList(reportInputParameters);
+        CollectionUtils.filter(filteredParams, predicate);
+        if (filteredParams.size() == 1) {
+            return metadata.getClass(filteredParams.get(0).getEntityMetaClass());
+        } else {
+            return null;
         }
     }
 
