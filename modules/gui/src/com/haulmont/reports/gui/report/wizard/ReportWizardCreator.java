@@ -385,6 +385,7 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
                                         @Override
                                         public void actionPerform(Component component) {
                                             getItem().getReportRegions().clear();
+                                            regionsTable.refresh(); //for web6
                                             //((RegionsStepFrame) regionsStepFrame).isAddRegionActionPerformed = false;
                                             isListedReport.setValue(value);
                                         }
@@ -417,6 +418,7 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
                                         @Override
                                         public void actionPerform(Component component) {
                                             getItem().getReportRegions().clear();
+                                            regionsTable.refresh(); //for web6
                                             EntityTree entityTree = reportWizardService.buildEntityTree((MetaClass) value);
                                             entityTreeHasSimpleAttrs = entityTree.getEntityTreeStructureInfo().isEntityTreeHasSimpleAttrs();
                                             entityTreeHasCollections = entityTree.getEntityTreeStructureInfo().isEntityTreeHasCollections();
