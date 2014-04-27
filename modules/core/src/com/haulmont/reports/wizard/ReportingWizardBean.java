@@ -41,6 +41,7 @@ import java.util.*;
 public class ReportingWizardBean implements ReportingWizardApi {
     public static final String ROOT_BAND_DEFINITION_NAME = "Root";
     public static List<String> IGNORED_ENTITY_PROPERTIES = Arrays.asList("id", "createTs", "createdBy", "version", "updateTs", "updatedBy", "deleteTs", "deletedBy");
+    protected static final String DEFAULT_ALIAS = "entity";//cause Thesis used it for running reports from screens without selection input params
     @Inject
     protected Persistence persistence;
     @Inject
@@ -66,7 +67,8 @@ public class ReportingWizardBean implements ReportingWizardApi {
             reportInputParameter.setType(ParameterType.ENTITY);
         }
         reportInputParameter.setRequired(Boolean.TRUE);
-        reportInputParameter.setAlias(reportData.getEntityTreeRootNode().getName());
+        //reportInputParameter.setAlias(reportData.getEntityTreeRootNode().getName());
+        reportInputParameter.setAlias(DEFAULT_ALIAS);
         reportInputParameter.setEntityMetaClass(reportData.getEntityTreeRootNode().getWrappedMetaClass().getName());
         reportInputParameter.setPosition(reportInputParameterPos++);
         report.getInputParameters().add(reportInputParameter);
@@ -105,7 +107,7 @@ public class ReportingWizardBean implements ReportingWizardApi {
 
             if (reportData.getIsTabulatedReport()) {
                 bandDataSet.setType(DataSetType.MULTI);
-                bandDataSet.setListEntitiesParamName(reportData.getEntityTreeRootNode().getName());
+                bandDataSet.setListEntitiesParamName(reportInputParameter.getAlias());
             } else {
                 if (reportRegion.getIsTabulatedRegion()) {
                     bandDataSet.setType(DataSetType.MULTI);
