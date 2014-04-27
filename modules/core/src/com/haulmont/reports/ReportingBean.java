@@ -53,6 +53,7 @@ import java.util.zip.CRC32;
 @ManagedBean(ReportingApi.NAME)
 public class ReportingBean implements ReportingApi {
     public static final String REPORT_EDIT_VIEW_NAME = "report.edit";
+    protected static final int MAX_REPORT_NAME_LENGTH = 255;
     protected PrototypesLoader prototypesLoader = new PrototypesLoader();
     @Inject
     protected Persistence persistence;
@@ -273,20 +274,29 @@ public class ReportingBean implements ReportingApi {
 
     public String generateReportName(String sourceName, int iteration) {
         if (iteration == 1) {
-            iteration++; //new name like in win 7
+            iteration++; //like in win 7: duplicate of file 'a.txt' is 'a (2).txt', NOT 'a (1).txt'
         }
         EntityManager em = persistence.getEntityManager();
-        String reportName;
-        if (iteration == 0) {
-            reportName = String.format("%s ", sourceName.trim());
-        } else {
-            reportName = String.format("%s (%s)", sourceName.trim(), iteration);
+        String reportName = StringUtils.stripEnd(sourceName, null);
+        if (iteration > 0) {
+            String newReportName = String.format("%s (%s)", reportName, iteration);
+            if (newReportName.length() > MAX_REPORT_NAME_LENGTH) {
+
+                String abbreviatedReportName = StringUtils.abbreviate(reportName, MAX_REPORT_NAME_LENGTH -
+                        String.valueOf(iteration).length() - 3 );// 3 cause it us " ()".length
+
+                reportName = String.format("%s (%s)", abbreviatedReportName, iteration);
+            } else {
+                reportName = newReportName;
+            }
+
         }
         Query q = em.createQuery("select r from report$Report r where r.name = :name");
         q.setParameter("name", reportName);
         if (q.getResultList().size() > 0) {
             return generateReportName(sourceName, ++iteration);
         }
+
         return reportName;
     }
 
