@@ -253,7 +253,7 @@ public class ReportingBean implements ReportingApi {
 
         Transaction tx = persistence.createTransaction();
         try {
-            copiedReport.setName(generateReportName(source.getName(), 1));
+            copiedReport.setName(generateReportName(source.getName(), 2));
             EntityManager em = persistence.getEntityManager();
             em.persist(copiedReport);
             for (ReportTemplate copiedTemplate : copiedTemplates) {
@@ -272,8 +272,16 @@ public class ReportingBean implements ReportingApi {
     }
 
     public String generateReportName(String sourceName, int iteration) {
+        if (iteration == 1) {
+            iteration++; //new name like in win 7
+        }
         EntityManager em = persistence.getEntityManager();
-        String reportName = String.format("%s (%s)", sourceName, iteration);
+        String reportName;
+        if (iteration == 0) {
+            reportName = String.format("%s ", sourceName.trim());
+        } else {
+            reportName = String.format("%s (%s)", sourceName.trim(), iteration);
+        }
         Query q = em.createQuery("select r from report$Report r where r.name = :name");
         q.setParameter("name", reportName);
         if (q.getResultList().size() > 0) {

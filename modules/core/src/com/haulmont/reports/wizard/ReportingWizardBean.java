@@ -140,7 +140,7 @@ public class ReportingWizardBean implements ReportingWizardApi {
 
         Transaction t = persistence.createTransaction();
         try {
-            report.setName(reportingBean.generateReportName(reportData.getName(), 1));
+            report.setName(reportingBean.generateReportName(reportData.getName(), 0));
             String xml = reportingBean.convertToXml(report);
             report.setXml(xml);
             if (!isTmp) {
