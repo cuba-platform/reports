@@ -41,6 +41,7 @@ import java.util.*;
 public class ReportingWizardBean implements ReportingWizardApi {
     public static final String ROOT_BAND_DEFINITION_NAME = "Root";
     protected static final String DEFAULT_ALIAS = "entity";//cause Thesis used it for running reports from screens without selection input params
+    protected static final String DEFAULT_TABULATED_REPORT_ALIAS = "entities";//cause Thesis will use it for running reports from screens without selection input params
     @Inject
     protected Persistence persistence;
     @Inject
@@ -62,12 +63,14 @@ public class ReportingWizardBean implements ReportingWizardApi {
         reportInputParameter.setName(reportData.getEntityTreeRootNode().getLocalizedName());
         if (reportData.getIsTabulatedReport()) {
             reportInputParameter.setType(ParameterType.ENTITY_LIST);
+            reportInputParameter.setAlias(DEFAULT_TABULATED_REPORT_ALIAS);
         } else {
             reportInputParameter.setType(ParameterType.ENTITY);
+            reportInputParameter.setAlias(DEFAULT_ALIAS);
         }
         reportInputParameter.setRequired(Boolean.TRUE);
         //reportInputParameter.setAlias(reportData.getEntityTreeRootNode().getName());
-        reportInputParameter.setAlias(DEFAULT_ALIAS);
+
         reportInputParameter.setEntityMetaClass(reportData.getEntityTreeRootNode().getWrappedMetaClass().getName());
         reportInputParameter.setPosition(reportInputParameterPos++);
         report.getInputParameters().add(reportInputParameter);
