@@ -21,7 +21,6 @@ import org.apache.commons.lang.BooleanUtils;
 import org.springframework.cglib.core.CollectionUtils;
 import org.springframework.cglib.core.Transformer;
 
-import javax.activation.DataSource;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -74,7 +73,7 @@ public class RegionEditor extends AbstractEditor<ReportRegion> {
             }
         }
 
-        initComponents();
+        initComponents(params);
     }
 
     @Override
@@ -82,7 +81,7 @@ public class RegionEditor extends AbstractEditor<ReportRegion> {
         super.postInit();
     }
 
-    protected void initComponents() {
+    protected void initComponents(Map<String, Object> params) {
         initControlBtnsActions();
         addRegionPropertiesDsListener();
 
@@ -91,7 +90,7 @@ public class RegionEditor extends AbstractEditor<ReportRegion> {
             initAsViewEditor();
         }
         entityTree.setMultiSelect(true);
-        entityTree.expandTree();
+        entityTree.expand(((EntityTreeNode)params.get("rootEntity")).getId());
     }
 
     protected void initAsViewEditor() {
