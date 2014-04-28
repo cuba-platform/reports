@@ -189,7 +189,7 @@ public class ReportBrowser extends AbstractLookup {
 
                 @Override
                 public String getCaption() {
-                    return getMessage("actions.Create");
+                    return getMessage("report.new");
                 }
             });
             popupCreateBtn.addAction(new AbstractAction("wizard") {
