@@ -40,7 +40,6 @@ import java.util.*;
 @ManagedBean(ReportingWizardApi.NAME)
 public class ReportingWizardBean implements ReportingWizardApi {
     public static final String ROOT_BAND_DEFINITION_NAME = "Root";
-    public static List<String> IGNORED_ENTITY_PROPERTIES = Arrays.asList("id", "createTs", "createdBy", "version", "updateTs", "updatedBy", "deleteTs", "deletedBy");
     protected static final String DEFAULT_ALIAS = "entity";//cause Thesis used it for running reports from screens without selection input params
     @Inject
     protected Persistence persistence;
@@ -214,6 +213,7 @@ public class ReportingWizardBean implements ReportingWizardApi {
         }
         return reportRegion;
     }
+
     protected void iterateViewAndCreatePropertiesForRegion(final boolean scalarOnly, final View parentView, final Map<String, EntityTreeNode> allNodesAndHierarchicalPathsMap, final List<RegionProperty> regionProperties, String pathFromParentView, long propertyOrderNum) {
         if (pathFromParentView == null) {
             pathFromParentView = "";
@@ -300,12 +300,12 @@ public class ReportingWizardBean implements ReportingWizardApi {
             }
         });
 
-        if (getWizardBlackListedProperties().isEmpty()) {
+        /*if (getWizardBlackListedProperties().isEmpty()) {
             ownPropsNamesList.removeAll(IGNORED_ENTITY_PROPERTIES);
             if (ownPropsNamesList.isEmpty()) {
                 return false;
             }
-        }
+        }*/
 
         ownPropsNamesList.removeAll(CollectionUtils.collect(getWizardBlackListedProperties(), new Transformer() {
             @Override
@@ -322,13 +322,22 @@ public class ReportingWizardBean implements ReportingWizardApi {
     @Override
     public boolean isPropertyAllowedForReportWizard(MetaClass metaClass, MetaProperty metaProperty) {
         //here we can`t just to determine metaclass using property argument cause it can be an ancestor of it
-        if (getWizardBlackListedProperties().contains(metaClass.getName() + "." + metaProperty.getName())) {
+        /*if (getWizardBlackListedProperties().contains(metaClass.getName() + "." + metaProperty.getName()) ||
+                getWizardBlackListedProperties().contains(metaProperty.getDomain() + "." + metaProperty.getName())) {
             return false;
         }
         if (getWizardBlackListedProperties().isEmpty() && IGNORED_ENTITY_PROPERTIES.contains(metaProperty.getName())) {
             return false;
         }
+        return true;*/
+        String propertiesBlackList = AppBeans.get(Configuration.class).getConfig(ReportingConfig.class).getWizardPropertiesBlackList();
+        String getWizardPropertiesExcludedBlackList = AppBeans.get(Configuration.class).getConfig(ReportingConfig.class).getWizardPropertiesExcludedBlackList();
+        if (propertiesBlackList.contains(metaClass.getName() + "." + metaProperty.getName()) ||
+                (propertiesBlackList.contains(metaProperty.getDomain() + "." + metaProperty.getName()) && !getWizardPropertiesExcludedBlackList.contains(metaClass.getName() + "." + metaProperty.getName()))) {
+            return false;
+        }
         return true;
+
     }
 
     protected List<String> getWizardBlackListedEntities() {
@@ -351,6 +360,15 @@ public class ReportingWizardBean implements ReportingWizardApi {
 
     protected List<String> getWizardBlackListedProperties() {
         String propertiesBlackList = AppBeans.get(Configuration.class).getConfig(ReportingConfig.class).getWizardPropertiesBlackList();
+        if (StringUtils.isNotBlank(propertiesBlackList)) {
+            return Arrays.asList(StringUtils.split(propertiesBlackList, ','));
+        }
+
+        return Collections.emptyList();
+    }
+
+    protected List<String> getWizardPropertiesExcludedBlackList() {
+        String propertiesBlackList = AppBeans.get(Configuration.class).getConfig(ReportingConfig.class).getWizardPropertiesExcludedBlackList();
         if (StringUtils.isNotBlank(propertiesBlackList)) {
             return Arrays.asList(StringUtils.split(propertiesBlackList, ','));
         }

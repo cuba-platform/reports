@@ -96,9 +96,10 @@ public interface ReportingConfig extends Config {
     void setWizardEntitiesWhiteList(String wizardEntitiesWhiteList);
 
     /**
-     * Entity properties that will not be available in report creation wizard. Format is like 'tm$Task.jbpmProcessId,tm$Task.id,...'
-     * Note that if this list is not empty, then system properties like "id, deleteTs, etc" will be available, so if U wish to hide them,
-     * put them in that property obviously
+     * Entity properties that will not be available for report creation wizard. Format is like 'BaseUuidEntity.id,BaseUuidEntity.createTs,ref$Car.id,...'<br/>
+     * Properties support <b>inheritance</b>, i.e. BaseUuidEntity.id will filter that field for all descendants i.e. ref$Car.
+     * To allow selection that field for concrete descendant of that instance (e.g. ref$Car) use
+     * <b>'cuba.reporting.wizardPropertiesExcludedBlackList'</b> setting with value 'ref$Car.id'
      *
      * @return blacklisted properties that is not available
      */
@@ -107,6 +108,16 @@ public interface ReportingConfig extends Config {
     String getWizardPropertiesBlackList();
 
     void setWizardPropertiesBlackList(String wizardPropertiesBlackList);
+
+    /**
+     * Entity properties that will not to be excluded by 'cuba.reporting.wizardPropertiesBlackList' setting
+     * @see com.haulmont.reports.ReportingConfig#getWizardPropertiesBlackList()
+     */
+    @Property("cuba.reporting.wizardPropertiesExcludedBlackList")
+    @DefaultString("")
+    String getWizardPropertiesExcludedBlackList();
+
+    void setWizardPropertiesExcludedBlackList(String wizardPropertiesExcludedBlackList);
 
     /**
      * Maximum deep of builded entity model that is used in report wizard or report dataset view editor
