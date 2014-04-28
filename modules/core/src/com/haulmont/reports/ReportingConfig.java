@@ -61,6 +61,7 @@ public interface ReportingConfig extends Config {
     @Property("cuba.reporting.putEmptyRowIfNoDataSelected")
     @DefaultBoolean(true)
     Boolean getPutEmptyRowIfNoDataSelected();
+
     void setPutEmptyRowIfNoDataSelected(Boolean putEmptyRowIfNoDataSelected);
 
     /**
@@ -73,31 +74,48 @@ public interface ReportingConfig extends Config {
     /**
      * Return entities that will not to be available for report wizard
      * Note that if <b>'cuba.reporting.wizardEntitiesBlackList'<b/> is not null, this list will be ignored
+     *
      * @return list of ignored entities
      */
     @Property("cuba.reporting.wizardEntitiesBlackList")
     @DefaultString("")
     String getWizardEntitiesBlackList();
+
     void setWizardEntitiesBlackList(String wizardEntitiesBlackList);
 
     /**
-     * Return entities that will be available for report wizard. All others entities will be ignored
+     * Entities that will be available for report wizard. All others entities will be ignored
      * Note that if <b>'cuba.reporting.wizardEntitiesBlackList'<b/> is not null, this list will be used anyway.
+     *
      * @return list of entities that available for reportWizard
      */
     @Property("cuba.reporting.wizardEntitiesWhiteList")
     @DefaultString("")
     String getWizardEntitiesWhiteList();
+
     void setWizardEntitiesWhiteList(String wizardEntitiesWhiteList);
 
     /**
-     * Return entity properties that will not be available in report creation wizard. Format is like 'tm$Task.jbpmProcessId,tm$Task.id,...'
+     * Entity properties that will not be available in report creation wizard. Format is like 'tm$Task.jbpmProcessId,tm$Task.id,...'
      * Note that if this list is not empty, then system properties like "id, deleteTs, etc" will be available, so if U wish to hide them,
      * put them in that property obviously
-     * @return
+     *
+     * @return blacklisted properties that is not available
      */
     @Property("cuba.reporting.wizardPropertiesBlackList")
     @DefaultString("")
     String getWizardPropertiesBlackList();
+
     void setWizardPropertiesBlackList(String wizardPropertiesBlackList);
+
+    /**
+     * Maximum deep of builded entity model that is used in report wizard or report dataset view editor
+     *
+     * @return deep value
+     */
+    @Property("cuba.reporting.entityTreeModelMaxDeep")
+    @DefaultInteger(3)
+    Integer getEntityTreeModelMaxDeep();
+
+    void setEntityTreeModelMaxDeep(Integer entityTreeModelMaxDeep);
 }

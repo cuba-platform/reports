@@ -7,8 +7,10 @@ package com.haulmont.reports.wizard;
 
 import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.cuba.core.global.AppBeans;
+import com.haulmont.cuba.core.global.Configuration;
 import com.haulmont.cuba.core.global.MessageTools;
 import com.haulmont.cuba.core.global.Metadata;
+import com.haulmont.reports.ReportingConfig;
 import com.haulmont.reports.app.EntityTree;
 import com.haulmont.reports.app.EntityTreeStructureInfo;
 import com.haulmont.reports.entity.wizard.EntityTreeNode;
@@ -29,7 +31,7 @@ public class EntityTreeModelBuilder implements EntityTreeModelBuilderApi {
     public static String[] IGNORED_ENTITIES_PREFIXES = new String[]{"sys$", "sec$"};
     protected MessageTools messageTools = AppBeans.get(MessageTools.NAME);
     protected ReportingWizardApi reportingWizardApi = AppBeans.get(ReportingWizardApi.NAME);
-    protected int entityTreeModelMaxDeep = 3;
+    protected int entityTreeModelMaxDeep = AppBeans.get(Configuration.class).getConfig(ReportingConfig.class).getEntityTreeModelMaxDeep();
     protected Metadata metadata = AppBeans.get(Metadata.NAME);
 
     public int getEntityTreeModelMaxDeep() {
