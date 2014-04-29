@@ -324,9 +324,14 @@ public class ReportingWizardBean implements ReportingWizardApi {
 
     @Override
     public boolean isPropertyAllowedForReportWizard(MetaClass metaClass, MetaProperty metaProperty) {
-        if (metaProperty.getAnnotations().containsKey("MetaProperty")) {
-            return false;
-        }
+        //decided to include metaproperties and transient properties into model
+        //if (metaProperty.getAnnotatedElement().
+        //        getAnnotation(com.haulmont.chile.core.annotations.MetaProperty.class) != null ||
+        //        metaProperty.getAnnotatedElement().
+        //                getAnnotation(javax.persistence.Transient.class) != null) {
+        //    return false;
+        //}
+
         //here we can`t just to determine metaclass using property argument cause it can be an ancestor of it
         String propertiesBlackList = AppBeans.get(Configuration.class).getConfig(ReportingConfig.class).getWizardPropertiesBlackList();
         String getWizardPropertiesExcludedBlackList = AppBeans.get(Configuration.class).getConfig(ReportingConfig.class).getWizardPropertiesExcludedBlackList();
