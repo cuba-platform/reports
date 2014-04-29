@@ -324,15 +324,10 @@ public class ReportingWizardBean implements ReportingWizardApi {
 
     @Override
     public boolean isPropertyAllowedForReportWizard(MetaClass metaClass, MetaProperty metaProperty) {
+        if (metaProperty.getAnnotations().containsKey("MetaProperty")) {
+            return false;
+        }
         //here we can`t just to determine metaclass using property argument cause it can be an ancestor of it
-        /*if (getWizardBlackListedProperties().contains(metaClass.getName() + "." + metaProperty.getName()) ||
-                getWizardBlackListedProperties().contains(metaProperty.getDomain() + "." + metaProperty.getName())) {
-            return false;
-        }
-        if (getWizardBlackListedProperties().isEmpty() && IGNORED_ENTITY_PROPERTIES.contains(metaProperty.getName())) {
-            return false;
-        }
-        return true;*/
         String propertiesBlackList = AppBeans.get(Configuration.class).getConfig(ReportingConfig.class).getWizardPropertiesBlackList();
         String getWizardPropertiesExcludedBlackList = AppBeans.get(Configuration.class).getConfig(ReportingConfig.class).getWizardPropertiesExcludedBlackList();
         if (propertiesBlackList.contains(metaClass.getName() + "." + metaProperty.getName()) ||
