@@ -362,6 +362,46 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
         return super.formatMessage(key, params);
     }
 
+
+    protected void setCorrectReportOutputType() {
+        ReportOutputType outputFileFormatPrevValue = outputFileFormat.getValue();
+        outputFileFormat.setValue(null);
+        outputFileFormat.setOptionsMap(
+                refreshOutputAvailableFormats(
+                        (TemplateFileType) templateFileFormat.getValue()));
+
+
+        if (outputFileFormatPrevValue != null) {
+            if (outputFileFormat.getOptionsMap().containsKey(outputFileFormatPrevValue.toString().toLowerCase())) {
+                outputFileFormat.setValue(outputFileFormatPrevValue);
+            }
+        }
+        if (outputFileFormat.getValue() == null) {
+            outputFileFormat.setValue(outputFileFormat.getOptionsMap().get(templateFileFormat.getValue().toString().toLowerCase()));
+        }
+    }
+
+    protected Map<String, Object> refreshOutputAvailableFormats(TemplateFileType templateFileType) {
+
+        Map<String, Object> result = new LinkedHashMap<>();
+        switch (templateFileType) {
+            case DOCX:
+                result.put(ReportOutputType.DOCX.toString().toLowerCase(), ReportOutputType.DOCX);
+                result.put(ReportOutputType.HTML.toString().toLowerCase(), ReportOutputType.HTML);
+                result.put(ReportOutputType.PDF.toString().toLowerCase(), ReportOutputType.PDF);
+                break;
+            case XLSX:
+                result.put(ReportOutputType.XLSX.toString().toLowerCase(), ReportOutputType.XLSX);
+                result.put(ReportOutputType.PDF.toString().toLowerCase(), ReportOutputType.PDF);
+                break;
+            case HTML:
+                result.put(ReportOutputType.HTML.toString().toLowerCase(), ReportOutputType.HTML);
+                result.put(ReportOutputType.PDF.toString().toLowerCase(), ReportOutputType.PDF);
+                break;
+        }
+        return result;
+    }
+
     protected class DetailsStepFrame extends StepFrame {
         public DetailsStepFrame() {
             super(ReportWizardCreator.this, getMessage("reportDetails"), "detailsStep");
@@ -818,6 +858,7 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
                     }
                 });
                 showAddRegion();
+                setCorrectReportOutputType();
             }
 
             private void showAddRegion() {
@@ -913,44 +954,6 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
 
             }
 
-            protected void setCorrectReportOutputType() {
-                ReportOutputType outputFileFormatPrevValue = outputFileFormat.getValue();
-                outputFileFormat.setValue(null);
-                outputFileFormat.setOptionsMap(
-                        refreshOutputAvailableFormats(
-                                (TemplateFileType) templateFileFormat.getValue()));
-
-
-                if (outputFileFormatPrevValue != null) {
-                    if (outputFileFormat.getOptionsMap().containsKey(outputFileFormatPrevValue.toString().toLowerCase())) {
-                        outputFileFormat.setValue(outputFileFormatPrevValue);
-                    }
-                }
-                if (outputFileFormat.getValue() == null) {
-                    outputFileFormat.setValue(outputFileFormat.getOptionsMap().get(templateFileFormat.getValue().toString().toLowerCase()));
-                }
-            }
-
-            protected Map<String, Object> refreshOutputAvailableFormats(TemplateFileType templateFileType) {
-
-                Map<String, Object> result = new LinkedHashMap<>();
-                switch (templateFileType) {
-                    case DOCX:
-                        result.put(ReportOutputType.DOCX.toString().toLowerCase(), ReportOutputType.DOCX);
-                        result.put(ReportOutputType.HTML.toString().toLowerCase(), ReportOutputType.HTML);
-                        result.put(ReportOutputType.PDF.toString().toLowerCase(), ReportOutputType.PDF);
-                        break;
-                    case XLSX:
-                        result.put(ReportOutputType.XLSX.toString().toLowerCase(), ReportOutputType.XLSX);
-                        result.put(ReportOutputType.PDF.toString().toLowerCase(), ReportOutputType.PDF);
-                        break;
-                    case HTML:
-                        result.put(ReportOutputType.HTML.toString().toLowerCase(), ReportOutputType.HTML);
-                        result.put(ReportOutputType.PDF.toString().toLowerCase(), ReportOutputType.PDF);
-                        break;
-                }
-                return result;
-            }
         }
 
         protected class BeforeHideSaveStepFrameHandler implements BeforeHideStepFrameHandler {
@@ -961,4 +964,5 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
             }
         }
     }
+
 }
