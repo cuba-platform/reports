@@ -10,6 +10,7 @@ import com.haulmont.reports.app.EntityMap;
 import com.haulmont.reports.entity.DataSet;
 import com.haulmont.yarg.structure.BandData;
 import com.haulmont.yarg.structure.ReportQuery;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.Collections;
 import java.util.List;
@@ -27,20 +28,22 @@ public class SingleEntityDataLoader extends AbstractEntityDataLoader {
     public List<Map<String, Object>> loadData(ReportQuery dataSet, BandData parentBand, Map<String, Object> params) {
         Map<String, Object> additionalParams = dataSet.getAdditionalParams();
         String paramName = (String) additionalParams.get(DataSet.ENTITY_PARAM_NAME);
+        if (StringUtils.isBlank(paramName)) {
+            paramName = DEFAULT_ENTITY_PARAM_NAME;
+        }
 
-        Object entity;
+        Object entity = null;
         if (params.containsKey(paramName)) {
             entity = params.get(paramName);
-        } else {
-            entity = params.get(DEFAULT_ENTITY_PARAM_NAME);
         }
 
         if (entity == null) {
-            throw new IllegalStateException("Input parameters don't contain 'entity' param");
-        } else {
-            entity = reloadEntityByDataSetView(dataSet, entity);
+            throw new IllegalStateException(
+                    String.format("Input parameters do not contain '%s' parameter", paramName)
+            );
         }
 
+        entity = reloadEntityByDataSetView(dataSet, entity);
         return Collections.singletonList((Map<String, Object>) new EntityMap((Entity) entity));
     }
 

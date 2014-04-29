@@ -24,32 +24,48 @@ import java.util.Map;
 public class MultiEntityDataLoader extends AbstractEntityDataLoader {
 
     public static final String DEFAULT_LIST_ENTITIES_PARAM_NAME = "entities";
+    public static final String NESTED_COLLECTION_SEPARATOR = "#";
 
     @Override
     public List<Map<String, Object>> loadData(ReportQuery dataSet, BandData parentBand, Map<String, Object> params) {
         Map<String, Object> additionalParams = dataSet.getAdditionalParams();
         String paramName = (String) additionalParams.get(DataSet.LIST_ENTITIES_PARAM_NAME);
-        Object entities;
+        if (StringUtils.isBlank(paramName)) {
+            paramName = DEFAULT_LIST_ENTITIES_PARAM_NAME;
+        }
 
+        boolean hasNestedCollection = paramName.contains(NESTED_COLLECTION_SEPARATOR);
+        String entityParameterName = StringUtils.substringBefore(paramName, NESTED_COLLECTION_SEPARATOR);
+        String nestedCollectionName = StringUtils.substringAfter(paramName, NESTED_COLLECTION_SEPARATOR);
+
+        Object entities = null;
         if (params.containsKey(paramName)) {
             entities = params.get(paramName);
-        } else if (paramName.contains("#") && params.containsKey(StringUtils.substringBefore(paramName, "#"))) {  //TODO move sharp to constant
-            Entity entity = (Entity) params.get(StringUtils.substringBefore(paramName, "#"));
+        } else if (hasNestedCollection && params.containsKey(entityParameterName)) {
+            Entity entity = (Entity) params.get(entityParameterName);
             entity = reloadEntityByDataSetView(dataSet, entity);
-            entities = entity.getValueEx(StringUtils.substringAfter(paramName, "#"));
-        } else {
-            entities = params.get(DEFAULT_LIST_ENTITIES_PARAM_NAME);
+            if (entity != null) {
+                entities = entity.getValueEx(nestedCollectionName);
+            }
         }
-
 
         if (entities == null || !(entities instanceof Collection)) {
-            throw new IllegalStateException(
-                    "Input parameters don't contain 'entities' param or it isn't a collection");
+            if (hasNestedCollection) {
+                throw new IllegalStateException(
+                        String.format("Input parameters do not contain '%s' parameter, " +
+                                "or the entity does not contain nested collection '%s'", entityParameterName, nestedCollectionName)
+                );
+            } else {
+                throw new IllegalStateException(
+                        String.format("Input parameters do not contain '%s' parameter or it has type other than collection", paramName)
+                );
+            }
         }
+
         Collection<Entity> entitiesList = (Collection) entities;
         List<Map<String, Object>> resultList = new ArrayList<>();
         for (Entity entity : entitiesList) {
-            if (!paramName.contains("#")) {
+            if (!hasNestedCollection) {
                 entity = reloadEntityByDataSetView(dataSet, entity);
             }
 

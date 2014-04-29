@@ -20,7 +20,6 @@ public abstract class AbstractEntityDataLoader implements ReportDataLoader {
     protected Entity reloadEntityByDataSetView(ReportQuery dataSet, Object entity) {
         if (entity instanceof Entity &&
                 dataSet instanceof DataSet &&
-                //((DataSet) dataSet).getBandDefinition().getReport().getIsTmp() &&
                 ((DataSet) dataSet).getView() != null) {
             ReportingApi reportingApi = AppBeans.get(ReportingApi.NAME);
             if (reportingApi != null) {
