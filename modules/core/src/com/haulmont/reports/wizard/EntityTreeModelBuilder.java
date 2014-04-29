@@ -48,7 +48,7 @@ public class EntityTreeModelBuilder implements EntityTreeModelBuilderApi {
         EntityTreeStructureInfo entityTreeStructureInfo = new EntityTreeStructureInfo();
         EntityTreeNode root = metadata.create(EntityTreeNode.class);
         root.setName(metaClass.getName());
-        root.setLocalizedName(messageTools.getEntityCaption(metaClass));
+        root.setLocalizedName(StringUtils.isEmpty(messageTools.getEntityCaption(metaClass)) ? metaClass.getName() : messageTools.getEntityCaption(metaClass));
         root.setWrappedMetaClass(metaClass);
         fillChildNodes(root, 1, new HashSet<String>(), entityTreeStructureInfo);
         entityTree.setEntityTreeRootNode(root);
@@ -75,7 +75,10 @@ public class EntityTreeModelBuilder implements EntityTreeModelBuilderApi {
                     EntityTreeNode newParentModelNode = metadata.create(EntityTreeNode.class);
                     newParentModelNode.setName(metaProperty.getName());
                     //newParentModelNode.setLocalizedName(messageTools.getEntityCaption(effectiveMetaClass));
-                    newParentModelNode.setLocalizedName(messageTools.getPropertyCaption(parentEntityTreeNode.getWrappedMetaClass(), metaProperty.getName()));
+                    newParentModelNode.setLocalizedName(
+                            StringUtils.isEmpty(messageTools.getPropertyCaption(parentEntityTreeNode.getWrappedMetaClass(), metaProperty.getName())) ?
+                                    metaProperty.getName() : messageTools.getPropertyCaption(parentEntityTreeNode.getWrappedMetaClass(), metaProperty.getName())
+                    );
                     newParentModelNode.setWrappedMetaClass(effectiveMetaClass);
                     newParentModelNode.setWrappedMetaProperty(metaProperty);
                     newParentModelNode.setParent(parentEntityTreeNode);
@@ -104,7 +107,7 @@ public class EntityTreeModelBuilder implements EntityTreeModelBuilderApi {
                 }
                 EntityTreeNode child = metadata.create(EntityTreeNode.class);
                 child.setName(metaProperty.getName());
-                child.setLocalizedName(messageTools.getPropertyCaption(metaProperty));
+                child.setLocalizedName(StringUtils.isEmpty(messageTools.getPropertyCaption(metaProperty)) ? metaProperty.getName() : messageTools.getPropertyCaption(metaProperty));
                 child.setWrappedMetaProperty(metaProperty);
                 child.setParent(parentEntityTreeNode);
                 parentEntityTreeNode.getChildren().add(child);
