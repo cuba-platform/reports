@@ -276,6 +276,11 @@ public class BandDefinitionEditor extends AbstractEditor<BandDefinition> impleme
 
     public void setBandDefinition(BandDefinition bandDefinition) {
         bandDefinitionDs.setItem(bandDefinition);
+        if (bandDefinition != null && bandDefinition.getParent() == null) {
+            name.setEditable(false);
+        } else {
+            name.setEditable(true);
+        }
     }
 
     public Datasource<BandDefinition> getBandDefinitionDs() {

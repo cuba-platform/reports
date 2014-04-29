@@ -193,8 +193,7 @@ public class ReportEditor extends AbstractEditor<Report> {
         bandTree.expandTree();
 
         bandEditor.setBandDefinition(bandTree.<BandDefinition>getSingleSelected());
-        if (bandTree.getSingleSelected() == null
-                || bandTree.getSingleSelected().equals(getItem().getRootBandDefinition())) {
+        if (bandTree.getSingleSelected() == null) {
             bandEditor.setEnabled(false);
         }
     }
@@ -398,8 +397,7 @@ public class ReportEditor extends AbstractEditor<Report> {
             @Override
             public void itemChanged(Datasource<BandDefinition> ds, BandDefinition prevItem, BandDefinition item) {
                 bandEditor.setBandDefinition(item);
-                bandEditor.setEnabled(!(item == null || getItem().getRootBandDefinition().equals(item)));
-
+                bandEditor.setEnabled(item != null);
                 availableParentBandsDs.clear();
                 if (item != null) {
                     for (BandDefinition bandDefinition : bandsDs.getItems()) {
