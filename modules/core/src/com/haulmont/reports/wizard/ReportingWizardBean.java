@@ -31,6 +31,9 @@ import javax.annotation.ManagedBean;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.persistence.Embeddable;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import java.lang.reflect.AnnotatedElement;
 import java.util.*;
 
 /**
@@ -56,6 +59,7 @@ public class ReportingWizardBean implements ReportingWizardApi {
         report.setIsTmp(isTmp);
         report.setReportType(ReportType.SIMPLE);
         report.setGroup(reportData.getGroup());
+        List<ReportValueFormat> reportValueFormatList = new ArrayList();
 
         int reportInputParameterPos = 0;
         ReportInputParameter reportInputParameter = metadata.create(ReportInputParameter.class);
@@ -97,6 +101,27 @@ public class ReportingWizardBean implements ReportingWizardApi {
                 childBands.add(headerBandDefinition);
                 bandDefinitions.add(headerBandDefinition);
             }
+            if (!reportData.getTemplateFileName().endsWith(".html"))
+                for (RegionProperty regionProperty : reportRegion.getRegionProperties()) {
+                    if (regionProperty.getEntityTreeNode().getWrappedMetaProperty().getJavaType().isAssignableFrom(Date.class)) {
+                        ReportValueFormat rvf = new ReportValueFormat();
+                        rvf.setReport(report);
+                        rvf.setValueName(reportRegion.getNameForBand() + "." + regionProperty.getEntityTreeNode().getWrappedMetaProperty().getName());
+                        rvf.setFormatString(messages.getMainMessage("dateTimeFormat"));
+                        AnnotatedElement annotatedElement = regionProperty.getEntityTreeNode().getWrappedMetaProperty().getAnnotatedElement();
+                        if (annotatedElement != null && annotatedElement.isAnnotationPresent(Temporal.class)) {
+                            switch (annotatedElement.getAnnotation(Temporal.class).value()) {
+                                case TIME:
+                                    rvf.setFormatString(messages.getMainMessage("timeFormat"));
+                                    break;
+                                case DATE:
+                                    rvf.setFormatString(messages.getMainMessage("dateFormat"));
+                                    break;
+                            }
+                        }
+                        reportValueFormatList.add(rvf);
+                    }
+                }
             BandDefinition bandDefinition = metadata.create(BandDefinition.class);
             bandDefinition.setParentBandDefinition(rootReportBandDefinition);
             bandDefinition.setOrientation(Orientation.HORIZONTAL);
@@ -129,7 +154,6 @@ public class ReportingWizardBean implements ReportingWizardApi {
         rootReportBandDefinition.getChildrenBandDefinitions().addAll(childBands);
 
         report.setBands(bandDefinitions);
-
         ReportTemplate reportTemplate = metadata.create(ReportTemplate.class);
         reportTemplate.setReport(report);
         reportTemplate.setCode(ReportService.DEFAULT_TEMPLATE_CODE);
@@ -141,6 +165,8 @@ public class ReportingWizardBean implements ReportingWizardApi {
         reportTemplate.setReportOutputType(ReportOutputType.fromId(outputFileTypeId));
         report.setDefaultTemplate(reportTemplate);
         report.setTemplates(Collections.singletonList(reportTemplate));
+
+        report.setValuesFormats(reportValueFormatList);
 
         Transaction t = persistence.createTransaction();
         try {
