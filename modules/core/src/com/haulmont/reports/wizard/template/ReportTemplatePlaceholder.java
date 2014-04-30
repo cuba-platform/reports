@@ -10,6 +10,7 @@ import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.reports.entity.wizard.RegionProperty;
 import com.haulmont.reports.entity.wizard.ReportRegion;
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -53,7 +54,7 @@ public class ReportTemplatePlaceholder {
         String fieldName = regionProperty.getEntityTreeNode().getHierarchicalNameExceptRoot();
         if (reportRegion.isTabulatedRegion()) {
             bandName = "row";
-            if (!reportRegion.getReportData().getIsTabulatedReport()) {
+            if (BooleanUtils.isNotFalse(reportRegion.getReportData().getIsTabulatedReport())) {
                fieldName = StringUtils.removeStart(regionProperty.getEntityTreeNode().getHierarchicalNameExceptRoot(), reportRegion.getRegionPropertiesRootNode().getName() + ".");
             }
         } else {

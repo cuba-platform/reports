@@ -84,14 +84,14 @@ public class HtmlGenerator implements Generator {
                 //closing table header tags:
                 templateBody.append("</tr>\n</thead>\n");
                 //table body rows
-                templateBody.append("<tbody>\n<#list ").
+                templateBody.append("<tbody>\n<#if ").append(reportRegion.getNameForBand()).append("?has_content>\n<#list ").
                         append(reportRegion.getNameForBand()).
                         append(" as row>\n<tr>");
                 for (RegionProperty regionProperty : reportRegion.getRegionProperties()) {
                     templateBody.append("\n<td> ").append(reportTemplatePlaceholder.getHtmlPlaceholderValue(reportRegion, regionProperty)).append(" </td>");
                 }
                 //closing table and table body tags:
-                templateBody.append("\n</tr>\n</#list>\n</tbody>\n</table>\n\n");
+                templateBody.append("\n</tr>\n</#list>\n</#if>\n</tbody>\n</table>\n\n");
             } else {
                 for (RegionProperty regionProperty : reportRegion.getRegionProperties()) {
                     templateBody.append("\n").
