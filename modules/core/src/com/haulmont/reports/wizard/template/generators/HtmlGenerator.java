@@ -88,7 +88,7 @@ public class HtmlGenerator implements Generator {
                         append(reportRegion.getNameForBand()).
                         append(" as row>\n<tr>");
                 for (RegionProperty regionProperty : reportRegion.getRegionProperties()) {
-                    templateBody.append("\n<td> ").append(reportTemplatePlaceholder.getHtmlTablePlaceholderValue(regionProperty.getHierarchicalNameExceptRoot(),reportRegion)).append(" </td>");
+                    templateBody.append("\n<td> ").append(reportTemplatePlaceholder.getHtmlPlaceholderValue(reportRegion, regionProperty)).append(" </td>");
                 }
                 //closing table and table body tags:
                 templateBody.append("\n</tr>\n</#list>\n</tbody>\n</table>\n\n");
@@ -98,7 +98,7 @@ public class HtmlGenerator implements Generator {
                             append("<p>").
                             append(regionProperty.getHierarchicalLocalizedNameExceptRoot()).
                             append(": ").
-                            append(reportTemplatePlaceholder.getHtmlPlaceholderValueWithBandName(regionProperty.getHierarchicalNameExceptRoot(), reportRegion)).append("</p>");
+                            append(reportTemplatePlaceholder.getHtmlPlaceholderValue(reportRegion, regionProperty)).append("</p>");
                 }
             }
         }
