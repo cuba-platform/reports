@@ -646,7 +646,7 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
         protected class ReportRegionTableColumnGenerator implements Table.ColumnGenerator<ReportRegion> {
             protected static final String WIDTH_PERCENT_100 = "100%";
             protected static final int MAX_ATTRS_BTN_CAPTION_WIDTH = 95;
-            protected static final String BOLD_LABEL_STYLE = "boldLabel";
+            protected static final String BOLD_LABEL_STYLE = "semi-bold-label";
             private ReportRegion currentReportRegionGeneratedColumn;
 
             @Override
