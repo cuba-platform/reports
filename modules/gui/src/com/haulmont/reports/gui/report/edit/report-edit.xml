@@ -74,7 +74,7 @@
         <hbox spacing="true">
             <button id="windowCommitAndClose" action="windowCommitAndClose" icon="icons/ok.png"/>
             <button id="windowCommit" action="windowCommit"/>
-            <button id="saveAndRun"/>
+            <button id="run"/>
             <button id="windowClose" action="windowClose" icon="icons/cancel.png"/>
         </hbox>
     </layout>

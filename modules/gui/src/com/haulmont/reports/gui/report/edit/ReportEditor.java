@@ -74,8 +74,8 @@ public class ReportEditor extends AbstractEditor<Report> {
     @Named("templatesFrame.templatesTable")
     protected Table templatesTable;
 
-    @Named("saveAndRun")
-    protected Button saveAndRun;
+    @Named("run")
+    protected Button run;
 
     @Named("generalFrame.createBandDefinition")
     protected Button createBandDefinitionButton;
@@ -792,21 +792,18 @@ public class ReportEditor extends AbstractEditor<Report> {
         bandTree.addAction(bandUpButton.getAction());
         bandTree.addAction(bandDownButton.getAction());
 
-        saveAndRun.setAction(new AbstractAction("button.saveAndRun") {
+        run.setAction(new AbstractAction("button.run") {
             @Override
             public void actionPerform(Component component) {
-                if (ReportEditor.this.commit()) {
-                    postInit();
-
-                    Window runRindow = openWindow("report$inputParameters", OpenType.DIALOG,
-                            Collections.<String, Object>singletonMap("report", getItem()));
-                    runRindow.addListener(new CloseListener() {
-                        @Override
-                        public void windowClosed(String actionId) {
-                            tree.requestFocus();
-                        }
-                    });
-                }
+                getItem().setIsTmp(true);
+                Window runWindow = openWindow("report$inputParameters", OpenType.DIALOG,
+                        Collections.<String, Object>singletonMap("report", getItem()));
+                runWindow.addListener(new CloseListener() {
+                    @Override
+                    public void windowClosed(String actionId) {
+                        tree.requestFocus();
+                    }
+                });
             }
         });
     }

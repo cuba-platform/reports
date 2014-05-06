@@ -33,49 +33,57 @@ import java.util.*;
 @SuppressWarnings("unused")
 public class Report extends BaseReportEntity implements com.haulmont.yarg.structure.Report {
     private static final long serialVersionUID = -2817764915661205093L;
+
     @Column(name = "NAME")
     protected String name;
+
     @Column(name = "LOCALE_NAMES")
     protected String localeNames;
+
     @Column(name = "CODE")
     protected String code;
+
     @ManyToOne
     @JoinColumn(name = "GROUP_ID")
     protected ReportGroup group;
+
     @OneToOne
     @JoinColumn(name = "DEFAULT_TEMPLATE_ID")
     protected ReportTemplate defaultTemplate;
+
     @Column(name = "REPORT_TYPE")
     protected Integer reportType;
+
     @Column(name = "XML")
     protected String xml;
-    //@Column(name = "IS_TMP")
-    @Transient
-    protected Boolean isTmp = Boolean.FALSE;
+
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "report")
     @Composition
     protected List<ReportTemplate> templates;
-    @Transient
-    protected String localeName;
+
     @Transient
     protected BandDefinition rootBandDefinition;
-    @Transient
-    @MetaProperty
+
+    @Transient @MetaProperty
     protected Set<BandDefinition> bands = new HashSet<>();
-    @Transient
-    @MetaProperty
-    @Composition
+
+    @Transient @MetaProperty @Composition
     protected List<ReportInputParameter> inputParameters = new ArrayList<>();
-    @Transient
-    @MetaProperty
-    @Composition
+
+    @Transient @MetaProperty @Composition
     protected List<ReportValueFormat> valuesFormats = new ArrayList<>();
-    @Transient
-    @MetaProperty
+
+    @Transient @MetaProperty
     protected List<ReportScreen> reportScreens = new ArrayList<>();
-    @Transient
-    @MetaProperty
+
+    @Transient @MetaProperty
     protected Set<Role> roles = new HashSet<>();
+
+    @Transient
+    protected String localeName;
+
+    @Transient
+    protected Boolean isTmp = Boolean.FALSE;
 
     public Boolean getIsTmp() {
         return isTmp;
