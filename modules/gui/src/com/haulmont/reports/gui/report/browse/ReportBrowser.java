@@ -180,13 +180,7 @@ public class ReportBrowser extends AbstractLookup {
         });
 
         if (hasPermissionsToCreateReports) {
-            popupCreateBtn.addAction(new AbstractAction("table.Create") {
-
-                @Override
-                public void actionPerform(Component component) {
-                    openEditor("report$Report.edit", metadata.create(Report.class), WindowManager.OpenType.THIS_TAB, reportsTable.getDatasource());
-                }
-
+            popupCreateBtn.addAction(new CreateAction(reportsTable) {
                 @Override
                 public String getCaption() {
                     return getMessage("report.new");
