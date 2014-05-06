@@ -32,7 +32,6 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.persistence.Embeddable;
 import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import java.lang.reflect.AnnotatedElement;
 import java.util.*;
 
@@ -359,10 +358,10 @@ public class ReportingWizardBean implements ReportingWizardApi {
         //}
 
         //here we can`t just to determine metaclass using property argument cause it can be an ancestor of it
-        String propertiesBlackList = AppBeans.get(Configuration.class).getConfig(ReportingConfig.class).getWizardPropertiesBlackList();
-        String getWizardPropertiesExcludedBlackList = AppBeans.get(Configuration.class).getConfig(ReportingConfig.class).getWizardPropertiesExcludedBlackList();
+        List propertiesBlackList = Arrays.asList(AppBeans.get(Configuration.class).getConfig(ReportingConfig.class).getWizardPropertiesBlackList().split(","));
+        List wizardPropertiesExcludedBlackList = Arrays.asList(AppBeans.get(Configuration.class).getConfig(ReportingConfig.class).getWizardPropertiesExcludedBlackList().split(","));
         if (propertiesBlackList.contains(metaClass.getName() + "." + metaProperty.getName()) ||
-                (propertiesBlackList.contains(metaProperty.getDomain() + "." + metaProperty.getName()) && !getWizardPropertiesExcludedBlackList.contains(metaClass.getName() + "." + metaProperty.getName()))) {
+                (propertiesBlackList.contains(metaProperty.getDomain() + "." + metaProperty.getName()) && !wizardPropertiesExcludedBlackList.contains(metaClass.getName() + "." + metaProperty.getName()))) {
             return false;
         }
         return true;
