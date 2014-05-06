@@ -10,6 +10,7 @@ import com.haulmont.chile.core.annotations.NamePattern;
 import com.haulmont.cuba.core.entity.AbstractNotPersistentEntity;
 import com.haulmont.cuba.core.entity.annotation.SystemLevel;
 import com.haulmont.yarg.structure.ReportParameter;
+import org.apache.commons.lang.ObjectUtils;
 
 import javax.persistence.Transient;
 
@@ -78,6 +79,9 @@ public class ReportInputParameter extends AbstractNotPersistentEntity implements
     }
 
     public void setName(String name) {
+        if (ObjectUtils.notEqual(name, this.name)) {
+            localeName = null;
+        }
         this.name = name;
     }
 
@@ -134,6 +138,9 @@ public class ReportInputParameter extends AbstractNotPersistentEntity implements
     }
 
     public void setLocaleNames(String localeNames) {
+        if (ObjectUtils.notEqual(localeNames, this.localeNames)) {
+            localeName = null;
+        }
         this.localeNames = localeNames;
     }
 
