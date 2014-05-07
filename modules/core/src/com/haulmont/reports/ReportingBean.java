@@ -38,6 +38,8 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.perf4j.StopWatch;
+import org.perf4j.log4j.Log4JStopWatch;
 
 import javax.annotation.ManagedBean;
 import javax.inject.Inject;
@@ -185,7 +187,9 @@ public class ReportingBean implements ReportingApi {
 
     protected ReportOutputDocument createReportDocument(Report report, ReportTemplate template, Map<String, Object> params)
             throws IOException {
+        StopWatch stopWatch = null;
         try {
+            stopWatch = new Log4JStopWatch("Reporting#" + report.getName());
             List<String> prototypes = new LinkedList<>();
             for (Map.Entry<String, Object> param : params.entrySet()) {
                 if (param.getValue() instanceof ParameterPrototype)
@@ -227,6 +231,10 @@ public class ReportingBean implements ReportingApi {
             }
 
             throw new ReportingException(sb.toString());
+        } finally {
+            if (stopWatch != null) {
+                stopWatch.stop();
+            }
         }
     }
 
@@ -283,7 +291,7 @@ public class ReportingBean implements ReportingApi {
             if (newReportName.length() > MAX_REPORT_NAME_LENGTH) {
 
                 String abbreviatedReportName = StringUtils.abbreviate(reportName, MAX_REPORT_NAME_LENGTH -
-                        String.valueOf(iteration).length() - 3 );// 3 cause it us " ()".length
+                        String.valueOf(iteration).length() - 3);// 3 cause it us " ()".length
 
                 reportName = String.format("%s (%s)", abbreviatedReportName, iteration);
             } else {
