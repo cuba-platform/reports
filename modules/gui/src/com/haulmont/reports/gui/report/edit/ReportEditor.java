@@ -266,7 +266,11 @@ public class ReportEditor extends AbstractEditor<Report> {
 
             @Override
             public boolean isApplicableTo(Datasource.State state, Entity item) {
-                return super.isApplicableTo(state, item) && ((ReportInputParameter) item).getPosition() > 0;
+                if (Datasource.State.VALID.equals(state) && parametersDs.getItem() == item) {
+                    return super.isApplicableTo(state, item) && ((ReportInputParameter) item).getPosition() > 0;
+                } else {
+                    return isEnabled();
+                }
             }
         });
 
@@ -296,8 +300,12 @@ public class ReportEditor extends AbstractEditor<Report> {
 
             @Override
             public boolean isApplicableTo(Datasource.State state, Entity item) {
-                return super.isApplicableTo(state, item) &&
-                        ((ReportInputParameter) item).getPosition() < parametersDs.size() - 1;
+                if (Datasource.State.VALID.equals(state) && parametersDs.getItem() == item) {
+                    return super.isApplicableTo(state, item) &&
+                            ((ReportInputParameter) item).getPosition() < parametersDs.size() - 1;
+                } else {
+                    return isEnabled();
+                }
             }
         });
 
