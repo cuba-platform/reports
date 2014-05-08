@@ -12,6 +12,7 @@ import com.haulmont.cuba.core.entity.AbstractNotPersistentEntity;
 import com.haulmont.cuba.core.entity.annotation.SystemLevel;
 import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.Messages;
+import org.apache.commons.lang.StringUtils;
 
 import javax.persistence.Transient;
 import java.util.ArrayList;
@@ -40,6 +41,9 @@ public class ReportRegion extends AbstractNotPersistentEntity implements Orderab
     @MetaProperty
     @Transient
     protected Long orderNum = Long.MAX_VALUE;
+    @MetaProperty
+    @Transient
+    protected String bandNameFromReport;
 
     public ReportRegion() {
     }
@@ -101,9 +105,9 @@ public class ReportRegion extends AbstractNotPersistentEntity implements Orderab
     @MetaProperty
     @Transient
     public String getNameForBand() {
-        return getRegionPropertiesRootNode().getWrappedMetaClass().getJavaClass().getSimpleName() +
+        return StringUtils.isEmpty(bandNameFromReport) ? getRegionPropertiesRootNode().getWrappedMetaClass().getJavaClass().getSimpleName() +
                 (isTabulatedRegion() ? "s" : "") +
-                (getReportData().getReportRegions().size() == 1 ? "" : getOrderNum().toString());
+                (getReportData().getReportRegions().size() == 1 ? "" : getOrderNum().toString()) : bandNameFromReport;
     }
 
     @MetaProperty
@@ -114,5 +118,13 @@ public class ReportRegion extends AbstractNotPersistentEntity implements Orderab
 
     public boolean isTabulatedRegion() {
         return isTabulatedRegion;
+    }
+
+    public void setBandNameFromReport(String bandNameFromReport) {
+        this.bandNameFromReport = bandNameFromReport;
+    }
+
+    public String getBandNameFromReport() {
+        return bandNameFromReport;
     }
 }

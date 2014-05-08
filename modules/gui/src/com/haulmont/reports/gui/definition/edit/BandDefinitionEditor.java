@@ -19,13 +19,18 @@ import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.components.actions.RemoveAction;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
 import com.haulmont.cuba.gui.data.Datasource;
+import com.haulmont.cuba.gui.data.HierarchicalDatasource;
 import com.haulmont.cuba.gui.data.impl.DatasourceImplementation;
 import com.haulmont.cuba.gui.data.impl.DsListenerAdapter;
 import com.haulmont.reports.app.EntityTree;
 import com.haulmont.reports.app.service.ReportService;
 import com.haulmont.reports.app.service.ReportWizardService;
 import com.haulmont.reports.entity.*;
+import com.haulmont.reports.entity.wizard.RegionProperty;
+import com.haulmont.reports.entity.wizard.ReportData;
 import com.haulmont.reports.entity.wizard.ReportRegion;
+import com.haulmont.reports.entity.wizard.TemplateFileType;
+import com.haulmont.reports.exception.TemplateGenerationException;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 
@@ -46,6 +51,10 @@ public class BandDefinitionEditor extends AbstractEditor<BandDefinition> impleme
     protected CollectionDatasource<DataSet, UUID> dataSetsDs;
     @Inject
     protected Datasource<Report> reportDs;
+    @Inject
+    protected CollectionDatasource<ReportTemplate, UUID> templatesDs;
+    @Inject
+    protected HierarchicalDatasource<BandDefinition, UUID> treeDs;
     @Inject
     protected Table dataSets;
     @Named("text")
@@ -72,6 +81,8 @@ public class BandDefinitionEditor extends AbstractEditor<BandDefinition> impleme
     protected ReportService reportService;
     @Inject
     protected ReportWizardService reportWizardService;
+
+    protected List xlsExts = Arrays.asList("xls", "xlsx");
 
     @Override
     protected void initNewItem(BandDefinition item) {
@@ -333,7 +344,17 @@ public class BandDefinitionEditor extends AbstractEditor<BandDefinition> impleme
                                     @Override
                                     public void windowClosed(String actionId) {
                                         if (COMMIT_ACTION_ID.equals(actionId)) {
-                                            dataSet.setView(reportRegionToView(entityTree, (ReportRegion) regionEditor.getItem()));
+                                            ReportRegion region = (ReportRegion) regionEditor.getItem();
+                                            dataSet.setView(reportRegionToView(entityTree, region));
+                                            showOptionDialog(getMessage("notifications.confirmPrintAllheader"), getMessage("generateNewTemplate"), MessageType.CONFIRMATION, new Action[]{
+                                                    new DialogAction(DialogAction.Type.YES) {
+                                                        @Override
+                                                        public void actionPerform(Component component) {
+                                                            generateAndAddNewReportTemplate(entityTree);
+                                                        }
+                                                    },
+                                                    new DialogAction(DialogAction.Type.NO)
+                                            });
                                         }
                                     }
                                 });
@@ -344,6 +365,61 @@ public class BandDefinitionEditor extends AbstractEditor<BandDefinition> impleme
                     }
                 }
 
+            }
+        }
+
+        protected void generateAndAddNewReportTemplate(EntityTree entityTree) {
+            Report report = reportDs.getItem();
+
+            ReportData reportData = new ReportData();
+            reportData.setName(report.getName());
+            reportData.setTemplateFileName(report.getDefaultTemplate().getName().replaceFirst("(\\(\\d+\\))?\\.", "(" + report.getTemplates().size() + ")."));
+            reportData.setIsTabulatedReport(!CollectionUtils.isEmpty(report.getInputParameters()) && ParameterType.ENTITY_LIST.equals(report.getInputParameters().get(0).getType()));
+            reportData.setOutputFileType(report.getDefaultTemplate().getReportOutputType());
+            reportData.setGroup(report.getGroup());
+
+            List<ReportRegion> regionList = new ArrayList<ReportRegion>();
+            List<BandDefinition> bands = new ArrayList<BandDefinition>(treeDs.getItems());
+            Collections.sort(bands, new Comparator<BandDefinition>() {
+                @Override
+                public int compare(BandDefinition o1, BandDefinition o2) {
+                    return o1.getPosition() < o2.getPosition() ? -1 : o1.getPosition() == o2.getPosition() ? 0 : 1;
+                }
+            });
+            for (BandDefinition bandDefinition : bands) {
+                if (!bandDefinition.equals(report.getRootBand()))
+                    for (DataSet dataSetC : bandDefinition.getDataSets()) {
+                        if (DataSetType.SINGLE == dataSetC.getType() || DataSetType.MULTI == dataSetC.getType()) {
+                            ReportRegion reportRegion = dataSetToReportRegion(dataSetC, entityTree);
+                            reportRegion.setReportData(reportData);
+                            reportRegion.setBandNameFromReport(bandDefinition.getName());
+                            regionList.add(reportRegion);
+                        }
+                    }
+            }
+
+            reportData.setReportRegions(regionList);
+
+            TemplateFileType templateFileType = TemplateFileType.HTML.name().equals(report.getDefaultTemplate().getExt()) ?
+                    TemplateFileType.HTML : (xlsExts.contains(report.getDefaultTemplate().getExt()) ?
+                    TemplateFileType.XLSX : TemplateFileType.DOCX);
+            byte[] templateByteArray = null;
+            try {
+                templateByteArray = reportWizardService.generateTemplate(reportData, templateFileType);
+            } catch (TemplateGenerationException e) {
+                showNotification(getMessage("templateGenerationException"), NotificationType.WARNING);
+            }
+            if (templateByteArray != null) {
+                ReportTemplate reportTemplate = metadata.create(ReportTemplate.class);
+                reportTemplate.setReport(report);
+                reportTemplate.setCode(ReportService.DEFAULT_TEMPLATE_CODE);
+                reportTemplate.setName(reportData.getTemplateFileName());
+                reportTemplate.setContent(templateByteArray);
+                reportTemplate.setCustomFlag(Boolean.FALSE);
+                reportTemplate.setReportOutputType(reportData.getOutputFileType());
+                report.getTemplates().add(reportTemplate);
+                templatesDs.addItem(reportTemplate);
+                report.setDefaultTemplate(reportTemplate);
             }
         }
 
@@ -394,7 +470,7 @@ public class BandDefinitionEditor extends AbstractEditor<BandDefinition> impleme
                 case MULTI:
                     isTabulatedRegion = true;
                     collectionPropertyName = StringUtils.substringAfter(dataSet.getListEntitiesParamName(), "#");
-                    if (StringUtils.isBlank(collectionPropertyName) && dataSet.getListEntitiesParamName().indexOf("#")!=-1){
+                    if (StringUtils.isBlank(collectionPropertyName) && dataSet.getListEntitiesParamName().indexOf("#") != -1) {
                         showNotification(getMessage("dataSet.entityAliasInvalid"), NotificationType.TRAY);
                         return null;
                     }
