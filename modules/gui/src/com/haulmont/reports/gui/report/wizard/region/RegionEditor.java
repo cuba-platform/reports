@@ -90,7 +90,7 @@ public class RegionEditor extends AbstractEditor<ReportRegion> {
             initAsViewEditor();
         }
         entityTree.setMultiSelect(true);
-        entityTree.expand(((EntityTreeNode)params.get("rootEntity")).getId());
+        entityTree.expand(((EntityTreeNode) params.get("rootEntity")).getId());
     }
 
     protected void initAsViewEditor() {
@@ -156,6 +156,7 @@ public class RegionEditor extends AbstractEditor<ReportRegion> {
 
                 Set<EntityTreeNode> selectedItems = entityTree.getSelected();
                 int addedItems = 0;
+                boolean alreadyAdded = false;
                 for (EntityTreeNode entityTreeNode : selectedItems) {
                     if (entityTreeNode.getWrappedMetaClass() != null) {
                         continue;
@@ -166,10 +167,15 @@ public class RegionEditor extends AbstractEditor<ReportRegion> {
                         regionProperty.setOrderNum((long) reportRegionPropertiesTableDs.getItemIds().size() + 1); //first element must be not zero cause later we do sorting by multiplying that values
                         reportRegionPropertiesTableDs.addItem(regionProperty);
                         addedItems++;
+                    } else {
+                        alreadyAdded = true;
                     }
                 }
                 if (addedItems == 0) {
-                    showNotification(getMessage("elementsWasNotAdded"), NotificationType.TRAY);
+                    if (alreadyAdded)
+                        showNotification(getMessage("elementsAlreadyAdded"), NotificationType.TRAY);
+                    else
+                        showNotification(getMessage("elementsWasNotAdded"), NotificationType.TRAY);
                 }
             }
 
