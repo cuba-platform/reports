@@ -11,10 +11,7 @@ import com.haulmont.cuba.web.App;
 import com.haulmont.cuba.web.AppUI;
 import com.haulmont.cuba.web.exception.AbstractExceptionHandler;
 import com.haulmont.cuba.web.exception.ExceptionDialog;
-import com.haulmont.reports.exception.FailedToConnectToOpenOfficeException;
-import com.haulmont.reports.exception.FailedToLoadTemplateClassException;
-import com.haulmont.reports.exception.ReportingException;
-import com.haulmont.reports.exception.UnsupportedFormatException;
+import com.haulmont.reports.exception.*;
 import com.vaadin.ui.Window;
 
 import javax.annotation.Nullable;
@@ -30,6 +27,7 @@ public class ReportExceptionHandler extends AbstractExceptionHandler {
     public ReportExceptionHandler() {
         super(
                 ReportingException.class.getName(),
+                NoOpenOfficeFreePortsException.class.getName(),
                 FailedToConnectToOpenOfficeException.class.getName(),
                 UnsupportedFormatException.class.getName(),
                 FailedToLoadTemplateClassException.class.getName()
@@ -42,6 +40,9 @@ public class ReportExceptionHandler extends AbstractExceptionHandler {
 
         if (FailedToConnectToOpenOfficeException.class.getName().equals(className)) {
             String msg = messages.getMessage(getClass(), "reportException.failedConnectToOffice");
+            app.getWindowManager().showNotification(msg, IFrame.NotificationType.ERROR);
+        } if (NoOpenOfficeFreePortsException.class.getName().equals(className)) {
+            String msg = messages.getMessage(getClass(), "reportException.noOpenOfficeFreePorts");
             app.getWindowManager().showNotification(msg, IFrame.NotificationType.ERROR);
         } else {
             ExceptionDialog dialog = new ExceptionDialog(
@@ -57,7 +58,6 @@ public class ReportExceptionHandler extends AbstractExceptionHandler {
             }
             app.getAppUI().addWindow(dialog);
             dialog.focus();
-
         }
     }
 }

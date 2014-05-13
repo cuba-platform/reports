@@ -8,10 +8,11 @@ import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.gui.components.IFrame;
 import com.haulmont.cuba.web.App;
+import com.haulmont.cuba.web.AppWindow;
 import com.haulmont.cuba.web.exception.AbstractExceptionHandler;
-import com.haulmont.reports.exception.FailedToConnectToOpenOfficeException;
-import com.haulmont.reports.exception.FailedToLoadTemplateClassException;
-import com.haulmont.reports.exception.UnsupportedFormatException;
+import com.haulmont.cuba.web.exception.ExceptionDialog;
+import com.haulmont.reports.exception.*;
+import com.vaadin.ui.Window;
 
 import javax.annotation.Nullable;
 
@@ -25,21 +26,39 @@ public class ReportExceptionHandler extends AbstractExceptionHandler {
 
     public ReportExceptionHandler() {
         super(
-                FailedToConnectToOpenOfficeException.class.getName()
+                ReportingException.class.getName(),
+                NoOpenOfficeFreePortsException.class.getName(),
+                FailedToConnectToOpenOfficeException.class.getName(),
+                UnsupportedFormatException.class.getName(),
+                FailedToLoadTemplateClassException.class.getName()
         );
     }
 
     @Override
     protected void doHandle(App app, String className, String message, @Nullable Throwable throwable) {
-        String messageCode = "reportException.message";
+        Messages messages = AppBeans.get(Messages.class);
+
         if (FailedToConnectToOpenOfficeException.class.getName().equals(className)) {
-            messageCode = "reportException.failedConnectToOffice";
-        } else if (UnsupportedFormatException.class.getName().equals(className)) {
-            messageCode = "reportException.unsupportedFileFormat";
-        } else if (FailedToLoadTemplateClassException.class.getName().equals(className)) {
-            messageCode = "reportException.failedToLoadTemplateClass";
+            String msg = messages.getMessage(getClass(), "reportException.failedConnectToOffice");
+            app.getWindowManager().showNotification(msg, IFrame.NotificationType.ERROR);
+        } if (NoOpenOfficeFreePortsException.class.getName().equals(className)) {
+            String msg = messages.getMessage(getClass(), "reportException.noOpenOfficeFreePorts");
+            app.getWindowManager().showNotification(msg, IFrame.NotificationType.ERROR);
+        }else {
+            ExceptionDialog dialog = new ExceptionDialog(
+                    throwable,
+                    messages.getMessage(getClass(), "reportException.message"),
+                    message
+            );
+            AppWindow appWindow = App.getInstance().getAppWindow();
+            for (Window window : appWindow.getChildWindows()) {
+                if (window.isModal()) {
+                    dialog.setModal(true);
+                    break;
+                }
+            }
+            appWindow.addWindow(dialog);
+            dialog.focus();
         }
-        String msg = AppBeans.get(Messages.class).getMessage(getClass(), messageCode);
-        app.getWindowManager().showNotification(msg, IFrame.NotificationType.ERROR);
     }
 }

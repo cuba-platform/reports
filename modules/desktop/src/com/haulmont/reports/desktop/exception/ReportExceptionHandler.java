@@ -11,10 +11,8 @@ import com.haulmont.cuba.desktop.App;
 import com.haulmont.cuba.desktop.exception.AbstractExceptionHandler;
 import com.haulmont.cuba.desktop.sys.DialogWindow;
 import com.haulmont.cuba.gui.components.IFrame;
-import com.haulmont.reports.exception.FailedToConnectToOpenOfficeException;
-import com.haulmont.reports.exception.FailedToLoadTemplateClassException;
-import com.haulmont.reports.exception.ReportingException;
-import com.haulmont.reports.exception.UnsupportedFormatException;
+import com.haulmont.reports.exception.*;
+import com.haulmont.yarg.formatters.impl.doc.connector.NoFreePortsException;
 import org.jdesktop.swingx.JXErrorPane;
 import org.jdesktop.swingx.error.ErrorInfo;
 
@@ -35,6 +33,7 @@ public class ReportExceptionHandler extends AbstractExceptionHandler {
     public ReportExceptionHandler() {
         super(
                 ReportingException.class.getName(),
+                NoOpenOfficeFreePortsException.class.getName(),
                 FailedToConnectToOpenOfficeException.class.getName(),
                 UnsupportedFormatException.class.getName(),
                 FailedToLoadTemplateClassException.class.getName()
@@ -47,6 +46,9 @@ public class ReportExceptionHandler extends AbstractExceptionHandler {
 
         if (FailedToConnectToOpenOfficeException.class.getName().equals(className)) {
             String msg = messages.getMessage(getClass(), "reportException.failedConnectToOffice");
+            App.getInstance().getMainFrame().getWindowManager().showNotification(msg, IFrame.NotificationType.ERROR);
+        } if (NoOpenOfficeFreePortsException.class.getName().equals(className)) {
+            String msg = messages.getMessage(getClass(), "reportException.noOpenOfficeFreePorts");
             App.getInstance().getMainFrame().getWindowManager().showNotification(msg, IFrame.NotificationType.ERROR);
         } else {
             JXErrorPane errorPane = new JXErrorPane();

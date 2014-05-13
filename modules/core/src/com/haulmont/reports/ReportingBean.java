@@ -19,10 +19,12 @@ import com.haulmont.reports.app.ParameterPrototype;
 import com.haulmont.reports.entity.*;
 import com.haulmont.reports.exception.FailedToConnectToOpenOfficeException;
 import com.haulmont.reports.exception.FailedToLoadTemplateClassException;
+import com.haulmont.reports.exception.NoOpenOfficeFreePortsException;
 import com.haulmont.reports.exception.ReportingException;
 import com.haulmont.yarg.exception.OpenOfficeException;
 import com.haulmont.yarg.exception.UnsupportedFormatException;
 import com.haulmont.yarg.formatters.CustomReport;
+import com.haulmont.yarg.formatters.impl.doc.connector.NoFreePortsException;
 import com.haulmont.yarg.reporting.ReportOutputDocument;
 import com.haulmont.yarg.reporting.ReportOutputDocumentImpl;
 import com.haulmont.yarg.reporting.ReportingAPI;
@@ -55,8 +57,11 @@ import java.util.zip.CRC32;
 @ManagedBean(ReportingApi.NAME)
 public class ReportingBean implements ReportingApi {
     public static final String REPORT_EDIT_VIEW_NAME = "report.edit";
+
     protected static final int MAX_REPORT_NAME_LENGTH = 255;
+
     protected PrototypesLoader prototypesLoader = new PrototypesLoader();
+
     @Inject
     protected Persistence persistence;
     @Inject
@@ -216,6 +221,8 @@ public class ReportingBean implements ReportingApi {
             throw new ReportingException(
                     String.format("Could not instantiate class for custom template [%s]. Report name [%s]",
                             template.getCustomClass(), report.getName()), e);
+        } catch (NoFreePortsException nfe) {
+            throw new NoOpenOfficeFreePortsException(nfe.getMessage());
         } catch (OpenOfficeException ooe) {
             throw new FailedToConnectToOpenOfficeException(ooe.getMessage());
         } catch (UnsupportedFormatException fe) {
