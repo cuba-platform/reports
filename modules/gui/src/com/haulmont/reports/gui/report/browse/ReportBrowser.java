@@ -195,12 +195,23 @@ public class ReportBrowser extends AbstractLookup {
                     editor.addListener(new CloseListener() {
                         @Override
                         public void windowClosed(String actionId) {
-                            if (actionId.equals(COMMIT_ACTION_ID)){
-                                reportsTable.requestFocus();
+                            if (actionId.equals(COMMIT_ACTION_ID)) {
                                 reportsTable.refresh();
                                 if (editor.getItem() != null && editor.getItem().getGeneratedReport() != null /*&& reportDs.getItems() != null && !reportDs.getItems().isEmpty()*/) {
                                     reportsTable.setSelected(editor.getItem().getGeneratedReport());
-                                    openEditor("report$Report.edit", editor.getItem().getGeneratedReport(), WindowManager.OpenType.THIS_TAB, reportsTable.getDatasource());
+                                    final AbstractEditor<Report> reportEditor = openEditor("report$Report.edit", reportDs.getItem(), WindowManager.OpenType.THIS_TAB);
+                                    reportEditor.addListener(new CloseListener() {
+                                        @Override
+                                        public void windowClosed(String actionId) {
+                                            if (Window.COMMIT_ACTION_ID.equals(actionId) && reportEditor instanceof Window.Editor) {
+                                                Report item = reportEditor.getItem();
+                                                if (item != null) {
+                                                    reportDs.updateItem(item);
+                                                }
+                                            }
+                                            reportsTable.requestFocus();
+                                        }
+                                    });
                                 }
                             }
                         }
