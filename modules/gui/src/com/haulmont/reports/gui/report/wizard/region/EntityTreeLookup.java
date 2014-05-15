@@ -5,11 +5,14 @@
 
 package com.haulmont.reports.gui.report.wizard.region;
 
-import com.haulmont.cuba.gui.components.AbstractLookup;
-import com.haulmont.cuba.gui.components.Tree;
+import com.haulmont.cuba.client.ClientConfig;
+import com.haulmont.cuba.core.global.Configuration;
+import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.data.impl.AbstractTreeDatasource;
 import com.haulmont.reports.entity.wizard.EntityTreeNode;
+import org.apache.commons.lang.StringUtils;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.Map;
 
@@ -19,11 +22,22 @@ public class EntityTreeLookup extends AbstractLookup {
     protected AbstractTreeDatasource reportEntityTreeNodeDs;
     @Named("entityTreeFrame.entityTree")
     protected Tree entityTree;
+    @Named("entityTreeFrame.reportPropertyName")
+    protected TextField reportPropertyName;
+    @Named("entityTreeFrame.reportPropertyNameSearchButton")
+    protected Button reportPropertyNameSearchButton;
+
+    @Inject
+    protected Configuration configuration;
+
+    protected EntityTreeNode rootNode;
 
     @Override
     public void init(Map<String, Object> params) {
         super.init(params);
+        params.put("component$reportPropertyName", reportPropertyName);
         reportEntityTreeNodeDs.refresh(params);
+        rootNode = (EntityTreeNode) params.get("rootEntity");
         entityTree.expandTree();
         this.setLookupValidator(new Validator() {
 
@@ -41,6 +55,28 @@ public class EntityTreeLookup extends AbstractLookup {
                 return true;
             }
         });
+        Action search = new AbstractAction("search", configuration.getConfig(ClientConfig.class).getFilterApplyShortcut()) {
+            @Override
+            public void actionPerform(Component component) {
+                reportEntityTreeNodeDs.refresh();
+                if (!reportEntityTreeNodeDs.getItemIds().isEmpty()) {
+                    if (StringUtils.isEmpty(reportPropertyName.<String>getValue())) {
+                        entityTree.collapseTree();
+                        entityTree.expand(rootNode.getId());
+                    } else
+                        entityTree.expandTree();
+                } else {
+                    showNotification(getMessage("valueNotFound"), NotificationType.HUMANIZED);
+                }
+            }
+
+            @Override
+            public String getCaption() {
+                return null;
+            }
+        };
+        reportPropertyNameSearchButton.setAction(search);
+        addAction(search);
     }
 
     @Override

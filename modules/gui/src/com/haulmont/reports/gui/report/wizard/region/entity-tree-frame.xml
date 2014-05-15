@@ -12,9 +12,15 @@
                                 datasourceClass="com.haulmont.reports.gui.report.wizard.region.EntityTreeNodeDs"/>
     </dsContext>
     <layout>
-        <tree id="entityTree" width="100%" height="500px" multiselect="false">
-            <treechildren datasource="reportEntityTreeNodeDs" captionProperty="localizedName"/>
-        </tree>
+        <vbox spacing="true" margin="false">
+            <hbox id="reportPropertyHBox" spacing="true" margin="false" expand="reportPropertyName" width="100%">
+                <textField id="reportPropertyName"/>
+                <button id="reportPropertyNameSearchButton" icon="icons/search.png" width="31px"/>
+            </hbox>
+            <tree id="entityTree" width="100%" height="470px" multiselect="false">
+                <treechildren datasource="reportEntityTreeNodeDs" captionProperty="localizedName"/>
+            </tree>
+        </vbox>
     </layout>
 
 </window>

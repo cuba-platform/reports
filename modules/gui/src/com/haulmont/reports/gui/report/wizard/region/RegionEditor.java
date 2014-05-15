@@ -5,7 +5,9 @@
 
 package com.haulmont.reports.gui.report.wizard.region;
 
+import com.haulmont.cuba.client.ClientConfig;
 import com.haulmont.cuba.core.entity.Entity;
+import com.haulmont.cuba.core.global.Configuration;
 import com.haulmont.cuba.core.global.Metadata;
 import com.haulmont.cuba.gui.WindowParams;
 import com.haulmont.cuba.gui.components.*;
@@ -18,6 +20,7 @@ import com.haulmont.reports.entity.wizard.RegionProperty;
 import com.haulmont.reports.entity.wizard.ReportRegion;
 import com.haulmont.reports.gui.components.actions.OrderableItemMoveAction;
 import org.apache.commons.lang.BooleanUtils;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.cglib.core.CollectionUtils;
 import org.springframework.cglib.core.Transformer;
 
@@ -37,6 +40,10 @@ public class RegionEditor extends AbstractEditor<ReportRegion> {
     protected CollectionDatasource<RegionProperty, UUID> reportRegionPropertiesTableDs;
     @Named("entityTreeFrame.entityTree")
     protected Tree entityTree;
+    @Named("entityTreeFrame.reportPropertyName")
+    protected TextField reportPropertyName;
+    @Named("entityTreeFrame.reportPropertyNameSearchButton")
+    protected Button reportPropertyNameSearchButton;
     @Inject
     protected Datasource reportRegionDs;
     @Inject
@@ -51,9 +58,12 @@ public class RegionEditor extends AbstractEditor<ReportRegion> {
     protected Table propertiesTable;
     @Inject
     protected Metadata metadata;
+    @Inject
+    protected Configuration configuration;
     protected boolean isTabulated;//if true then user perform add tabulated region action
     protected int regionEditorWindowWidth = 950;
     protected boolean asViewEditor;
+    protected EntityTreeNode rootNode;
 
     @Override
     public void init(Map<String, Object> params) {
@@ -62,6 +72,7 @@ public class RegionEditor extends AbstractEditor<ReportRegion> {
         companion.addTreeTableDblClickListener(entityTree, reportRegionPropertiesTableDs);
         isTabulated = ((ReportRegion) WindowParams.ITEM.getEntity(params)).getIsTabulatedRegion();
         asViewEditor = BooleanUtils.isTrue((Boolean) params.get("asViewEditor"));
+        params.put("component$reportPropertyName", reportPropertyName);
         reportEntityTreeNodeDs.refresh(params);
         //TODO add disallowing of classes selection in tree
 
@@ -72,7 +83,7 @@ public class RegionEditor extends AbstractEditor<ReportRegion> {
                 setSimpleRegionEditorCaption();
             }
         }
-
+        rootNode = (EntityTreeNode) params.get("rootEntity");
         initComponents(params);
     }
 
@@ -90,7 +101,30 @@ public class RegionEditor extends AbstractEditor<ReportRegion> {
             initAsViewEditor();
         }
         entityTree.setMultiSelect(true);
-        entityTree.expand(((EntityTreeNode) params.get("rootEntity")).getId());
+        entityTree.expand(rootNode.getId());
+
+        Action search = new AbstractAction("search", configuration.getConfig(ClientConfig.class).getFilterApplyShortcut()) {
+            @Override
+            public void actionPerform(Component component) {
+                reportEntityTreeNodeDs.refresh();
+                if (!reportEntityTreeNodeDs.getItemIds().isEmpty()) {
+                    if (StringUtils.isEmpty(reportPropertyName.<String>getValue())) {
+                        entityTree.collapseTree();
+                        entityTree.expand(rootNode.getId());
+                    } else
+                        entityTree.expandTree();
+                } else {
+                    showNotification(getMessage("valueNotFound"), NotificationType.HUMANIZED);
+                }
+            }
+
+            @Override
+            public String getCaption() {
+                return null;
+            }
+        };
+        reportPropertyNameSearchButton.setAction(search);
+        addAction(search);
     }
 
     protected void initAsViewEditor() {
@@ -174,6 +208,8 @@ public class RegionEditor extends AbstractEditor<ReportRegion> {
                 if (addedItems == 0) {
                     if (alreadyAdded)
                         showNotification(getMessage("elementsAlreadyAdded"), NotificationType.TRAY);
+                    else if (selectedItems.size() != 0)
+                        showNotification(getMessage("selectPropertyFromEntity"), NotificationType.HUMANIZED);
                     else
                         showNotification(getMessage("elementsWasNotAdded"), NotificationType.TRAY);
                 }
