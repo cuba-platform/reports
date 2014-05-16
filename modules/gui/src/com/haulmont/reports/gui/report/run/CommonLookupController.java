@@ -48,9 +48,10 @@ public class CommonLookupController extends AbstractLookup {
                 .buildCollectionDatasource();
 
         final Table table = cFactory.createComponent(Table.NAME);
-                MetaPropertyPath nameProperty = new MetaPropertyPath(metaClass,
-                        new ArrayList<>(metaClass.getOwnProperties()).get(0));
+        MetaPropertyPath nameProperty = new MetaPropertyPath(metaClass,
+                new ArrayList<>(metaClass.getOwnProperties()).get(0));
         table.setId("lookupTable");
+        table.setFrame(this);
 
         Table.Column nameColumn = new Table.Column(nameProperty);
         nameColumn.setCaption(messages.getMessage(getClass(), "name"));
