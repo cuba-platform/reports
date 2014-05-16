@@ -107,7 +107,9 @@ public class EntityTreeModelBuilder implements EntityTreeModelBuilderApi {
                 }
                 EntityTreeNode child = metadata.create(EntityTreeNode.class);
                 child.setName(metaProperty.getName());
-                child.setLocalizedName(StringUtils.isEmpty(messageTools.getPropertyCaption(metaProperty)) ? metaProperty.getName() : messageTools.getPropertyCaption(metaProperty));
+                child.setLocalizedName(StringUtils.isEmpty(messageTools.
+                        getPropertyCaption(parentEntityTreeNode.getWrappedMetaClass(), metaProperty.getName())) ?
+                        metaProperty.getName() : messageTools.getPropertyCaption(parentEntityTreeNode.getWrappedMetaClass(), metaProperty.getName()));
                 child.setWrappedMetaProperty(metaProperty);
                 child.setParent(parentEntityTreeNode);
                 parentEntityTreeNode.getChildren().add(child);
