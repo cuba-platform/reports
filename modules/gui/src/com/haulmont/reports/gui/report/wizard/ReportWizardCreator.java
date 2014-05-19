@@ -116,6 +116,7 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
     protected boolean entityTreeHasSimpleAttrs;
     protected boolean entityTreeHasCollections;
     protected int windowWidth = 800;
+    protected boolean needUpdateEntityModel = false;
 
     @Override
     public void init(Map<String, Object> params) {
@@ -126,6 +127,13 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
         fwdBtn.setAction(new AbstractAction("fwd") {
             @Override
             public void actionPerform(Component component) {
+                if (needUpdateEntityModel) {
+                    EntityTree entityTree = reportWizardService.buildEntityTree((MetaClass) entity.getValue());
+                    entityTreeHasSimpleAttrs = entityTree.getEntityTreeStructureInfo().isEntityTreeHasSimpleAttrs();
+                    entityTreeHasCollections = entityTree.getEntityTreeStructureInfo().isEntityTreeHasCollections();
+                    getItem().setEntityTreeRootNode(entityTree.getEntityTreeRootNode());
+                    needUpdateEntityModel = false;
+                }
                 stepFrameManager.nextFrame();
             }
         });
@@ -368,7 +376,8 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
         outputFileFormat.setValue(null);
         outputFileFormat.setOptionsMap(
                 refreshOutputAvailableFormats(
-                        (TemplateFileType) templateFileFormat.getValue()));
+                        (TemplateFileType) templateFileFormat.getValue())
+        );
 
 
         if (outputFileFormatPrevValue != null) {
@@ -459,10 +468,7 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
                                         public void actionPerform(Component component) {
                                             getItem().getReportRegions().clear();
                                             regionsTable.refresh(); //for web6
-                                            EntityTree entityTree = reportWizardService.buildEntityTree((MetaClass) value);
-                                            entityTreeHasSimpleAttrs = entityTree.getEntityTreeStructureInfo().isEntityTreeHasSimpleAttrs();
-                                            entityTreeHasCollections = entityTree.getEntityTreeStructureInfo().isEntityTreeHasCollections();
-                                            getItem().setEntityTreeRootNode(entityTree.getEntityTreeRootNode());
+                                            needUpdateEntityModel = true;
                                             entity.setValue(value);
                                         }
                                     },
@@ -473,10 +479,7 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
 
                             return prevValue;
                         } else {
-                            EntityTree entityTree = reportWizardService.buildEntityTree((MetaClass) value);
-                            entityTreeHasSimpleAttrs = entityTree.getEntityTreeStructureInfo().isEntityTreeHasSimpleAttrs();
-                            entityTreeHasCollections = entityTree.getEntityTreeStructureInfo().isEntityTreeHasCollections();
-                            getItem().setEntityTreeRootNode(entityTree.getEntityTreeRootNode());
+                            needUpdateEntityModel = true;
                             return value;
                         }
                     }
