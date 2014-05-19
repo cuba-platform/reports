@@ -33,7 +33,10 @@ public class WebRegionEditorCompanion implements RegionEditor.Companion {
                     if (event.getItem() instanceof ItemWrapper && ((ItemWrapper) event.getItem()).getItem() instanceof EntityTreeNode) {
                         EntityTreeNode entityTreeNode = (EntityTreeNode) ((ItemWrapper) event.getItem()).getItem();
                         if (entityTreeNode.getWrappedMetaClass() != null) {
-                            webTree.expandItem(entityTreeNode.getId());
+                            if (webTree.isExpanded(entityTreeNode.getId()))
+                                webTree.collapseItem(entityTreeNode.getId());
+                            else
+                                webTree.expandItem(entityTreeNode.getId());
                             return;
                         }
                         if (CollectionUtils.transform(reportRegionPropertiesTableDs.getItems(), new Transformer() {
