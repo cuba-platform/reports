@@ -44,7 +44,7 @@
                            columnControlVisible="false"
                            width="100%" height="500px">
                         <columns>
-                            <column id="hierarchicalLocalizedName" caption="msg://properties" width="507px"/>
+                            <column id="hierarchicalLocalizedName" caption="msg://properties" width="900px"/>
                         </columns>
                         <rows datasource="reportRegionPropertiesTableDs"/>
                     </table>
