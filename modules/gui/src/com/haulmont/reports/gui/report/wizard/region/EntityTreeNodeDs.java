@@ -41,13 +41,13 @@ public class EntityTreeNodeDs extends AbstractTreeDatasource<EntityTreeNode, UUI
         scalarOnly = isTreeForScalarOnly(params);
         showRoot = isTreeMustContainRoot(params);
         Tree<EntityTreeNode> resultTree = new Tree<>();
-        String searchValue = StringUtils.defaultIfBlank(((TextField) params.get("component$reportPropertyName")).<String>getValue(), "");
+        String searchValue = StringUtils.defaultIfBlank(((TextField) params.get("component$reportPropertyName")).<String>getValue(), "").toLowerCase().trim();
         if (params.get("rootEntity") != null) {
             EntityTreeNode rootNodeObject = (EntityTreeNode) params.get("rootEntity");
             List<Node<EntityTreeNode>> rootNodes;
             if (isTreeMustContainRoot(params)) {
                 Node<EntityTreeNode> rootNode = new Node<>(rootNodeObject);
-                if (rootNodeObject.getLocalizedName().toLowerCase().contains(searchValue.toLowerCase()))
+                if (rootNodeObject.getLocalizedName().toLowerCase().contains(searchValue))
                     fill(rootNode);
                 else
                     fill(rootNode, searchValue);
@@ -59,7 +59,7 @@ public class EntityTreeNodeDs extends AbstractTreeDatasource<EntityTreeNode, UUI
                         continue;
                     }
                     Node<EntityTreeNode> newRootNode = new Node<>(child);
-                    if (child.getLocalizedName().toLowerCase().contains(searchValue.toLowerCase()))
+                    if (child.getLocalizedName().toLowerCase().contains(searchValue))
                         fill(newRootNode);
                     else
                         fill(newRootNode, searchValue);
@@ -93,13 +93,9 @@ public class EntityTreeNodeDs extends AbstractTreeDatasource<EntityTreeNode, UUI
 
                 Node<EntityTreeNode> newParentNode = new Node<>(child);
                 newParentNode.parent = parentNode;
-                if (StringUtils.isEmpty(searchValue) || child.getLocalizedName().toLowerCase().contains(searchValue.toLowerCase())) {
+                if (StringUtils.isEmpty(searchValue) || child.getLocalizedName().toLowerCase().contains(searchValue)) {
                     fill(newParentNode);
                     parentNode.addChild(newParentNode);
-                } else {
-                    fill(newParentNode, searchValue);
-                    if (!newParentNode.getChildren().isEmpty())
-                        parentNode.addChild(newParentNode);
                 }
             } else {
                 if (scalarOnly && child.getWrappedMetaProperty().getRange().isClass()) {
@@ -107,7 +103,7 @@ public class EntityTreeNodeDs extends AbstractTreeDatasource<EntityTreeNode, UUI
                     continue;
                 }
                 Node childNode = new Node<>(child);
-                if (StringUtils.isEmpty(searchValue) || child.getLocalizedName().toLowerCase().contains(searchValue.toLowerCase())) {
+                if (StringUtils.isEmpty(searchValue) || child.getLocalizedName().toLowerCase().contains(searchValue)) {
                     parentNode.addChild(childNode);
                 }
             }
@@ -117,45 +113,6 @@ public class EntityTreeNodeDs extends AbstractTreeDatasource<EntityTreeNode, UUI
 
     protected void fill(final Node<EntityTreeNode> parentNode) {
         fill(parentNode, "");
-    }
-
-    protected boolean findSearchProperty(final Node<EntityTreeNode> parentNode, String searchValue) {
-        if (StringUtils.isEmpty(searchValue))
-            return true;
-        Collections.sort(parentNode.getData().getChildren(), nodeComparator);
-        for (EntityTreeNode child : parentNode.getData().getChildren()) {
-            if (collectionsOnly && !child.getWrappedMetaProperty().getRange().getCardinality().isMany()) {
-                continue;
-            }
-
-            if (collectionsOnly && (
-                    (showRoot && parentNode.getParent() != null && parentNode.getParent().getParent() == null) ||
-                            (!showRoot && parentNode.getParent() == null)
-            )) {
-                //for collections max selection depth is limited to 2 cause reporting is not supported collection multiplying. And it is good )
-                continue;
-            }
-            if (scalarOnly && child.getWrappedMetaProperty().getRange().getCardinality().isMany()) {
-                continue;
-            }
-            if (!child.getChildren().isEmpty()) {
-
-                Node<EntityTreeNode> newParentNode = new Node<>(child);
-                newParentNode.parent = parentNode;
-
-                boolean hasProperty = findSearchProperty(newParentNode, searchValue);
-                if (hasProperty)
-                    return true;
-            } else {
-                if (scalarOnly && child.getWrappedMetaProperty().getRange().isClass()) {
-                    //doesn`t fetch if it is a last entity and is a class cause we can`t select it in UI anyway
-                    continue;
-                }
-                if (child.getLocalizedName().contains(searchValue))
-                    return true;
-            }
-        }
-        return false;
     }
 
     protected boolean isTreeForCollectionsOnly(Map<String, Object> params) {

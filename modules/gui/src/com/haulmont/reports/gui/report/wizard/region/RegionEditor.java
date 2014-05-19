@@ -20,7 +20,6 @@ import com.haulmont.reports.entity.wizard.RegionProperty;
 import com.haulmont.reports.entity.wizard.ReportRegion;
 import com.haulmont.reports.gui.components.actions.OrderableItemMoveAction;
 import org.apache.commons.lang.BooleanUtils;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.cglib.core.CollectionUtils;
 import org.springframework.cglib.core.Transformer;
 
@@ -108,11 +107,8 @@ public class RegionEditor extends AbstractEditor<ReportRegion> {
             public void actionPerform(Component component) {
                 reportEntityTreeNodeDs.refresh();
                 if (!reportEntityTreeNodeDs.getItemIds().isEmpty()) {
-                    if (StringUtils.isEmpty(reportPropertyName.<String>getValue())) {
-                        entityTree.collapseTree();
-                        entityTree.expand(rootNode.getId());
-                    } else
-                        entityTree.expandTree();
+                    entityTree.collapseTree();
+                    entityTree.expand(rootNode.getId());
                 } else {
                     showNotification(getMessage("valueNotFound"), NotificationType.HUMANIZED);
                 }
