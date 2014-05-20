@@ -18,6 +18,7 @@ import com.haulmont.reports.ReportingConfig;
 import com.haulmont.yarg.exception.ReportFormattingException;
 import com.haulmont.yarg.formatters.factory.FormatterFactoryInput;
 import com.haulmont.yarg.formatters.impl.HtmlFormatter;
+import com.haulmont.yarg.structure.BandData;
 import com.lowagie.text.DocumentException;
 import com.lowagie.text.Image;
 import com.lowagie.text.pdf.BaseFont;
@@ -35,7 +36,7 @@ import org.xhtmlrenderer.resource.ImageResource;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.nio.charset.Charset;
-import java.util.UUID;
+import java.util.*;
 
 public class CubaHtmlFormatter extends HtmlFormatter {
     protected static final String CUBA_FONTS_DIR = "/cuba/fonts";
@@ -213,5 +214,30 @@ public class CubaHtmlFormatter extends HtmlFormatter {
 
             return super.resolveAndOpenStream(uri);
         }
+    }
+
+    @Override
+    protected Map getBandModel(BandData band) {
+        Map<String, Object> model = new HashMap<String, Object>();
+
+        Map<String, Object> bands = new HashMap<String, Object>();
+        for (String bandName : band.getChildrenBands().keySet()) {
+            List<BandData> subBands = band.getChildrenBands().get(bandName);
+            List<Map> bandModels = new ArrayList<Map>();
+            for (BandData child : subBands)
+                bandModels.add(getBandModel(child));
+
+            bands.put(bandName, bandModels);
+        }
+        model.put("bands", bands);
+        Map<String, Object> data = new HashMap<String, Object>();
+        for (String key : band.getData().keySet()) {
+            if (band.getData().get(key) instanceof Enum)
+                data.put(key, defaultFormat(band.getData().get(key)));
+            else data.put(key, band.getData().get(key));
+        }
+        model.put("fields", data);
+
+        return model;
     }
 }
