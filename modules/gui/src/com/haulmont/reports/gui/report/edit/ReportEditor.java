@@ -803,15 +803,17 @@ public class ReportEditor extends AbstractEditor<Report> {
         run.setAction(new AbstractAction("button.run") {
             @Override
             public void actionPerform(Component component) {
-                getItem().setIsTmp(true);
-                Window runWindow = openWindow("report$inputParameters", OpenType.DIALOG,
-                        Collections.<String, Object>singletonMap("report", getItem()));
-                runWindow.addListener(new CloseListener() {
-                    @Override
-                    public void windowClosed(String actionId) {
-                        tree.requestFocus();
-                    }
-                });
+                if (validateAll()) {
+                    getItem().setIsTmp(true);
+                    Window runWindow = openWindow("report$inputParameters", OpenType.DIALOG,
+                            Collections.<String, Object>singletonMap("report", getItem()));
+                    runWindow.addListener(new CloseListener() {
+                        @Override
+                        public void windowClosed(String actionId) {
+                            tree.requestFocus();
+                        }
+                    });
+                }
             }
         });
     }
