@@ -3,14 +3,12 @@
   ~ Use is subject to license terms, see http://www.cuba-platform.com/license for details.
   -->
 
-<window
-        xmlns="http://schemas.haulmont.com/cuba/5.2/window.xsd"
+<window xmlns="http://schemas.haulmont.com/cuba/5.2/window.xsd"
         class="com.haulmont.reports.gui.definition.edit.BandDefinitionEditor"
         datasource="bandDefinitionDs"
         caption="msg://bandDefinitionEditor"
         messagesPack="com.haulmont.reports.gui"
-        focusComponent="name"
-        >
+        focusComponent="name">
 
     <companions>
         <desktop class="com.haulmont.reports.desktop.gui.BandDefinitionEditorCompanion"/>
@@ -54,8 +52,8 @@
                 </table>
             </vbox>
             <!-- Split -->
-            <vbox margin="false;false;false;true" spacing="true" expand="textBox" height="100%">
-                <vbox id="textBox" expand="text">
+            <vbox id="editPane" margin="false;false;false;true" spacing="true" height="100%">
+                <vbox id="textBox" expand="text" height="100%">
                     <label id="dataSetTextLabel" value="msg://dataSet.text"/>
                     <sourceCodeEditor id="text" datasource="dataSetsDs" property="text"
                                       mode="Text" width="100%"/>

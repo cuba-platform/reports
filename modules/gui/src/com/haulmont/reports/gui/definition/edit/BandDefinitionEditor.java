@@ -26,7 +26,6 @@ import com.haulmont.reports.app.EntityTree;
 import com.haulmont.reports.app.service.ReportService;
 import com.haulmont.reports.app.service.ReportWizardService;
 import com.haulmont.reports.entity.*;
-import com.haulmont.reports.entity.wizard.RegionProperty;
 import com.haulmont.reports.entity.wizard.ReportData;
 import com.haulmont.reports.entity.wizard.ReportRegion;
 import com.haulmont.reports.entity.wizard.TemplateFileType;
@@ -81,6 +80,8 @@ public class BandDefinitionEditor extends AbstractEditor<BandDefinition> impleme
     protected ReportService reportService;
     @Inject
     protected ReportWizardService reportWizardService;
+    @Inject
+    protected BoxLayout editPane;
 
     protected List xlsExts = Arrays.asList("xls", "xlsx");
 
@@ -218,9 +219,10 @@ public class BandDefinitionEditor extends AbstractEditor<BandDefinition> impleme
     }
 
     protected void hideEditComponents() {
-        textBox.setVisible(false);
-        entityBox.setVisible(false);
-        entitiesBox.setVisible(false);
+        // do not use setVisible(false) due to web legacy (Vaadin 6) layout problems #PL-3916
+        editPane.remove(textBox);
+        editPane.remove(entityBox);
+        editPane.remove(entitiesBox);
     }
 
     protected void applyType(DataSetType dsType) {
@@ -231,13 +233,13 @@ public class BandDefinitionEditor extends AbstractEditor<BandDefinition> impleme
                 case SQL:
                 case JPQL:
                 case GROOVY:
-                    textBox.setVisible(true);
+                    editPane.add(textBox);
                     break;
                 case SINGLE:
-                    entityBox.setVisible(true);
+                    editPane.add(entityBox);
                     break;
                 case MULTI:
-                    entitiesBox.setVisible(true);
+                    editPane.add(entitiesBox);
                     break;
             }
 
