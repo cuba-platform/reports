@@ -7,6 +7,7 @@ package com.haulmont.reports.web.report.wizard.region;
 
 import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.Metadata;
+import com.haulmont.cuba.gui.components.Table;
 import com.haulmont.cuba.gui.components.Tree;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
 import com.haulmont.cuba.web.gui.components.WebComponentsHelper;
@@ -52,6 +53,11 @@ public class WebRegionEditorCompanion implements RegionEditor.Companion {
                         regionProperty.setEntityTreeNode(entityTreeNode);
                         regionProperty.setOrderNum((long) reportRegionPropertiesTableDs.getItemIds().size() + 1); //first element must be not zero cause later we do sorting by multiplying that values
                         reportRegionPropertiesTableDs.addItem(regionProperty);
+                        Table propertiesTable = entityTree.getFrame().getComponent("propertiesTable");
+                        if (propertiesTable != null) {
+                            propertiesTable.setSelected(regionProperty);
+                            ((com.vaadin.ui.Table) WebComponentsHelper.unwrap(propertiesTable)).setCurrentPageFirstItemId(regionProperty.getId());
+                        }
                     }
                 }
             }

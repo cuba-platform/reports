@@ -185,7 +185,7 @@ public class RegionEditor extends AbstractEditor<ReportRegion> {
                 }));
 
                 Set<EntityTreeNode> selectedItems = entityTree.getSelected();
-                int addedItems = 0;
+                List addedItems = new ArrayList();
                 boolean alreadyAdded = false;
                 for (EntityTreeNode entityTreeNode : selectedItems) {
                     if (entityTreeNode.getWrappedMetaClass() != null) {
@@ -196,19 +196,20 @@ public class RegionEditor extends AbstractEditor<ReportRegion> {
                         regionProperty.setEntityTreeNode(entityTreeNode);
                         regionProperty.setOrderNum((long) reportRegionPropertiesTableDs.getItemIds().size() + 1); //first element must be not zero cause later we do sorting by multiplying that values
                         reportRegionPropertiesTableDs.addItem(regionProperty);
-                        addedItems++;
+                        addedItems.add(regionProperty);
                     } else {
                         alreadyAdded = true;
                     }
                 }
-                if (addedItems == 0) {
+                if (addedItems.isEmpty()) {
                     if (alreadyAdded)
                         showNotification(getMessage("elementsAlreadyAdded"), NotificationType.TRAY);
                     else if (selectedItems.size() != 0)
                         showNotification(getMessage("selectPropertyFromEntity"), NotificationType.HUMANIZED);
                     else
                         showNotification(getMessage("elementsWasNotAdded"), NotificationType.TRAY);
-                }
+                } else
+                    propertiesTable.setSelected(addedItems);
             }
 
             @Override
