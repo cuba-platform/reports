@@ -130,8 +130,8 @@ public class InputParametersController extends AbstractWindow {
         Field field = fieldCreationMapping.get(parameter.getType()).createField(parameter);
         field.setRequiredMessage(formatMessage("error.paramIsRequiredButEmpty", parameter.getLocName()));
 
-        field.setId(parameter.getAlias());
-        field.setWidth("250px");
+        field.setId("param_" + parameter.getAlias());
+        field.setWidth("100%");
         field.setFrame(this);
         field.setEditable(true);
 
@@ -153,6 +153,7 @@ public class InputParametersController extends AbstractWindow {
 
         Label label = cFactory.createComponent(Label.NAME);
         label.setAlignment(Alignment.MIDDLE_LEFT);
+        label.setWidth(Component.AUTO_SIZE);
         label.setValue(parameter.getLocName());
 
         parametersGrid.add(label, 0, currentGridRow);
@@ -254,7 +255,7 @@ public class InputParametersController extends AbstractWindow {
 
             pickerField.setMetaClass(entityMetaClass);
 
-            PickerField.LookupAction pickerlookupAction = new PickerField.LookupAction(pickerField) {
+            PickerField.LookupAction pickerLookupAction = new PickerField.LookupAction(pickerField) {
                 @Override
                 public void actionPerform(Component component) {
                     getDialogParams().setHeight(400);
@@ -262,20 +263,20 @@ public class InputParametersController extends AbstractWindow {
                     super.actionPerform(component);
                 }
             };
-            pickerlookupAction.setLookupScreenOpenType(WindowManager.OpenType.DIALOG);
-            pickerField.addAction(pickerlookupAction);
+            pickerLookupAction.setLookupScreenOpenType(WindowManager.OpenType.DIALOG);
+            pickerField.addAction(pickerLookupAction);
 
             String alias = parameter.getScreen();
 
             if (StringUtils.isNotEmpty(alias)) {
-                pickerlookupAction.setLookupScreen(alias);
-                pickerlookupAction.setLookupScreenParams(Collections.<String, Object>emptyMap());
+                pickerLookupAction.setLookupScreen(alias);
+                pickerLookupAction.setLookupScreenParams(Collections.<String, Object>emptyMap());
             } else {
-                pickerlookupAction.setLookupScreen("report$commonLookup");
+                pickerLookupAction.setLookupScreen("report$commonLookup");
                 Map<String, Object> params = new HashMap<>();
                 params.put("class", entityMetaClass);
 
-                pickerlookupAction.setLookupScreenParams(params);
+                pickerLookupAction.setLookupScreenParams(params);
             }
 
             if ((linkedEntity != null) && (clazz != null) && (clazz.isAssignableFrom(linkedEntity.getClass())))
@@ -306,7 +307,8 @@ public class InputParametersController extends AbstractWindow {
             tokenList.setEditable(true);
             tokenList.setLookup(true);
             tokenList.setLookupOpenMode(WindowManager.OpenType.DIALOG);
-            tokenList.setHeight("150px");
+            tokenList.setHeight("120px");
+
             String screen = parameter.getScreen();
 
             if (StringUtils.isNotEmpty(screen)) {
@@ -320,6 +322,7 @@ public class InputParametersController extends AbstractWindow {
             }
 
             tokenList.setAddButtonCaption(messages.getMessage(TokenList.class, "actions.Select"));
+            tokenList.setInline(true);
             tokenList.setSimple(true);
 
             if (Boolean.TRUE.equals(parameter.getRequired())) {
@@ -332,7 +335,6 @@ public class InputParametersController extends AbstractWindow {
                     }
                 });
             }
-
 
             return tokenList;
         }
