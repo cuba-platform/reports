@@ -58,7 +58,7 @@ public class HtmlGenerator implements Generator {
     }
 
     protected void putStylesHtml(Map<String, String> templateParameters) {
-        templateParameters.put(HTML_TEMPLATE_PLACEHOLDER_STYLES, " body  {font-family: Arial;}\n tbody tr {height:20px; min-height:20px}\n");
+        templateParameters.put(HTML_TEMPLATE_PLACEHOLDER_STYLES, " body  {font-family: 'Charis SIL', sans-serif;}\n tbody tr {height:20px; min-height:20px}\n");
     }
 
     protected void putBodyHtml(Map<String, String> templateParameters) {
