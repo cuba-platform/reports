@@ -7,7 +7,7 @@
 
     <layout spacing="true" expand="inputParametersTable">
         <label value="msg://report.parameters" stylename="h2"/>
-        <table id="inputParametersTable" sortable="true" width="100%"
+        <table id="inputParametersTable" sortable="false" width="100%"
                reorderingAllowed="false" columnControlVisible="false">
             <buttonsPanel>
                 <button action="inputParametersTable.create" icon="icons/create.png"/>

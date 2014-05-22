@@ -123,7 +123,7 @@ public class ReportEditor extends AbstractEditor<Report> {
     protected CollectionDatasource<ReportGroup, UUID> groupsDs;
 
     @Inject
-    protected CollectionDatasource<ReportInputParameter, UUID> parametersDs;
+    protected CollectionDatasource.Sortable<ReportInputParameter, UUID> parametersDs;
 
     @Inject
     protected CollectionDatasource<ReportScreen, UUID> reportScreensDs;
@@ -210,9 +210,6 @@ public class ReportEditor extends AbstractEditor<Report> {
     }
 
     protected void initParameters() {
-        final MetaClass metaClass = AppBeans.get(Metadata.class).getSession().getClass(ReportInputParameter.class);
-        final MetaPropertyPath mpp = new MetaPropertyPath(metaClass, metaClass.getProperty("position"));
-
         parametersTable.addAction(
                 new CreateAction(parametersTable, OpenType.DIALOG) {
                     @Override
@@ -258,7 +255,8 @@ public class ReportEditor extends AbstractEditor<Report> {
                         if (previousParameter != null) {
                             parameter.setPosition(previousParameter.getPosition());
                             previousParameter.setPosition(index);
-                            parametersTable.sortBy(mpp, true);
+
+                            sortParametersByPosition();
                         }
                     }
                 }
@@ -292,7 +290,8 @@ public class ReportEditor extends AbstractEditor<Report> {
                         if (nextParameter != null) {
                             parameter.setPosition(nextParameter.getPosition());
                             nextParameter.setPosition(index);
-                            parametersTable.sortBy(mpp, true);
+
+                            sortParametersByPosition();
                         }
                     }
                 }
@@ -320,6 +319,17 @@ public class ReportEditor extends AbstractEditor<Report> {
                 }
             }
         });
+    }
+
+    protected void sortParametersByPosition() {
+        final MetaClass metaClass = AppBeans.get(Metadata.class).getSession().getClass(ReportInputParameter.class);
+        final MetaPropertyPath mpp = new MetaPropertyPath(metaClass, metaClass.getProperty("position"));
+
+        CollectionDatasource.Sortable.SortInfo sortInfo = new CollectionDatasource.Sortable.SortInfo();
+        sortInfo.setOrder(CollectionDatasource.Sortable.Order.ASC);
+        sortInfo.setPropertyPath(mpp);
+
+        parametersDs.sort(new CollectionDatasource.Sortable.SortInfo[]{sortInfo});
     }
 
     protected void initValuesFormats() {
