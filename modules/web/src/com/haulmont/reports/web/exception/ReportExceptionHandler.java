@@ -41,7 +41,7 @@ public class ReportExceptionHandler extends AbstractExceptionHandler {
         if (FailedToConnectToOpenOfficeException.class.getName().equals(className)) {
             String msg = messages.getMessage(getClass(), "reportException.failedConnectToOffice");
             app.getWindowManager().showNotification(msg, IFrame.NotificationType.ERROR);
-        } if (NoOpenOfficeFreePortsException.class.getName().equals(className)) {
+        } else if (NoOpenOfficeFreePortsException.class.getName().equals(className)) {
             String msg = messages.getMessage(getClass(), "reportException.noOpenOfficeFreePorts");
             app.getWindowManager().showNotification(msg, IFrame.NotificationType.ERROR);
         } else {

@@ -8,11 +8,11 @@ package com.haulmont.reports.desktop.exception;
 import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.desktop.App;
+import com.haulmont.cuba.desktop.TopLevelFrame;
 import com.haulmont.cuba.desktop.exception.AbstractExceptionHandler;
 import com.haulmont.cuba.desktop.sys.DialogWindow;
 import com.haulmont.cuba.gui.components.IFrame;
 import com.haulmont.reports.exception.*;
-import com.haulmont.yarg.formatters.impl.doc.connector.NoFreePortsException;
 import org.jdesktop.swingx.JXErrorPane;
 import org.jdesktop.swingx.error.ErrorInfo;
 
@@ -44,30 +44,34 @@ public class ReportExceptionHandler extends AbstractExceptionHandler {
     protected void doHandle(Thread thread, String className, String message, @Nullable Throwable throwable) {
         Messages messages = AppBeans.get(Messages.class);
 
+        final App app = App.getInstance();
+        final TopLevelFrame mainFrame = app.getMainFrame();
+
         if (FailedToConnectToOpenOfficeException.class.getName().equals(className)) {
             String msg = messages.getMessage(getClass(), "reportException.failedConnectToOffice");
-            App.getInstance().getMainFrame().getWindowManager().showNotification(msg, IFrame.NotificationType.ERROR);
-        } if (NoOpenOfficeFreePortsException.class.getName().equals(className)) {
+            mainFrame.getWindowManager().showNotification(msg, IFrame.NotificationType.ERROR);
+        } else if (NoOpenOfficeFreePortsException.class.getName().equals(className)) {
             String msg = messages.getMessage(getClass(), "reportException.noOpenOfficeFreePorts");
-            App.getInstance().getMainFrame().getWindowManager().showNotification(msg, IFrame.NotificationType.ERROR);
+            mainFrame.getWindowManager().showNotification(msg, IFrame.NotificationType.ERROR);
         } else {
             JXErrorPane errorPane = new JXErrorPane();
             ErrorInfo errorInfo = new ErrorInfo(
                     messages.getMessage(getClass(), "reportException.message"), message,
                     null, null, throwable, null, null);
             errorPane.setErrorInfo(errorInfo);
-            JDialog dialog = JXErrorPane.createDialog(App.getInstance().getMainFrame(), errorPane);
+            JDialog dialog = JXErrorPane.createDialog(mainFrame, errorPane);
             dialog.setMinimumSize(new Dimension(600, (int) dialog.getMinimumSize().getHeight()));
 
-            final DialogWindow lastDialogWindow = getLastDialogWindow();
+            final DialogWindow lastDialogWindow = getLastDialogWindow(mainFrame);
             dialog.addWindowListener(
                     new WindowAdapter() {
                         @Override
                         public void windowClosed(WindowEvent e) {
                             if (lastDialogWindow != null)
                                 lastDialogWindow.enableWindow();
-                            else
-                                App.getInstance().getMainFrame().activate();
+                            else {
+                                mainFrame.activate();
+                            }
                         }
                     }
             );
@@ -76,15 +80,15 @@ public class ReportExceptionHandler extends AbstractExceptionHandler {
             if (lastDialogWindow != null)
                 lastDialogWindow.disableWindow(null);
             else
-                App.getInstance().getMainFrame().deactivate(null);
+                mainFrame.deactivate(null);
 
             dialog.setVisible(true);
         }
-   }
+    }
 
-    private DialogWindow getLastDialogWindow() {
+    protected DialogWindow getLastDialogWindow(TopLevelFrame mainFrame) {
         try {
-            return App.getInstance().getMainFrame().getWindowManager().getLastDialogWindow();
+            return mainFrame.getWindowManager().getLastDialogWindow();
         } catch (Exception e) {
             // this may happen in case of initialization error
             return null;

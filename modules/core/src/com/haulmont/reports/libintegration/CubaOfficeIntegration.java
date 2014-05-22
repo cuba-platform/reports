@@ -51,6 +51,9 @@ public class CubaOfficeIntegration extends OfficeIntegration implements CubaOffi
             if (ex.getCause() instanceof BootstrapException) {
                 throw new OpenOfficeException("Failed to connect to open office. Please check open office path " + openOfficePath, ex);
             }
+            if (ex.getCause() instanceof OpenOfficeException) {
+                throw (OpenOfficeException)ex.getCause();
+            }
             throw new RuntimeException(ex.getCause());
         } catch (OpenOfficeException ex) {
             throw ex;
