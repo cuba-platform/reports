@@ -94,8 +94,8 @@ public class EntityTreeModelBuilder implements EntityTreeModelBuilderApi {
                     //System.err.println(StringUtils.leftPad("", newDepth * 2, " ") + getTreeNodeInfo(newParentModelNode) + "     |     " + getTreeNodeInfo(parentEntityTreeNode));
                     //System.err.println("");
 
-                    if (!entityTreeStructureInfo.isEntityTreeHasCollections() && metaProperty.getRange().getCardinality().isMany() && newDepth < getEntityTreeModelMaxDeep()) {
-                        entityTreeStructureInfo.setEntityTreeHasCollections(true);//TODO set to true if only simple attributes of that collection as children exists
+                    if (!entityTreeStructureInfo.isEntityTreeRootHasCollections() && metaProperty.getRange().getCardinality().isMany() && depth == 1) {
+                        entityTreeStructureInfo.setEntityTreeRootHasCollections(true);//TODO set to true if only simple attributes of that collection as children exists
                     }
                     fillChildNodes(newParentModelNode, newDepth, alreadyAddedMetaProps, entityTreeStructureInfo);
 
@@ -122,7 +122,9 @@ public class EntityTreeModelBuilder implements EntityTreeModelBuilderApi {
 
     private String getTreeNodeInfo(EntityTreeNode parentEntityTreeNode) {
         if (parentEntityTreeNode.getWrappedMetaProperty() != null) {
-            return parentEntityTreeNode.getWrappedMetaClass().getName() + " isMany:" + parentEntityTreeNode.getWrappedMetaProperty().getRange().getCardinality().isMany();
+            return (parentEntityTreeNode.getWrappedMetaProperty().getDomain().getName().equals(parentEntityTreeNode.getWrappedMetaClass().getName()) ?
+                    "" : parentEntityTreeNode.getWrappedMetaProperty().getDomain() + ".") +
+                    parentEntityTreeNode.getWrappedMetaClass().getName() + " isMany:" + parentEntityTreeNode.getWrappedMetaProperty().getRange().getCardinality().isMany();
         } else {
             return parentEntityTreeNode.getWrappedMetaClass().getName() + " isMany:false";
         }

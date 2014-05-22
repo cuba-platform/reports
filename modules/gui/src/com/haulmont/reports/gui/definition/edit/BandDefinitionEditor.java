@@ -375,7 +375,8 @@ public class BandDefinitionEditor extends AbstractEditor<BandDefinition> impleme
 
             ReportData reportData = new ReportData();
             reportData.setName(report.getName());
-            reportData.setTemplateFileName(report.getDefaultTemplate().getName().replaceFirst("(\\(\\d+\\))?\\.", "(" + report.getTemplates().size() + ")."));
+            reportData.setTemplateFileName(report.getDefaultTemplate() == null ? "default.docx" :
+                    report.getDefaultTemplate().getName().replaceFirst("(\\(\\d+\\))?\\.", "(" + report.getTemplates().size() + ")."));
             reportData.setIsTabulatedReport(!CollectionUtils.isEmpty(report.getInputParameters()) && ParameterType.ENTITY_LIST.equals(report.getInputParameters().get(0).getType()));
             reportData.setOutputFileType(report.getDefaultTemplate().getReportOutputType());
             reportData.setGroup(report.getGroup());
@@ -402,8 +403,8 @@ public class BandDefinitionEditor extends AbstractEditor<BandDefinition> impleme
 
             reportData.setReportRegions(regionList);
 
-            TemplateFileType templateFileType = TemplateFileType.HTML.name().equals(report.getDefaultTemplate().getExt()) ?
-                    TemplateFileType.HTML : (xlsExts.contains(report.getDefaultTemplate().getExt()) ?
+            TemplateFileType templateFileType = TemplateFileType.HTML.name().equals(report.getDefaultTemplate().getExt().toUpperCase()) ?
+                    TemplateFileType.HTML : (xlsExts.contains(report.getDefaultTemplate().getExt().toUpperCase()) ?
                     TemplateFileType.XLSX : TemplateFileType.DOCX);
             byte[] templateByteArray = null;
             try {

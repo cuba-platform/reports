@@ -130,7 +130,7 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
                 if (needUpdateEntityModel) {
                     EntityTree entityTree = reportWizardService.buildEntityTree((MetaClass) entity.getValue());
                     entityTreeHasSimpleAttrs = entityTree.getEntityTreeStructureInfo().isEntityTreeHasSimpleAttrs();
-                    entityTreeHasCollections = entityTree.getEntityTreeStructureInfo().isEntityTreeHasCollections();
+                    entityTreeHasCollections = entityTree.getEntityTreeStructureInfo().isEntityTreeRootHasCollections();
                     getItem().setEntityTreeRootNode(entityTree.getEntityTreeRootNode());
                     needUpdateEntityModel = false;
                 }
@@ -284,7 +284,7 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
 
         public EntityTreeNode buildNewEntityTreeModelAndGetRoot(MetaClass metaClass) {
             entityTreeHasSimpleAttrs = false;
-            entityTreeHasCollections = false;
+            entityTreeRootHasCollections = false;
             EntityTreeNode root = metadata.create(EntityTreeNode.class);
             root.setName(metaClass.getName());
             root.setLocalizedName(messageTools.getEntityCaption(metaClass));
@@ -326,9 +326,9 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
                         //System.err.println(StringUtils.leftPad("", newDepth * 2, " ") + getTreeNodeInfo(newParentModelNode) + "     |     " + getTreeNodeInfo(parentEntityTreeNode));
                         //System.err.println("");
 
-                        if (!entityTreeHasCollections && metaProperty.getRange().getCardinality().isMany() && newDepth < getEntityTreeModelMaxDeep()) {
-                            entityTreeHasCollections = true;//TODO set to true if only simple attributes of that collection as children exists
-                            entityTreeHasCollections = true;//TODO set to true if only simple attributes of that collection as children exists
+                        if (!entityTreeRootHasCollections && metaProperty.getRange().getCardinality().isMany() && newDepth < getEntityTreeModelMaxDeep()) {
+                            entityTreeRootHasCollections = true;//TODO set to true if only simple attributes of that collection as children exists
+                            entityTreeRootHasCollections = true;//TODO set to true if only simple attributes of that collection as children exists
                         }
                         fillChildNodes(newParentModelNode, newDepth, alreadyAddedMetaProps);
 

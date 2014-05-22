@@ -16,7 +16,7 @@ import java.io.Serializable;
 public class EntityTreeStructureInfo implements Serializable{
     private static final long serialVersionUID = -7636338880001636048L;
     protected boolean entityTreeHasSimpleAttrs;
-    protected boolean entityTreeHasCollections;
+    protected boolean entityTreeRootHasCollections;
 
     public boolean isEntityTreeHasSimpleAttrs() {
         return entityTreeHasSimpleAttrs;
@@ -26,12 +26,12 @@ public class EntityTreeStructureInfo implements Serializable{
         this.entityTreeHasSimpleAttrs = entityTreeHasSimpleAttrs;
     }
 
-    public boolean isEntityTreeHasCollections() {
-        return entityTreeHasCollections;
+    public boolean isEntityTreeRootHasCollections() {
+        return entityTreeRootHasCollections;
     }
 
-    public void setEntityTreeHasCollections(boolean entityTreeHasCollections) {
-        this.entityTreeHasCollections = entityTreeHasCollections;
+    public void setEntityTreeRootHasCollections(boolean entityTreeRootHasCollections) {
+        this.entityTreeRootHasCollections = entityTreeRootHasCollections;
     }
 
 }
