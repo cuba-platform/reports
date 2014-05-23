@@ -16,6 +16,7 @@ import com.haulmont.cuba.gui.data.CollectionDatasource;
 import com.haulmont.cuba.gui.data.Datasource;
 import com.haulmont.cuba.gui.data.ValueChangingListener;
 import com.haulmont.cuba.gui.data.ValueListener;
+import com.haulmont.cuba.gui.data.impl.CollectionDsListenerAdapter;
 import com.haulmont.cuba.gui.export.ByteArrayDataProvider;
 import com.haulmont.cuba.gui.export.ExportDisplay;
 import com.haulmont.cuba.gui.export.ExportFormat;
@@ -144,6 +145,13 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
             }
         });
         stepFrameManager.showCurrentFrame();
+        reportRegionsDs.addListener(new CollectionDsListenerAdapter<ReportRegion>() {
+            @Override
+            public void collectionChanged(CollectionDatasource ds, Operation operation, List<ReportRegion> items) {
+                super.collectionChanged(ds, operation, items);
+                if (Operation.ADD.equals(operation)) regionsTable.setSelected((List) items);
+            }
+        });
     }
 
     protected List<StepFrame> getStepFrames() {
