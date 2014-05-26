@@ -28,19 +28,20 @@
         </collectionDatasource>
     </dsContext>
 
-    <layout spacing="true">
-        <vbox>
+    <layout spacing="true" height="380px"  expand="mainVbox">
+        <vbox id="mainVbox" expand="navBtns">
             <iframe src="/com/haulmont/reports/gui/report/wizard/step/first-details-frame.xml" id="detailsStep"
                     width="100%"
                     visible="false"/>
-            <iframe src="/com/haulmont/reports/gui/report/wizard/step/intermediate-regions-frame.xml" id="regionsStep"
+            <iframe src="/com/haulmont/reports/gui/report/wizard/step/intermediate-regions-frame.xml"
+                    id="regionsStep"
                     width="100%"
                     visible="false"/>
             <iframe src="/com/haulmont/reports/gui/report/wizard/step/last-save-frame.xml" id="saveStep"
                     width="100%"
                     visible="false"/>
             <hbox id="navBtns" align="TOP_CENTER" margin="true">
-                <buttonsPanel>
+                <buttonsPanel align="BOTTOM_CENTER">
                     <button id="bwd" caption="msg://backward"/>
                     <button id="run" caption="msg://runReport" visible="false"/>
                     <button id="fwd" caption="msg://forward"/>
