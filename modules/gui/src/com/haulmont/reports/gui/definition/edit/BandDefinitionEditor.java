@@ -346,17 +346,7 @@ public class BandDefinitionEditor extends AbstractEditor<BandDefinition> impleme
                                     @Override
                                     public void windowClosed(String actionId) {
                                         if (COMMIT_ACTION_ID.equals(actionId)) {
-                                            ReportRegion region = (ReportRegion) regionEditor.getItem();
-                                            dataSet.setView(reportRegionToView(entityTree, region));
-                                            showOptionDialog(getMessage("notifications.confirmPrintAllheader"), getMessage("generateNewTemplate"), MessageType.CONFIRMATION, new Action[]{
-                                                    new DialogAction(DialogAction.Type.YES) {
-                                                        @Override
-                                                        public void actionPerform(Component component) {
-                                                            generateAndAddNewReportTemplate(entityTree);
-                                                        }
-                                                    },
-                                                    new DialogAction(DialogAction.Type.NO)
-                                            });
+                                            dataSet.setView(reportRegionToView(entityTree, (ReportRegion) regionEditor.getItem()));
                                         }
                                     }
                                 });
