@@ -35,6 +35,7 @@ import com.haulmont.cuba.gui.xml.layout.ComponentsFactory;
 import com.haulmont.cuba.security.entity.Role;
 import com.haulmont.reports.app.service.ReportService;
 import com.haulmont.reports.entity.*;
+import com.haulmont.reports.gui.ReportPrintHelper;
 import com.haulmont.reports.gui.definition.edit.BandDefinitionEditor;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
@@ -826,6 +827,25 @@ public class ReportEditor extends AbstractEditor<Report> {
                 }
             }
         });
+    }
+
+    @Override
+    public boolean validateAll() {
+        return super.validateAll() && validateInputOutputFormats();
+    }
+
+    protected boolean validateInputOutputFormats() {
+        if (getItem().getDefaultTemplate() == null) {
+            showNotification(getMessage("report.templateMsg"), NotificationType.TRAY);
+            return false;
+        }
+        String inputType = getItem().getDefaultTemplate().getExt();
+        if (!ReportPrintHelper.getInputOutputTypesMapping().containsKey(inputType) ||
+                !ReportPrintHelper.getInputOutputTypesMapping().get(inputType).contains(getItem().getDefaultTemplate().getReportOutputType())) {
+            showNotification(getMessage("inputOutputTypesError"), NotificationType.TRAY);
+            return false;
+        }
+        return true;
     }
 
     protected void initTemplates() {
