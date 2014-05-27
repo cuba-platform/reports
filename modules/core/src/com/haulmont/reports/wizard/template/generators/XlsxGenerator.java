@@ -20,6 +20,7 @@ import org.xlsx4j.sml.*;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
+import java.util.List;
 
 /**
  * @author fedorchenko
@@ -39,11 +40,6 @@ public class XlsxGenerator extends AbstractOfficeGenerator {
         ctCalcPr.setCalcMode(STCalcMode.AUTO);
         pkg.getWorkbookPart().getJaxbElement().setCalcPr(ctCalcPr);
 
-        CTSheetFormatPr format = factory.createCTSheetFormatPr();
-        format.setBaseColWidth(10L);
-        format.setDefaultColWidth(30.);
-        sheet.getJaxbElement().setSheetFormatPr(format);
-
         Styles styles = new Styles(new PartName("/xl/styles.xml"));
         styles.setJaxbElement(generateStyleSheet(factory));
 
@@ -52,6 +48,7 @@ public class XlsxGenerator extends AbstractOfficeGenerator {
         long rowNum = 1; //first row of sheet is '1'
         long startedRowForRegion;
         long endedRowForRegion;
+        int maxColCount = 0;
         for (ReportRegion reportRegion : reportData.getReportRegions()) {
             if (reportRegion.isTabulatedRegion()) {
                 rowNum++;//insert empty row before table
@@ -66,6 +63,7 @@ public class XlsxGenerator extends AbstractOfficeGenerator {
                     sheetData.getRow().add(createRow(factory, reportTemplatePlaceholder.getPlaceholderValue(regionProperty.getHierarchicalNameExceptRoot(), reportRegion), colNum++, rowNum));
                 }
                 endedRowForRegion = rowNum;
+                maxColCount = maxColCount > colNum ? maxColCount : colNum;
                 rowNum++;
                 rowNum++;//insert empty row after table
             } else {
@@ -79,10 +77,24 @@ public class XlsxGenerator extends AbstractOfficeGenerator {
                     rowNum++;
                 }
                 endedRowForRegion = rowNum - 1;
+                maxColCount = maxColCount > 2 ? maxColCount : 2;
             }
 
             addDefinedNames(SHEET, factory, definedNames, startedRowForRegion, endedRowForRegion, reportRegion);
         }
+        List<Cols> lstCols = sheet.getJaxbElement().getCols();
+        Cols cols = factory.createCols();
+        for (int i = 0; i < maxColCount; i++) {
+            Col col = factory.createCol();
+            col.setMin(i+1);
+            col.setMax(i+1);
+            col.setBestFit(Boolean.TRUE);
+            col.setCustomWidth(true);
+            col.setWidth(30.);
+            cols.getCol().add(col);
+        }
+        lstCols.add(cols);
+
         pkg.getWorkbookPart().getJaxbElement().setDefinedNames(definedNames);
         sheet.addTargetPart(styles);
         Parts parts = pkg.getParts();
