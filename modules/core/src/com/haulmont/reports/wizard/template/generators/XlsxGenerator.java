@@ -11,10 +11,14 @@ import org.apache.poi.ss.util.CellReference;
 import org.docx4j.openpackaging.exceptions.Docx4JException;
 import org.docx4j.openpackaging.packages.OpcPackage;
 import org.docx4j.openpackaging.packages.SpreadsheetMLPackage;
+import org.docx4j.openpackaging.parts.Part;
 import org.docx4j.openpackaging.parts.PartName;
+import org.docx4j.openpackaging.parts.Parts;
+import org.docx4j.openpackaging.parts.SpreadsheetML.Styles;
 import org.docx4j.openpackaging.parts.SpreadsheetML.WorksheetPart;
 import org.xlsx4j.sml.*;
 
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 
 /**
@@ -34,6 +38,14 @@ public class XlsxGenerator extends AbstractOfficeGenerator {
         CTCalcPr ctCalcPr = factory.createCTCalcPr();
         ctCalcPr.setCalcMode(STCalcMode.AUTO);
         pkg.getWorkbookPart().getJaxbElement().setCalcPr(ctCalcPr);
+
+        CTSheetFormatPr format = factory.createCTSheetFormatPr();
+        format.setBaseColWidth(10L);
+        format.setDefaultColWidth(30.);
+        sheet.getJaxbElement().setSheetFormatPr(format);
+
+        Styles styles = new Styles(new PartName("/xl/styles.xml"));
+        styles.setJaxbElement(generateStyleSheet(factory));
 
 
         DefinedNames definedNames = factory.createDefinedNames();
@@ -72,6 +84,10 @@ public class XlsxGenerator extends AbstractOfficeGenerator {
             addDefinedNames(SHEET, factory, definedNames, startedRowForRegion, endedRowForRegion, reportRegion);
         }
         pkg.getWorkbookPart().getJaxbElement().setDefinedNames(definedNames);
+        sheet.addTargetPart(styles);
+        Parts parts = pkg.getParts();
+        Part workBook = parts.get(new PartName("/xl/workbook.xml"));
+        workBook.addTargetPart(styles);
         return pkg;
     }
 
@@ -99,5 +115,87 @@ public class XlsxGenerator extends AbstractOfficeGenerator {
         definedNames.getDefinedName().add(ctDefinedName);
     }
 
+    protected CTBorder generateBorder(org.xlsx4j.sml.ObjectFactory factory, CTBorderPr borderPr) {
+        CTBorder border = factory.createCTBorder();
+        border.setBottom(borderPr);
+        border.setTop(borderPr);
+        border.setLeft(borderPr);
+        border.setRight(borderPr);
+        return border;
+    }
+
+    protected CTXf generateCTXf(Long borderId, Long XfId, Long numFmtId, Long fontId, Long fillId, CTCellAlignment alignment, Boolean applyBorder) {
+        CTXf xf = new CTXf();
+        if (applyBorder != null) xf.setApplyBorder(applyBorder);
+        if (borderId != null) xf.setBorderId(borderId);
+        if (XfId != null) xf.setXfId(XfId);
+        if (numFmtId != null) xf.setNumFmtId(numFmtId);
+        if (fontId != null) xf.setFontId(fontId);
+        if (fillId != null) xf.setFillId(fillId);
+        if (alignment != null) xf.setAlignment(alignment);
+        return xf;
+    }
+
+    protected CTStylesheet generateStyleSheet(ObjectFactory factory) {
+        CTStylesheet stylesheet = factory.createCTStylesheet();
+        CTBorders borders = factory.createCTBorders();
+        CTBorderPr borderPr = factory.createCTBorderPr();
+        borderPr.setStyle(STBorderStyle.THIN);
+        CTColor borderColor = new CTColor();
+        borderColor.setIndexed(64l);
+        borderPr.setColor(borderColor);
+        borders.getBorder().add(generateBorder(factory, factory.createCTBorderPr()));
+        borders.getBorder().add(generateBorder(factory, borderPr));
+        borders.setCount(2L);
+        stylesheet.setBorders(borders);
+
+        stylesheet.setCellXfs(new CTCellXfs());
+        stylesheet.getCellXfs().setCount(2L);
+        CTCellAlignment cellAlignment = new CTCellAlignment();
+        cellAlignment.setWrapText(true);
+
+        stylesheet.getCellXfs().getXf().add(generateCTXf(0l, 0l, null, 0l, 0l, cellAlignment, null));
+        stylesheet.getCellXfs().getXf().add(generateCTXf(1l, 0l, null, 0l, 0l, cellAlignment, true));
+        stylesheet.setCellStyles(new CTCellStyles());
+        stylesheet.getCellStyles().setCount(1L);
+        CTCellStyle cellStyle = new CTCellStyle();
+        cellStyle.setName("myStyle");
+        cellStyle.setBuiltinId(0L);
+        cellStyle.setXfId(0L);
+        cellStyle.setCustomBuiltin(true);
+        stylesheet.getCellStyles().getCellStyle().add(cellStyle);
+        stylesheet.setCellStyleXfs(new CTCellStyleXfs());
+        stylesheet.getCellStyleXfs().setCount(1L);
+
+        stylesheet.getCellStyleXfs().getXf().add(generateCTXf(0l, null, null, 0l, 0l, null, null));
+
+        stylesheet.setFills(factory.createCTFills());
+        CTFill fill = factory.createCTFill();
+        CTPatternFill ctPatternFilll = new CTPatternFill();
+        ctPatternFilll.setPatternType(STPatternType.NONE);
+        fill.setPatternFill(ctPatternFilll);
+        stylesheet.getFills().getFill().add(fill);
+        stylesheet.getFills().setCount(1L);
+
+        stylesheet.setFonts(factory.createCTFonts());
+        CTFont font = new CTFont();
+        CTFontSize fdrSize = new CTFontSize();
+        fdrSize.setVal(12);
+        JAXBElement<CTFontSize> element19 = factory.createCTFontSz(fdrSize);
+        font.getNameOrCharsetOrFamily().add(element19);
+
+        CTColor fdrColor = new CTColor();
+        fdrColor.setTheme(1L);
+        JAXBElement<CTColor> element20 = factory.createCTFontColor(fdrColor);
+        font.getNameOrCharsetOrFamily().add(element20);
+
+        CTFontName fdrFontName = new CTFontName();
+        fdrFontName.setVal("Times New Roman");
+        JAXBElement<CTFontName> element21 = factory.createCTFontName(fdrFontName);
+        font.getNameOrCharsetOrFamily().add(element21);
+        stylesheet.getFonts().getFont().add(font);
+        stylesheet.getFonts().setCount(1L);
+        return stylesheet;
+    }
 
 }

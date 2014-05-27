@@ -59,6 +59,7 @@ public abstract class AbstractOfficeGenerator implements Generator {
         cell.setT(STCellType.STR);
         cell.setV(stringContent);
         cell.setR(CellReference.convertNumToColString(colNum - 1) + "" + rowNum);
+        cell.setS(1L);
         return cell;
     }
 
