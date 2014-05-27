@@ -13,6 +13,7 @@ import com.haulmont.reports.entity.Report;
 import com.haulmont.reports.entity.wizard.EntityTreeNode;
 import com.haulmont.reports.entity.wizard.ReportData;
 import com.haulmont.reports.entity.wizard.ReportRegion;
+import com.haulmont.reports.entity.wizard.TemplateFileType;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -26,7 +27,7 @@ import java.util.List;
 public interface ReportingWizardApi {
     String NAME = "report_ReportingWizardApi";
 
-    Report toReport(ReportData reportData, byte[] templateByteArray, boolean isTmp);
+    Report toReport(ReportData reportData, byte[] templateByteArray, boolean isTmp, TemplateFileType templateFileType);
 
     View createViewByReportRegions(EntityTreeNode entityTreeRootNode, List<ReportRegion> reportRegions);
 

@@ -251,7 +251,7 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
         }
 
 
-        Report report = reportWizardService.toReport(reportData, templateByteArray, tmp);
+        Report report = reportWizardService.toReport(reportData, templateByteArray, tmp, (TemplateFileType) templateFileFormat.getValue());
         reportData.setGeneratedReport(report);
         return report;
     }

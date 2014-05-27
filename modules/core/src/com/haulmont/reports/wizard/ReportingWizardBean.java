@@ -17,10 +17,7 @@ import com.haulmont.reports.ReportingConfig;
 import com.haulmont.reports.app.EntityTree;
 import com.haulmont.reports.app.service.ReportService;
 import com.haulmont.reports.entity.*;
-import com.haulmont.reports.entity.wizard.EntityTreeNode;
-import com.haulmont.reports.entity.wizard.RegionProperty;
-import com.haulmont.reports.entity.wizard.ReportData;
-import com.haulmont.reports.entity.wizard.ReportRegion;
+import com.haulmont.reports.entity.wizard.*;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang.StringUtils;
@@ -53,7 +50,7 @@ public class ReportingWizardBean implements ReportingWizardApi {
     protected Log log = LogFactory.getLog(ReportingBean.class);
 
     @Override
-    public Report toReport(ReportData reportData, byte[] templateByteArray, boolean isTmp) {
+    public Report toReport(ReportData reportData, byte[] templateByteArray, boolean isTmp, TemplateFileType templateFileType) {
         Report report = metadata.create(Report.class);
         report.setIsTmp(isTmp);
         report.setReportType(ReportType.SIMPLE);
@@ -90,7 +87,8 @@ public class ReportingWizardBean implements ReportingWizardApi {
         Messages messages = AppBeans.get(Messages.NAME);
         for (ReportRegion reportRegion : reportData.getReportRegions()) {
             if (reportRegion.isTabulatedRegion() && (reportData.getOutputFileType() == ReportOutputType.XLSX ||
-                    reportData.getOutputFileType() == ReportOutputType.XLS)) {
+                    reportData.getOutputFileType() == ReportOutputType.XLS ||
+                    (reportData.getOutputFileType() == ReportOutputType.PDF && TemplateFileType.XLSX.equals(templateFileType)))) {
                 BandDefinition headerBandDefinition = metadata.create(BandDefinition.class);
                 headerBandDefinition.setParentBandDefinition(rootReportBandDefinition);
                 headerBandDefinition.setOrientation(Orientation.HORIZONTAL);
