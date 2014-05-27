@@ -405,7 +405,7 @@ public class BandDefinitionEditor extends AbstractEditor<BandDefinition> impleme
             if (templateByteArray != null) {
                 ReportTemplate reportTemplate = metadata.create(ReportTemplate.class);
                 reportTemplate.setReport(report);
-                reportTemplate.setCode(ReportService.DEFAULT_TEMPLATE_CODE);
+                report.getDefaultTemplate().setCode("Template_" + report.getTemplates().size());
                 reportTemplate.setName(reportData.getTemplateFileName());
                 reportTemplate.setContent(templateByteArray);
                 reportTemplate.setCustomFlag(Boolean.FALSE);
