@@ -83,7 +83,7 @@ public class BandDefinitionEditor extends AbstractEditor<BandDefinition> impleme
     @Inject
     protected BoxLayout editPane;
 
-    protected List xlsExts = Arrays.asList("xls", "xlsx");
+    protected List xlsExts = Arrays.asList("XLS", "XLSX");
 
     @Override
     protected void initNewItem(BandDefinition item) {
@@ -405,7 +405,7 @@ public class BandDefinitionEditor extends AbstractEditor<BandDefinition> impleme
             if (templateByteArray != null) {
                 ReportTemplate reportTemplate = metadata.create(ReportTemplate.class);
                 reportTemplate.setReport(report);
-                report.getDefaultTemplate().setCode("Template_" + report.getTemplates().size());
+                reportTemplate.setCode("Template_" + report.getTemplates().size());
                 reportTemplate.setName(reportData.getTemplateFileName());
                 reportTemplate.setContent(templateByteArray);
                 reportTemplate.setCustomFlag(Boolean.FALSE);
