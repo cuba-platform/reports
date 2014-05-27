@@ -50,7 +50,9 @@ public abstract class AbstractOfficeGenerator implements Generator {
     public Row createRow(org.xlsx4j.sml.ObjectFactory factory, String stringContent, int colNum, long rowNum) {
         Row row = factory.createRow();
         row.setR(rowNum);
-        row.getC().add(createCell(factory, stringContent, colNum, rowNum));
+        Cell cell = createCell(factory, stringContent, colNum, rowNum);
+        cell.setS(1L);
+        row.getC().add(cell);
         return row;
     }
 
@@ -59,7 +61,6 @@ public abstract class AbstractOfficeGenerator implements Generator {
         cell.setT(STCellType.STR);
         cell.setV(stringContent);
         cell.setR(CellReference.convertNumToColString(colNum - 1) + "" + rowNum);
-        cell.setS(1L);
         return cell;
     }
 

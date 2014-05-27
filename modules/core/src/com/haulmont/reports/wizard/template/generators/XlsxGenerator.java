@@ -86,8 +86,8 @@ public class XlsxGenerator extends AbstractOfficeGenerator {
         Cols cols = factory.createCols();
         for (int i = 0; i < maxColCount; i++) {
             Col col = factory.createCol();
-            col.setMin(i+1);
-            col.setMax(i+1);
+            col.setMin(i + 1);
+            col.setMax(i + 1);
             col.setBestFit(Boolean.TRUE);
             col.setCustomWidth(true);
             col.setWidth(30.);
