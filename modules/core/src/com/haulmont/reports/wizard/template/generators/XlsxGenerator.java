@@ -165,6 +165,8 @@ public class XlsxGenerator extends AbstractOfficeGenerator {
         stylesheet.getCellXfs().setCount(2L);
         CTCellAlignment cellAlignment = new CTCellAlignment();
         cellAlignment.setWrapText(true);
+        cellAlignment.setHorizontal(STHorizontalAlignment.JUSTIFY);
+        cellAlignment.setVertical(STVerticalAlignment.JUSTIFY);
 
         stylesheet.getCellXfs().getXf().add(generateCTXf(0l, 0l, null, 0l, 0l, cellAlignment, null));
         stylesheet.getCellXfs().getXf().add(generateCTXf(1l, 0l, null, 0l, 0l, cellAlignment, true));
