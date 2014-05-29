@@ -185,9 +185,9 @@ public class XlsxGenerator extends AbstractOfficeGenerator {
 
         stylesheet.setFills(factory.createCTFills());
         CTFill fill = factory.createCTFill();
-        CTPatternFill ctPatternFilll = new CTPatternFill();
-        ctPatternFilll.setPatternType(STPatternType.NONE);
-        fill.setPatternFill(ctPatternFilll);
+        CTPatternFill ctPatternFill = new CTPatternFill();
+        ctPatternFill.setPatternType(STPatternType.NONE);
+        fill.setPatternFill(ctPatternFill);
         stylesheet.getFills().getFill().add(fill);
         stylesheet.getFills().setCount(1L);
 

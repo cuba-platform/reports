@@ -10,8 +10,10 @@
  */
 package com.haulmont.reports.libintegration;
 
+import com.haulmont.chile.core.model.MetaProperty;
 import com.haulmont.cuba.core.app.DataWorker;
 import com.haulmont.cuba.core.app.FileStorageAPI;
+import com.haulmont.cuba.core.entity.BaseUuidEntity;
 import com.haulmont.cuba.core.entity.FileDescriptor;
 import com.haulmont.cuba.core.global.*;
 import com.haulmont.reports.ReportingConfig;
@@ -234,10 +236,33 @@ public class CubaHtmlFormatter extends HtmlFormatter {
         for (String key : band.getData().keySet()) {
             if (band.getData().get(key) instanceof Enum)
                 data.put(key, defaultFormat(band.getData().get(key)));
-            else data.put(key, band.getData().get(key));
+            else if (band.getData().get(key) instanceof BaseUuidEntity) {
+                data.put(key, transformEntityToMap((BaseUuidEntity) band.getData().get(key)));
+            } else {
+                data.put(key, band.getData().get(key));
+            }
         }
         model.put("fields", data);
 
         return model;
+    }
+
+    protected Map<String, Object> transformEntityToMap(BaseUuidEntity entity) {
+        Map<String, Object> resultMap = new HashMap<String, Object>();
+        for (MetaProperty property : entity.getMetaClass().getProperties()) {
+            Object value = null;
+            try {
+                if (property.getRange().isEnum())
+                    value = defaultFormat(entity.getValue(property.getName()));
+                else if (property.getRange().isClass() && entity.getValue(property.getName()) instanceof BaseUuidEntity)
+                    value = transformEntityToMap(entity.<BaseUuidEntity>getValue(property.getName()));
+                else
+                    value = entity.getValue(property.getName());
+            } catch (RuntimeException ex) {
+                log.debug(ex.getMessage(), ex);
+            }
+            resultMap.put(property.getName(), value);
+        }
+        return resultMap;
     }
 }
