@@ -160,6 +160,8 @@ public class ReportingWizardBean implements ReportingWizardApi {
         reportTemplate.setCustomFlag(Boolean.FALSE);
         Integer outputFileTypeId = reportData.getOutputFileType().getId();
         reportTemplate.setReportOutputType(ReportOutputType.fromId(outputFileTypeId));
+        if (StringUtils.isNotEmpty(reportData.getOutputNamePattern()))
+            reportTemplate.setOutputNamePattern(reportData.getOutputNamePattern());
         report.setDefaultTemplate(reportTemplate);
         report.setTemplates(Collections.singletonList(reportTemplate));
 

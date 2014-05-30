@@ -21,7 +21,8 @@ public class RegionEditor extends com.haulmont.reports.gui.report.wizard.region.
         ((Button)WebComponentsHelper.unwrap(addItem)).addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                ((Table) WebComponentsHelper.unwrap(propertiesTable)).setCurrentPageFirstItemId(((Table) WebComponentsHelper.unwrap(propertiesTable)).lastItemId());
+                Table table = (Table) WebComponentsHelper.unwrap(propertiesTable);
+                table.setCurrentPageFirstItemId(table.lastItemId());
             }
         });
     }

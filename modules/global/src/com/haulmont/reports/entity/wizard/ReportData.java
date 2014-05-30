@@ -46,6 +46,9 @@ public class ReportData extends AbstractNotPersistentEntity {
     protected String templateFileName;
     @MetaProperty
     @Transient
+    protected String outputNamePattern;
+    @MetaProperty
+    @Transient
     protected ReportOutputType outputFileType;
     @MetaProperty
     @Composition
@@ -127,6 +130,14 @@ public class ReportData extends AbstractNotPersistentEntity {
     public ReportData addRegion(int index, ReportRegion region) {
         reportRegions.add(index, region);
         return this;
+    }
+
+    public String getOutputNamePattern() {
+        return outputNamePattern;
+    }
+
+    public void setOutputNamePattern(String outputNamePattern) {
+        this.outputNamePattern = outputNamePattern;
     }
 
     @Transient

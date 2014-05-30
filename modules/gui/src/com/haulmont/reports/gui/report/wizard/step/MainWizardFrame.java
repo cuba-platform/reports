@@ -5,7 +5,8 @@
 
 package com.haulmont.reports.gui.report.wizard.step;
 
-import com.haulmont.cuba.gui.components.*;
+import com.haulmont.cuba.gui.components.AbstractEditor;
+import com.haulmont.cuba.gui.components.Button;
 
 /**
  * @author fedorchenko
@@ -13,7 +14,7 @@ import com.haulmont.cuba.gui.components.*;
  */
 public interface MainWizardFrame<T extends AbstractEditor> {
 
-    String getMessage(String key) ;
+    String getMessage(String key);
 
     String formatMessage(String key, Object... params);
 
@@ -22,4 +23,12 @@ public interface MainWizardFrame<T extends AbstractEditor> {
     Button getBackwardBtn();
 
     Button getForwardBtn();
+
+    void removeBtns();
+
+    void addForwardBtn();
+
+    void addBackwardBtn();
+
+    void addSaveBtn();
 }

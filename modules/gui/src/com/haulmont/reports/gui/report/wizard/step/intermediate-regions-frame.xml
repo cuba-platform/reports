@@ -5,16 +5,23 @@
 
 <window xmlns="http://schemas.haulmont.com/cuba/5.2/window.xsd">
     <!--<layout expand="regions">-->
-    <layout>
-        <hbox margin="true">
+    <layout spacing="true">
+        <hbox spacing="true" width="100%" expand="spacer">
             <!--btn visibility will be switched dynamically:-->
-            <button id="addRegionDisabledBtn" caption="msg://addRegion" visible="true" enable="false"/>
-            <button id="addTabulatedRegionDisabledBtn" caption="msg://tabulatedRegion" visible="true" enable="false"/>
-            <button id="addSimpleRegionBtn" caption="msg://simpleRegion" visible="false"/>
-            <button id="addTabulatedRegionBtn" caption="msg://tabulatedRegion" visible="false"/>
-            <popupButton id="addRegionPopupBtn" caption="msg://add" visible="false"/>
+            <hbox id="buttonsBox">
+                <button id="addRegionDisabledBtn" caption="msg://addRegion" enable="false"/>
+                <button id="addTabulatedRegionDisabledBtn" caption="msg://tabulatedRegion" enable="false"/>
+                <button id="addSimpleRegionBtn" caption="msg://simpleRegion"/>
+                <button id="addTabulatedRegionBtn" caption="msg://tabulatedRegion"/>
+                <popupButton id="addRegionPopupBtn" caption="msg://add"/>
+            </hbox>
+            <button id="run" caption="msg://runReport" icon="icons/run.png"/>
+            <label value="" id="spacer"/>
+            <button id="moveUpBtn" width="30px" icon="icons/up_17x25.png"/>
+            <button id="moveDownBtn" width="30px" icon="icons/down_17x25.png"/>
+            <button id="removeBtn" width="30px" icon="icons/remove.png"/>
         </hbox>
-        <vbox margin="true">
+        <vbox>
             <table id="regionsTable" multiselect="false" sortable="false" reorderingAllowed="false"
                    columnControlVisible="false"
                    height="300px" width="100%">

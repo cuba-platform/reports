@@ -10,5 +10,9 @@
         extends="com/haulmont/reports/gui/report/wizard/region/region-editor.xml">
 
 
-    <layout />
+    <layout>
+        <vbox id="topSeparator" stylename="cuba-report-wizard"/>
+        <vbox id="buttomSeparator" stylename="cuba-report-wizard"/>
+    </layout>
+
 </window>

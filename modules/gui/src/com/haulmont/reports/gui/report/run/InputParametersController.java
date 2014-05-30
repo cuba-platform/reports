@@ -92,7 +92,7 @@ public class InputParametersController extends AbstractWindow {
         }
 
         if (report != null) {
-            if (!report.getIsTmp()){
+            if (!report.getIsTmp()) {
                 report = getDsContext().getDataSupplier().reload(report, "report.edit");
             }
             if (CollectionUtils.isNotEmpty(report.getInputParameters())) {
@@ -152,7 +152,7 @@ public class InputParametersController extends AbstractWindow {
         }
 
         Label label = cFactory.createComponent(Label.NAME);
-        label.setAlignment(Alignment.MIDDLE_LEFT);
+        label.setAlignment(field instanceof TokenList ? Alignment.TOP_LEFT : Alignment.MIDDLE_LEFT);
         label.setWidth(Component.AUTO_SIZE);
         label.setValue(parameter.getLocName());
 

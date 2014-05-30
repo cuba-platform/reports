@@ -28,24 +28,34 @@
         </collectionDatasource>
     </dsContext>
 
-    <layout spacing="true" height="380px"  expand="mainVbox">
-        <vbox id="mainVbox" expand="navBtns">
-            <iframe src="/com/haulmont/reports/gui/report/wizard/step/first-details-frame.xml" id="detailsStep"
-                    width="100%"
-                    visible="false"/>
-            <iframe src="/com/haulmont/reports/gui/report/wizard/step/intermediate-regions-frame.xml"
-                    id="regionsStep"
-                    width="100%"
-                    visible="false"/>
-            <iframe src="/com/haulmont/reports/gui/report/wizard/step/last-save-frame.xml" id="saveStep"
-                    width="100%"
-                    visible="false"/>
-            <hbox id="navBtns" align="TOP_CENTER" margin="true">
-                <buttonsPanel align="BOTTOM_CENTER">
-                    <button id="bwd" caption="msg://backward"/>
-                    <button id="run" caption="msg://runReport" visible="false"/>
-                    <button id="fwd" caption="msg://forward"/>
-                    <button id="save" caption="msg://save" visible="false"/>
+    <layout height="405px" expand="mainVbox">
+        <vbox id="mainVbox" expand="editAreaVbox" spacing="true">
+            <vbox stylename="wizard-top-separator"/>
+            <vbox spacing="true">
+                <label id="tipLabel"/>
+            </vbox>
+            <vbox stylename="wizard-top-separator"/>
+            <vbox id="editAreaVbox" expand="editAreaGroupBox">
+                <groupBox id="editAreaGroupBox">
+                    <iframe src="/com/haulmont/reports/gui/report/wizard/step/first-details-frame.xml" id="detailsStep"
+                            width="100%"
+                            visible="false"/>
+                    <iframe src="/com/haulmont/reports/gui/report/wizard/step/last-save-frame.xml" id="saveStep"
+                            width="100%"
+                            visible="false"/>
+                </groupBox>
+                <iframe src="/com/haulmont/reports/gui/report/wizard/step/intermediate-regions-frame.xml"
+                        id="regionsStep"
+                        width="100%"
+                        visible="false"/>
+
+            </vbox>
+            <hbox id="navBtns" align="BOTTOM_LEFT">
+                <buttonsPanel id="navBtnsPanel" align="BOTTOM_LEFT">
+                    <button id="bwd" caption="msg://backward" icon="icons/back.png"/>
+                    <!--<button id="run" caption="msg://runReport" visible="false"/>-->
+                    <button id="fwd" caption="msg://forward" icon="icons/forward.png"/>
+                    <button id="save" caption="msg://save" visible="false" icon="icons/ok.png"/>
                 </buttonsPanel>
             </hbox>
         </vbox>

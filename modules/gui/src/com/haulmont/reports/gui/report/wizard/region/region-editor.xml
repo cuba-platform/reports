@@ -23,6 +23,11 @@
     </dsContext>
 
     <layout expand="mainContent" spacing="true">
+        <vbox id="topSeparator" stylename="wizard-top-separator"/>
+        <vbox spacing="true">
+            <label id="tipLabel"/>
+        </vbox>
+        <vbox id="buttomSeparator" stylename="wizard-top-separator"/>
         <hbox id="mainContent" width="100%" expand="treePanel">
             <vbox id="treePanel">
                 <groupBox>

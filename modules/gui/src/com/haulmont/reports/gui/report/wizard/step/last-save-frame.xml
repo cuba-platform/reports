@@ -6,7 +6,7 @@
 <window xmlns="http://schemas.haulmont.com/cuba/5.2/window.xsd">
     <layout expand="props" width="100%">
         <vbox id="props">
-            <grid margin="true" spacing="true" width="100%">
+            <grid spacing="true" width="100%">
                 <columns>
                     <column flex="0"/>
                     <column flex="1"/>
@@ -14,11 +14,15 @@
                 <rows>
                     <row>
                         <label value="msg://downloadTemplateFile"/>
-                        <button id="downloadTemplateFile" width="100%" stylename="link"/>
+                        <button id="downloadTemplateFile" width="100%" stylename="link" description="msg://templateHintMsg"/>
+                    </row>
+                    <row>
+                        <label value="msg://outputFileName"/>
+                        <textField id="outputFileName" width="100%" required="true" description="msg://outputFileNameHintMsg"/>
                     </row>
                     <row>
                         <label value="msg://outputFileFormat"/>
-                        <lookupField id="outputFileFormat"  required="true" width="100px"/>
+                        <lookupField id="outputFileFormat" required="true" width="100px" description="msg://outputFileTypeHintMsg"/>
                     </row>
                 </rows>
             </grid>

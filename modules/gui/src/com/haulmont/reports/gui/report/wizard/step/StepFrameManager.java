@@ -67,6 +67,12 @@ public class StepFrameManager {
             mainWizardFrame.getBackwardBtn().setVisible(true);
             mainWizardFrame.getBackwardBtn().setEnabled(true);
         }
+        mainWizardFrame.removeBtns();
+        if (mainWizardFrame.getBackwardBtn().isVisible())
+            mainWizardFrame.addBackwardBtn();
+        if (mainWizardFrame.getForwardBtn().isVisible())
+            mainWizardFrame.addForwardBtn();
+        mainWizardFrame.addSaveBtn();
     }
 
     public boolean prevFrame() {

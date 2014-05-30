@@ -56,6 +56,8 @@ public class RegionEditor extends AbstractEditor<ReportRegion> {
     @Inject
     protected Table propertiesTable;
     @Inject
+    protected Label tipLabel;
+    @Inject
     protected Metadata metadata;
     @Inject
     protected Configuration configuration;
@@ -74,7 +76,7 @@ public class RegionEditor extends AbstractEditor<ReportRegion> {
         params.put("component$reportPropertyName", reportPropertyName);
         reportEntityTreeNodeDs.refresh(params);
         //TODO add disallowing of classes selection in tree
-
+        rootNode = (EntityTreeNode) params.get("rootEntity");
         if (!asViewEditor) {
             if (isTabulated) {
                 setTabulatedRegionEditorCaption(((EntityTreeNode) (params.get("rootEntity"))).getName());
@@ -82,7 +84,8 @@ public class RegionEditor extends AbstractEditor<ReportRegion> {
                 setSimpleRegionEditorCaption();
             }
         }
-        rootNode = (EntityTreeNode) params.get("rootEntity");
+        tipLabel.setValue(
+                formatMessage(isTabulated ? "selectEntityPropertiesForTableArea" : "selectEntityProperties", rootNode.getLocalizedName()));
         initComponents(params);
     }
 
@@ -208,8 +211,9 @@ public class RegionEditor extends AbstractEditor<ReportRegion> {
                         showNotification(getMessage("selectPropertyFromEntity"), NotificationType.HUMANIZED);
                     else
                         showNotification(getMessage("elementsWasNotAdded"), NotificationType.TRAY);
-                } else
+                } else {
                     propertiesTable.setSelected(addedItems);
+                }
             }
 
             @Override

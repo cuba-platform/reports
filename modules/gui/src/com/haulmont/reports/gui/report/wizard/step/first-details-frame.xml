@@ -6,30 +6,18 @@
 <window xmlns="http://schemas.haulmont.com/cuba/5.2/window.xsd">
     <layout expand="props" width="100%">
         <vbox id="props">
-            <grid margin="true" spacing="true" width="100%">
-                <columns>
-                    <column flex="0"/>
-                    <column flex="1"/>
-                </columns>
-                <rows>
-                    <row>
-                        <label value="msg://entity"/>
-                        <lookupField id="entity" required="true" width="100%"/>
-                    </row>
-                    <row>
-                        <label value="msg://templateFileFormat"/>
-                        <lookupField id="templateFileFormat" required="true" width="100%"/>
-                    </row>
-                    <row>
-                        <label value= "msg://reportName"/>
-                        <textField id="reportName" required="true" width="100%" maxLength="255"/>
-                    </row>
-                    <row>
-                        <label value="msg://reportBuildType"/>
-                        <optionsGroup id="isListed" multiselect="false" orientation="vertical"/>
-                    </row>
-                </rows>
-            </grid>
+            <fieldGroup id="mainFields" fieldCaptionWidth="125px" width="100%">
+                <field id="entity" caption="msg://entity" required="true" requiredMessage="msg://fillEntityMsg"
+                       description="msg://entityHintMsg" custom="true" width="100%"></field>
+                <field id="templateFileFormat" caption="msg://templateFileFormat" required="true"
+                       requiredMessage="msg://fillTemplateTypeMsg"
+                       description="msg://templateTypeHintMsg" custom="true" width="100%"></field>
+                <field id="reportName" caption="msg://reportName" required="true"
+                       requiredMessage="msg://fillreportNameMsg" custom="true"
+                       width="100%"></field>
+                <field id="isListed" caption="msg://reportBuildType" custom="true"
+                       description="msg://singleMultiEntityHintMsg" width="50%"></field>
+            </fieldGroup>
         </vbox>
     </layout>
 </window>
