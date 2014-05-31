@@ -6,6 +6,7 @@
 package com.haulmont.reports.gui.report.wizard.step;
 
 import com.haulmont.cuba.gui.components.IFrame;
+import com.haulmont.cuba.gui.components.Window;
 
 import java.util.List;
 
@@ -44,8 +45,12 @@ public class StepFrameManager {
     }
 
     public void setMainWindowProps() {
-        String newWindowCaption = getCurrentStepFrame().getName() + " " + mainWizardFrame.formatMessage("stepNo", currentFrameIdx + 1, stepFrames.size());
-        mainWizardFrame.getMainEditorFrame().getWrappedWindow().getWindowManager().setWindowCaption(mainWizardFrame.getMainEditorFrame().getWrappedWindow(), newWindowCaption, "");
+        String newWindowCaption = getCurrentStepFrame().getName() + " " +
+                mainWizardFrame.formatMessage("stepNo", currentFrameIdx + 1, stepFrames.size());
+
+        Window window = mainWizardFrame.getMainEditorFrame();
+        window.getWindowManager().setWindowCaption(window, newWindowCaption, "");
+
         setNavigationButtonProps();
     }
 

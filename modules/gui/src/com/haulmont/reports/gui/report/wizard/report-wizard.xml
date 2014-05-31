@@ -3,11 +3,11 @@
   ~ Use is subject to license terms, see http://www.cuba-platform.com/license for details.
   -->
 
-<window
-        xmlns="http://schemas.haulmont.com/cuba/5.2/window.xsd"
+<window xmlns="http://schemas.haulmont.com/cuba/5.2/window.xsd"
         class="com.haulmont.reports.gui.report.wizard.ReportWizardCreator"
         messagesPack="com.haulmont.reports.gui.report.wizard"
         datasource="reportDataDs">
+
     <dsContext>
         <datasource
                 id="reportDataDs"
@@ -52,9 +52,8 @@
             </vbox>
             <hbox id="navBtns" align="BOTTOM_LEFT">
                 <buttonsPanel id="navBtnsPanel" align="BOTTOM_LEFT">
-                    <button id="bwd" caption="msg://backward" icon="icons/back.png"/>
-                    <!--<button id="run" caption="msg://runReport" visible="false"/>-->
-                    <button id="fwd" caption="msg://forward" icon="icons/forward.png"/>
+                    <button id="bwd" caption="msg://backward" icon="icons/report-wizard-previous.png"/>
+                    <button id="fwd" caption="msg://forward" icon="icons/report-wizard-next.png"/>
                     <button id="save" caption="msg://save" visible="false" icon="icons/ok.png"/>
                 </buttonsPanel>
             </hbox>
