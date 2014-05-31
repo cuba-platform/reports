@@ -8,15 +8,16 @@
         <vbox id="props">
             <fieldGroup id="mainFields" fieldCaptionWidth="125px" width="100%">
                 <field id="entity" caption="msg://entity" required="true" requiredMessage="msg://fillEntityMsg"
-                       description="msg://entityHintMsg" custom="true" width="100%"></field>
+                       description="msg://entityHintMsg" custom="true" width="100%"/>
                 <field id="templateFileFormat" caption="msg://templateFileFormat" required="true"
                        requiredMessage="msg://fillTemplateTypeMsg"
-                       description="msg://templateTypeHintMsg" custom="true" width="100%"></field>
+                       description="msg://templateTypeHintMsg" custom="true" width="100%"/>
                 <field id="reportName" caption="msg://reportName" required="true"
                        requiredMessage="msg://fillreportNameMsg" custom="true"
-                       width="100%"></field>
-                <field id="isListed" caption="msg://reportBuildType" custom="true"
-                       description="msg://singleMultiEntityHintMsg" width="50%"></field>
+                       width="100%"/>
+                <field id="isListed" caption="msg://reportBuildType"
+                       width="-1px" custom="true"
+                       description="msg://singleMultiEntityHintMsg"/>
             </fieldGroup>
         </vbox>
     </layout>
