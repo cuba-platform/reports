@@ -47,6 +47,8 @@ public class CubaHtmlFormatter extends HtmlFormatter {
 
     protected Log log = LogFactory.getLog(getClass());
 
+    protected int entityMapMaxDeep = AppBeans.get(Configuration.class).getConfig(ReportingConfig.class).getEntityTreeModelMaxDeep();
+
     public CubaHtmlFormatter(FormatterFactoryInput formatterFactoryInput) {
         super(formatterFactoryInput);
     }
@@ -237,7 +239,7 @@ public class CubaHtmlFormatter extends HtmlFormatter {
             if (band.getData().get(key) instanceof Enum)
                 data.put(key, defaultFormat(band.getData().get(key)));
             else if (band.getData().get(key) instanceof BaseUuidEntity) {
-                data.put(key, transformEntityToMap((BaseUuidEntity) band.getData().get(key)));
+                data.put(key, transformEntityToMap((BaseUuidEntity) band.getData().get(key), 0));
             } else {
                 data.put(key, band.getData().get(key));
             }
@@ -247,7 +249,7 @@ public class CubaHtmlFormatter extends HtmlFormatter {
         return model;
     }
 
-    protected Map<String, Object> transformEntityToMap(BaseUuidEntity entity) {
+    protected Map<String, Object> transformEntityToMap(BaseUuidEntity entity, int deep) {
         Map<String, Object> resultMap = new HashMap<String, Object>();
         for (MetaProperty property : entity.getMetaClass().getProperties()) {
             Object value = null;
@@ -255,7 +257,9 @@ public class CubaHtmlFormatter extends HtmlFormatter {
                 if (property.getRange().isEnum())
                     value = defaultFormat(entity.getValue(property.getName()));
                 else if (property.getRange().isClass() && entity.getValue(property.getName()) instanceof BaseUuidEntity)
-                    value = transformEntityToMap(entity.<BaseUuidEntity>getValue(property.getName()));
+                    if (entityMapMaxDeep < deep)
+                        value = entity.getValue(property.getName());
+                    else value = transformEntityToMap(entity.<BaseUuidEntity>getValue(property.getName()), deep + 1);
                 else
                     value = entity.getValue(property.getName());
             } catch (RuntimeException ex) {
