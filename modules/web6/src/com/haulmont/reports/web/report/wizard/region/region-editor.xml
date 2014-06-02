@@ -3,12 +3,11 @@
   ~ Use is subject to license terms, see http://www.cuba-platform.com/license for details.
   -->
 
-<window
-        xmlns="http://schemas.haulmont.com/cuba/5.2/window.xsd"
+<window xmlns="http://schemas.haulmont.com/cuba/5.2/window.xsd"
         class="com.haulmont.reports.web.report.wizard.region.RegionEditor"
         messagesPack="com.haulmont.reports.gui.report.wizard"
         extends="com/haulmont/reports/gui/report/wizard/region/region-editor.xml">
+    <layout>
 
-
-    <layout/>
+    </layout>
 </window>

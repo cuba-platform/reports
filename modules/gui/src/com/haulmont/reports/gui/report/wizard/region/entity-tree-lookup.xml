@@ -1,11 +1,13 @@
-<window
-        xmlns="http://schemas.haulmont.com/cuba/5.2/window.xsd"
+<!--
+  ~ Copyright (c) 2008-2014 Haulmont. All rights reserved.
+  ~ Use is subject to license terms, see http://www.cuba-platform.com/license for details.
+  -->
+
+<window xmlns="http://schemas.haulmont.com/cuba/5.2/window.xsd"
         messagesPack="com.haulmont.reports.gui.report.wizard"
         class="com.haulmont.reports.gui.report.wizard.region.EntityTreeLookup"
         lookupComponent="entityTreeFrame.entityTree"
-        caption="msg://tabulatedLookup"
-
-        >
+        caption="msg://tabulatedLookup">
 
     <layout expand="entityTreeFrame">
         <iframe id="entityTreeFrame" src="/com/haulmont/reports/gui/report/wizard/region/entity-tree-frame.xml"

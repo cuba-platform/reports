@@ -21,37 +21,31 @@
     </dsContext>
 
     <layout expand="mainContent" spacing="true">
-        <vbox id="topSeparator" stylename="wizard-top-separator"/>
-        <vbox spacing="true">
-            <label id="tipLabel"/>
-        </vbox>
-        <vbox id="buttomSeparator" stylename="wizard-top-separator"/>
+        <label id="topSeparator" stylename="report-wizard-top-separator" width="100%"/>
+        <label id="tipLabel"/>
+        <label id="bottomSeparator" stylename="report-wizard-top-separator" width="100%"/>
         <hbox id="mainContent" width="100%" expand="treePanel">
-            <vbox id="treePanel">
-                <groupBox>
-                    <iframe id="entityTreeFrame"
-                            src="/com/haulmont/reports/gui/report/wizard/region/entity-tree-frame.xml"
-                            width="100%"/>
-                </groupBox>
-            </vbox>
+            <groupBox id="treePanel" height="500px">
+                <iframe id="entityTreeFrame"
+                        src="/com/haulmont/reports/gui/report/wizard/region/entity-tree-frame.xml"
+                        width="100%" height="100%"/>
+            </groupBox>
             <vbox id="btnsControlPanel" margin="true" spacing="true" width="AUTO">
                 <button id="addItem" caption="" icon="icons/report-wizard-to-right-pane.png"/>
                 <button id="removeItem" caption="" icon="icons/report-wizard-remove-property.png"/>
                 <button id="upItem" caption="" enable="false" icon="icons/report-wizard-up-property.png"/>
                 <button id="downItem" caption="" enable="false" icon="icons/report-wizard-down-property.png"/>
             </vbox>
-            <vbox id="selectedTreeItemsPanel" width="507px">
-                <groupBox>
-                    <table id="propertiesTable" multiselect="true" sortable="false" reorderingAllowed="false"
-                           columnControlVisible="false"
-                           width="100%" height="500px">
-                        <columns>
-                            <column id="hierarchicalLocalizedName" caption="msg://properties" width="900px"/>
-                        </columns>
-                        <rows datasource="reportRegionPropertiesTableDs"/>
-                    </table>
-                </groupBox>
-            </vbox>
+            <groupBox id="selectedTreeItemsPanel" width="500px" height="500px">
+                <table id="propertiesTable" multiselect="true" sortable="false" reorderingAllowed="false"
+                       columnControlVisible="false"
+                       width="100%" height="100%">
+                    <columns>
+                        <column id="hierarchicalLocalizedName" caption="msg://properties" width="900px"/>
+                    </columns>
+                    <rows datasource="reportRegionPropertiesTableDs"/>
+                </table>
+            </groupBox>
         </hbox>
         <iframe id="windowActions" screen="editWindowActions"/>
     </layout>
