@@ -17,8 +17,8 @@
             </hbox>
             <button id="run" caption="msg://runReport" icon="icons/run.png"/>
             <label value="" id="spacer"/>
-            <button id="moveUpBtn" width="30px" icon="icons/up_17x25.png"/>
-            <button id="moveDownBtn" width="30px" icon="icons/down_17x25.png"/>
+            <button id="moveUpBtn" width="30px" icon="icons/report-wizard-up-property.png"/>
+            <button id="moveDownBtn" width="30px" icon="icons/report-wizard-down-property.png"/>
             <button id="removeBtn" width="30px" icon="icons/remove.png"/>
         </hbox>
         <vbox>

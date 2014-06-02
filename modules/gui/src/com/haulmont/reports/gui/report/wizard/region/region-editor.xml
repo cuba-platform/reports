@@ -32,7 +32,7 @@
             </groupBox>
             <vbox id="btnsControlPanel" margin="true" spacing="true" width="AUTO">
                 <button id="addItem" caption="" icon="icons/report-wizard-to-right-pane.png"/>
-                <button id="removeItem" caption="" icon="icons/report-wizard-remove-property.png"/>
+                <button id="removeItem" caption="" icon="icons/remove.png"/>
                 <button id="upItem" caption="" enable="false" icon="icons/report-wizard-up-property.png"/>
                 <button id="downItem" caption="" enable="false" icon="icons/report-wizard-down-property.png"/>
             </vbox>
