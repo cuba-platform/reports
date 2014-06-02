@@ -71,6 +71,7 @@ public class RegionEditor extends AbstractEditor<ReportRegion> {
         super.init(params);
         Companion companion = getCompanion();
         companion.addTreeTableDblClickListener(entityTree, reportRegionPropertiesTableDs);
+        companion.initControlBtnsActions(addItem, propertiesTable);
         isTabulated = ((ReportRegion) WindowParams.ITEM.getEntity(params)).getIsTabulatedRegion();
         asViewEditor = BooleanUtils.isTrue((Boolean) params.get("asViewEditor"));
         params.put("component$reportPropertyName", reportPropertyName);
@@ -258,6 +259,8 @@ public class RegionEditor extends AbstractEditor<ReportRegion> {
 
     public interface Companion {
         void addTreeTableDblClickListener(Tree entityTree, final CollectionDatasource reportRegionPropertiesTableDs);
+
+        void initControlBtnsActions(Button button, Table table);
     }
 }
 

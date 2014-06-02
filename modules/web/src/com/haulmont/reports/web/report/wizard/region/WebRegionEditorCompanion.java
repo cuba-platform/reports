@@ -7,6 +7,7 @@ package com.haulmont.reports.web.report.wizard.region;
 
 import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.Metadata;
+import com.haulmont.cuba.gui.components.Button;
 import com.haulmont.cuba.gui.components.Table;
 import com.haulmont.cuba.gui.components.Tree;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
@@ -63,4 +64,18 @@ public class WebRegionEditorCompanion implements RegionEditor.Companion {
             }
         });
     }
+
+    @Override
+    public void initControlBtnsActions(Button button, final Table table) {
+        ((com.vaadin.ui.Button) WebComponentsHelper.unwrap(button)).addClickListener(new com.vaadin.ui.Button.ClickListener() {
+            @Override
+            public void buttonClick(com.vaadin.ui.Button.ClickEvent event) {
+                com.vaadin.ui.Table vaadinTable = (com.vaadin.ui.Table) WebComponentsHelper.unwrap(table);
+                vaadinTable.setCurrentPageFirstItemId(vaadinTable.lastItemId());
+                vaadinTable.refreshRowCache();
+            }
+        });
+    }
+
+
 }

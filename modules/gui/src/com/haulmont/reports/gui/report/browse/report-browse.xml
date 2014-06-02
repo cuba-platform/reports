@@ -44,11 +44,11 @@
             </actions>
             <buttonsPanel>
                 <!--<button id="wizard" icon="icons/wf-design-deploy.png" caption="msg://report.wizard"/>-->
-                <!--<button action="table.create" icon="icons/create.png"/>-->
-                <popupButton id = "popupCreateBtn" icon="icons/create.png" caption="msg://actions.Create">
+                <button id="createBtn" action="table.create" icon="icons/create.png"/>
+                <popupButton id="popupCreateBtn" icon="icons/create.png" caption="msg://actions.Create">
                     <!--<actions>-->
-                        <!--<action id="table.create" caption="msg://actions.Create"/>-->
-                        <!--<action id="wizard"/>-->
+                    <!--<action id="table.create" caption="msg://actions.Create"/>-->
+                    <!--<action id="wizard"/>-->
                     <!--</actions>-->
                 </popupButton>
                 <button action="table.edit" icon="icons/edit.png"/>

@@ -5,6 +5,7 @@
 package com.haulmont.reports.gui.report.browse;
 
 import com.haulmont.cuba.core.entity.Entity;
+import com.haulmont.cuba.core.global.ClientType;
 import com.haulmont.cuba.core.global.FileStorageException;
 import com.haulmont.cuba.core.global.Metadata;
 import com.haulmont.cuba.gui.AppConfig;
@@ -66,6 +67,8 @@ public class ReportBrowser extends AbstractLookup {
     protected Metadata metadata;
     @Inject
     protected PopupButton popupCreateBtn;
+    @Inject
+    protected Button createBtn;
     @Inject
     protected CollectionDatasource<Report, UUID> reportDs;
 
@@ -180,49 +183,54 @@ public class ReportBrowser extends AbstractLookup {
         });
 
         if (hasPermissionsToCreateReports) {
-            popupCreateBtn.addAction(new CreateAction(reportsTable) {
-                @Override
-                public String getCaption() {
-                    return getMessage("report.new");
-                }
-            });
-            popupCreateBtn.addAction(new AbstractAction("wizard") {
-                AbstractEditor<ReportData> editor;
+            if (AppConfig.getClientType().equals(ClientType.WEB)) {
+                reportsTable.getButtonsPanel().remove(createBtn);
+                popupCreateBtn.addAction(new CreateAction(reportsTable) {
+                    @Override
+                    public String getCaption() {
+                        return getMessage("report.new");
+                    }
+                });
+                popupCreateBtn.addAction(new AbstractAction("wizard") {
+                    AbstractEditor<ReportData> editor;
 
-                @Override
-                public void actionPerform(Component component) {
-                    editor = openEditor("report$Report.wizard", metadata.create(ReportData.class), WindowManager.OpenType.DIALOG, reportsTable.getDatasource());
-                    editor.addListener(new CloseListener() {
-                        @Override
-                        public void windowClosed(String actionId) {
-                            if (actionId.equals(COMMIT_ACTION_ID)) {
-                                reportsTable.refresh();
-                                if (editor.getItem() != null && editor.getItem().getGeneratedReport() != null /*&& reportDs.getItems() != null && !reportDs.getItems().isEmpty()*/) {
-                                    reportsTable.setSelected(editor.getItem().getGeneratedReport());
-                                    final AbstractEditor<Report> reportEditor = openEditor("report$Report.edit", reportDs.getItem(), WindowManager.OpenType.THIS_TAB);
-                                    reportEditor.addListener(new CloseListener() {
-                                        @Override
-                                        public void windowClosed(String actionId) {
-                                            if (Window.COMMIT_ACTION_ID.equals(actionId) && reportEditor instanceof Window.Editor) {
-                                                Report item = reportEditor.getItem();
-                                                if (item != null) {
-                                                    reportDs.updateItem(item);
+                    @Override
+                    public void actionPerform(Component component) {
+                        editor = openEditor("report$Report.wizard", metadata.create(ReportData.class), WindowManager.OpenType.DIALOG, reportsTable.getDatasource());
+                        editor.addListener(new CloseListener() {
+                            @Override
+                            public void windowClosed(String actionId) {
+                                if (actionId.equals(COMMIT_ACTION_ID)) {
+                                    reportsTable.refresh();
+                                    if (editor.getItem() != null && editor.getItem().getGeneratedReport() != null /*&& reportDs.getItems() != null && !reportDs.getItems().isEmpty()*/) {
+                                        reportsTable.setSelected(editor.getItem().getGeneratedReport());
+                                        final AbstractEditor<Report> reportEditor = openEditor("report$Report.edit", reportDs.getItem(), WindowManager.OpenType.THIS_TAB);
+                                        reportEditor.addListener(new CloseListener() {
+                                            @Override
+                                            public void windowClosed(String actionId) {
+                                                if (Window.COMMIT_ACTION_ID.equals(actionId) && reportEditor instanceof Window.Editor) {
+                                                    Report item = reportEditor.getItem();
+                                                    if (item != null) {
+                                                        reportDs.updateItem(item);
+                                                    }
                                                 }
+                                                reportsTable.requestFocus();
                                             }
-                                            reportsTable.requestFocus();
-                                        }
-                                    });
+                                        });
+                                    }
                                 }
                             }
-                        }
-                    });
-                }
+                        });
+                    }
 
-                @Override
-                public String getCaption() {
-                    return getMessage("report.wizard");
-                }
-            });
+                    @Override
+                    public String getCaption() {
+                        return getMessage("report.wizard");
+                    }
+                });
+            } else {
+                reportsTable.getButtonsPanel().remove(popupCreateBtn);
+            }
         }
     }
 }

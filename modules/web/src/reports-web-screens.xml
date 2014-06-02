@@ -7,6 +7,4 @@
 <screen-config xmlns="http://schemas.haulmont.com/cuba/5.2/screens.xsd">
 
     <include file="/reports-screens.xml"/>
-    <screen id="report$Report.regionEditor"
-            template="/com/haulmont/reports/web/report/wizard/region/region-editor.xml"/>
 </screen-config>
