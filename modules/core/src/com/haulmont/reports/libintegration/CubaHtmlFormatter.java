@@ -147,7 +147,7 @@ public class CubaHtmlFormatter extends HtmlFormatter {
                             Image image = Image.getInstance(IOUtils.toByteArray(is));
 
                             scaleToOutputResolution(image);
-                            resource = new ImageResource(new ITextFSImage(image));
+                            resource = new ImageResource(uri, new ITextFSImage(image));
                             //noinspection unchecked
                             _imageCache.put(uri, resource);
                         } catch (Exception e) {
@@ -173,9 +173,9 @@ public class CubaHtmlFormatter extends HtmlFormatter {
                         throw new ReportFormattingException("Error while clone internal image in Itext");
                     }
 
-                    resource = new ImageResource(new ITextFSImage(imageObject));
+                    resource = new ImageResource(uri, new ITextFSImage(imageObject));
                 } else {
-                    resource = new ImageResource(null);
+                    resource = new ImageResource(uri, null);
                 }
 
                 return resource;
