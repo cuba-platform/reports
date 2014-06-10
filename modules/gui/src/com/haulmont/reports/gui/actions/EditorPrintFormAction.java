@@ -6,9 +6,6 @@
 package com.haulmont.reports.gui.actions;
 
 import com.haulmont.cuba.core.entity.Entity;
-import com.haulmont.cuba.core.global.AppBeans;
-import com.haulmont.cuba.core.global.Messages;
-import com.haulmont.cuba.gui.AppConfig;
 import com.haulmont.cuba.gui.components.Component;
 import com.haulmont.cuba.gui.components.IFrame;
 import com.haulmont.cuba.gui.components.Window;
@@ -23,18 +20,19 @@ import javax.annotation.Nullable;
 public class EditorPrintFormAction extends AbstractPrintFormAction {
 
     private final Window.Editor editor;
-    private final String name;
+    private final String reportOutputName;
 
-    private final static String DEFAULT_ACTION_ID = "editorPrintForm";
-
-    public EditorPrintFormAction(Window.Editor editor, String name) {
-        this(DEFAULT_ACTION_ID, editor, name);
+    public EditorPrintFormAction(Window.Editor editor, @Nullable String reportOutputName) {
+        this("editorReport", editor, reportOutputName);
     }
 
-    public EditorPrintFormAction(String captionId, Window.Editor editor, @Nullable final String name) {
-        super(captionId);
+    public EditorPrintFormAction(String id, Window.Editor editor, @Nullable String reportOutputName) {
+        super(id);
+
         this.editor = editor;
-        this.name = name;
+        this.caption = messages.getMessage(getClass(), "actions.Report");
+        this.reportOutputName = reportOutputName;
+        this.icon = "icons/reports-print.png";
     }
 
     @Override
@@ -42,16 +40,10 @@ public class EditorPrintFormAction extends AbstractPrintFormAction {
         final Entity entity = editor.getItem();
         if (entity != null) {
             final String javaClassName = entity.getClass().getCanonicalName();
-            openRunReportScreen(editor, entity, javaClassName, name);
-        } else
-            editor.showNotification(AppBeans.get(Messages.class).getMessage(ReportGuiManager.class, "notifications.noSelectedEntity"),
+            openRunReportScreen(editor, entity, javaClassName, reportOutputName);
+        } else {
+            editor.showNotification(messages.getMessage(ReportGuiManager.class, "notifications.noSelectedEntity"),
                     IFrame.NotificationType.HUMANIZED);
-
-    }
-
-    @Override
-    public String getCaption() {
-        final String messagesPackage = AppConfig.getMessagesPack();
-        return AppBeans.get(Messages.class).getMessage(messagesPackage, "actions.Report");
+        }
     }
 }

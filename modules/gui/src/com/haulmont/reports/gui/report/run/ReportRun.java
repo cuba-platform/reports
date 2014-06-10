@@ -68,5 +68,8 @@ public class ReportRun extends AbstractLookup {
         };
         reportsTable.addAction(runAction);
         reportsTable.setItemClickAction(runAction);
+
+        // Dialog mode parameters
+        getDialogParams().setWidth(640).setHeight(480);
     }
 }

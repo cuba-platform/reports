@@ -15,6 +15,7 @@ import java.util.UUID;
  * @version $Id$
  */
 public class RunReportDatasource extends CollectionDatasourceImpl<Report, UUID> {
+    @Override
     protected void loadData(Map<String, Object> params) {
         //do nothing
     }

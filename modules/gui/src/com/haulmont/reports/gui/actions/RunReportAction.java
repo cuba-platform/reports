@@ -34,12 +34,23 @@ public class RunReportAction extends AbstractAction {
 
     protected ReportGuiManager reportGuiManager = AppBeans.get(ReportGuiManager.class);
 
+    public RunReportAction(IFrame window) {
+        this("runReport", window);
+    }
+
+    @Deprecated
     public RunReportAction(IFrame window, String captionId) {
-        super(captionId);
+        this(captionId, window);
+    }
+
+    public RunReportAction(String id, IFrame window) {
+        super(id);
 
         checkArgument(window != null, "Can not create RunReportAction with null window");
 
         this.window = window;
+        this.caption = messages.getMessage(getClass(), "actions.Report");
+        this.icon = "icons/reports-print.png";
     }
 
     @Override
@@ -48,7 +59,6 @@ public class RunReportAction extends AbstractAction {
         params.put("screen", window.getId());
 
         window.openLookup("report$Report.run", new Window.Lookup.Handler() {
-
             @Override
             public void handleLookup(Collection items) {
                 if (items != null && items.size() > 0) {
@@ -64,11 +74,6 @@ public class RunReportAction extends AbstractAction {
                 }
             }
         }, WindowManager.OpenType.DIALOG, params);
-    }
-
-    @Override
-    public String getCaption() {
-        return messages.getMessage(window.getMessagesPack(), getId());
     }
 
     protected void openReportParamsDialog(Report report, IFrame window) {

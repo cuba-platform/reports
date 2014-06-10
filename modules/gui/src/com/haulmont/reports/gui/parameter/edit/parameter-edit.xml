@@ -3,21 +3,15 @@
   ~ Use is subject to license terms, see http://www.cuba-platform.com/license for details.
   -->
 
-<window
-        xmlns="http://schemas.haulmont.com/cuba/5.2/window.xsd"
+<window xmlns="http://schemas.haulmont.com/cuba/5.2/window.xsd"
         class="com.haulmont.reports.gui.parameter.edit.ParameterEditor"
         messagesPack="com.haulmont.reports.gui"
         datasource="parameterDs"
         caption="msg://parameterEditor"
-        focusComponent="name"
-        >
+        focusComponent="name">
 
     <dsContext>
-        <datasource
-                id="parameterDs"
-                class="com.haulmont.reports.entity.ReportInputParameter"
-                view="report.edit">
-        </datasource>
+        <datasource id="parameterDs" class="com.haulmont.reports.entity.ReportInputParameter" view="report.edit"/>
     </dsContext>
 
     <assign name="width" value="200px"/>
@@ -75,8 +69,8 @@
                 <vbox expand="spacer" id="localesVBox" margin="true">
                     <label value="msg://localeCaption" stylename="h2"/>
                     <textArea id="localeTextField" datasource="parameterDs" property="localeNames"
-                               rows="10" cols="30"/>
-                    <hbox id="spacer"/>
+                               width="100%" height="240px"/>
+                    <label id="spacer"/>
                 </vbox>
             </tab>
         </tabSheet>

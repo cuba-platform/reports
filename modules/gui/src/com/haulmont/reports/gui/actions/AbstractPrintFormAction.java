@@ -7,7 +7,6 @@ package com.haulmont.reports.gui.actions;
 
 import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.cuba.core.global.AppBeans;
-import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.core.global.Metadata;
 import com.haulmont.cuba.core.global.UserSessionSource;
 import com.haulmont.cuba.gui.WindowManager;
@@ -16,7 +15,8 @@ import com.haulmont.cuba.gui.components.IFrame;
 import com.haulmont.cuba.gui.components.Window;
 import com.haulmont.cuba.security.entity.User;
 import com.haulmont.reports.app.ParameterPrototype;
-import com.haulmont.reports.entity.*;
+import com.haulmont.reports.entity.Report;
+import com.haulmont.reports.entity.ReportInputParameter;
 import com.haulmont.reports.exception.ReportingException;
 import com.haulmont.reports.gui.ReportGuiManager;
 import org.apache.commons.collections.CollectionUtils;
@@ -31,10 +31,8 @@ import java.util.Map;
  * @author artamonov
  * @version $Id$
  */
-abstract class AbstractPrintFormAction extends AbstractAction {
+public abstract class AbstractPrintFormAction extends AbstractAction {
     protected ReportGuiManager reportGuiManager = AppBeans.get(ReportGuiManager.class);
-
-    protected Messages messages = AppBeans.get(Messages.class);
 
     protected AbstractPrintFormAction(String id) {
         super(id);
@@ -44,14 +42,14 @@ abstract class AbstractPrintFormAction extends AbstractAction {
         openRunReportScreen(window, selectedValue, javaClassName, null);
     }
 
-    protected void openRunReportScreen(final Window window, final Object selectedValue, String javaClassName, @Nullable final String outputFileName) {
-
+    protected void openRunReportScreen(final Window window, final Object selectedValue, String javaClassName,
+                                       @Nullable final String outputFileName) {
         Map<String, Object> params = new HashMap<>();
 
         final MetaClass metaClass;
         try {
             Class<?> javaClass = Class.forName(javaClassName);
-            metaClass = AppBeans.get(Metadata.class).getSession().getClass(javaClass);
+            metaClass = AppBeans.get(Metadata.class).getSession().getClassNN(javaClass);
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
@@ -87,7 +85,8 @@ abstract class AbstractPrintFormAction extends AbstractAction {
             }
             reportGuiManager.runReport(report, window, parameter, selectedValue, null, outputFileName);
         } else {
-            window.showNotification(messages.getMessage(ReportGuiManager.class, "report.notFoundReports"), IFrame.NotificationType.HUMANIZED);
+            window.showNotification(messages.getMessage(ReportGuiManager.class, "report.notFoundReports"),
+                    IFrame.NotificationType.HUMANIZED);
         }
     }
 
@@ -98,6 +97,7 @@ abstract class AbstractPrintFormAction extends AbstractAction {
             }
         }
 
-        throw new ReportingException(String.format("Selected report [%s] doesn't have parameter with class [%s].", report.getName(), paramMetaClassName));
+        throw new ReportingException(String.format("Selected report [%s] doesn't have parameter with class [%s].",
+                report.getName(), paramMetaClassName));
     }
 }

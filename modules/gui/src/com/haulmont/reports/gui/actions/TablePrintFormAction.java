@@ -6,10 +6,7 @@
 package com.haulmont.reports.gui.actions;
 
 import com.haulmont.chile.core.model.MetaClass;
-import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.LoadContext;
-import com.haulmont.cuba.core.global.Messages;
-import com.haulmont.cuba.gui.AppConfig;
 import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
 import com.haulmont.cuba.gui.data.Datasource;
@@ -24,24 +21,31 @@ import java.util.Set;
  * @version $Id$
  */
 public class TablePrintFormAction extends AbstractPrintFormAction {
-    private final Window window;
-    private final Table table;
+    protected final Window window;
+    protected final Table table;
 
-    private final static String DEFAULT_ACTION_ID = "tablePrintForm";
-
-    protected Messages messages;
-
-    public TablePrintFormAction(Window window, Table table, final boolean multiObjects) {
-        this(DEFAULT_ACTION_ID, window, table, multiObjects);
+    public TablePrintFormAction(Window window, Table table) {
+        this("tableReport", window, table);
     }
 
+    @Deprecated
+    public TablePrintFormAction(Window window, Table table, boolean multiObjects) {
+        this("tableReport", window, table);
+    }
+
+    @Deprecated
     public TablePrintFormAction(String captionId, final Window window,
                                 final Table table, final boolean multiObjects) {
-        super(captionId);
+        this(captionId, window, table);
+    }
+
+    public TablePrintFormAction(String id, Window window, Table table) {
+        super(id);
+
         this.window = window;
         this.table = table;
-
-        messages = AppBeans.get(Messages.class);
+        this.caption = messages.getMessage(getClass(), "actions.Report");
+        this.icon = "icons/reports-print.png";
     }
 
     @Override
@@ -87,7 +91,9 @@ public class TablePrintFormAction extends AbstractPrintFormAction {
                 printSelected(selected);
             }
         } else {
-            if ((table.getDatasource().getState() == Datasource.State.VALID) && (table.getDatasource().getItemIds().size() > 0)) {
+            CollectionDatasource ds = table.getDatasource();
+
+            if ((ds.getState() == Datasource.State.VALID) && (ds.size() > 0)) {
                 Action yesAction = new DialogAction(DialogAction.Type.OK) {
                     @Override
                     public void actionPerform(Component component) {
@@ -105,14 +111,14 @@ public class TablePrintFormAction extends AbstractPrintFormAction {
         }
     }
 
-    private void printSelected(Set selected) {
+    protected void printSelected(Set selected) {
         Class<?> entityClass = selected.iterator().next().getClass();
         String javaClassName = entityClass.getCanonicalName();
 
         openRunReportScreen(window, selected, javaClassName);
     }
 
-    private void printAll() {
+    protected void printAll() {
         CollectionDatasource datasource = table.getDatasource();
 
         MetaClass metaClass = datasource.getMetaClass();
@@ -120,7 +126,7 @@ public class TablePrintFormAction extends AbstractPrintFormAction {
 
         LoadContext loadContext = datasource.getCompiledLoadContext();
 
-        ParameterPrototype parameterPrototype = new ParameterPrototype("");//todo
+        ParameterPrototype parameterPrototype = new ParameterPrototype(""); // todo degtyarjov
         parameterPrototype.setMetaClassName(metaClass.getFullName());
         LoadContext.Query query = loadContext.getQuery();
         parameterPrototype.setQueryString(query.getQueryString());
@@ -131,11 +137,5 @@ public class TablePrintFormAction extends AbstractPrintFormAction {
         parameterPrototype.setMaxResults(query.getMaxResults());
 
         openRunReportScreen(window, parameterPrototype, javaClassName);
-    }
-
-    @Override
-    public String getCaption() {
-        final String messagesPackage = AppConfig.getMessagesPack();
-        return messages.getMessage(messagesPackage, "actions.Report");
     }
 }
