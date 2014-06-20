@@ -14,6 +14,7 @@ import com.haulmont.cuba.core.Persistence;
 import com.haulmont.cuba.core.Transaction;
 import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.Metadata;
+import com.haulmont.yarg.exception.DataLoadingException;
 import com.haulmont.yarg.loaders.ReportDataLoader;
 import com.haulmont.yarg.structure.BandData;
 import com.haulmont.yarg.structure.ReportQuery;
@@ -34,16 +35,20 @@ public class CubaGroovyDataLoader implements ReportDataLoader {
 
     @Override
     public List<Map<String, Object>> loadData(ReportQuery reportQuery, BandData parentBand, Map<String, Object> params) {
-        String script = reportQuery.getScript();
-        Map<String, Object> scriptParams = new HashMap<String, Object>();
-        scriptParams.put("reportQuery", reportQuery);
-        scriptParams.put("parentBand", parentBand);
-        scriptParams.put("params", params);
-        scriptParams.put("persistence", AppBeans.get(Persistence.class));
-        scriptParams.put("metadata", AppBeans.get(Metadata.class));
-        scriptParams.put("transactional", new MethodClosure(this, "transactional"));
+        try {
+            String script = reportQuery.getScript();
+            Map<String, Object> scriptParams = new HashMap<String, Object>();
+            scriptParams.put("reportQuery", reportQuery);
+            scriptParams.put("parentBand", parentBand);
+            scriptParams.put("params", params);
+            scriptParams.put("persistence", AppBeans.get(Persistence.class));
+            scriptParams.put("metadata", AppBeans.get(Metadata.class));
+            scriptParams.put("transactional", new MethodClosure(this, "transactional"));
 
-        return scripting.evaluateGroovy(script, scriptParams);
+            return scripting.evaluateGroovy(script, scriptParams);
+        } catch (Throwable e) {
+            throw new DataLoadingException(String.format("An error occurred while loading data for data set [%s]", reportQuery.getName()), e);
+        }
     }
 
     protected void transactional(Closure closure) {

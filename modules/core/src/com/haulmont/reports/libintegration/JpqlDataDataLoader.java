@@ -54,12 +54,12 @@ public class JpqlDataDataLoader extends AbstractDbDataLoader implements ReportDa
     }
 
     @Override
-    public List<Map<String, Object>> loadData(ReportQuery dataSet, BandData band, Map<String, Object> params) {
+    public List<Map<String, Object>> loadData(ReportQuery reportQuery, BandData band, Map<String, Object> params) {
         List<OutputValue> outputParameters = null;
         List queryResult = null;
         Transaction tx = persistence.createTransaction();
         try {
-            String query = dataSet.getScript();
+            String query = reportQuery.getScript();
             if (StringUtils.isBlank(query)) return Collections.emptyList();
 
             outputParameters = parseQueryOutputParametersNames(query);
@@ -70,8 +70,8 @@ public class JpqlDataDataLoader extends AbstractDbDataLoader implements ReportDa
             Query select = insertParameters(query, band.getParentBand(), params);
             queryResult = select.getResultList();
             tx.commit();
-        } catch (Exception e) {
-            throw new DataLoadingException(e);
+        } catch (Throwable e) {
+            throw new DataLoadingException(String.format("An error occurred while loading data for data set [%s]", reportQuery.getName()), e);
         } finally {
             tx.end();
         }
