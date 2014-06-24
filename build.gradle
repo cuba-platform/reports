@@ -101,6 +101,8 @@ configure([globalModule, coreModule, guiModule, webModule, webLegacyModule, desk
     }
 }
 
+def yargVersion = '1.0-SNAPSHOT'
+
 configure(globalModule) {
     task enhance(type: CubaEnhancing) {
         persistenceXml = "$projectDir/src/reports-persistence.xml"
@@ -111,7 +113,7 @@ configure(globalModule) {
     }
 
     dependencies {
-		compile(group: 'com.haulmont.yarg', name: 'yarg', version: '1.0-SNAPSHOT') {
+		compile(group: 'com.haulmont.yarg', name: 'yarg-api', version: yargVersion) {
             exclude group: 'org.codehaus.groovy'
         }
     }
@@ -136,7 +138,10 @@ configure(coreModule) {
     dependencies {
         compile(globalModule)
         compile(group: 'com.haulmont.cuba', name: 'cuba-core', version: baseVersion)
-
+		compile(group: 'com.haulmont.yarg', name: 'yarg', version: yargVersion) {
+            exclude group: 'org.codehaus.groovy'
+        }
+		
         testCompile(group: 'com.haulmont.cuba', name: 'cuba-core', version: baseVersion, classifier: 'tests')
         provided(servletApi)
         jdbc(postgres)
