@@ -17,6 +17,7 @@ import com.haulmont.cuba.gui.components.validators.DoubleValidator;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
 import com.haulmont.cuba.gui.data.DsBuilder;
 import com.haulmont.cuba.gui.xml.layout.ComponentsFactory;
+import com.haulmont.reports.app.service.ReportService;
 import com.haulmont.reports.entity.ParameterType;
 import com.haulmont.reports.entity.Report;
 import com.haulmont.reports.entity.ReportInputParameter;
@@ -27,11 +28,18 @@ import org.apache.commons.lang.StringUtils;
 import javax.inject.Inject;
 import java.util.*;
 
+import static com.haulmont.reports.gui.report.run.CommonLookupController.*;
+
 /**
  * @author degtyarjov
  * @version $Id$
  */
 public class InputParametersController extends AbstractWindow {
+
+    public static final String REPORT_PARAMETER = "report";
+    public static final String PARAMETERS_PARAMETER = "parameters";
+    public static final String TEMPLATE_CODE_PARAMETER = "templateCode";
+    public static final String OUTPUT_FILE_NAME_PARAMETER = "outputFileName";
 
     protected interface FieldCreator {
         Field createField(ReportInputParameter parameter);
@@ -40,8 +48,6 @@ public class InputParametersController extends AbstractWindow {
     protected ComponentsFactory cFactory = AppConfig.getFactory();
 
     protected Report report;
-
-    protected Entity linkedEntity;
 
     protected Map<String, Object> parameters;
 
@@ -81,11 +87,10 @@ public class InputParametersController extends AbstractWindow {
     public void init(Map<String, Object> params) {
         super.init(params);
 
-        report = (Report) params.get("report");
-        linkedEntity = (Entity) params.get("entity");
-        parameters = (Map<String, Object>) params.get("parameters");
-        templateCode = (String) params.get("templateCode");
-        outputFileName = (String) params.get("outputFileName");
+        report = (Report) params.get(REPORT_PARAMETER);
+        parameters = (Map<String, Object>) params.get(PARAMETERS_PARAMETER);
+        templateCode = (String) params.get(TEMPLATE_CODE_PARAMETER);
+        outputFileName = (String) params.get(OUTPUT_FILE_NAME_PARAMETER);
 
         if (parameters == null) {
             parameters = Collections.emptyMap();
@@ -93,7 +98,7 @@ public class InputParametersController extends AbstractWindow {
 
         if (report != null) {
             if (!report.getIsTmp()) {
-                report = getDsContext().getDataSupplier().reload(report, "report.edit");
+                report = getDsContext().getDataSupplier().reload(report, ReportService.MAIN_VIEW_NAME);
             }
             if (CollectionUtils.isNotEmpty(report.getInputParameters())) {
                 parametersGrid.setRows(report.getInputParameters().size());
@@ -250,9 +255,7 @@ public class InputParametersController extends AbstractWindow {
         public Field createField(ReportInputParameter parameter) {
             PickerField pickerField = cFactory.createComponent(PickerField.NAME);
             final com.haulmont.chile.core.model.MetaClass entityMetaClass =
-                    metadata.getSession().getClass(parameter.getEntityMetaClass());
-            Class clazz = entityMetaClass.getJavaClass();
-
+                    metadata.getSession().getClassNN(parameter.getEntityMetaClass());
             pickerField.setMetaClass(entityMetaClass);
 
             PickerField.LookupAction pickerLookupAction = new PickerField.LookupAction(pickerField) {
@@ -274,13 +277,11 @@ public class InputParametersController extends AbstractWindow {
             } else {
                 pickerLookupAction.setLookupScreen("report$commonLookup");
                 Map<String, Object> params = new HashMap<>();
-                params.put("class", entityMetaClass);
+                params.put(CLASS_PARAMETER, entityMetaClass);
 
                 pickerLookupAction.setLookupScreenParams(params);
             }
 
-            if ((linkedEntity != null) && (clazz != null) && (clazz.isAssignableFrom(linkedEntity.getClass())))
-                pickerField.setValue(linkedEntity);
             return pickerField;
         }
     }
@@ -317,7 +318,7 @@ public class InputParametersController extends AbstractWindow {
             } else {
                 tokenList.setLookupScreen("report$commonLookup");
                 Map<String, Object> params = new HashMap<>();
-                params.put("class", entityMetaClass);
+                params.put(CLASS_PARAMETER, entityMetaClass);
                 tokenList.setLookupScreenParams(params);
             }
 

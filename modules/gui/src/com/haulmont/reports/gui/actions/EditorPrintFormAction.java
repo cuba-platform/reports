@@ -5,6 +5,7 @@
 
 package com.haulmont.reports.gui.actions;
 
+import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.gui.components.Component;
 import com.haulmont.cuba.gui.components.IFrame;
@@ -39,8 +40,8 @@ public class EditorPrintFormAction extends AbstractPrintFormAction {
     public void actionPerform(Component component) {
         final Entity entity = editor.getItem();
         if (entity != null) {
-            final String javaClassName = entity.getClass().getCanonicalName();
-            openRunReportScreen(editor, entity, javaClassName, reportOutputName);
+            MetaClass metaClass = entity.getMetaClass();
+            openRunReportScreen(editor, entity, metaClass, reportOutputName);
         } else {
             editor.showNotification(messages.getMessage(ReportGuiManager.class, "notifications.noSelectedEntity"),
                     IFrame.NotificationType.HUMANIZED);

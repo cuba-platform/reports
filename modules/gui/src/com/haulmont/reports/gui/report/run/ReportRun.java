@@ -29,6 +29,7 @@ import java.util.UUID;
 public class ReportRun extends AbstractLookup {
 
     protected static final String RUN_ACTION_ID = "runReport";
+    public static final String REPORTS_PARAMETER = "reports";
 
     @Inject
     protected Table reportsTable;
@@ -45,7 +46,7 @@ public class ReportRun extends AbstractLookup {
     @Override
     public void init(Map<String, Object> params) {
         super.init(params);
-        List<Report> reports = (List<Report>) params.get("reports");
+        List<Report> reports = (List<Report>) params.get(REPORTS_PARAMETER);
         if (reports == null) {
             reports = reportGuiManager.getAvailableReports(null, userSessionSource.getUserSession().getUser(), null, false);
         }

@@ -28,17 +28,6 @@ public class TablePrintFormAction extends AbstractPrintFormAction {
         this("tableReport", window, table);
     }
 
-    @Deprecated
-    public TablePrintFormAction(Window window, Table table, boolean multiObjects) {
-        this("tableReport", window, table);
-    }
-
-    @Deprecated
-    public TablePrintFormAction(String captionId, final Window window,
-                                final Table table, final boolean multiObjects) {
-        this(captionId, window, table);
-    }
-
     public TablePrintFormAction(String id, Window window, Table table) {
         super(id);
 
@@ -112,21 +101,20 @@ public class TablePrintFormAction extends AbstractPrintFormAction {
     }
 
     protected void printSelected(Set selected) {
-        Class<?> entityClass = selected.iterator().next().getClass();
-        String javaClassName = entityClass.getCanonicalName();
+        CollectionDatasource datasource = table.getDatasource();
+        MetaClass metaClass = datasource.getMetaClass();
 
-        openRunReportScreen(window, selected, javaClassName);
+        openRunReportScreen(window, selected, metaClass);
     }
 
     protected void printAll() {
         CollectionDatasource datasource = table.getDatasource();
 
         MetaClass metaClass = datasource.getMetaClass();
-        String javaClassName = metaClass.getJavaClass().getCanonicalName();
 
         LoadContext loadContext = datasource.getCompiledLoadContext();
 
-        ParameterPrototype parameterPrototype = new ParameterPrototype(""); // todo degtyarjov
+        ParameterPrototype parameterPrototype = new ParameterPrototype(metaClass.getFullName());
         parameterPrototype.setMetaClassName(metaClass.getFullName());
         LoadContext.Query query = loadContext.getQuery();
         parameterPrototype.setQueryString(query.getQueryString());
@@ -136,6 +124,6 @@ public class TablePrintFormAction extends AbstractPrintFormAction {
         parameterPrototype.setFirstResult(query.getFirstResult());
         parameterPrototype.setMaxResults(query.getMaxResults());
 
-        openRunReportScreen(window, parameterPrototype, javaClassName);
+        openRunReportScreen(window, parameterPrototype, metaClass);
     }
 }

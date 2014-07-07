@@ -25,6 +25,7 @@ import java.util.Map;
  */
 public class CommonLookupController extends AbstractLookup {
 
+    public static final String CLASS_PARAMETER = "class";
     @Inject
     private BoxLayout mainPane;
 
@@ -36,7 +37,7 @@ public class CommonLookupController extends AbstractLookup {
     @Override
     public void init(Map<String, Object> params) {
         super.init(params);
-        final MetaClass metaClass = (MetaClass) params.get("class");
+        final MetaClass metaClass = (MetaClass) params.get(CLASS_PARAMETER);
         final Class javaClass = metaClass.getJavaClass();
 
         this.setCaption(messages.getMessage(javaClass, javaClass.getSimpleName()));
