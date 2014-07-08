@@ -30,7 +30,8 @@ public class ReportExceptionHandler extends AbstractExceptionHandler {
                 NoOpenOfficeFreePortsException.class.getName(),
                 FailedToConnectToOpenOfficeException.class.getName(),
                 UnsupportedFormatException.class.getName(),
-                FailedToLoadTemplateClassException.class.getName()
+                FailedToLoadTemplateClassException.class.getName(),
+                ValidationException.class.getName()
         );
     }
 
@@ -44,6 +45,8 @@ public class ReportExceptionHandler extends AbstractExceptionHandler {
         } else if (NoOpenOfficeFreePortsException.class.getName().equals(className)) {
             String msg = messages.getMessage(getClass(), "reportException.noOpenOfficeFreePorts");
             app.getWindowManager().showNotification(msg, IFrame.NotificationType.ERROR);
+        } else if (ValidationException.class.getName().equals(className)) {
+            app.getWindowManager().showNotification(message, IFrame.NotificationType.ERROR);
         } else {
             ExceptionDialog dialog = new ExceptionDialog(
                     throwable,

@@ -17,12 +17,7 @@ import com.haulmont.cuba.core.entity.FileDescriptor;
 import com.haulmont.cuba.core.global.*;
 import com.haulmont.reports.app.ParameterPrototype;
 import com.haulmont.reports.entity.*;
-import com.haulmont.reports.exception.FailedToConnectToOpenOfficeException;
-import com.haulmont.reports.exception.FailedToLoadTemplateClassException;
-import com.haulmont.reports.exception.NoOpenOfficeFreePortsException;
-import com.haulmont.reports.exception.ReportingException;
-import com.haulmont.yarg.exception.OpenOfficeException;
-import com.haulmont.yarg.exception.UnsupportedFormatException;
+import com.haulmont.reports.exception.*;
 import com.haulmont.yarg.formatters.CustomReport;
 import com.haulmont.yarg.formatters.impl.doc.connector.NoFreePortsException;
 import com.haulmont.yarg.reporting.ReportOutputDocument;
@@ -224,10 +219,12 @@ public class ReportingBean implements ReportingApi {
                             template.getCustomClass(), report.getName()), e);
         } catch (NoFreePortsException nfe) {
             throw new NoOpenOfficeFreePortsException(nfe.getMessage());
-        } catch (OpenOfficeException ooe) {
+        } catch (com.haulmont.yarg.exception.OpenOfficeException ooe) {
             throw new FailedToConnectToOpenOfficeException(ooe.getMessage());
-        } catch (UnsupportedFormatException fe) {
-            throw new com.haulmont.reports.exception.UnsupportedFormatException(fe.getMessage());
+        } catch (com.haulmont.yarg.exception.UnsupportedFormatException fe) {
+            throw new UnsupportedFormatException(fe.getMessage());
+        } catch (com.haulmont.yarg.exception.ValidationException ve) {
+            throw new ValidationException(ve.getMessage());
         } catch (com.haulmont.yarg.exception.ReportingException re) {
             //noinspection unchecked
             List<Throwable> list = ExceptionUtils.getThrowableList(re);

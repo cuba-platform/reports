@@ -15,6 +15,7 @@ import com.haulmont.cuba.core.Transaction;
 import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.Metadata;
 import com.haulmont.yarg.exception.DataLoadingException;
+import com.haulmont.yarg.exception.ValidationException;
 import com.haulmont.yarg.loaders.ReportDataLoader;
 import com.haulmont.yarg.structure.BandData;
 import com.haulmont.yarg.structure.ReportQuery;
@@ -44,11 +45,18 @@ public class CubaGroovyDataLoader implements ReportDataLoader {
             scriptParams.put("persistence", AppBeans.get(Persistence.class));
             scriptParams.put("metadata", AppBeans.get(Metadata.class));
             scriptParams.put("transactional", new MethodClosure(this, "transactional"));
+            scriptParams.put("validationException", new MethodClosure(this, "validationException"));
 
             return scripting.evaluateGroovy(script, scriptParams);
+        } catch (ValidationException e) {
+            throw e;
         } catch (Throwable e) {
             throw new DataLoadingException(String.format("An error occurred while loading data for data set [%s]", reportQuery.getName()), e);
         }
+    }
+
+    protected void validationException(String message) {
+        throw new ValidationException(message);
     }
 
     protected void transactional(Closure closure) {
