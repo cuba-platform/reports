@@ -107,6 +107,7 @@ public class ReportingBean implements ReportingApi {
         xStream.alias("template", ReportTemplate.class);
         xStream.alias("screen", ReportScreen.class);
         xStream.alias("format", ReportValueFormat.class);
+        xStream.addDefaultImplementation(LinkedHashMap.class, Map.class);
         xStream.aliasSystemAttribute(null, "class");
         xStream.omitField(ReportTemplate.class, "content");
         xStream.omitField(ReportInputParameter.class, "localeName");

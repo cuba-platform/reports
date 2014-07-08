@@ -47,6 +47,9 @@ public class ReportingWizardBean implements ReportingWizardApi {
     protected Metadata metadata;
     @Inject
     protected ReportingBean reportingBean;
+    @Inject
+    protected Configuration configuration;
+
     protected Log log = LogFactory.getLog(ReportingBean.class);
 
     @Override
@@ -55,7 +58,7 @@ public class ReportingWizardBean implements ReportingWizardApi {
         report.setIsTmp(isTmp);
         report.setReportType(ReportType.SIMPLE);
         report.setGroup(reportData.getGroup());
-        List<ReportValueFormat> reportValueFormatList = new ArrayList();
+        List<ReportValueFormat> reportValueFormatList = new ArrayList<>();
 
         int reportInputParameterPos = 0;
         ReportInputParameter reportInputParameter = metadata.create(ReportInputParameter.class);
@@ -72,7 +75,7 @@ public class ReportingWizardBean implements ReportingWizardApi {
         //reportInputParameter.setAlias(reportData.getEntityTreeRootNode().getName());
 
         reportInputParameter.setEntityMetaClass(reportData.getEntityTreeRootNode().getWrappedMetaClass().getName());
-        reportInputParameter.setPosition(reportInputParameterPos++);
+        reportInputParameter.setPosition(++reportInputParameterPos);
         report.getInputParameters().add(reportInputParameter);
 
 
@@ -186,17 +189,32 @@ public class ReportingWizardBean implements ReportingWizardApi {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public View createViewByReportRegions(EntityTreeNode entityTreeRootNode, List<ReportRegion> reportRegions) {
         View view = new View(entityTreeRootNode.getWrappedMetaClass().getJavaClass());
 
-        Set<String> allRegionProps = new HashSet<>();
+        Map<EntityTreeNode, View> viewsForNodes = new HashMap<>();
+        viewsForNodes.put(entityTreeRootNode, view);
         for (ReportRegion reportRegion : reportRegions) {
             for (RegionProperty regionProperty : reportRegion.getRegionProperties()) {
-                allRegionProps.add(regionProperty.getHierarchicalName());
+                EntityTreeNode entityTreeNode = regionProperty.getEntityTreeNode();
+                MetaClass metaClass = entityTreeNode.getWrappedMetaClass();
+                if (metaClass != null) {
+                    View propertyView = viewsForNodes.get(entityTreeNode);
+                    if (propertyView == null) {
+                        propertyView = new View(metaClass.getJavaClass());
+                        viewsForNodes.put(entityTreeNode, propertyView);
+                    }
+
+                    View parentView = ensureParentViewsExist(entityTreeNode, viewsForNodes);
+                    parentView.addProperty(regionProperty.getName(), propertyView);
+                } else {
+                    View parentView = ensureParentViewsExist(entityTreeNode, viewsForNodes);
+                    parentView.addProperty(regionProperty.getName());
+                }
             }
         }
-        //iterate over whole entity model
-        createViewForNode(entityTreeRootNode, view, allRegionProps);
+
         return view;
     }
 
@@ -242,6 +260,28 @@ public class ReportingWizardBean implements ReportingWizardApi {
         return reportRegion;
     }
 
+    /**
+     * Search for view for parent node
+     * If does not exists - create it and add property to parent of parent view
+     */
+    @SuppressWarnings("unchecked")
+    protected View ensureParentViewsExist(EntityTreeNode entityTreeNode, Map<EntityTreeNode, View> viewsForNodes) {
+        EntityTreeNode parentNode = entityTreeNode.getParent();
+        View parentView = viewsForNodes.get(parentNode);
+
+        if (parentView == null && parentNode != null) {
+            parentView = new View(parentNode.getWrappedMetaClass().getJavaClass());
+            viewsForNodes.put(parentNode, parentView);
+            View parentOfParentView = ensureParentViewsExist(parentNode, viewsForNodes);
+            if (parentOfParentView != null) {
+                parentOfParentView.addProperty(parentNode.getName(), parentView);
+            }
+        }
+
+        return parentView;
+    }
+
+
     protected void iterateViewAndCreatePropertiesForRegion(final boolean scalarOnly, final View parentView, final Map<String, EntityTreeNode> allNodesAndHierarchicalPathsMap, final List<RegionProperty> regionProperties, String pathFromParentView, long propertyOrderNum) {
         if (pathFromParentView == null) {
             pathFromParentView = "";
@@ -249,7 +289,7 @@ public class ReportingWizardBean implements ReportingWizardApi {
         for (ViewProperty viewProperty : parentView.getProperties()) {
 
             if (scalarOnly) {
-                MetaClass metaClass = metadata.getClass(parentView.getEntityClass());
+                MetaClass metaClass = metadata.getClassNN(parentView.getEntityClass());
                 MetaProperty metaProperty = metaClass.getProperty(viewProperty.getName());
                 if (metaProperty != null && metaProperty.getRange().getCardinality().isMany()) {
                     continue;
@@ -282,24 +322,6 @@ public class ReportingWizardBean implements ReportingWizardApi {
         }
     }
 
-    protected void createViewForNode(EntityTreeNode entityTreeNode, View parentView, final Set<String> viewPropsWhiteList) {
-
-        for (EntityTreeNode child : entityTreeNode.getChildren()) {
-            if (child.getWrappedMetaClass() == null) {
-                if (viewPropsWhiteList.contains(child.getHierarchicalName())) {
-                    parentView.addProperty(child.getWrappedMetaProperty().getName()); //1)add property to view if it is exists in regionProperties of report
-                }
-            } else {
-                View newParentView = new View(child.getWrappedMetaClass().getJavaClass());
-                createViewForNode(child, newParentView, viewPropsWhiteList);
-                if (!newParentView.getProperties().isEmpty()) {
-                    //2) add views only with properties
-                    parentView.addProperty(child.getWrappedMetaProperty().getName(), newParentView);
-                }
-            }
-        }
-    }
-
     @Override
     public boolean isEntityAllowedForReportWizard(final MetaClass effectiveMetaClass) {
         if (StringUtils.startsWithAny(effectiveMetaClass.getName(), EntityTreeModelBuilder.IGNORED_ENTITIES_PREFIXES) ||
@@ -321,6 +343,8 @@ public class ReportingWizardBean implements ReportingWizardApi {
                 return false;
             }
         }
+
+        @SuppressWarnings("unchecked")
         Collection<Object> ownPropsNamesList = CollectionUtils.collect(effectiveMetaClass.getOwnProperties(), new Transformer() {
             @Override
             public Object transform(Object input) {
@@ -358,10 +382,14 @@ public class ReportingWizardBean implements ReportingWizardApi {
         //}
 
         //here we can`t just to determine metaclass using property argument cause it can be an ancestor of it
-        List propertiesBlackList = Arrays.asList(AppBeans.get(Configuration.class).getConfig(ReportingConfig.class).getWizardPropertiesBlackList().split(","));
-        List wizardPropertiesExcludedBlackList = Arrays.asList(AppBeans.get(Configuration.class).getConfig(ReportingConfig.class).getWizardPropertiesExcludedBlackList().split(","));
-        if (propertiesBlackList.contains(metaClass.getName() + "." + metaProperty.getName()) ||
-                (propertiesBlackList.contains(metaProperty.getDomain() + "." + metaProperty.getName()) && !wizardPropertiesExcludedBlackList.contains(metaClass.getName() + "." + metaProperty.getName()))) {
+        ReportingConfig reportingConfig = configuration.getConfig(ReportingConfig.class);
+        List propertiesBlackList = Arrays.asList(reportingConfig.getWizardPropertiesBlackList().split(","));
+        List wizardPropertiesExcludedBlackList = Arrays.asList(reportingConfig.getWizardPropertiesExcludedBlackList().split(","));
+
+        String classAndPropertyName = metaClass.getName() + "." + metaProperty.getName();
+        if (propertiesBlackList.contains(classAndPropertyName)
+                || (propertiesBlackList.contains(metaProperty.getDomain() + "." + metaProperty.getName())
+                        && !wizardPropertiesExcludedBlackList.contains(classAndPropertyName))) {
             return false;
         }
         return true;
@@ -369,7 +397,7 @@ public class ReportingWizardBean implements ReportingWizardApi {
     }
 
     protected List<String> getWizardBlackListedEntities() {
-        String entitiesBlackList = AppBeans.get(Configuration.class).getConfig(ReportingConfig.class).getWizardEntitiesBlackList();
+        String entitiesBlackList = configuration.getConfig(ReportingConfig.class).getWizardEntitiesBlackList();
         if (StringUtils.isNotBlank(entitiesBlackList)) {
             return Arrays.asList(StringUtils.split(entitiesBlackList, ','));
         }
@@ -378,7 +406,7 @@ public class ReportingWizardBean implements ReportingWizardApi {
     }
 
     protected List<String> getWizardWhiteListedEntities() {
-        String entitiesWhiteList = AppBeans.get(Configuration.class).getConfig(ReportingConfig.class).getWizardEntitiesWhiteList();
+        String entitiesWhiteList = configuration.getConfig(ReportingConfig.class).getWizardEntitiesWhiteList();
         if (StringUtils.isNotBlank(entitiesWhiteList)) {
             return Arrays.asList(StringUtils.split(entitiesWhiteList, ','));
         }
@@ -387,7 +415,7 @@ public class ReportingWizardBean implements ReportingWizardApi {
     }
 
     protected List<String> getWizardBlackListedProperties() {
-        String propertiesBlackList = AppBeans.get(Configuration.class).getConfig(ReportingConfig.class).getWizardPropertiesBlackList();
+        String propertiesBlackList = configuration.getConfig(ReportingConfig.class).getWizardPropertiesBlackList();
         if (StringUtils.isNotBlank(propertiesBlackList)) {
             return Arrays.asList(StringUtils.split(propertiesBlackList, ','));
         }
@@ -396,7 +424,7 @@ public class ReportingWizardBean implements ReportingWizardApi {
     }
 
     protected List<String> getWizardPropertiesExcludedBlackList() {
-        String propertiesBlackList = AppBeans.get(Configuration.class).getConfig(ReportingConfig.class).getWizardPropertiesExcludedBlackList();
+        String propertiesBlackList = configuration.getConfig(ReportingConfig.class).getWizardPropertiesExcludedBlackList();
         if (StringUtils.isNotBlank(propertiesBlackList)) {
             return Arrays.asList(StringUtils.split(propertiesBlackList, ','));
         }

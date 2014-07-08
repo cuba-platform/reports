@@ -331,7 +331,7 @@ public class BandDefinitionEditor extends AbstractEditor<BandDefinition> impleme
 
                         if (reportRegion != null) {
                             if (reportRegion.getRegionPropertiesRootNode() == null) {
-                                showNotification(getMessage("dataSet.entityAliasInvalid"), NotificationType.TRAY);
+                                showNotification(formatMessage("dataSet.entityAliasInvalid", getNameForEntityParameter(dataSet)), NotificationType.TRAY);
                                 //without that root node region editor form will not initialized correctly and became empty. just return
                                 return;
                             } else {
@@ -419,22 +419,14 @@ public class BandDefinitionEditor extends AbstractEditor<BandDefinition> impleme
         //Detect metaclass by an alias and parameter
         protected MetaClass findMetaClassByAlias(DataSet dataSet) {
             MetaClass byAliasMetaClass;
-            String dataSetAlias = null;
-            switch (dataSet.getType()) {
-                case SINGLE:
-                    dataSetAlias = dataSet.getEntityParamName();
-                    break;
-                case MULTI:
-                    dataSetAlias = dataSet.getListEntitiesParamName();
-                    break;
-            }
+            String dataSetAlias = getNameForEntityParameter(dataSet);
 
             byAliasMetaClass = reportService.findMetaClassByDataSetEntityAlias(dataSetAlias, dataSet.getType(), dataSet.getBandDefinition().getReport().getInputParameters());
 
             //Lets return some value
             if (byAliasMetaClass == null) {
                 //Can`t determine parameter and its metaClass by alias
-                showNotification(getMessage("dataSet.entityAliasInvalid"), NotificationType.TRAY);
+                showNotification(formatMessage("dataSet.entityAliasInvalid", dataSetAlias), NotificationType.TRAY);
                 return null;
                 //when byAliasMetaClass is null we return also null
             } else {
@@ -464,7 +456,7 @@ public class BandDefinitionEditor extends AbstractEditor<BandDefinition> impleme
                     isTabulatedRegion = true;
                     collectionPropertyName = StringUtils.substringAfter(dataSet.getListEntitiesParamName(), "#");
                     if (StringUtils.isBlank(collectionPropertyName) && dataSet.getListEntitiesParamName().indexOf("#") != -1) {
-                        showNotification(getMessage("dataSet.entityAliasInvalid"), NotificationType.TRAY);
+                        showNotification(formatMessage("dataSet.entityAliasInvalid", getNameForEntityParameter(dataSet)), NotificationType.TRAY);
                         return null;
                     }
                     if (StringUtils.isNotBlank(collectionPropertyName)) {
@@ -520,5 +512,18 @@ public class BandDefinitionEditor extends AbstractEditor<BandDefinition> impleme
             }
             return null;
         }
+    }
+
+    private String getNameForEntityParameter(DataSet dataSet) {
+        String dataSetAlias = null;
+        switch (dataSet.getType()) {
+            case SINGLE:
+                dataSetAlias = dataSet.getEntityParamName();
+                break;
+            case MULTI:
+                dataSetAlias = dataSet.getListEntitiesParamName();
+                break;
+        }
+        return dataSetAlias;
     }
 }

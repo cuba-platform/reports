@@ -130,8 +130,8 @@ public class RegionEditor extends AbstractEditor<ReportRegion> {
     protected void initAsViewEditor() {
         reportRegionDs.setAllowCommit(false);
         reportRegionPropertiesTableDs.setAllowCommit(false);
-        upItem.setVisible(false);
-        downItem.setVisible(false);
+//        upItem.setVisible(false);
+//        downItem.setVisible(false);
         if (isTabulated) {
             setCaption(getMessage("singleEntityDataSetViewEditor"));
         } else {
