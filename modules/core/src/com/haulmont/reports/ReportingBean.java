@@ -353,7 +353,7 @@ public class ReportingBean implements ReportingApi {
         file.setCreateDate(timeSource.currentTimestamp());
         file.setName(fileName + "." + ext);
         file.setExtension(ext);
-        file.setSize(reportData.length);
+        file.setSize((long) reportData.length);
 
         try {
             fileStorageAPI.saveFile(file, reportData);
