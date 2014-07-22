@@ -21,7 +21,6 @@ import com.haulmont.cuba.gui.export.ExportDisplay;
 import com.haulmont.cuba.gui.export.ExportFormat;
 import com.haulmont.cuba.gui.upload.FileUploadingAPI;
 import com.haulmont.cuba.security.entity.EntityOp;
-import com.haulmont.cuba.security.entity.User;
 import com.haulmont.cuba.security.global.UserSession;
 import com.haulmont.reports.app.service.ReportService;
 import com.haulmont.reports.entity.Report;
@@ -57,8 +56,6 @@ public class ReportBrowser extends AbstractLookup {
     protected Button exportReport;
     @Named("copy")
     protected Button copyReport;
-    /*@Named("wizard")
-    protected Button wizardReport;*/
     @Named("table")
     protected GroupTable reportsTable;
     @Inject
@@ -77,7 +74,7 @@ public class ReportBrowser extends AbstractLookup {
         super.init(params);
 
         final boolean hasPermissionsToCreateReports =
-                userSession.isEntityOpPermitted(metadata.getClassNN(User.class), EntityOp.CREATE);
+                userSession.isEntityOpPermitted(metadata.getClassNN(Report.class), EntityOp.CREATE);
 
         copyReport.setAction(new ItemTrackingAction("copy") {
             @Override
@@ -202,13 +199,17 @@ public class ReportBrowser extends AbstractLookup {
                             public void windowClosed(String actionId) {
                                 if (actionId.equals(COMMIT_ACTION_ID)) {
                                     reportsTable.refresh();
-                                    if (editor.getItem() != null && editor.getItem().getGeneratedReport() != null /*&& reportDs.getItems() != null && !reportDs.getItems().isEmpty()*/) {
+
+                                    if (editor.getItem() != null && editor.getItem().getGeneratedReport() != null
+                                        /*&& reportDs.getItems() != null && !reportDs.getItems().isEmpty()*/) {
+
                                         reportsTable.setSelected(editor.getItem().getGeneratedReport());
-                                        final AbstractEditor<Report> reportEditor = openEditor("report$Report.edit", reportDs.getItem(), WindowManager.OpenType.THIS_TAB);
+                                        final AbstractEditor<Report> reportEditor = openEditor("report$Report.edit",
+                                                reportDs.getItem(), WindowManager.OpenType.THIS_TAB);
                                         reportEditor.addListener(new CloseListener() {
                                             @Override
                                             public void windowClosed(String actionId) {
-                                                if (Window.COMMIT_ACTION_ID.equals(actionId) && reportEditor instanceof Window.Editor) {
+                                                if (Window.COMMIT_ACTION_ID.equals(actionId)) {
                                                     Report item = reportEditor.getItem();
                                                     if (item != null) {
                                                         reportDs.updateItem(item);
