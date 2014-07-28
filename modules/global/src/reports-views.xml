@@ -6,27 +6,8 @@
 
 <views xmlns="http://schemas.haulmont.com/cuba/5.2/view.xsd">
 
-    <view entity="report$BandDefinition" name="report.edit" extends="_local">
-        <property name="parentBandDefinition" view="_minimal"/>
-        <property name="childrenBandDefinitions" view="_local"/>
-        <property name="report" view="_minimal"/>
-        <property name="dataSets" view="report.edit"/>
-    </view>
-
     <view entity="report$ReportTemplate" name="template.edit" extends="_local">
         <property name="report" view="_minimal"/>
-    </view>
-
-    <view entity="report$ReportInputParameter" name="report.edit" extends="_local">
-        <property name="report" view="_minimal"/>
-    </view>
-
-    <view entity="report$ReportValueFormat" name="report.edit" extends="_local">
-        <property name="report" view="_minimal"/>
-    </view>
-
-    <view entity="report$DataSet" name="report.edit" extends="_local">
-        <property name="bandDefinition" view="_minimal"/>
     </view>
 
     <view entity="report$Report" name="report.edit" extends="_local">
@@ -37,14 +18,6 @@
 
     <view entity="report$Report" name="report.view" extends="_local">
         <property name="group" view="_local"/>
-    </view>
-
-    <view entity="report$WizardReportRegion" name="wizardReportRegion.edit" extends="_local">
-        <property name="regionProperties" view="_local"/>
-    </view>
-
-    <view entity="report$WizardReportData" name="wizardReportData.edit" extends="_local">
-        <property name="reportRegions" view="wizardReportRegion.edit"/>
     </view>
 
 </views>

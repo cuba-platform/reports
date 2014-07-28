@@ -15,8 +15,7 @@
     <dsContext>
         <datasource
                 id="valuesFormatsDs"
-                class="com.haulmont.reports.entity.ReportValueFormat"
-                view="report.edit">
+                class="com.haulmont.reports.entity.ReportValueFormat">
         </datasource>
     </dsContext>
 

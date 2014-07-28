@@ -12,8 +12,7 @@
         <datasource
                 id="reportDataDs"
                 class="com.haulmont.reports.entity.wizard.ReportData"
-                datasourceClass="com.haulmont.reports.gui.datasource.NotPersistenceDatasource"
-                view="wizardReportData.edit">
+                datasourceClass="com.haulmont.reports.gui.datasource.NotPersistenceDatasource">
             <collectionDatasource id="reportRegionsDs"
                                   property="reportRegions">
                 <collectionDatasource id="regionPropertiesDs"

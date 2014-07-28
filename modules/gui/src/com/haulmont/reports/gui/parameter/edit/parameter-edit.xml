@@ -11,7 +11,7 @@
         focusComponent="name">
 
     <dsContext>
-        <datasource id="parameterDs" class="com.haulmont.reports.entity.ReportInputParameter" view="report.edit"/>
+        <datasource id="parameterDs" class="com.haulmont.reports.entity.ReportInputParameter"/>
     </dsContext>
 
     <assign name="width" value="200px"/>

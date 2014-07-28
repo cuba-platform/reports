@@ -14,8 +14,7 @@
     </companions>
 
     <dsContext>
-        <datasource id="reportRegionDs" class="com.haulmont.reports.entity.wizard.ReportRegion"
-                    view="wizardReportRegion.edit">
+        <datasource id="reportRegionDs" class="com.haulmont.reports.entity.wizard.ReportRegion">
             <collectionDatasource id="reportRegionPropertiesTableDs" property="regionProperties"/>
         </datasource>
     </dsContext>

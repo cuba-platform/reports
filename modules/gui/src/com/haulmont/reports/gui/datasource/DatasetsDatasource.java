@@ -5,7 +5,6 @@
 package com.haulmont.reports.gui.datasource;
 
 import com.haulmont.cuba.core.entity.Entity;
-import com.haulmont.cuba.core.global.View;
 import com.haulmont.cuba.gui.data.impl.CollectionPropertyDatasourceImpl;
 import com.haulmont.reports.entity.BandDefinition;
 import com.haulmont.reports.entity.DataSet;
@@ -14,11 +13,6 @@ import com.haulmont.reports.entity.Report;
 import java.util.*;
 
 public class DatasetsDatasource extends CollectionPropertyDatasourceImpl<DataSet, UUID> {
-
-    @Override
-    public View getView() {
-        return null;
-    }
 
     public void committed(Set<Entity> entities) {
         if (!State.VALID.equals(masterDs.getState()))
