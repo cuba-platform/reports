@@ -113,7 +113,7 @@ configure(globalModule) {
     }
 
     dependencies {
-		compile(group: 'com.haulmont.yarg', name: 'yarg', version: yargVersion) {
+		compile(group: 'com.haulmont.yarg', name: 'yarg-api', version: yargVersion) {
             exclude group: 'org.codehaus.groovy'
         }
     }
