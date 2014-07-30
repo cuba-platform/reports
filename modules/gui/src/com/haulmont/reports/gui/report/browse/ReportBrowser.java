@@ -8,6 +8,7 @@ import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.global.ClientType;
 import com.haulmont.cuba.core.global.FileStorageException;
 import com.haulmont.cuba.core.global.Metadata;
+import com.haulmont.cuba.core.global.Security;
 import com.haulmont.cuba.gui.AppConfig;
 import com.haulmont.cuba.gui.WindowManager;
 import com.haulmont.cuba.gui.app.core.file.FileUploadDialog;
@@ -21,7 +22,6 @@ import com.haulmont.cuba.gui.export.ExportDisplay;
 import com.haulmont.cuba.gui.export.ExportFormat;
 import com.haulmont.cuba.gui.upload.FileUploadingAPI;
 import com.haulmont.cuba.security.entity.EntityOp;
-import com.haulmont.cuba.security.global.UserSession;
 import com.haulmont.reports.app.service.ReportService;
 import com.haulmont.reports.entity.Report;
 import com.haulmont.reports.entity.wizard.ReportData;
@@ -59,7 +59,7 @@ public class ReportBrowser extends AbstractLookup {
     @Named("table")
     protected GroupTable reportsTable;
     @Inject
-    protected UserSession userSession;
+    protected Security security;
     @Inject
     protected Metadata metadata;
     @Inject
@@ -74,7 +74,7 @@ public class ReportBrowser extends AbstractLookup {
         super.init(params);
 
         final boolean hasPermissionsToCreateReports =
-                userSession.isEntityOpPermitted(metadata.getClassNN(Report.class), EntityOp.CREATE);
+                security.isEntityOpPermitted(metadata.getClassNN(Report.class), EntityOp.CREATE);
 
         copyReport.setAction(new ItemTrackingAction("copy") {
             @Override
