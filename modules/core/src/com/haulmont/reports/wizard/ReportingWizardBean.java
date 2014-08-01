@@ -83,6 +83,7 @@ public class ReportingWizardBean implements ReportingWizardApi {
         BandDefinition rootReportBandDefinition = metadata.create(BandDefinition.class);
         rootReportBandDefinition.setPosition(0);
         rootReportBandDefinition.setName(ROOT_BAND_DEFINITION_NAME);
+        rootReportBandDefinition.setReport(report);
         Set<BandDefinition> bandDefinitions = new LinkedHashSet<>(reportData.getReportRegions().size() + 1); //plus rootBand
         bandDefinitions.add(rootReportBandDefinition);
         List<BandDefinition> childBands = new ArrayList<>();
