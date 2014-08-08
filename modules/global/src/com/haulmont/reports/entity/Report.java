@@ -29,7 +29,7 @@ import java.util.*;
 @Entity(name = "report$Report")
 @Table(name = "REPORT_REPORT")
 @NamePattern("%s|locName")
-@Listeners("com.haulmont.reports.listener.ReportDetachListener")
+@Listeners("report_ReportDetachListener")
 @SuppressWarnings("unused")
 public class Report extends BaseReportEntity implements com.haulmont.yarg.structure.Report {
     private static final long serialVersionUID = -2817764915661205093L;
