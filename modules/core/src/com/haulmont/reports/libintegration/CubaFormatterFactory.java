@@ -14,9 +14,12 @@ import com.haulmont.yarg.formatters.ReportFormatter;
 import com.haulmont.yarg.formatters.factory.DefaultFormatterFactory;
 import com.haulmont.yarg.formatters.factory.FormatterFactoryInput;
 import com.haulmont.yarg.formatters.impl.AbstractFormatter;
+import com.haulmont.yarg.formatters.impl.DocxFormatter;
 import com.haulmont.yarg.formatters.impl.HtmlFormatter;
 
 public class CubaFormatterFactory extends DefaultFormatterFactory {
+    protected boolean useOfficeForDocxPdfConversion = true;
+
     public CubaFormatterFactory() {
         super();
         FormatterCreator ftlCreator = new FormatterCreator() {
@@ -29,6 +32,20 @@ public class CubaFormatterFactory extends DefaultFormatterFactory {
         };
         formattersMap.put("ftl", ftlCreator);
         formattersMap.put("html", ftlCreator);
+
+        FormatterCreator docxCreator = new FormatterCreator() {
+            @Override
+            public ReportFormatter create(FormatterFactoryInput factoryInput) {
+                DocxFormatter docxFormatter = new DocxFormatter(factoryInput);
+                docxFormatter.setDefaultFormatProvider(defaultFormatProvider);
+                if (useOfficeForDocxPdfConversion) {
+                    docxFormatter.setPdfConverter(pdfConverter);
+                }
+                return docxFormatter;
+            }
+        };
+
+        formattersMap.put("docx", docxCreator);
     }
 
     @Override
@@ -40,5 +57,13 @@ public class CubaFormatterFactory extends DefaultFormatterFactory {
         }
 
         return formatter;
+    }
+
+    public boolean isUseOfficeForDocxPdfConversion() {
+        return useOfficeForDocxPdfConversion;
+    }
+
+    public void setUseOfficeForDocxPdfConversion(boolean useOfficeForDocxPdfConversion) {
+        this.useOfficeForDocxPdfConversion = useOfficeForDocxPdfConversion;
     }
 }
