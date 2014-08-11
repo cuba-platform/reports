@@ -37,8 +37,12 @@ import org.xhtmlrenderer.resource.ImageResource;
 
 import java.io.*;
 import java.lang.reflect.Field;
+import java.net.URL;
+import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.util.*;
+
+import static java.lang.String.*;
 
 public class CubaHtmlFormatter extends HtmlFormatter {
     protected static final String CUBA_FONTS_DIR = "/cuba/fonts";
@@ -48,6 +52,8 @@ public class CubaHtmlFormatter extends HtmlFormatter {
     protected Log log = LogFactory.getLog(getClass());
 
     protected int entityMapMaxDeep = AppBeans.get(Configuration.class).getConfig(ReportingConfig.class).getEntityTreeModelMaxDeep();
+
+    protected int externalImagesTimeoutSec = AppBeans.get(Configuration.class).getConfig(ReportingConfig.class).getHtmlExternalResourcesTimeoutSec();
 
     public CubaHtmlFormatter(FormatterFactoryInput formatterFactoryInput) {
         super(formatterFactoryInput);
@@ -123,7 +129,7 @@ public class CubaHtmlFormatter extends HtmlFormatter {
                     }
                 }
             } else
-                log.warn(String.format("File %s is not a directory", fontsDir.getAbsolutePath()));
+                log.warn(format("File %s is not a directory", fontsDir.getAbsolutePath()));
         } else {
             log.debug("Fonts directory does not exist: " + fontsDir.getPath());
         }
@@ -152,7 +158,7 @@ public class CubaHtmlFormatter extends HtmlFormatter {
                             _imageCache.put(uri, resource);
                         } catch (Exception e) {
                             throw wrapWithReportingException(
-                                    String.format("Can't read image file; unexpected problem for URI '%s'", uri), e);
+                                    format("Can't read image file; unexpected problem for URI '%s'", uri), e);
                         } finally {
                             IOUtils.closeQuietly(is);
                         }
@@ -204,7 +210,7 @@ public class CubaHtmlFormatter extends HtmlFormatter {
                 FileDescriptor fd = dataWorker.load(loadContext);
                 if (fd == null) {
                     throw new ReportFormattingException(
-                            String.format("File with id [%s] has not been found in file storage", id));
+                            format("File with id [%s] has not been found in file storage", id));
                 }
 
                 FileStorageAPI storageAPI = AppBeans.get(FileStorageAPI.class);
@@ -212,11 +218,28 @@ public class CubaHtmlFormatter extends HtmlFormatter {
                     return storageAPI.openStream(fd);
                 } catch (FileStorageException e) {
                     throw wrapWithReportingException(
-                            String.format("An error occurred while loading file with id [%s] from file storage", id), e);
+                            format("An error occurred while loading file with id [%s] from file storage", id), e);
                 }
-            }
+            } else {
+                uri = resolveURI(uri);
+                InputStream inputStream = null;
+                try {
+                    URL url = new URL(uri);
+                    URLConnection urlConnection = url.openConnection();
+                    urlConnection.setConnectTimeout(externalImagesTimeoutSec * 1000);
+                    inputStream = urlConnection.getInputStream();
+                } catch (java.net.SocketTimeoutException e) {
+                    throw new ReportFormattingException(format("Loading resource [%s] has been stopped by timeout", uri), e);
+                } catch (java.net.MalformedURLException e) {
+                    throw new ReportFormattingException(format("Bad URL given: [%s]", uri), e);
+                } catch (java.io.FileNotFoundException e) {
+                    throw new ReportFormattingException(format("Resource at URL [%s] not found", uri));
+                } catch (java.io.IOException e) {
+                    throw new ReportFormattingException(format("An IO problem occurred while loading resource [%s]", uri), e);
+                }
 
-            return super.resolveAndOpenStream(uri);
+                return inputStream;
+            }
         }
     }
 

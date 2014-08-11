@@ -129,4 +129,11 @@ public interface ReportingConfig extends Config {
     Integer getEntityTreeModelMaxDeep();
 
     void setEntityTreeModelMaxDeep(Integer entityTreeModelMaxDeep);
+
+
+    @Property("cuba.reporting.html.externalResourcesTimeoutSec")
+    @DefaultInteger(5)
+    Integer getHtmlExternalResourcesTimeoutSec();
+
+    void setHtmlExternalResourcesTimeoutSec(Integer externalResourcesTimeoutSec);
 }
