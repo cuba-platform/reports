@@ -46,7 +46,7 @@ import static org.apache.commons.lang.StringUtils.isNotBlank;
  * @author degtyarjov
  * @version $Id$
  */
-@ManagedBean
+@ManagedBean("cuba_ReportGuiManager")
 public class ReportGuiManager {
 
     @Inject
