@@ -58,6 +58,7 @@
                 <button id="export"/>
                 <button id="runReport" icon="icons/run.png"/>
             </buttonsPanel>
+            <rowsCount/>
             <columns>
                 <group>
                     <column id="group" width="200px"/>
