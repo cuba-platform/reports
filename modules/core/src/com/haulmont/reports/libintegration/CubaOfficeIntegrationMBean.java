@@ -17,6 +17,9 @@ public interface CubaOfficeIntegrationMBean {
     public void setDisplayDeviceAvailable(Boolean displayDeviceAvailable);
     public Boolean isDisplayDeviceAvailable();
 
+    void setTemporaryDirPath(String temporaryDirPath);
+    String getTemporaryDirPath();
+
     public String getAvailablePorts();
     public void hardReloadAccessPorts();
 }
