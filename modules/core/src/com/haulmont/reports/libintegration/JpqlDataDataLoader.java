@@ -54,7 +54,7 @@ public class JpqlDataDataLoader extends AbstractDbDataLoader implements ReportDa
     }
 
     @Override
-    public List<Map<String, Object>> loadData(ReportQuery reportQuery, BandData band, Map<String, Object> params) {
+    public List<Map<String, Object>> loadData(ReportQuery reportQuery, BandData parentBand, Map<String, Object> params) {
         List<OutputValue> outputParameters = null;
         List queryResult = null;
         Transaction tx = persistence.createTransaction();
@@ -67,7 +67,7 @@ public class JpqlDataDataLoader extends AbstractDbDataLoader implements ReportDa
             query = query.replaceAll("(?i)" + ALIAS_PATTERN + ",", ",");//replaces [as alias_name], entries except last
             query = query.replaceAll("(?i)" + ALIAS_PATTERN, " ");//replaces last [as alias_name] entry
 
-            Query select = insertParameters(query, band.getParentBand(), params);
+            Query select = insertParameters(query, parentBand, params);
             queryResult = select.getResultList();
             tx.commit();
         } catch (Throwable e) {
