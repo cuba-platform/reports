@@ -165,11 +165,14 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
     }
 
     protected boolean validateInputOutputFormats() {
-        String inputType = templatePath.getCaption().contains(".") ? templatePath.getCaption().substring(templatePath.getCaption().lastIndexOf(".") + 1) : "";
-        if (!ReportPrintHelper.getInputOutputTypesMapping().containsKey(inputType) ||
-                !ReportPrintHelper.getInputOutputTypesMapping().get(inputType).contains(outputType.getValue())) {
-            showNotification(getMessage("inputOutputTypesError"), NotificationType.TRAY);
-            return false;
+        String name = getItem().getName();
+        if (name != null) {
+            String inputType = name.contains(".") ? name.substring(name.lastIndexOf(".") + 1) : "";
+            if (!ReportPrintHelper.getInputOutputTypesMapping().containsKey(inputType) ||
+                    !ReportPrintHelper.getInputOutputTypesMapping().get(inputType).contains(outputType.getValue())) {
+                showNotification(getMessage("inputOutputTypesError"), NotificationType.TRAY);
+                return false;
+            }
         }
         return true;
     }

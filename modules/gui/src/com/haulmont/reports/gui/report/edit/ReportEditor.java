@@ -835,15 +835,18 @@ public class ReportEditor extends AbstractEditor<Report> {
     }
 
     protected boolean validateInputOutputFormats() {
-        if (getItem().getDefaultTemplate() == null) {
+        ReportTemplate template = getItem().getDefaultTemplate();
+        if (template == null) {
             showNotification(getMessage("report.templateMsg"), NotificationType.TRAY);
             return false;
         }
-        String inputType = getItem().getDefaultTemplate().getExt();
-        if (!ReportPrintHelper.getInputOutputTypesMapping().containsKey(inputType) ||
-                !ReportPrintHelper.getInputOutputTypesMapping().get(inputType).contains(getItem().getDefaultTemplate().getReportOutputType())) {
-            showNotification(getMessage("inputOutputTypesError"), NotificationType.TRAY);
-            return false;
+        if (!template.isCustom()) {
+            String inputType = template.getExt();
+            if (!ReportPrintHelper.getInputOutputTypesMapping().containsKey(inputType) ||
+                    !ReportPrintHelper.getInputOutputTypesMapping().get(inputType).contains(template.getReportOutputType())) {
+                showNotification(getMessage("inputOutputTypesError"), NotificationType.TRAY);
+                return false;
+            }
         }
         return true;
     }
