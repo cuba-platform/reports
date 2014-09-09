@@ -6,6 +6,7 @@ package com.haulmont.reports.gui;
 
 import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.cuba.core.app.DataService;
+import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.global.*;
 import com.haulmont.cuba.gui.AppConfig;
 import com.haulmont.cuba.gui.WindowManager;
@@ -76,18 +77,30 @@ public class ReportGuiManager {
             throw new IllegalArgumentException("Can not run null report");
         }
 
+        //todo refactor following
         List<ReportInputParameter> params = report.getInputParameters();
         if (params != null && params.size() > 1) {
+            Object resultingParamValue = null;
             if (ParameterType.ENTITY == parameter.getType()) {
-                Collection selected = (Collection) paramValue;
-                if (CollectionUtils.isNotEmpty(selected)) {
-                    openReportParamsDialog(window, report, Collections.singletonMap(parameter.getAlias(), selected.iterator().next()), null, null);
-                } else {
-                    openReportParamsDialog(window, report, Collections.singletonMap(parameter.getAlias(), null), null, null);
+                if (paramValue instanceof Entity) {
+                    resultingParamValue = paramValue;
+                } else if (paramValue instanceof Collection) {
+                    Collection selected = (Collection) paramValue;
+                    if (CollectionUtils.isNotEmpty(selected)) {
+                        resultingParamValue = selected.iterator().next();
+                    } else {
+                        resultingParamValue = null;
+                    }
                 }
-            } else {
-                openReportParamsDialog(window, report, Collections.singletonMap(parameter.getAlias(), paramValue), null, null);
+            } else if (ParameterType.ENTITY_LIST == parameter.getType()) {
+                if (paramValue instanceof Collection) {
+                    resultingParamValue = paramValue;
+                } else {
+                    resultingParamValue = Collections.singletonList(paramValue);
+                }
             }
+
+            openReportParamsDialog(window, report, Collections.singletonMap(parameter.getAlias(), resultingParamValue), null, null);
         } else if (params == null || params.size() <= 1) {
             if (ParameterType.ENTITY == parameter.getType()) {
                 if (paramValue instanceof Collection) {
@@ -101,15 +114,26 @@ public class ReportGuiManager {
                         bulkPrint(report, parameter.getAlias(), selectedEntities, window);
                     } else if (selectedEntities.size() == 0) {
                         printReport(report,
-                                Collections.<String, Object>singletonMap(parameter.getAlias(), null),
+                                Collections.singletonMap(parameter.getAlias(), null),
                                 templateCode, outputFileName, window);
                     }
+                } else if (paramValue instanceof Entity) {
+                    printReport(report,
+                            Collections.singletonMap(parameter.getAlias(), paramValue),
+                            templateCode, outputFileName, window);
                 } else if (paramValue instanceof ParameterPrototype) {
                     throw new ReportingException("[Entity] parameter type does not support prototype loaders");
                 }
             } else if (ParameterType.ENTITY_LIST == parameter.getType()) {
+                Object resultingParamValue;
+                if (paramValue instanceof Collection) {
+                    resultingParamValue = paramValue;
+                } else {
+                    resultingParamValue = Collections.singletonList(paramValue);
+                }
+
                 printReport(report,
-                        Collections.<String, Object>singletonMap(parameter.getAlias(), paramValue),
+                        Collections.singletonMap(parameter.getAlias(), resultingParamValue),
                         templateCode, outputFileName, window);
             }
         }
