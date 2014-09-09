@@ -72,71 +72,59 @@ public class ReportGuiManager {
     }
 
     public void runReport(Report report, IFrame window, final ReportInputParameter parameter,
-                          final Object paramValue, @Nullable String templateCode, @Nullable String outputFileName) {
+                          final Object parameterValue, @Nullable String templateCode, @Nullable String outputFileName) {
         if (report == null) {
             throw new IllegalArgumentException("Can not run null report");
         }
-
-        //todo refactor following
         List<ReportInputParameter> params = report.getInputParameters();
-        if (params != null && params.size() > 1) {
-            Object resultingParamValue = null;
-            if (ParameterType.ENTITY == parameter.getType()) {
-                if (paramValue instanceof Entity) {
-                    resultingParamValue = paramValue;
-                } else if (paramValue instanceof Collection) {
-                    Collection selected = (Collection) paramValue;
-                    if (CollectionUtils.isNotEmpty(selected)) {
-                        resultingParamValue = selected.iterator().next();
-                    } else {
-                        resultingParamValue = null;
-                    }
-                }
-            } else if (ParameterType.ENTITY_LIST == parameter.getType()) {
-                if (paramValue instanceof Collection) {
-                    resultingParamValue = paramValue;
-                } else {
-                    resultingParamValue = Collections.singletonList(paramValue);
-                }
-            }
 
-            openReportParamsDialog(window, report, Collections.singletonMap(parameter.getAlias(), resultingParamValue), null, null);
-        } else if (params == null || params.size() <= 1) {
-            if (ParameterType.ENTITY == parameter.getType()) {
-                if (paramValue instanceof Collection) {
-                    Collection selectedEntities = (Collection) paramValue;
-                    if (selectedEntities.size() == 1) {
-                        printReport(report,
-                                Collections.singletonMap(parameter.getAlias(), selectedEntities.iterator().next()),
-                                templateCode, outputFileName, window);
+        boolean reportHasMoreThanOneParameter = params != null && params.size() > 1;
 
-                    } else if (selectedEntities.size() > 1) {
-                        bulkPrint(report, parameter.getAlias(), selectedEntities, window);
-                    } else if (selectedEntities.size() == 0) {
-                        printReport(report,
-                                Collections.singletonMap(parameter.getAlias(), null),
-                                templateCode, outputFileName, window);
-                    }
-                } else if (paramValue instanceof Entity) {
+        Object resultingParamValue = convertParameterIfNecessary(parameter, parameterValue, reportHasMoreThanOneParameter);
+
+        if (reportHasMoreThanOneParameter) {
+            openReportParamsDialog(window, report,
+                    Collections.singletonMap(parameter.getAlias(), resultingParamValue), templateCode, outputFileName);
+        } else {
+            if (ParameterType.ENTITY == parameter.getType()
+                    && resultingParamValue instanceof Collection) {
+                Collection selectedEntities = (Collection) resultingParamValue;
+                if (selectedEntities.size() > 1) {
+                    bulkPrint(report, parameter.getAlias(), selectedEntities, window);
+                } else if (selectedEntities.size() == 1) {
                     printReport(report,
-                            Collections.singletonMap(parameter.getAlias(), paramValue),
+                            Collections.singletonMap(parameter.getAlias(), selectedEntities.iterator().next()),
                             templateCode, outputFileName, window);
-                } else if (paramValue instanceof ParameterPrototype) {
-                    throw new ReportingException("[Entity] parameter type does not support prototype loaders");
                 }
-            } else if (ParameterType.ENTITY_LIST == parameter.getType()) {
-                Object resultingParamValue;
-                if (paramValue instanceof Collection) {
-                    resultingParamValue = paramValue;
-                } else {
-                    resultingParamValue = Collections.singletonList(paramValue);
-                }
-
+            } else {
                 printReport(report,
                         Collections.singletonMap(parameter.getAlias(), resultingParamValue),
                         templateCode, outputFileName, window);
             }
         }
+    }
+
+    protected Object convertParameterIfNecessary(ReportInputParameter parameter, Object paramValue, boolean reportHasMoreThanOneParameter) {
+        Object resultingParamValue = paramValue;
+        if (ParameterType.ENTITY == parameter.getType()) {
+            if (paramValue instanceof Collection) {
+                Collection selected = (Collection) paramValue;
+                if (CollectionUtils.isNotEmpty(selected)) {
+                    if (reportHasMoreThanOneParameter) {
+                        resultingParamValue = selected.iterator().next();
+                    }
+                } else {
+                    resultingParamValue = null;
+                }
+            } else if (paramValue instanceof ParameterPrototype) {
+                throw new ReportingException("[Entity] parameter type does not support prototype loaders");
+            }
+        } else if (ParameterType.ENTITY_LIST == parameter.getType()) {
+            if (!(paramValue instanceof Collection) && !(paramValue instanceof ParameterPrototype)) {
+                resultingParamValue = Collections.singletonList(paramValue);
+            }
+        }
+        return resultingParamValue;
     }
 
     /**
