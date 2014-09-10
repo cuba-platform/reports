@@ -47,7 +47,7 @@ public class ReportingWizardBean implements ReportingWizardApi {
     @Inject
     protected Metadata metadata;
     @Inject
-    protected ReportingApi reportingBean;
+    protected ReportingApi reportingApi;
     @Inject
     protected Configuration configuration;
 
@@ -174,8 +174,8 @@ public class ReportingWizardBean implements ReportingWizardApi {
 
         Transaction t = persistence.createTransaction();
         try {
-            report.setName(reportingBean.generateReportName(reportData.getName()));
-            String xml = reportingBean.convertToXml(report);
+            report.setName(reportingApi.generateReportName(reportData.getName()));
+            String xml = reportingApi.convertToXml(report);
             report.setXml(xml);
             if (!isTmp) {
                 EntityManager em = persistence.getEntityManager();
