@@ -161,6 +161,7 @@ public class ReportingBean implements ReportingApi {
             zipOutputStream.closeArchiveEntry();
             zipOutputStream.close();
 
+            //noinspection UnnecessaryLocalVariable
             ReportOutputDocument reportOutputDocument =
                     new ReportOutputDocumentImpl(report, byteArrayOutputStream.toByteArray(), "Reports.zip", com.haulmont.yarg.structure.ReportOutputType.custom);
             return reportOutputDocument;
@@ -230,6 +231,7 @@ public class ReportingBean implements ReportingApi {
             List<Throwable> list = ExceptionUtils.getThrowableList(re);
             StringBuilder sb = new StringBuilder();
             for (Iterator<Throwable> it = list.iterator(); it.hasNext(); ) {
+                //noinspection ThrowableResultOfMethodCallIgnored
                 sb.append(it.next().getMessage());
                 if (it.hasNext())
                     sb.append("\n");
@@ -470,13 +472,18 @@ public class ReportingBean implements ReportingApi {
         }
         Predicate predicate = new ReportInputParameterAliasFilterPredicate(dataSetType, realAlias, isCollectionAlias);
 
-        List<ReportInputParameter> filteredParams = new ArrayList(reportInputParameters);
+        List<ReportInputParameter> filteredParams = new ArrayList<>(reportInputParameters);
         CollectionUtils.filter(filteredParams, predicate);
         if (filteredParams.size() == 1) {
             return metadata.getClass(filteredParams.get(0).getEntityMetaClass());
         } else {
             return null;
         }
+    }
+
+    @Override
+    public String generateReportName(String sourceName) {
+        return generateReportName(sourceName, 0);
     }
 
     @SuppressWarnings("unchecked")

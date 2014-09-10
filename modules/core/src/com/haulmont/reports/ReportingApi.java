@@ -60,4 +60,6 @@ public interface ReportingApi {
     <T extends Entity> T reloadEntity(T entity, View view);
 
     MetaClass findMetaClassByDataSetEntityAlias(String alias, DataSetType dataSetType, List<ReportInputParameter> reportInputParameters);
+
+    String generateReportName(String sourceName);
 }

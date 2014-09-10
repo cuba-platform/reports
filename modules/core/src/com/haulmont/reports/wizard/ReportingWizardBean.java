@@ -12,6 +12,7 @@ import com.haulmont.cuba.core.Persistence;
 import com.haulmont.cuba.core.Transaction;
 import com.haulmont.cuba.core.entity.annotation.SystemLevel;
 import com.haulmont.cuba.core.global.*;
+import com.haulmont.reports.ReportingApi;
 import com.haulmont.reports.ReportingBean;
 import com.haulmont.reports.ReportingConfig;
 import com.haulmont.reports.app.EntityTree;
@@ -46,7 +47,7 @@ public class ReportingWizardBean implements ReportingWizardApi {
     @Inject
     protected Metadata metadata;
     @Inject
-    protected ReportingBean reportingBean;
+    protected ReportingApi reportingBean;
     @Inject
     protected Configuration configuration;
 
@@ -173,7 +174,7 @@ public class ReportingWizardBean implements ReportingWizardApi {
 
         Transaction t = persistence.createTransaction();
         try {
-            report.setName(reportingBean.generateReportName(reportData.getName(), 0));
+            report.setName(reportingBean.generateReportName(reportData.getName()));
             String xml = reportingBean.convertToXml(report);
             report.setXml(xml);
             if (!isTmp) {
