@@ -14,15 +14,23 @@
                 <rows>
                     <row>
                         <label value="msg://downloadTemplateFile"/>
-                        <button id="downloadTemplateFile" width="100%" stylename="link" description="msg://templateHintMsg"/>
+                        <button id="downloadTemplateFile" width="100%" stylename="link"
+                                description="msg://templateHintMsg"/>
                     </row>
                     <row>
                         <label value="msg://outputFileName"/>
-                        <textField id="outputFileName" width="100%" required="true" description="msg://outputFileNameHintMsg"/>
+                        <textField id="outputFileName" width="100%" required="true"
+                                   description="msg://outputFileNameHintMsg">
+                            <validator
+                                    class="com.haulmont.cuba.gui.components.validators.ScriptValidator">
+                                <![CDATA[if (value) return (value.length() > 0) else return false;]]>
+                            </validator>
+                        </textField>
                     </row>
                     <row>
                         <label value="msg://outputFileFormat"/>
-                        <lookupField id="outputFileFormat" required="true" width="100px" description="msg://outputFileTypeHintMsg"/>
+                        <lookupField id="outputFileFormat" required="true" width="100px"
+                                     description="msg://outputFileTypeHintMsg"/>
                     </row>
                 </rows>
             </grid>

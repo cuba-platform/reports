@@ -1041,6 +1041,13 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
                 saveBtn.setAction(new AbstractAction("saveReport") {
                     @Override
                     public void actionPerform(Component component) {
+                        try {
+                            outputFileName.validate();
+                        } catch (ValidationException e) {
+                            showNotification(getMessage("validationFail.caption"),
+                                    String.format(getMessage("validation.required.defaultMsg"), getMessage("outputFileName")), NotificationType.TRAY);
+                            return;
+                        }
                         if (getItem().getReportRegions().isEmpty()) {
                             showOptionDialog(getMessage("dialogs.Confirmation"), getMessage("confirmSaveWithoutRegions"), MessageType.CONFIRMATION, new Action[]{
                                     new DialogAction(DialogAction.Type.OK) {
@@ -1084,7 +1091,8 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
                         }
                     }
                 });
-                outputFileName.setValue(generateOutputFileName(templateFileFormat.getValue().toString().toLowerCase()));
+                if (StringUtils.isEmpty(outputFileName.<String>getValue()))
+                    outputFileName.setValue(generateOutputFileName(templateFileFormat.getValue().toString().toLowerCase()));
                 setCorrectReportOutputType();
 
             }
