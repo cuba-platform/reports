@@ -16,10 +16,7 @@ import com.haulmont.cuba.gui.ScreensHelper;
 import com.haulmont.cuba.gui.WindowManager.OpenType;
 import com.haulmont.cuba.gui.app.core.file.FileUploadDialog;
 import com.haulmont.cuba.gui.components.*;
-import com.haulmont.cuba.gui.components.actions.CreateAction;
-import com.haulmont.cuba.gui.components.actions.EditAction;
-import com.haulmont.cuba.gui.components.actions.ItemTrackingAction;
-import com.haulmont.cuba.gui.components.actions.RemoveAction;
+import com.haulmont.cuba.gui.components.actions.*;
 import com.haulmont.cuba.gui.config.WindowConfig;
 import com.haulmont.cuba.gui.config.WindowInfo;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
@@ -347,7 +344,7 @@ public class ReportEditor extends AbstractEditor<Report> {
     }
 
     protected void initRoles() {
-        rolesTable.addAction(new RemoveAction(rolesTable, false));
+        rolesTable.addAction(new ExcludeAction(rolesTable, false, true));
 
         addRoleBtn.setAction(new AbstractAction("actions.Add") {
             @Override
