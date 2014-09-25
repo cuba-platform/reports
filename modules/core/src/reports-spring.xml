@@ -50,6 +50,9 @@
         <property name="temporaryDirPath">
             <value>${cuba.tempDir}/reporting/</value>
         </property>
+        <property name="countOfRetry">
+            <value>${cuba.reporting.openoffice.countOfRetry?:3}</value>
+        </property>
     </bean>
 
     <bean id="reporting_lib_CubaFieldFormatProvider" class="com.haulmont.reports.libintegration.CubaFieldFormatProvider"/>
