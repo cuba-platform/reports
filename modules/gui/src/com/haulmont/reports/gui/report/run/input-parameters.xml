@@ -8,7 +8,7 @@
         messagesPack="com.haulmont.reports.gui.report.run"
         caption="msg://inputParameters">
 
-    <layout expand="parametersGrid" spacing="true">
+    <layout spacing="true">
         <grid id="parametersGrid" spacing="true" width="100%">
             <columns>
                 <column/>
