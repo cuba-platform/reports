@@ -3,13 +3,11 @@
   ~ Use is subject to license terms, see http://www.cuba-platform.com/license for details.
   -->
 
-<window
-        xmlns="http://schemas.haulmont.com/cuba/5.2/window.xsd"
+<window xmlns="http://schemas.haulmont.com/cuba/5.2/window.xsd"
         class="com.haulmont.reports.gui.group.browse.ReportGroupBrowser"
         caption="msg://reportGroupBrowser"
         messagesPack="com.haulmont.reports.gui"
-        focusComponent="reportGroupsTable"
-        >
+        focusComponent="reportGroupsTable">
 
     <dsContext>
         <collectionDatasource id="groupsDs" class="com.haulmont.reports.entity.ReportGroup" view="_local">
@@ -19,8 +17,8 @@
         </collectionDatasource>
     </dsContext>
 
-    <layout expand="reportGroupsTable">
-        <table id="reportGroupsTable" width="100%">
+    <layout>
+        <table id="reportGroupsTable" width="100%" height="100%">
             <buttonsPanel>
                 <button action="reportGroupsTable.create"/>
                 <button action="reportGroupsTable.edit"/>

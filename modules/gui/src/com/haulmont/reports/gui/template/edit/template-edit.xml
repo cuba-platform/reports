@@ -3,14 +3,12 @@
   ~ Use is subject to license terms, see http://www.cuba-platform.com/license for details.
   -->
 
-<window
-        xmlns="http://schemas.haulmont.com/cuba/5.2/window.xsd"
+<window xmlns="http://schemas.haulmont.com/cuba/5.2/window.xsd"
         class="com.haulmont.reports.gui.template.edit.TemplateEditor"
         datasource="templateDs"
         caption="msg://templateEditor"
         messagesPack="com.haulmont.reports.gui"
-        focusComponent="code"
-        >
+        focusComponent="code">
 
     <dsContext>
         <datasource
@@ -22,7 +20,7 @@
 
     <assign name="width" value="300px"/>
 
-    <layout expand="windowActions" spacing="true">
+    <layout spacing="true">
         <grid spacing="true">
             <columns>
                 <column flex="1"/>

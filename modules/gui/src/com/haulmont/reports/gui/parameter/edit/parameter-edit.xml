@@ -16,7 +16,7 @@
 
     <assign name="width" value="200px"/>
 
-    <layout expand="windowActions" spacing="true">
+    <layout spacing="true">
         <tabSheet id="tabsheet">
             <tab id="optionsTab" caption="msg://parameters.optionsTab">
                 <grid spacing="true" margin="true">
@@ -65,13 +65,10 @@
                     </rows>
                 </grid>
             </tab>
-            <tab id="localesTab" caption="msg://parameters.localesTab">
-                <vbox expand="spacer" id="localesVBox" margin="true">
-                    <label value="msg://localeCaption" stylename="h2"/>
-                    <textArea id="localeTextField" datasource="parameterDs" property="localeNames"
-                               width="100%" height="240px"/>
-                    <label id="spacer"/>
-                </vbox>
+            <tab id="localesTab" caption="msg://parameters.localesTab" margin="true">
+                <label value="msg://localeCaption" stylename="h2"/>
+                <textArea id="localeTextField" datasource="parameterDs" property="localeNames"
+                           width="100%" height="240px"/>
             </tab>
         </tabSheet>
         <iframe id="windowActions" screen="editWindowActions"/>
