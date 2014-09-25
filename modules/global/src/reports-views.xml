@@ -16,7 +16,11 @@
         <property name="group" view="_minimal"/>
     </view>
 
-    <view entity="report$Report" name="report.view" extends="_local">
+    <view entity="report$Report" name="report.view">
+        <property name="name"/>
+        <property name="localeNames"/>
+        <property name="code"/>
+        <property name="reportType"/>
         <property name="group" view="_local"/>
     </view>
 
