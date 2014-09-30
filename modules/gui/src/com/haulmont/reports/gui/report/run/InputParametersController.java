@@ -140,6 +140,10 @@ public class InputParametersController extends AbstractWindow {
         field.setFrame(this);
         field.setEditable(true);
 
+        if (currentGridRow == 0) {
+            field.requestFocus();
+        }
+
         parameterComponents.put(parameter.getAlias(), field);
         field.setRequired(parameter.getRequired());
 

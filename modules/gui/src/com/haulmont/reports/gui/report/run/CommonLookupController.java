@@ -73,6 +73,7 @@ public class CommonLookupController extends AbstractLookup {
         table.setMultiSelect(true);
         table.setWidth("100%");
         table.setHeight("100%");
+        table.requestFocus();
         mainPane.add(table);
 
         table.refresh();
