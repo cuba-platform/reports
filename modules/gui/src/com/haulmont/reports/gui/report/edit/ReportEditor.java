@@ -491,7 +491,7 @@ public class ReportEditor extends AbstractEditor<Report> {
                                         defaultTemplate.getName(), ExportFormat.getByExtension(defaultTemplate.getExt()));
                             }
                         } else {
-                            showNotification(getMessage("notification.defaultTemplateIsEmpty"), NotificationType.HUMANIZED);
+                            showNotification(getMessage("notification.defaultTemplateIsEmpty"), NotificationType.TRAY);
                         }
 
                         lookupPickerField.requestFocus();
@@ -539,7 +539,7 @@ public class ReportEditor extends AbstractEditor<Report> {
                                 }
                             });
                         } else {
-                            showNotification(getMessage("notification.defaultTemplateIsEmpty"), NotificationType.HUMANIZED);
+                            showNotification(getMessage("notification.defaultTemplateIsEmpty"), NotificationType.TRAY);
                         }
                     }
                 });
@@ -608,7 +608,7 @@ public class ReportEditor extends AbstractEditor<Report> {
                                 }
                             });
                         } else {
-                            showNotification(getMessage("notification.defaultTemplateIsEmpty"), NotificationType.HUMANIZED);
+                            showNotification(getMessage("notification.defaultTemplateIsEmpty"), NotificationType.TRAY);
                         }
                     }
                 });

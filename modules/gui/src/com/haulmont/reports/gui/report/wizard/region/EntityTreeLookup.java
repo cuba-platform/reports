@@ -70,7 +70,7 @@ public class EntityTreeLookup extends AbstractLookup {
                     } else
                         entityTree.expandTree();
                 } else {
-                    showNotification(getMessage("valueNotFound"), NotificationType.HUMANIZED);
+                    showNotification(getMessage("valueNotFound"), NotificationType.TRAY);
                 }
             }
 

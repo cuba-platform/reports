@@ -71,7 +71,7 @@ public abstract class AbstractPrintFormAction extends AbstractAction {
             reportGuiManager.runReport(report, window, parameter, selectedValue, null, outputFileName);
         } else {
             window.showNotification(messages.getMessage(ReportGuiManager.class, "report.notFoundReports"),
-                    IFrame.NotificationType.HUMANIZED);
+                    IFrame.NotificationType.TRAY);
         }
     }
 

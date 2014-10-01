@@ -134,7 +134,7 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
                 templatePath.setCaption(uploadTemplate.getFileName());
                 updateTemplatePathVisibility();
                 showNotification(messages.getMessage(TemplateEditor.class,
-                        "templateEditor.uploadSuccess"), IFrame.NotificationType.HUMANIZED);
+                        "templateEditor.uploadSuccess"), NotificationType.TRAY);
             }
 
             @Override
