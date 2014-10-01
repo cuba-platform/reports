@@ -11,6 +11,7 @@ import com.haulmont.cuba.desktop.App;
 import com.haulmont.cuba.desktop.TopLevelFrame;
 import com.haulmont.cuba.desktop.exception.AbstractExceptionHandler;
 import com.haulmont.cuba.desktop.sys.DialogWindow;
+import com.haulmont.cuba.desktop.sys.JXErrorPaneHelper;
 import com.haulmont.cuba.gui.components.IFrame;
 import com.haulmont.reports.exception.*;
 import org.jdesktop.swingx.JXErrorPane;
@@ -54,7 +55,7 @@ public class ReportExceptionHandler extends AbstractExceptionHandler {
             String msg = messages.getMessage(getClass(), "reportException.noOpenOfficeFreePorts");
             mainFrame.getWindowManager().showNotification(msg, IFrame.NotificationType.ERROR);
         } else {
-            JXErrorPane errorPane = new JXErrorPane();
+            JXErrorPane errorPane = JXErrorPaneHelper.getDefaultPane();
             ErrorInfo errorInfo = new ErrorInfo(
                     messages.getMessage(getClass(), "reportException.message"), message,
                     null, null, throwable, null, null);
