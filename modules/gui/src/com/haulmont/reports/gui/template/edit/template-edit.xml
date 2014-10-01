@@ -51,7 +51,10 @@
                 <row>
                     <label value="msg://template.outputNamePattern"/>
                     <textField id="outputNamePattern" datasource="templateDs" property="outputNamePattern"
-                               width="${width}"/>
+                               width="${width}" required="true">
+                        <validator
+                                class="com.haulmont.reports.gui.report.validators.OutputFileNameValidator"/>
+                    </textField>
                 </row>
                 <row>
                     <label value="msg://template.isCustom"/>

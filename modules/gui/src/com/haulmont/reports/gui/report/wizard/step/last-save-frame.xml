@@ -22,9 +22,7 @@
                         <textField id="outputFileName" width="100%" required="true"
                                    description="msg://outputFileNameHintMsg">
                             <validator
-                                    class="com.haulmont.cuba.gui.components.validators.ScriptValidator">
-                                <![CDATA[if (value) return (value.length() > 0) else return false;]]>
-                            </validator>
+                                    class="com.haulmont.reports.gui.report.validators.OutputFileNameValidator"/>
                         </textField>
                     </row>
                     <row>

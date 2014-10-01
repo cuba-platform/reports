@@ -642,6 +642,7 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
                     @Override
                     public void valueChanged(Object source, String property, @Nullable Object prevValue, @Nullable Object value) {
                         setGeneratedReportName((MetaClass) prevValue, (MetaClass) value);
+                        outputFileName.setValue("");
                     }
 
                     private void setGeneratedReportName(MetaClass prevValue, MetaClass value) {
