@@ -84,7 +84,7 @@ public class ReportBrowser extends AbstractLookup {
                     reportService.copyReport(report);
                     reportsTable.refresh();
                 } else {
-                    showNotification(getMessage("notification.selectReport"), NotificationType.TRAY);
+                    showNotification(getMessage("notification.selectReport"), NotificationType.HUMANIZED);
                 }
             }
 

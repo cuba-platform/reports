@@ -114,7 +114,7 @@ public class RegionEditor extends AbstractEditor<ReportRegion> {
                     entityTree.collapseTree();
                     entityTree.expand(rootNode.getId());
                 } else {
-                    showNotification(getMessage("valueNotFound"), NotificationType.TRAY);
+                    showNotification(getMessage("valueNotFound"), NotificationType.HUMANIZED);
                 }
             }
 
@@ -209,7 +209,7 @@ public class RegionEditor extends AbstractEditor<ReportRegion> {
                     if (alreadyAdded)
                         showNotification(getMessage("elementsAlreadyAdded"), NotificationType.TRAY);
                     else if (selectedItems.size() != 0)
-                        showNotification(getMessage("selectPropertyFromEntity"), NotificationType.TRAY);
+                        showNotification(getMessage("selectPropertyFromEntity"), NotificationType.HUMANIZED);
                     else
                         showNotification(getMessage("elementsWasNotAdded"), NotificationType.TRAY);
                 } else {

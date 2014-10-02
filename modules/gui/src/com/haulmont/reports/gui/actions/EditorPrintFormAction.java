@@ -44,7 +44,7 @@ public class EditorPrintFormAction extends AbstractPrintFormAction {
             openRunReportScreen(editor, entity, metaClass, reportOutputName);
         } else {
             editor.showNotification(messages.getMessage(ReportGuiManager.class, "notifications.noSelectedEntity"),
-                    IFrame.NotificationType.TRAY);
+                    IFrame.NotificationType.HUMANIZED);
         }
     }
 }

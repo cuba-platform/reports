@@ -95,7 +95,7 @@ public class TablePrintFormAction extends AbstractPrintFormAction {
                         IFrame.MessageType.CONFIRMATION, new Action[]{yesAction, cancelAction});
             } else {
                 window.showNotification(messages.getMessage(ReportGuiManager.class, "notifications.noSelectedEntity"),
-                        IFrame.NotificationType.TRAY);
+                        IFrame.NotificationType.HUMANIZED);
             }
         }
     }
