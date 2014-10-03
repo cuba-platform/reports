@@ -3,25 +3,20 @@
   ~ Use is subject to license terms, see http://www.cuba-platform.com/license for details.
   -->
 
-<window
-        xmlns="http://schemas.haulmont.com/cuba/5.2/window.xsd"
+<window xmlns="http://schemas.haulmont.com/cuba/5.2/window.xsd"
         class="com.haulmont.reports.gui.valueformat.edit.ValueFormatEditor"
         messagesPack="com.haulmont.reports.gui"
         datasource="valuesFormatsDs"
         caption="msg://formatsEdit"
-        focusComponent="formatFields"
-        >
+        focusComponent="formatFields">
 
     <dsContext>
-        <datasource
-                id="valuesFormatsDs"
-                class="com.haulmont.reports.entity.ReportValueFormat">
-        </datasource>
+        <datasource id="valuesFormatsDs" class="com.haulmont.reports.entity.ReportValueFormat"/>
     </dsContext>
 
     <assign name="width" value="200"/>
 
-    <layout expand="windowActions" spacing="true">
+    <layout spacing="true">
         <fieldGroup id="formatFields" datasource="valuesFormatsDs">
             <column flex="1">
                 <field id="valueName" required="true" caption="msg://valuesFormats.name" width="${width}"
