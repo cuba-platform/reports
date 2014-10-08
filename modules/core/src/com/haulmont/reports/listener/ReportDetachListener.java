@@ -5,6 +5,7 @@
 package com.haulmont.reports.listener;
 
 import com.haulmont.cuba.core.EntityManager;
+import com.haulmont.cuba.core.Persistence;
 import com.haulmont.cuba.core.listener.BeforeDetachEntityListener;
 import com.haulmont.reports.ReportingApi;
 import com.haulmont.reports.entity.Report;
@@ -23,9 +24,12 @@ public class ReportDetachListener implements BeforeDetachEntityListener<Report> 
     @Inject
     protected ReportingApi reportingApi;
 
+    @Inject
+    protected Persistence persistence;
+
     @Override
     public void onBeforeDetach(Report entity, EntityManager entityManager) {
-        if (StringUtils.isNotBlank(entity.getXml())) {
+        if (persistence.getTools().isLoaded(entity, "xml") && StringUtils.isNotBlank(entity.getXml())) {
             Report reportFromXml = reportingApi.convertToReport(entity.getXml());
             entity.setBands(reportFromXml.getBands());
             entity.setInputParameters(reportFromXml.getInputParameters());
