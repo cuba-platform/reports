@@ -201,16 +201,6 @@ configure(webModule) {
                 'aceeditor', 'popupbutton',
                 'reports-global', 'reports-gui', 'reports-web')
     }
-	
-	task webArchive(type: Zip) {
-        from file('web')
-        exclude '**/web.xml', '**/app.properties'
-        classifier = 'web'
-    }
-		
-    artifacts {
-        archives webArchive
-	}
 }
 
 configure(desktopModule) {
@@ -248,16 +238,6 @@ configure(webLegacyModule) {
         appJars('cuba-global', 'cuba-client', 'cuba-gui', 'cuba-web6',
                 'vaadin', 'popupbutton',
                 'reports-global', 'reports-gui', 'reports-web')
-    }
-
-    task webArchive(type: Zip) {
-        from file('web')
-        exclude '**/web.xml', '**/app.properties'
-        classifier = 'web'
-    }
-
-    artifacts {
-        archives webArchive
     }
 }
 
