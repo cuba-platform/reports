@@ -260,6 +260,17 @@ postUpdate.add({
                 }
             }
 
+            for (BandDefinition band : report.bands) {
+                if (band.childrenBandDefinitions) {
+                    band.childrenBandDefinitions = new ArrayList<>(band.childrenBandDefinitions)
+                    band.childrenBandDefinitions.sort {it.position}
+                }
+            }
+
+            if (report.inputParameters) {
+                report.inputParameters = new ArrayList<>(report.inputParameters)
+                report.inputParameters.sort({it.position})
+            }
 
             ReportService reportService = AppBeans.get(ReportService.NAME);
             String xml = reportService.convertToXml(report);
