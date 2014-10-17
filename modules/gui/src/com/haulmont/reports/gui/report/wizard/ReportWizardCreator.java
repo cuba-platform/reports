@@ -136,23 +136,28 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
     protected ComponentsFactory componentsFactory;
     @Inject
     protected ReportWizardService reportWizardService;
+
     //non-injected fields:
     protected StepFrame detailsStepFrame;
     protected StepFrame regionsStepFrame;
     protected StepFrame saveStepFrame;
     protected StepFrameManager stepFrameManager;
     protected ReportGuiManager reportGuiManager = AppBeans.get(ReportGuiManager.class);
+
     protected byte[] lastGeneratedTemplate;
     protected Report lastGeneratedTmpReport;
     protected boolean entityTreeHasSimpleAttrs;
     protected boolean entityTreeHasCollections;
-    protected int windowWidth = 800;
     protected boolean needUpdateEntityModel = false;
 
     @Override
     public void init(Map<String, Object> params) {
         super.init(params);
-        getWindowManager().getDialogParams().setWidth(windowWidth);
+
+        getDialogParams()
+            .setWidth(800)
+            .setHeight(400);
+
         stepFrameManager = new StepFrameManager(this, getStepFrames());
 
         fwdBtn.setAction(new AbstractAction("fwd") {
@@ -177,6 +182,7 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
                 refreshFrameVisible();
             }
         });
+
         FieldGroup.FieldConfig f = mainFields.getField("entity");
         mainFields.addCustomField(f, new FieldGroup.CustomFieldGenerator() {
             @Override
@@ -215,6 +221,7 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
                 return optionsGroup;
             }
         });
+
         stepFrameManager.showCurrentFrame();
         tipLabel.setValue(getMessage("enterMainParameters"));
         reportRegionsDs.addListener(new CollectionDsListenerAdapter<ReportRegion>() {

@@ -18,8 +18,8 @@
                 <collectionDatasource id="regionPropertiesDs"
                                       property="regionProperties"/>
             </collectionDatasource>
-
         </datasource>
+
         <collectionDatasource id="groupsDs" class="com.haulmont.reports.entity.ReportGroup" view="_local">
             <query>
                 <![CDATA[ select rg from report$ReportGroup rg order by rg.createTs asc ]]>
@@ -27,35 +27,28 @@
         </collectionDatasource>
     </dsContext>
 
-    <layout height="405px" expand="mainVbox">
-        <vbox id="mainVbox" expand="editAreaVbox" spacing="true">
-            <vbox stylename="wizard-top-separator"/>
-            <vbox spacing="true">
-                <label id="tipLabel"/>
-            </vbox>
-            <vbox stylename="wizard-top-separator"/>
-            <vbox id="editAreaVbox" expand="editAreaGroupBox">
-                <groupBox id="editAreaGroupBox">
-                    <iframe src="/com/haulmont/reports/gui/report/wizard/step/first-details-frame.xml" id="detailsStep"
-                            width="100%"
-                            visible="false"/>
-                    <iframe src="/com/haulmont/reports/gui/report/wizard/step/last-save-frame.xml" id="saveStep"
-                            width="100%"
-                            visible="false"/>
-                </groupBox>
-                <iframe src="/com/haulmont/reports/gui/report/wizard/step/intermediate-regions-frame.xml"
-                        id="regionsStep"
-                        width="100%"
+    <layout expand="editAreaVbox" spacing="true">
+        <label stylename="report-wizard-top-separator" width="100%"/>
+        <label id="tipLabel"/>
+        <label stylename="report-wizard-top-separator" width="100%"/>
+        <vbox id="editAreaVbox">
+            <groupBox id="editAreaGroupBox" width="100%" height="100%">
+                <iframe src="/com/haulmont/reports/gui/report/wizard/step/first-details-frame.xml" id="detailsStep"
+                        width="100%" height="100%"
                         visible="false"/>
-
-            </vbox>
-            <hbox id="navBtns" align="BOTTOM_LEFT">
-                <buttonsPanel id="navBtnsPanel" align="BOTTOM_LEFT">
-                    <button id="bwd" caption="msg://backward" icon="icons/report-wizard-previous.png"/>
-                    <button id="fwd" caption="msg://forward" icon="icons/report-wizard-next.png"/>
-                    <button id="save" caption="msg://save" visible="false" icon="icons/ok.png"/>
-                </buttonsPanel>
-            </hbox>
+                <iframe src="/com/haulmont/reports/gui/report/wizard/step/last-save-frame.xml" id="saveStep"
+                        width="100%" height="100%"
+                        visible="false"/>
+            </groupBox>
+            <iframe src="/com/haulmont/reports/gui/report/wizard/step/intermediate-regions-frame.xml"
+                    id="regionsStep"
+                    width="100%" height="100%"
+                    visible="false"/>
         </vbox>
+        <buttonsPanel id="navBtnsPanel">
+            <button id="bwd" caption="msg://backward" icon="icons/report-wizard-previous.png"/>
+            <button id="fwd" caption="msg://forward" icon="icons/report-wizard-next.png"/>
+            <button id="save" caption="msg://save" visible="false" icon="icons/ok.png"/>
+        </buttonsPanel>
     </layout>
 </window>

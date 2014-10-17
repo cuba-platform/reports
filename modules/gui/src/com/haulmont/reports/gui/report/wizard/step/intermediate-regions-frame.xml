@@ -5,7 +5,7 @@
 
 <window xmlns="http://schemas.haulmont.com/cuba/5.2/window.xsd">
     <!--<layout expand="regions">-->
-    <layout spacing="true">
+    <layout spacing="true" expand="regionsBox">
         <hbox spacing="true" width="100%" expand="spacer">
             <!--btn visibility will be switched dynamically:-->
             <hbox id="buttonsBox">
@@ -17,14 +17,13 @@
             </hbox>
             <button id="run" caption="msg://runReport" icon="icons/run.png"/>
             <label value="" id="spacer"/>
-            <button id="moveUpBtn" width="30px" icon="icons/report-wizard-up-property.png"/>
-            <button id="moveDownBtn" width="30px" icon="icons/report-wizard-down-property.png"/>
-            <button id="removeBtn" width="30px" icon="icons/remove.png"/>
+            <button id="moveUpBtn" icon="icons/report-wizard-up-property.png"/>
+            <button id="moveDownBtn" icon="icons/report-wizard-down-property.png"/>
+            <button id="removeBtn" icon="icons/remove.png"/>
         </hbox>
-        <vbox>
+        <vbox id="regionsBox">
             <table id="regionsTable" multiselect="false" sortable="false" reorderingAllowed="false"
-                   columnControlVisible="false"
-                   height="300px" width="100%">
+                   columnControlVisible="false" height="100%" width="100%">
                 <columns>
                     <column id="regionsGeneratedColumn" caption="msg://reportRegionsColumn"/>
                 </columns>
