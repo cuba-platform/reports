@@ -114,8 +114,8 @@ public class TablePrintFormAction extends AbstractPrintFormAction {
 
         LoadContext loadContext = datasource.getCompiledLoadContext();
 
-        ParameterPrototype parameterPrototype = new ParameterPrototype(metaClass.getFullName());
-        parameterPrototype.setMetaClassName(metaClass.getFullName());
+        ParameterPrototype parameterPrototype = new ParameterPrototype(metaClass.getName());
+        parameterPrototype.setMetaClassName(metaClass.getName());
         LoadContext.Query query = loadContext.getQuery();
         parameterPrototype.setQueryString(query.getQueryString());
         parameterPrototype.setQueryParams(query.getParameters());
