@@ -136,4 +136,25 @@ public interface ReportingConfig extends Config {
     Integer getHtmlExternalResourcesTimeoutSec();
 
     void setHtmlExternalResourcesTimeoutSec(Integer externalResourcesTimeoutSec);
+
+    /**
+     * Reporting uses CURL tool to generate reports from url. This is the system path to the tool.
+     */
+    @Property("cuba.reporting.curl.path")
+    @DefaultString("curl")
+    String getCurlPath();
+    void setCurlPath(String value);
+
+    /**
+     * Reporting uses CURL tool to generate reports from url. This the string with parameters used while calling CURL.
+     */
+    @Property("cuba.reporting.curl.params")
+    @DefaultString("")
+    String getCurlParams();
+    void setCurlParams(String value);
+
+    @Property("cuba.reporting.curl.timeoutSec")
+    @DefaultInteger(10)
+    Integer getCurlTimeout();
+    void setCurlTimeout(Integer value);
 }

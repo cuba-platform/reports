@@ -18,7 +18,7 @@ import com.haulmont.cuba.core.global.*;
 import com.haulmont.reports.app.ParameterPrototype;
 import com.haulmont.reports.entity.*;
 import com.haulmont.reports.exception.*;
-import com.haulmont.yarg.formatters.CustomReport;
+import com.haulmont.reports.libintegration.CustomFormatter;
 import com.haulmont.yarg.formatters.impl.doc.connector.NoFreePortsException;
 import com.haulmont.yarg.reporting.ReportOutputDocument;
 import com.haulmont.yarg.reporting.ReportOutputDocumentImpl;
@@ -102,6 +102,7 @@ public class ReportingBean implements ReportingApi {
         xStream.alias("template", ReportTemplate.class);
         xStream.alias("screen", ReportScreen.class);
         xStream.alias("format", ReportValueFormat.class);
+        xStream.aliasField("customFlag", ReportTemplate.class, "custom");
         xStream.addDefaultImplementation(LinkedHashMap.class, Map.class);
         xStream.aliasSystemAttribute(null, "class");
         xStream.omitField(ReportTemplate.class, "content");
@@ -206,18 +207,11 @@ public class ReportingBean implements ReportingApi {
             }
 
             if (template.isCustom()) {
-                Class<Object> reportClass = scripting.loadClass(template.getCustomClass());
-                if (reportClass == null) {
-                    throw new FailedToLoadTemplateClassException(template.getCustomClass());
-                }
-                template.setCustomReport((CustomReport) reportClass.newInstance());
+                CustomFormatter customFormatter = new CustomFormatter(report, template, params);
+                template.setCustomReport(customFormatter);
             }
 
             return reportingApi.runReport(new RunParams(report).template(template).params(resultParams));
-        } catch (InstantiationException | IllegalAccessException e) {
-            throw new ReportingException(
-                    String.format("Could not instantiate class for custom template [%s]. Report name [%s]",
-                            template.getCustomClass(), report.getName()), e);
         } catch (NoFreePortsException nfe) {
             throw new NoOpenOfficeFreePortsException(nfe.getMessage());
         } catch (com.haulmont.yarg.exception.OpenOfficeException ooe) {

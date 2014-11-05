@@ -125,7 +125,7 @@ String mapping = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n" +
         "            <id property=\"id\" column=\"template_id\"/>\n" +
         "            <result property=\"id\" column=\"template_id\"/>\n" +
         "            <result property=\"code\" column=\"template_code\"/>\n" +
-        "            <result property=\"customFlag\" column=\"template_is_custom\"/>\n" +
+        "            <result property=\"custom\" column=\"template_is_custom\"/>\n" +
         "            <result property=\"customClass\" column=\"template_custom_class\"/>\n" +
         "            <result property=\"outputNamePattern\" column=\"template_output_name_pattern\"/>\n" +
         "            <result property=\"name\" column=\"template_name\"/>\n" +

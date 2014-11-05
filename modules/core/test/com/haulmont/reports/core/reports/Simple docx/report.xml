@@ -26,7 +26,7 @@ ru=Общие</localeNames>
     <report reference="../.."/>
     <reportOutputType>40</reportOutputType>
     <code>DEFAULT</code>
-    <customFlag>false</customFlag>
+    <custom>false</custom>
     <customClass></customClass>
     <name>test.docx</name>
   </defaultTemplate>
@@ -56,7 +56,7 @@ ru=Общие</localeNames>
         <report reference="../.."/>
         <reportOutputType>40</reportOutputType>
         <code>DEFAULT</code>
-        <customFlag>false</customFlag>
+        <custom>false</custom>
         <customClass></customClass>
         <name>test.docx</name>
       </defaultTemplate>

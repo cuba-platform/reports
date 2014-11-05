@@ -85,7 +85,7 @@ public class ImportExportTest extends ReportsTestCase {
 
         template.setContent(templateContent.getBytes());
         template.setName("testTemplate.html");
-        template.setCustomFlag(false);
+        template.setCustom(false);
 
         em.persist(template);
 

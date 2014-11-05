@@ -43,10 +43,13 @@ public class ReportTemplate extends BaseReportEntity implements com.haulmont.yar
     protected String code;
 
     @Column(name = "IS_CUSTOM")
-    protected Boolean customFlag = false;
+    protected Boolean custom = false;
 
     @Column(name = "CUSTOM_CLASS")
     protected String customClass;
+
+    @Column(name = "CUSTOM_DEFINED_BY")
+    protected Integer customDefinedBy = CustomTemplateDefinedBy.CLASS.getId();
 
     @Column(name = "OUTPUT_NAME_PATTERN")
     protected String outputNamePattern;
@@ -85,12 +88,12 @@ public class ReportTemplate extends BaseReportEntity implements com.haulmont.yar
         this.report = report;
     }
 
-    public Boolean getCustomFlag() {
-        return customFlag;
+    public Boolean getCustom() {
+        return custom;
     }
 
-    public void setCustomFlag(Boolean customFlag) {
-        this.customFlag = customFlag;
+    public void setCustom(Boolean custom) {
+        this.custom = custom;
     }
 
     public String getCustomClass() {
@@ -119,6 +122,14 @@ public class ReportTemplate extends BaseReportEntity implements com.haulmont.yar
 
     public String getExt() {
         return StringUtils.substringAfterLast(name, ".");
+    }
+
+    public CustomTemplateDefinedBy getCustomDefinedBy() {
+        return CustomTemplateDefinedBy.fromId(customDefinedBy);
+    }
+
+    public void setCustomDefinedBy(CustomTemplateDefinedBy customDefinedBy) {
+        this.customDefinedBy = CustomTemplateDefinedBy.getId(customDefinedBy);
     }
 
     @Override
@@ -152,7 +163,7 @@ public class ReportTemplate extends BaseReportEntity implements com.haulmont.yar
 
     @Override
     public boolean isCustom() {
-        return Boolean.TRUE.equals(customFlag);
+        return Boolean.TRUE.equals(custom);
     }
 
     @Override

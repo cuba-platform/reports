@@ -38,7 +38,7 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
     protected TextField customClass;
 
     @Inject
-    protected CheckBox customFlag;
+    protected CheckBox custom;
 
     @Inject
     protected FileUploadField uploadTemplate;
@@ -51,6 +51,9 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
 
     @Inject
     protected LookupField outputType;
+
+    @Inject
+    protected LookupField customDefinedBy;
 
     public TemplateEditor() {
         showSaveNotification = false;
@@ -73,7 +76,7 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
     protected void postInit() {
         super.postInit();
 
-        enableCustomProps(getItem().getCustomFlag());
+        enableCustomProps(getItem().getCustom());
 
         templatePath.setCaption(getItem().getName());
         updateTemplatePathVisibility();
@@ -87,6 +90,10 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
     private void enableCustomProps(boolean customEnabled) {
         templatePath.setEnabled(!customEnabled);
         uploadTemplate.setEnabled(!customEnabled);
+        customDefinedBy.setEnabled(customEnabled);
+        customDefinedBy.setRequired(customEnabled);
+        customDefinedBy.setRequiredMessage(messages.getMessage(TemplateEditor.class,
+                "templateEditor.customDefinedBy"));
         customClass.setEnabled(customEnabled);
         customClass.setRequired(customEnabled);
         customClass.setRequiredMessage(messages.getMessage(TemplateEditor.class,
@@ -100,7 +107,7 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
 
         getDialogParams().setWidth(490);
 
-        customFlag.addListener(new ValueListener() {
+        custom.addListener(new ValueListener() {
             @Override
             public void valueChanged(Object source, String property, Object prevValue, Object value) {
                 Boolean isCustom = Boolean.TRUE.equals(value);
@@ -179,7 +186,7 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
 
     protected boolean validateTemplateFile() {
         ReportTemplate template = getItem();
-        if (!BooleanUtils.isTrue(template.getCustomFlag()) && template.getContent() == null) {
+        if (!BooleanUtils.isTrue(template.getCustom()) && template.getContent() == null) {
             StringBuilder notification = new StringBuilder(getMessage("template.uploadTemplate"));
 
             if (StringUtils.isEmpty(template.getCode())) {
@@ -203,7 +210,7 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
         if (!validateTemplateFile())
             return;
 
-        if (!getItem().getCustomFlag()) {
+        if (!getItem().getCustom()) {
             getItem().setCustomClass("");
         }
         if (commit(true))

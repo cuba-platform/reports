@@ -58,8 +58,13 @@
                 </row>
                 <row>
                     <label value="msg://template.isCustom"/>
-                    <checkBox id="customFlag" datasource="templateDs" property="customFlag"
+                    <checkBox id="custom" datasource="templateDs" property="custom"
                               width="${width}"/>
+                </row>
+                <row>
+                    <label value="msg://template.customDefinedBy"/>
+                    <lookupField id="customDefinedBy" datasource="templateDs" property="customDefinedBy"
+                               width="${width}"/>
                 </row>
                 <row>
                     <label value="msg://template.customClass"/>
