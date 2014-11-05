@@ -111,6 +111,7 @@ create table REPORT_TEMPLATE (
     OUTPUT_TYPE integer not null,
     IS_DEFAULT char(1),
     IS_CUSTOM char(1),
+    CUSTOM_DEFINED_BY integer default 100,
     CUSTOM_CLASS varchar2(4000),
     OUTPUT_NAME_PATTERN varchar2(255),
     NAME varchar2(500),

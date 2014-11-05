@@ -80,6 +80,7 @@ create table REPORT_TEMPLATE
   OUTPUT_TYPE integer default 0 not null,
   IS_DEFAULT boolean default false,
   IS_CUSTOM boolean default false,
+  CUSTOM_DEFINED_BY integer default 100,
   CUSTOM_CLASS varchar,
   OUTPUT_NAME_PATTERN varchar(255),
   NAME varchar(500),
