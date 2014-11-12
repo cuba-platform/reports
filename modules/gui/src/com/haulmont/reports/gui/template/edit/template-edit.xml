@@ -51,7 +51,7 @@
                 <row>
                     <label value="msg://template.outputNamePattern"/>
                     <textField id="outputNamePattern" datasource="templateDs" property="outputNamePattern"
-                               width="${width}" required="true">
+                               width="${width}">
                         <validator
                                 class="com.haulmont.reports.gui.report.validators.OutputFileNameValidator"/>
                     </textField>

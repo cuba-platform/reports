@@ -155,8 +155,8 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
         super.init(params);
 
         getDialogParams()
-            .setWidth(800)
-            .setHeight(400);
+                .setWidth(800)
+                .setHeight(400);
 
         stepFrameManager = new StepFrameManager(this, getStepFrames());
 
@@ -1052,8 +1052,7 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
                         try {
                             outputFileName.validate();
                         } catch (ValidationException e) {
-                            showNotification(getMessage("validationFail.caption"),
-                                    String.format(getMessage("validation.required.defaultMsg"), getMessage("outputFileName")), NotificationType.TRAY);
+                            showNotification(getMessage("validationFail.caption"), e.getMessage(), NotificationType.TRAY);
                             return;
                         }
                         if (getItem().getReportRegions().isEmpty()) {
