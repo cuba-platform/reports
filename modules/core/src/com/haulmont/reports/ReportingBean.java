@@ -106,6 +106,7 @@ public class ReportingBean implements ReportingApi {
         xStream.addDefaultImplementation(LinkedHashMap.class, Map.class);
         xStream.aliasSystemAttribute(null, "class");
         xStream.omitField(ReportTemplate.class, "content");
+        xStream.omitField(ReportTemplate.class, "defaultFlag");
         xStream.omitField(ReportInputParameter.class, "localeName");
         xStream.omitField(Report.class, "xml");
         xStream.aliasField("uuid", BandDefinition.class, "id");
