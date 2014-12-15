@@ -22,26 +22,31 @@
             </column>
         </fieldGroup>
 
-        <vbox id="bands" width="100%" height="100%">
+        <vbox id="bands" width="100%" height="100%" >
             <split orientation="horizontal" id="hSplit" pos="30" width="100%" height="100%">
-                <groupBox id="treeBox" expand="serviceTree" height="100%" width="100%" spacing="true"
-                          caption="msg://report.bands">
-                    <buttonsPanel>
-                        <button id="createBandDefinition" icon="icons/plus-btn.png"/>
-                        <button id="removeBandDefinition" icon="icons/remove.png"/>
-                        <button id="up" icon="icons/up.png"/>
-                        <button id="down" icon="icons/down.png"/>
-                    </buttonsPanel>
+                <vbox margin="false;true;false;false" width="100%" height="100%">
+                    <groupBox id="treeBox" expand="serviceTree" height="100%" width="100%" spacing="true"
+                              caption="msg://report.bands">
+                        <buttonsPanel>
+                            <button id="createBandDefinition" icon="icons/plus-btn.png"/>
+                            <button id="removeBandDefinition" icon="icons/remove.png"/>
+                            <button id="up" icon="icons/up.png"/>
+                            <button id="down" icon="icons/down.png"/>
+                        </buttonsPanel>
 
-                    <tree id="serviceTree" width="100%" height="100%">
-                        <treechildren datasource="treeDs" captionProperty="name"/>
-                    </tree>
-                </groupBox>
-                <groupBox id="bandDetailsBox" height="100%" width="100%" caption="msg://report.bandDetails">
-                    <iframe src="/com/haulmont/reports/gui/definition/edit/definition-edit.xml" id="bandEditor"
-                            width="100%"
-                            height="100%"/>
-                </groupBox>
+                        <tree id="serviceTree" width="100%" height="100%">
+                            <treechildren datasource="treeDs" captionProperty="name"/>
+                        </tree>
+                    </groupBox>
+                </vbox>
+                <!-- Split -->
+                <vbox margin="false;false;false;true" width="100%" height="100%">
+                    <groupBox id="bandDetailsBox" height="100%" width="100%" caption="msg://report.bandDetails">
+                        <iframe src="/com/haulmont/reports/gui/definition/edit/definition-edit.xml" id="bandEditor"
+                                width="100%"
+                                height="100%"/>
+                    </groupBox>
+                </vbox>
             </split>
         </vbox>
     </layout>

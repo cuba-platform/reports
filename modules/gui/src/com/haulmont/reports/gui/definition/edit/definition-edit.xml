@@ -26,11 +26,11 @@
 
     <layout expand="split" spacing="true">
         <hbox spacing="true" id="propertiesBox">
-            <label value="msg://definition.name"/>
+            <label value="msg://definition.name" align="MIDDLE_LEFT"/>
             <textField id="name" datasource="bandDefinitionDs" property="name" width="${width}"/>
-            <label value="msg://definition.orientation"/>
+            <label value="msg://definition.orientation" align="MIDDLE_LEFT"/>
             <lookupField id="orientation" datasource="bandDefinitionDs" property="orientation" width="${width}"/>
-            <label value="msg://definition.parentBand"/>
+            <label value="msg://definition.parentBand" align="MIDDLE_LEFT"/>
             <lookupField id="parentBand" datasource="bandDefinitionDs" optionsDatasource="availableParentBandsDs"
                          property="parentBandDefinition" width="${width}"/>
         </hbox>

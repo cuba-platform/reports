@@ -4,25 +4,23 @@
   -->
 
 <window xmlns="http://schemas.haulmont.com/cuba/5.3/window.xsd">
-    <layout margin="true">
-        <vbox id ="templatesBox" expand="templatesTable" height="100%">
-            <label value="msg://report.templates" stylename="h2"/>
-            <table id="templatesTable" sortable="false" width="100%"
-                   reorderingAllowed="false" columnControlVisible="false">
-                <buttonsPanel>
-                    <button action="templatesTable.create" icon="icons/create.png"/>
-                    <button action="templatesTable.edit" icon="icons/edit.png"/>
-                    <button action="templatesTable.remove" icon="icons/remove.png"/>
-                    <button action="templatesTable.defaultTemplate" icon="icons/ok.png"/>
-                </buttonsPanel>
-                <columns>
-                    <column id="name"/>
-                    <column id="code"/>
-                    <column id="reportOutputType"/>
-                    <column id="customClass"/>
-                </columns>
-                <rows datasource="templatesDs"/>
-            </table>
-        </vbox>
+    <layout expand="templatesTable" spacing="true" margin="true">
+        <label value="msg://report.templates" stylename="h2"/>
+        <table id="templatesTable" sortable="false" width="100%"
+               reorderingAllowed="false" columnControlVisible="false">
+            <buttonsPanel>
+                <button action="templatesTable.create" icon="icons/create.png"/>
+                <button action="templatesTable.edit" icon="icons/edit.png"/>
+                <button action="templatesTable.remove" icon="icons/remove.png"/>
+                <button action="templatesTable.defaultTemplate" icon="icons/ok.png"/>
+            </buttonsPanel>
+            <columns>
+                <column id="name"/>
+                <column id="code"/>
+                <column id="reportOutputType"/>
+                <column id="customClass"/>
+            </columns>
+            <rows datasource="templatesDs"/>
+        </table>
     </layout>
 </window>
