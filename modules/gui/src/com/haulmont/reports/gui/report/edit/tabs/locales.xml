@@ -4,10 +4,9 @@
   -->
 
 <window xmlns="http://schemas.haulmont.com/cuba/5.3/window.xsd">
-    <layout expand="spacer" margin="true" spacing="true">
+    <layout expand="localeTextField" margin="true" spacing="true">
         <label value="msg://localeCaption" stylename="h2"/>
         <textArea id="localeTextField" datasource="reportDs" property="localeNames"
                    rows="20" cols="30" width="100%"/>
-        <hbox id="spacer"/>
     </layout>
 </window>
