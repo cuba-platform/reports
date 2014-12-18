@@ -5,28 +5,22 @@
 package com.haulmont.reports.gui.definition.edit;
 
 import com.haulmont.chile.core.model.MetaClass;
-import com.haulmont.chile.core.model.MetaProperty;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.global.Metadata;
 import com.haulmont.cuba.core.global.View;
-import com.haulmont.cuba.core.global.ViewProperty;
-import com.haulmont.cuba.gui.WindowManager;
 import com.haulmont.cuba.gui.autocomplete.AutoCompleteSupport;
 import com.haulmont.cuba.gui.autocomplete.JpqlSuggestionFactory;
 import com.haulmont.cuba.gui.autocomplete.Suggester;
 import com.haulmont.cuba.gui.autocomplete.Suggestion;
 import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.components.actions.RemoveAction;
-import com.haulmont.cuba.gui.data.CollectionDatasource;
-import com.haulmont.cuba.gui.data.Datasource;
-import com.haulmont.cuba.gui.data.HierarchicalDatasource;
+import com.haulmont.cuba.gui.data.*;
+import com.haulmont.cuba.gui.data.impl.CollectionDsListenerAdapter;
 import com.haulmont.cuba.gui.data.impl.DatasourceImplementation;
 import com.haulmont.cuba.gui.data.impl.DsListenerAdapter;
-import com.haulmont.reports.app.EntityTree;
 import com.haulmont.reports.app.service.ReportService;
 import com.haulmont.reports.app.service.ReportWizardService;
 import com.haulmont.reports.entity.*;
-import com.haulmont.reports.entity.wizard.ReportRegion;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 
@@ -40,7 +34,6 @@ import java.util.*;
  * @version $Id$
  */
 public class BandDefinitionEditor extends AbstractEditor<BandDefinition> implements Suggester {
-
     @Inject
     protected Datasource<BandDefinition> bandDefinitionDs;
     @Inject
@@ -52,15 +45,22 @@ public class BandDefinitionEditor extends AbstractEditor<BandDefinition> impleme
     @Inject
     protected HierarchicalDatasource<BandDefinition, UUID> treeDs;
     @Inject
+    private CollectionDatasource<ReportInputParameter, UUID> parametersDs;
+
+    @Inject
     protected Table dataSets;
     @Named("text")
-    protected SourceCodeEditor datasetScriptField;
-    @Named("textBox")
+    protected SourceCodeEditor dataSetScriptField;
+    @Inject
     protected BoxLayout textBox;
-    @Named("entityBox")
-    protected BoxLayout entityBox;
-    @Named("entitiesBox")
-    protected BoxLayout entitiesBox;
+    @Inject
+    protected GridLayout entityGrid;
+    @Inject
+    protected GridLayout entitiesGrid;
+    @Inject
+    protected GridLayout commonEntityGrid;
+    @Inject
+    protected Label viewNameLabel;
     @Inject
     protected LookupField orientation;
     @Inject
@@ -68,9 +68,21 @@ public class BandDefinitionEditor extends AbstractEditor<BandDefinition> impleme
     @Inject
     protected TextField name;
     @Inject
-    protected Button singleDataSetEditViewButton;
+    protected LookupField viewNameLookup;
     @Inject
-    protected Button multiDataSetEditViewButton;
+    protected LookupField entitiesParamLookup;
+    @Inject
+    protected LookupField entityParamLookup;
+    @Inject
+    protected CheckBox useExistingViewCheckbox;
+    @Inject
+    protected Button viewEditButton;
+    @Inject
+    protected Label buttonEmptyElement;
+    @Inject
+    protected Label checkboxEmptyElement;
+    @Inject
+    protected Label spacer;
     @Inject
     protected Metadata metadata;
     @Inject
@@ -80,7 +92,40 @@ public class BandDefinitionEditor extends AbstractEditor<BandDefinition> impleme
     @Inject
     protected BoxLayout editPane;
 
-    protected List xlsExts = Arrays.asList("XLS", "XLSX");
+    public interface Companion {
+        void initDatasetsTable(Table table);
+    }
+
+    public void setBandDefinition(BandDefinition bandDefinition) {
+        bandDefinitionDs.setItem(bandDefinition);
+        if (bandDefinition != null && bandDefinition.getParent() == null) {
+            name.setEditable(false);
+        } else {
+            name.setEditable(true);
+        }
+    }
+
+    public Datasource<BandDefinition> getBandDefinitionDs() {
+        return bandDefinitionDs;
+    }
+
+    @Override
+    public void setEnabled(boolean enabled) {
+        //Desktop Component containers doesn't apply disable flags for child components
+        for (Component component : getComponents()) {
+            component.setEnabled(enabled);
+        }
+    }
+
+    @Override
+    public List<Suggestion> getSuggestions(AutoCompleteSupport source, String text, int cursorPosition) {
+        if (StringUtils.isBlank(text)) {
+            return Collections.emptyList();
+        }
+        int queryPosition = cursorPosition - 1;
+
+        return JpqlSuggestionFactory.requestHint(text, queryPosition, source, cursorPosition);
+    }
 
     @Override
     protected void initNewItem(BandDefinition item) {
@@ -89,13 +134,32 @@ public class BandDefinitionEditor extends AbstractEditor<BandDefinition> impleme
 
     @Override
     protected void postInit() {
-        selectFirstDataset();
+        selectFirstDataSet();
     }
 
     @Override
     public void init(Map<String, Object> params) {
         super.init(params);
 
+        initDataSetListeners();
+
+        initBandDefinitionsListeners();
+
+        initParametersListeners();
+
+        initCompanion();
+
+        initActions();
+    }
+
+    protected void initCompanion() {
+        Companion companion = getCompanion();
+        if (companion != null) {
+            companion.initDatasetsTable(dataSets);
+        }
+    }
+
+    protected void initActions() {
         dataSets.addAction(new RemoveAction(dataSets, false) {
             @Override
             public String getDescription() {
@@ -143,39 +207,79 @@ public class BandDefinitionEditor extends AbstractEditor<BandDefinition> impleme
             }
         });
 
-        initDataSetControls();
+        Action editDataSetViewAction = new EditViewAction(this);
+        viewEditButton.setAction(editDataSetViewAction);
 
+        viewNameLookup.setOptionsMap(new HashMap<String, Object>());
+
+        entitiesParamLookup.setNewOptionAllowed(true);
+        entityParamLookup.setNewOptionAllowed(true);
+        viewNameLookup.setNewOptionAllowed(true);
+        entitiesParamLookup.setNewOptionHandler(LinkedWithPropertyNewOptionHandler.handler(dataSetsDs, "listEntitiesParamName"));
+        entityParamLookup.setNewOptionHandler(LinkedWithPropertyNewOptionHandler.handler(dataSetsDs, "entityParamName"));
+        viewNameLookup.setNewOptionHandler(LinkedWithPropertyNewOptionHandler.handler(dataSetsDs, "viewName"));
+    }
+
+    protected void initParametersListeners() {
+        parametersDs.addListener(new CollectionDsListenerAdapter<ReportInputParameter>() {
+            @Override
+            public void collectionChanged(CollectionDatasource ds, Operation operation, List<ReportInputParameter> items) {
+                super.collectionChanged(ds, operation, items);
+                Map<String, Object> paramAliases = new HashMap<>();
+                for (ReportInputParameter item : (Collection<ReportInputParameter>) ds.getItems()) {
+                    paramAliases.put(item.getName(), item.getAlias());
+                }
+                entitiesParamLookup.setOptionsMap(paramAliases);
+                entityParamLookup.setOptionsMap(paramAliases);
+            }
+        });
+    }
+
+    protected void initBandDefinitionsListeners() {
         bandDefinitionDs.addListener(new DsListenerAdapter<BandDefinition>() {
             @Override
             public void itemChanged(Datasource<BandDefinition> ds, BandDefinition prevItem, BandDefinition item) {
                 updateRequiredIndicators(item);
-                selectFirstDataset();
+                selectFirstDataSet();
+            }
+        });
+    }
+
+    protected void initDataSetListeners() {
+        dataSetsDs.addListener(new DsListenerAdapter<DataSet>() {
+            @Override
+            public void valueChanged(DataSet source, String property, @Nullable Object prevValue, @Nullable Object value) {
+                applyVisibilityRules(source);
+                if ("entityParamName".equals(property) || "listEntitiesParamName".equals(property)) {
+                    ReportInputParameter linkedParameter = findParameterByAlias(String.valueOf(value));
+                    refreshViewNames(linkedParameter);
+                }
+
+                @SuppressWarnings("unchecked")
+                DatasourceImplementation<DataSet> implementation = (DatasourceImplementation<DataSet>) dataSetsDs;
+                implementation.modified(source);
+            }
+
+            @Override
+            public void itemChanged(Datasource ds, @Nullable DataSet prevItem, @Nullable DataSet item) {
+                if (item != null) {
+                    applyVisibilityRules(item);
+
+                    ReportInputParameter linkedParameter = null;
+                    if (item.getType() == DataSetType.SINGLE) {
+                        linkedParameter = findParameterByAlias(item.getEntityParamName());
+                        refreshViewNames(linkedParameter);
+                    } else if (item.getType() == DataSetType.MULTI) {
+                        linkedParameter = findParameterByAlias(item.getListEntitiesParamName());
+                        refreshViewNames(linkedParameter);
+                    }
+                } else {
+                    hideAllDataSetEditComponents();
+                }
             }
         });
 
-        BandDefinitionEditor.Companion companion = getCompanion();
-        if (companion != null) {
-            companion.initDatasetsTable(dataSets);
-        }
-        Action editDataSetViewAction = new EditDataSetViewAction();
-        singleDataSetEditViewButton.setAction(editDataSetViewAction);
-        multiDataSetEditViewButton.setAction(editDataSetViewAction);
-    }
-
-    //TODO it is a stub for using set in some dataset change listener
-    protected void showOrHideEditDataSetViewBtn(DataSet dataSet) {
-        if (isDataSetViewEditAllowed(dataSet)) {
-            singleDataSetEditViewButton.setVisible(true);
-            singleDataSetEditViewButton.setVisible(true);
-        } else {
-            singleDataSetEditViewButton.setVisible(false);
-            singleDataSetEditViewButton.setVisible(false);
-        }
-    }
-
-    //TODO
-    protected boolean isDataSetViewEditAllowed(DataSet dataSet) {
-        return true;
+        hideAllDataSetEditComponents();
     }
 
     protected void updateRequiredIndicators(BandDefinition item) {
@@ -185,45 +289,46 @@ public class BandDefinitionEditor extends AbstractEditor<BandDefinition> impleme
         name.setRequired(item != null);
     }
 
-    @Override
-    public boolean validateAll() {
-        //validation works in ReportEditor
-        return true;
-    }
-
-    public void initDataSetControls() {
-        dataSetsDs.addListener(new DsListenerAdapter<DataSet>() {
-            @Override
-            public void valueChanged(DataSet source, String property,
-                                     @Nullable Object prevValue, @Nullable Object value) {
-                if (property.equals("type")) {
-                    applyType((DataSetType) value);
-                }
-                ((DatasourceImplementation) dataSetsDs).modified(source);
+    @Nullable
+    protected ReportInputParameter findParameterByAlias(String alias) {
+        for (ReportInputParameter reportInputParameter : parametersDs.getItems()) {
+            if (reportInputParameter.getAlias().equals(alias)) {
+                return reportInputParameter;
             }
+        }
+        return null;
+    }
 
-            @Override
-            public void itemChanged(Datasource ds, @Nullable DataSet prevItem, @Nullable DataSet item) {
-                if (item != null) {
-                    applyType(item.getType());
-                } else {
-                    hideEditComponents();
+    protected void refreshViewNames(@Nullable ReportInputParameter reportInputParameter) {
+        if (reportInputParameter != null) {
+            if (StringUtils.isNotBlank(reportInputParameter.getEntityMetaClass())) {
+                MetaClass parameterMetaClass = metadata.getClass(reportInputParameter.getEntityMetaClass());
+                Collection<String> viewNames = metadata.getViewRepository().getViewNames(parameterMetaClass);
+                if (viewNames != null) {
+                    Map<String, Object> views = new HashMap<>();
+                    for (String viewName : viewNames) {
+                        views.put(viewName, viewName);
+                    }
+                    views.put(View.LOCAL, View.LOCAL);
+                    views.put(View.MINIMAL, View.MINIMAL);
+                    viewNameLookup.setOptionsMap(views);
+                    return;
                 }
             }
-        });
+        }
 
-        hideEditComponents();
+        viewNameLookup.setOptionsMap(new HashMap<String, Object>());
     }
 
-    protected void hideEditComponents() {
-        // do not use setVisible(false) due to web legacy (Vaadin 6) layout problems #PL-3916
-        editPane.remove(textBox);
-        editPane.remove(entityBox);
-        editPane.remove(entitiesBox);
+    protected void applyVisibilityRules(DataSet item) {
+        applyVisibilityRulesForType(item.getType());
+        if (item.getType() == DataSetType.SINGLE || item.getType() == DataSetType.MULTI) {
+            applyVisibilityRulesForEntityType(item);
+        }
     }
 
-    protected void applyType(DataSetType dsType) {
-        hideEditComponents();
+    protected void applyVisibilityRulesForType(DataSetType dsType) {
+        hideAllDataSetEditComponents();
 
         if (dsType != null) {
             switch (dsType) {
@@ -233,38 +338,73 @@ public class BandDefinitionEditor extends AbstractEditor<BandDefinition> impleme
                     editPane.add(textBox);
                     break;
                 case SINGLE:
-                    editPane.add(entityBox);
+                    editPane.add(entityGrid);
+                    editPane.add(commonEntityGrid);
+                    editPane.add(spacer);
+                    editPane.expand(spacer);
                     break;
                 case MULTI:
-                    editPane.add(entitiesBox);
+                    editPane.add(entitiesGrid);
+                    editPane.add(commonEntityGrid);
+                    editPane.add(spacer);
+                    editPane.expand(spacer);
                     break;
             }
 
             switch (dsType) {
                 case SQL:
-                    datasetScriptField.setMode(SourceCodeEditor.Mode.SQL);
-                    datasetScriptField.setSuggester(null);
+                    dataSetScriptField.setMode(SourceCodeEditor.Mode.SQL);
+                    dataSetScriptField.setSuggester(null);
                     break;
 
                 case GROOVY:
-                    datasetScriptField.setSuggester(null);
-                    datasetScriptField.setMode(SourceCodeEditor.Mode.Groovy);
+                    dataSetScriptField.setSuggester(null);
+                    dataSetScriptField.setMode(SourceCodeEditor.Mode.Groovy);
                     break;
 
                 case JPQL:
-                    datasetScriptField.setSuggester(this);
-                    datasetScriptField.setMode(SourceCodeEditor.Mode.Text);
+                    dataSetScriptField.setSuggester(this);
+                    dataSetScriptField.setMode(SourceCodeEditor.Mode.Text);
                     break;
 
                 default:
-                    datasetScriptField.setSuggester(null);
-                    datasetScriptField.setMode(SourceCodeEditor.Mode.Text);
+                    dataSetScriptField.setSuggester(null);
+                    dataSetScriptField.setMode(SourceCodeEditor.Mode.Text);
                     break;
             }
         }
     }
 
-    protected void selectFirstDataset() {
+    protected void applyVisibilityRulesForEntityType(DataSet item) {
+        commonEntityGrid.remove(viewNameLabel);
+        commonEntityGrid.remove(viewNameLookup);
+        commonEntityGrid.remove(viewEditButton);
+        commonEntityGrid.remove(buttonEmptyElement);
+        commonEntityGrid.remove(useExistingViewCheckbox);
+        commonEntityGrid.remove(checkboxEmptyElement);
+
+        if (Boolean.TRUE.equals(item.getUseExistingView())) {
+            commonEntityGrid.add(viewNameLabel);
+            commonEntityGrid.add(viewNameLookup);
+        } else {
+            commonEntityGrid.add(viewEditButton);
+            commonEntityGrid.add(buttonEmptyElement);
+        }
+
+        commonEntityGrid.add(useExistingViewCheckbox);
+        commonEntityGrid.add(checkboxEmptyElement);
+    }
+
+    protected void hideAllDataSetEditComponents() {
+        // do not use setVisible(false) due to web legacy (Vaadin 6) layout problems #PL-3916
+        editPane.remove(textBox);
+        editPane.remove(entityGrid);
+        editPane.remove(entitiesGrid);
+        editPane.remove(commonEntityGrid);
+        editPane.remove(spacer);
+    }
+
+    protected void selectFirstDataSet() {
         dataSetsDs.refresh();
         if (!dataSetsDs.getItemIds().isEmpty()) {
             Entity item = dataSetsDs.getItem(dataSetsDs.getItemIds().iterator().next());
@@ -274,196 +414,22 @@ public class BandDefinitionEditor extends AbstractEditor<BandDefinition> impleme
         }
     }
 
-    @Override
-    public List<Suggestion> getSuggestions(AutoCompleteSupport source, String text, int cursorPosition) {
-        if (text == null || "".equals(text.trim())) {
-            return Collections.emptyList();
-        }
-        int queryPosition = cursorPosition - 1;
-
-        return JpqlSuggestionFactory.requestHint(text, queryPosition, source, cursorPosition);
+    // For EditViewAction
+    protected String formatMessage(String key, Object... params) {
+        return super.formatMessage(key, params);
     }
 
-    public void setBandDefinition(BandDefinition bandDefinition) {
-        bandDefinitionDs.setItem(bandDefinition);
-        if (bandDefinition != null && bandDefinition.getParent() == null) {
-            name.setEditable(false);
+    // This is a stub for using set in some DataSet change listener
+    protected void setViewEditVisibility(DataSet dataSet) {
+        if (isViewEditAllowed(dataSet)) {
+            viewEditButton.setVisible(true);
         } else {
-            name.setEditable(true);
+            viewEditButton.setVisible(false);
         }
     }
 
-    public Datasource<BandDefinition> getBandDefinitionDs() {
-        return bandDefinitionDs;
+    protected boolean isViewEditAllowed(DataSet dataSet) {
+        return true;
     }
 
-    @Override
-    public void setEnabled(boolean enabled) {
-        //Desktop Component containers doesn't apply disable flags for child components
-        for (Component component : getComponents()) {
-            component.setEnabled(enabled);
-        }
-    }
-
-    public interface Companion {
-        void initDatasetsTable(Table table);
-    }
-
-    protected class EditDataSetViewAction extends AbstractAction {
-        public EditDataSetViewAction() {
-            super("editView");
-        }
-
-        @Override
-        public void actionPerform(Component component) {
-            if (dataSets.getSingleSelected() instanceof DataSet) {
-                final DataSet dataSet = dataSets.getSingleSelected();
-                if (dataSet != null && (DataSetType.SINGLE == dataSet.getType() || DataSetType.MULTI == dataSet.getType())) {
-                    MetaClass forEntityTreeModelMetaClass = findMetaClassByAlias(dataSet);
-                    if (forEntityTreeModelMetaClass != null) {
-
-                        final EntityTree entityTree = reportWizardService.buildEntityTree(forEntityTreeModelMetaClass);
-                        ReportRegion reportRegion = dataSetToReportRegion(dataSet, entityTree);
-
-
-                        if (reportRegion != null) {
-                            if (reportRegion.getRegionPropertiesRootNode() == null) {
-                                showNotification(formatMessage("dataSet.entityAliasInvalid", getNameForEntityParameter(dataSet)), NotificationType.TRAY);
-                                //without that root node region editor form will not initialized correctly and became empty. just return
-                                return;
-                            } else {
-                                //Open editor and convert saved in editor ReportRegion item to View
-                                Map<String, Object> editorParams = new HashMap<>();
-                                editorParams.put("asViewEditor", Boolean.TRUE);
-                                editorParams.put("rootEntity", reportRegion.getRegionPropertiesRootNode());
-                                editorParams.put("scalarOnly", Boolean.TRUE);
-
-                                final Editor regionEditor = openEditor("report$Report.regionEditor", reportRegion, WindowManager.OpenType.DIALOG, editorParams, dataSetsDs);
-                                regionEditor.addListener(new CloseListener() {
-                                    @Override
-                                    public void windowClosed(String actionId) {
-                                        if (COMMIT_ACTION_ID.equals(actionId)) {
-                                            dataSet.setView(reportRegionToView(entityTree, (ReportRegion) regionEditor.getItem()));
-                                        }
-                                    }
-                                });
-                            }
-
-                        }
-
-                    }
-                }
-            }
-        }
-
-        //Detect metaclass by an alias and parameter
-        protected MetaClass findMetaClassByAlias(DataSet dataSet) {
-            MetaClass byAliasMetaClass;
-            String dataSetAlias = getNameForEntityParameter(dataSet);
-
-            byAliasMetaClass = reportService.findMetaClassByDataSetEntityAlias(dataSetAlias, dataSet.getType(), dataSet.getBandDefinition().getReport().getInputParameters());
-
-            //Lets return some value
-            if (byAliasMetaClass == null) {
-                //Can`t determine parameter and its metaClass by alias
-                showNotification(formatMessage("dataSet.entityAliasInvalid", dataSetAlias), NotificationType.TRAY);
-                return null;
-                //when byAliasMetaClass is null we return also null
-            } else {
-                //Detect metaclass by current view for comparison
-                MetaClass viewMetaClass = null;
-                if (dataSet.getView() != null) {
-                    viewMetaClass = metadata.getClass(dataSet.getView().getEntityClass());
-                }
-                if (viewMetaClass != null && !byAliasMetaClass.getName().equals(viewMetaClass.getName())) {
-                    showNotification(formatMessage("dataSet.entityWasChanged", byAliasMetaClass.getName()), NotificationType.TRAY);
-                }
-                return byAliasMetaClass;
-            }
-        }
-
-        protected ReportRegion dataSetToReportRegion(DataSet dataSet, EntityTree entityTree) {
-            boolean isTabulatedRegion;
-            View view = null;
-            String collectionPropertyName;
-            switch (dataSet.getType()) {
-                case SINGLE:
-                    isTabulatedRegion = false;
-                    view = dataSet.getView();
-                    collectionPropertyName = null;
-                    break;
-                case MULTI:
-                    isTabulatedRegion = true;
-                    collectionPropertyName = StringUtils.substringAfter(dataSet.getListEntitiesParamName(), "#");
-                    if (StringUtils.isBlank(collectionPropertyName) && dataSet.getListEntitiesParamName().indexOf("#") != -1) {
-                        showNotification(formatMessage("dataSet.entityAliasInvalid", getNameForEntityParameter(dataSet)), NotificationType.TRAY);
-                        return null;
-                    }
-                    if (StringUtils.isNotBlank(collectionPropertyName)) {
-
-                        if (dataSet.getView() != null) {
-                            view = findSubViewByCollectionPropertyName(dataSet.getView(), collectionPropertyName);
-
-                        }
-                        if (view == null) {
-                            //View was never created for current dataset.
-                            //We must to create minimal view that contains collection property for ability of creating ReportRegion.regionPropertiesRootNode later
-                            MetaClass metaClass = entityTree.getEntityTreeRootNode().getWrappedMetaClass();
-                            MetaProperty metaProperty = metaClass.getProperty(collectionPropertyName);
-                            if (metaProperty != null && metaProperty.getDomain() != null && metaProperty.getRange().getCardinality().isMany()) {
-                                view = new View(metaProperty.getDomain().getJavaClass());
-                            } else {
-                                showNotification(formatMessage("dataSet.cantFindCollectionProperty", collectionPropertyName, metaClass.getName()), NotificationType.TRAY);
-                                return null;
-                            }
-                        }
-                    } else {
-                        view = dataSet.getView();
-                    }
-                    break;
-                default:
-                    return null;
-            }
-            return reportWizardService.createReportRegionByView(entityTree, isTabulatedRegion,
-                    view, collectionPropertyName);
-        }
-
-        protected View reportRegionToView(EntityTree entityTree, ReportRegion reportRegion) {
-            return reportWizardService.createViewByReportRegions(entityTree.getEntityTreeRootNode(), Collections.singletonList(reportRegion));
-        }
-
-        public View findSubViewByCollectionPropertyName(View view, final String propertyName) {
-            if (view == null) {
-                return null;
-            }
-            for (ViewProperty viewProperty : view.getProperties()) {
-                if (propertyName.equals(viewProperty.getName())) {
-                    if (viewProperty.getView() != null) {
-                        return viewProperty.getView();
-                    }
-                }
-
-                if (viewProperty.getView() != null) {
-                    View foundedView = findSubViewByCollectionPropertyName(viewProperty.getView(), propertyName);
-                    if (foundedView != null) {
-                        return foundedView;
-                    }
-                }
-            }
-            return null;
-        }
-    }
-
-    private String getNameForEntityParameter(DataSet dataSet) {
-        String dataSetAlias = null;
-        switch (dataSet.getType()) {
-            case SINGLE:
-                dataSetAlias = dataSet.getEntityParamName();
-                break;
-            case MULTI:
-                dataSetAlias = dataSet.getListEntitiesParamName();
-                break;
-        }
-        return dataSetAlias;
-    }
 }

@@ -24,10 +24,14 @@ public class DataSet extends AbstractNotPersistentEntity implements ReportQuery 
     public static final String ENTITY_PARAM_NAME = "entityParamName";
     public static final String LIST_ENTITIES_PARAM_NAME = "listEntitiesParamName";
     private static final long serialVersionUID = -3706206933129963303L;
-    //@MetaProperty
+
     protected View view;
     @MetaProperty
     protected String name;
+    @MetaProperty
+    protected Boolean useExistingView = false;
+    @MetaProperty
+    protected String viewName;
     @MetaProperty
     protected String text;
     @MetaProperty
@@ -49,12 +53,28 @@ public class DataSet extends AbstractNotPersistentEntity implements ReportQuery 
         this.view = view;
     }
 
+    public Boolean getUseExistingView() {
+        return useExistingView;
+    }
+
+    public void setUseExistingView(Boolean useExistingView) {
+        this.useExistingView = useExistingView;
+    }
+
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getViewName() {
+        return viewName;
+    }
+
+    public void setViewName(String viewName) {
+        this.viewName = viewName;
     }
 
     public String getText() {

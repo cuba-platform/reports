@@ -23,6 +23,7 @@
     </dsContext>
 
     <assign name="width" value="150"/>
+    <assign name="labelWidth" value="350"/>
 
     <layout expand="split" spacing="true">
         <hbox spacing="true" id="propertiesBox">
@@ -51,7 +52,7 @@
                 </table>
             </vbox>
             <!-- Split -->
-            <vbox id="editPane" margin="false;false;false;true" spacing="true" height="100%">
+            <vbox id="editPane" margin="false;false;false;true" height="100%" spacing="true">
                 <vbox id="textBox" expand="text" height="100%">
                     <label id="dataSetTextLabel" value="msg://dataSet.text"/>
                     <sourceCodeEditor id="text" datasource="dataSetsDs" property="text"
@@ -60,19 +61,54 @@
                     <textField id="linkParameterName" width="${width}"
                                datasource="dataSetsDs" property="linkParameterName"/>
                 </vbox>
-                <vbox id="entityBox" spacing="true">
-                    <label id="entityParamLabel" value="msg://dataSet.entityParamName"/>
-
-                    <textField id="entityParamTextBox" width="${width}"
-                               datasource="dataSetsDs" property="entityParamName"/>
-                    <button id="singleDataSetEditViewButton" caption="msg://dataSet.editView"/>
-                </vbox>
-                <vbox id="entitiesBox" spacing="true">
-                    <label id="entitiesParamLabel" value="msg://dataSet.entitiesParamName"/>
-                    <textField id="entitiesParamTextBox" width="${width}"
-                               datasource="dataSetsDs" property="listEntitiesParamName"/>
-                    <button id="multiDataSetEditViewButton" caption="msg://dataSet.editView"/>
-                </vbox>
+                <grid id="entitiesGrid" spacing="true" margin="true;false;false;false">
+                    <columns>
+                        <column flex="1"/>
+                        <column flex="1"/>
+                    </columns>
+                    <rows>
+                        <row>
+                            <label id="entitiesParamLabel" value="msg://dataSet.entitiesParamName"
+                                   width="${labelWidth}"/>
+                            <lookupField id="entitiesParamLookup" width="${width}" datasource="dataSetsDs" property="listEntitiesParamName"/>
+                        </row>
+                    </rows>
+                </grid>
+                <grid id="entityGrid" spacing="true" margin="true;false;false;false">
+                    <columns>
+                        <column flex="1"/>
+                        <column flex="1"/>
+                    </columns>
+                    <rows>
+                        <row>
+                            <label id="entityParamLabel" value="msg://dataSet.entityParamName" width="${labelWidth}"/>
+                            <lookupField id="entityParamLookup" width="${width}" datasource="dataSetsDs" property="entityParamName"/>
+                        </row>
+                    </rows>
+                </grid>
+                <grid id="commonEntityGrid" spacing="true">
+                    <columns>
+                        <column flex="1"/>
+                        <column flex="1"/>
+                    </columns>
+                    <rows>
+                        <row>
+                            <button id="viewEditButton" caption="msg://dataSet.editView" width="${width}"/>
+                            <label id="buttonEmptyElement"/>
+                        </row>
+                        <row>
+                            <label id="viewNameLabel" value="msg://dataSet.viewName" width="${labelWidth}"/>
+                            <lookupField id="viewNameLookup" datasource="dataSetsDs" property="viewName"
+                                       width="${width}"/>
+                        </row>
+                        <row>
+                            <checkBox id="useExistingViewCheckbox" datasource="dataSetsDs"
+                                      property="useExistingView" caption="msg://dataSet.useExistingView"/>
+                            <label id="checkboxEmptyElement"/>
+                        </row>
+                    </rows>
+                </grid>
+                <label id="spacer"/>
             </vbox>
         </split>
     </layout>

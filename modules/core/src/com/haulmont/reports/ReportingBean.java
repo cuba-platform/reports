@@ -68,8 +68,6 @@ public class ReportingBean implements ReportingApi {
     @Inject
     protected ReportingAPI reportingApi;
     @Inject
-    protected Scripting scripting;
-    @Inject
     protected ReportImportExportAPI reportImportExport;
     @Inject
     protected UuidSource uuidSource;
@@ -123,7 +121,7 @@ public class ReportingBean implements ReportingApi {
     @Override
     public ReportOutputDocument createReport(Report report, Map<String, Object> params) throws IOException {
         report = reloadEntity(report, REPORT_EDIT_VIEW_NAME);
-        ReportTemplate reportTemplate = report.getDefaultTemplate();
+        ReportTemplate reportTemplate = getDefaultTemplate(report);
         return createReportDocument(report, reportTemplate, params);
     }
 
@@ -146,7 +144,7 @@ public class ReportingBean implements ReportingApi {
             zipOutputStream.setMethod(ZipArchiveOutputStream.STORED);
             zipOutputStream.setEncoding(ReportImportExport.ENCODING);
 
-            ReportTemplate reportTemplate = report.getDefaultTemplate();
+            ReportTemplate reportTemplate = getDefaultTemplate(report);
             Map<String, Integer> alreadyUsedNames = new HashMap<>();
 
             for (Map<String, Object> params : paramsList) {
@@ -263,7 +261,7 @@ public class ReportingBean implements ReportingApi {
             copiedTemplate.setId(uuidSource.createUuid());
             copiedTemplate.setReport(copiedReport);
             copiedTemplates.add(copiedTemplate);
-            if (source.getDefaultTemplate().equals(reportTemplate)) {
+            if (getDefaultTemplate(source).equals(reportTemplate)) {
                 defaultCopiedTemplate = copiedTemplate;
             }
         }
@@ -326,7 +324,7 @@ public class ReportingBean implements ReportingApi {
     public FileDescriptor createAndSaveReport(Report report,
                                               Map<String, Object> params, String fileName) throws IOException {
         report = reloadEntity(report, REPORT_EDIT_VIEW_NAME);
-        ReportTemplate template = report.getDefaultTemplate();
+        ReportTemplate template = getDefaultTemplate(report);
         return createAndSaveReport(report, template, params, fileName);
     }
 
@@ -450,6 +448,7 @@ public class ReportingBean implements ReportingApi {
                 if (object instanceof ReportInputParameter) {
                     filterCandidateParameter = (ReportInputParameter) object;
                 }
+
                 if (realAlias.equals(filterCandidateParameter.getAlias())) {
                     if (DataSetType.MULTI == dataSetType) {
                         //find param that is matched for a MULTI dataset
@@ -508,5 +507,12 @@ public class ReportingBean implements ReportingApi {
         } finally {
             tx.end();
         }
+    }
+
+    protected ReportTemplate getDefaultTemplate(Report report) {
+        ReportTemplate defaultTemplate = report.getDefaultTemplate();
+        if (defaultTemplate == null)
+            throw new ReportingException(String.format("No default template specified for report [%s]", report.getName()));
+        return defaultTemplate;
     }
 }
