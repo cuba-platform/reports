@@ -304,16 +304,14 @@ public class BandDefinitionEditor extends AbstractEditor<BandDefinition> impleme
             if (StringUtils.isNotBlank(reportInputParameter.getEntityMetaClass())) {
                 MetaClass parameterMetaClass = metadata.getClass(reportInputParameter.getEntityMetaClass());
                 Collection<String> viewNames = metadata.getViewRepository().getViewNames(parameterMetaClass);
-                if (viewNames != null) {
-                    Map<String, Object> views = new HashMap<>();
-                    for (String viewName : viewNames) {
-                        views.put(viewName, viewName);
-                    }
-                    views.put(View.LOCAL, View.LOCAL);
-                    views.put(View.MINIMAL, View.MINIMAL);
-                    viewNameLookup.setOptionsMap(views);
-                    return;
+                Map<String, Object> views = new HashMap<>();
+                for (String viewName : viewNames) {
+                    views.put(viewName, viewName);
                 }
+                views.put(View.LOCAL, View.LOCAL);
+                views.put(View.MINIMAL, View.MINIMAL);
+                viewNameLookup.setOptionsMap(views);
+                return;
             }
         }
 
