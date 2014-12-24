@@ -69,6 +69,7 @@ configure([globalModule, coreModule, guiModule, webModule, webLegacyModule, desk
     apply(plugin: 'maven')
     apply(plugin: 'checkstyle')
     apply(plugin: 'cuba')
+    apply from: "$rootProject.projectDir/lib.gradle"
 
     dependencies {
         compile(group: 'com.haulmont.cuba', name: 'cuba-global', version: baseVersion)
@@ -101,8 +102,6 @@ configure([globalModule, coreModule, guiModule, webModule, webLegacyModule, desk
     }
 }
 
-def yargVersion = '1.0-SNAPSHOT'
-
 configure(globalModule) {
     task enhance(type: CubaEnhancing) {
         persistenceXml = "$projectDir/src/reports-persistence.xml"
@@ -113,7 +112,7 @@ configure(globalModule) {
     }
 
     dependencies {
-		compile(group: 'com.haulmont.yarg', name: 'yarg-api', version: yargVersion) {
+		compile(project.ext.yargApi) {
             exclude group: 'org.codehaus.groovy'
         }
     }
@@ -138,7 +137,7 @@ configure(coreModule) {
     dependencies {
         compile(globalModule)
         compile(group: 'com.haulmont.cuba', name: 'cuba-core', version: baseVersion)
-		compile(group: 'com.haulmont.yarg', name: 'yarg', version: yargVersion) {
+		compile(project.ext.yarg) {
             exclude group: 'org.codehaus.groovy'
         }
 		
