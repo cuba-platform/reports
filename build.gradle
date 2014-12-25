@@ -113,7 +113,7 @@ configure(globalModule) {
     }
 
     dependencies {
-		compile(project.ext.yargApi) {
+		compile(yargApi) {
             exclude group: 'org.codehaus.groovy'
         }
     }
@@ -138,7 +138,7 @@ configure(coreModule) {
     dependencies {
         compile(globalModule)
         compile(group: 'com.haulmont.cuba', name: 'cuba-core', version: baseVersion)
-		compile(project.ext.yarg) {
+		compile(yarg) {
             exclude group: 'org.codehaus.groovy'
         }
 		
