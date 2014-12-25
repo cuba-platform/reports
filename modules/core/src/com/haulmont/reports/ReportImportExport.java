@@ -8,7 +8,6 @@ import com.haulmont.cuba.core.EntityManager;
 import com.haulmont.cuba.core.Persistence;
 import com.haulmont.cuba.core.Transaction;
 import com.haulmont.cuba.core.global.AppBeans;
-import com.haulmont.cuba.core.global.FileStorageException;
 import com.haulmont.cuba.core.global.View;
 import com.haulmont.cuba.core.global.ViewRepository;
 import com.haulmont.cuba.security.app.Authenticated;
@@ -53,41 +52,51 @@ public class ReportImportExport implements ReportImportExportAPI, ReportImportEx
     @Inject
     protected Persistence persistence;
 
-    public byte[] exportReports(Collection<Report> reports) throws IOException, FileStorageException {
+    public byte[] exportReports(Collection<Report> reports){
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
         ZipArchiveOutputStream zipOutputStream = new ZipArchiveOutputStream(byteArrayOutputStream);
-        zipOutputStream.setMethod(ZipArchiveOutputStream.STORED);
-        zipOutputStream.setEncoding(ENCODING);
-        for (Report report : reports) {
-            try {
-                byte[] reportBytes = exportReport(report);
-                ArchiveEntry singleReportEntry = newStoredEntry(replaceForbiddenCharacters(report.getName()) + ".zip", reportBytes);
-                zipOutputStream.putArchiveEntry(singleReportEntry);
-                zipOutputStream.write(reportBytes);
-                zipOutputStream.closeArchiveEntry();
-            } catch (Exception ex) {
-                throw new RuntimeException("Exception occured while exporting report\"" + report.getName() + "\".", ex);
+        try {
+            zipOutputStream.setMethod(ZipArchiveOutputStream.STORED);
+            zipOutputStream.setEncoding(ENCODING);
+            for (Report report : reports) {
+                try {
+                    byte[] reportBytes = exportReport(report);
+                    ArchiveEntry singleReportEntry = newStoredEntry(replaceForbiddenCharacters(report.getName()) + ".zip", reportBytes);
+                    zipOutputStream.putArchiveEntry(singleReportEntry);
+                    zipOutputStream.write(reportBytes);
+                    zipOutputStream.closeArchiveEntry();
+                } catch (IOException e) {
+                    throw new ReportingException(String.format("Exception occurred while exporting report [%s]", report.getName()), e);
+                }
             }
+        } finally {
+            IOUtils.closeQuietly(zipOutputStream);
         }
-        zipOutputStream.close();
+
         return byteArrayOutputStream.toByteArray();
     }
 
-    public Collection<Report> importReports(byte[] zipBytes) throws IOException, FileStorageException {
+    public Collection<Report> importReports(byte[] zipBytes) {
         LinkedList<Report> reports = null;
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(zipBytes);
-        ZipArchiveInputStream archiveReader;
-        archiveReader = new ZipArchiveInputStream(byteArrayInputStream);
-        while (archiveReader.getNextZipEntry() != null) {
-            if (reports == null) {
-                reports = new LinkedList<>();
+        ZipArchiveInputStream archiveReader = new ZipArchiveInputStream(byteArrayInputStream);
+        try {
+            try {
+                while (archiveReader.getNextZipEntry() != null) {
+                    if (reports == null) {
+                        reports = new LinkedList<>();
+                    }
+                    final byte[] buffer = readBytesFromEntry(archiveReader);
+                    Report report = importReport(buffer);
+                    reports.add(report);
+                }
+            } catch (IOException e) {
+                throw new ReportingException("Exception occurred while importing report", e);
             }
-            final byte[] buffer = readBytesFromEntry(archiveReader);
-            Report report = importReport(buffer);
-            reports.add(report);
+        } finally {
+            IOUtils.closeQuietly(byteArrayInputStream);
         }
-        byteArrayInputStream.close();
 
         if (reports == null) {
             throw new ReportingException("Unable to import reports because correct data not found in the archive");
@@ -111,10 +120,9 @@ public class ReportImportExport implements ReportImportExportAPI, ReportImportEx
      * @param path to folder with reports
      * @return status
      * @throws IOException
-     * @throws FileStorageException
      */
     @Authenticated
-    public String deployAllReportsFromPath(String path) throws IOException, FileStorageException {
+    public String deployAllReportsFromPath(String path) throws IOException {
         File directory = new File(path);
         if (directory.exists() && directory.isDirectory()) {
             File[] subDirectories = directory.listFiles();
@@ -132,7 +140,7 @@ public class ReportImportExport implements ReportImportExportAPI, ReportImportEx
                             }
                         }
                     } else {
-                        throw new RuntimeException("Report deployment failed. Root folder should have special structure.");
+                        throw new ReportingException("Report deployment failed. Root folder should have special structure.");
                     }
                 }
                 importReports(zipContent(map));
@@ -150,9 +158,8 @@ public class ReportImportExport implements ReportImportExportAPI, ReportImportEx
      * @param report Report object that must be exported.
      * @return ZIP archive as a byte array.
      * @throws IOException
-     * @throws FileStorageException
      */
-    protected byte[] exportReport(Report report) throws IOException, FileStorageException {
+    protected byte[] exportReport(Report report) throws IOException {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         ZipArchiveOutputStream zipOutputStream = new ZipArchiveOutputStream(byteArrayOutputStream);
         zipOutputStream.setMethod(ZipArchiveOutputStream.STORED);
@@ -187,7 +194,7 @@ public class ReportImportExport implements ReportImportExportAPI, ReportImportEx
     }
 
 
-    protected Report importReport(byte[] zipBytes) throws IOException, FileStorageException {
+    protected Report importReport(byte[] zipBytes) throws IOException {
         Report report = null;
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(zipBytes);
         ZipArchiveInputStream archiveReader;

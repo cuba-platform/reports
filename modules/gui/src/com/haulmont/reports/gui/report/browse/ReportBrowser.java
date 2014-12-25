@@ -6,7 +6,6 @@ package com.haulmont.reports.gui.report.browse;
 
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.global.ClientType;
-import com.haulmont.cuba.core.global.FileStorageException;
 import com.haulmont.cuba.core.global.Metadata;
 import com.haulmont.cuba.core.global.Security;
 import com.haulmont.cuba.gui.AppConfig;
@@ -30,7 +29,6 @@ import org.apache.commons.io.FileUtils;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -159,12 +157,8 @@ public class ReportBrowser extends AbstractLookup {
                 Set<Report> reports = reportsTable.getSelected();
                 if ((reports != null) && (!reports.isEmpty())) {
                     ExportDisplay exportDisplay = AppConfig.createExportDisplay(ReportBrowser.this);
-                    try {
                         ByteArrayDataProvider provider = new ByteArrayDataProvider(reportService.exportReports(reports));
                         exportDisplay.show(provider, "Reports", ExportFormat.ZIP);
-                    } catch (IOException | FileStorageException e) {
-                        throw new RuntimeException(e);
-                    }
                 }
             }
         });

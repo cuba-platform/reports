@@ -34,7 +34,6 @@ import org.apache.commons.lang.StringUtils;
 import javax.annotation.ManagedBean;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
-import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -96,7 +95,10 @@ public class ReportGuiManager {
         }
     }
 
-    protected @Nullable Object convertParameterIfNecessary(ReportInputParameter parameter, @Nullable Object paramValue, boolean reportHasMoreThanOneParameter) {
+
+    @Nullable
+    protected Object convertParameterIfNecessary(ReportInputParameter parameter, @Nullable Object paramValue, boolean
+            reportHasMoreThanOneParameter) {
         Object resultingParamValue = paramValue;
         if (ParameterType.ENTITY == parameter.getType()) {
             if (paramValue instanceof Collection || paramValue instanceof ParameterPrototype) {
@@ -111,7 +113,9 @@ public class ReportGuiManager {
         return resultingParamValue;
     }
 
-    protected @Nullable Object handleCollectionParameter(@Nullable Object paramValue, boolean reportHasMoreThanOneParameter) {
+
+    @Nullable
+    protected Object handleCollectionParameter(@Nullable Object paramValue, boolean reportHasMoreThanOneParameter) {
         Collection paramValueWithCollection = null;
         if (paramValue instanceof Collection) {
             paramValueWithCollection = (Collection) paramValue;
@@ -167,22 +171,18 @@ public class ReportGuiManager {
      * Print report synchronously
      */
     public void printReportSync(Report report, Map<String, Object> params, @Nullable String templateCode, @Nullable String outputFileName, @Nullable IFrame window) {
-        try {
-            ReportOutputDocument document;
-            if (StringUtils.isBlank(templateCode)) {
-                document = reportService.createReport(report, params);
-            } else {
-                document = reportService.createReport(report, templateCode, params);
-            }
-
-            byte[] byteArr = document.getContent();
-            ExportFormat exportFormat = ReportPrintHelper.getExportFormat(document.getReportOutputType());
-            ExportDisplay exportDisplay = AppConfig.createExportDisplay(window);
-            String documentName = isNotBlank(outputFileName) ? outputFileName : document.getDocumentName();
-            exportDisplay.show(new ByteArrayDataProvider(byteArr), documentName, exportFormat);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        ReportOutputDocument document;
+        if (StringUtils.isBlank(templateCode)) {
+            document = reportService.createReport(report, params);
+        } else {
+            document = reportService.createReport(report, templateCode, params);
         }
+
+        byte[] byteArr = document.getContent();
+        ExportFormat exportFormat = ReportPrintHelper.getExportFormat(document.getReportOutputType());
+        ExportDisplay exportDisplay = AppConfig.createExportDisplay(window);
+        String documentName = isNotBlank(outputFileName) ? outputFileName : document.getDocumentName();
+        exportDisplay.show(new ByteArrayDataProvider(byteArr), documentName, exportFormat);
     }
 
     /**

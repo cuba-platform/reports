@@ -24,6 +24,7 @@ import com.haulmont.yarg.reporting.ReportOutputDocument;
 import com.haulmont.yarg.reporting.ReportOutputDocumentImpl;
 import com.haulmont.yarg.reporting.ReportingAPI;
 import com.haulmont.yarg.reporting.RunParams;
+import com.haulmont.yarg.structure.ReportOutputType;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.basic.DateConverter;
 import com.thoughtworks.xstream.converters.collections.CollectionConverter;
@@ -119,15 +120,14 @@ public class ReportingBean implements ReportingApi {
     }
 
     @Override
-    public ReportOutputDocument createReport(Report report, Map<String, Object> params) throws IOException {
+    public ReportOutputDocument createReport(Report report, Map<String, Object> params) {
         report = reloadEntity(report, REPORT_EDIT_VIEW_NAME);
         ReportTemplate reportTemplate = getDefaultTemplate(report);
         return createReportDocument(report, reportTemplate, params);
     }
 
     @Override
-    public ReportOutputDocument createReport(Report report, String templateCode, Map<String, Object> params)
-            throws IOException {
+    public ReportOutputDocument createReport(Report report, String templateCode, Map<String, Object> params) {
         report = reloadEntity(report, REPORT_EDIT_VIEW_NAME);
         ReportTemplate template = report.getTemplateByCode(templateCode);
         return createReportDocument(report, template, params);
@@ -154,7 +154,10 @@ public class ReportingBean implements ReportingApi {
                 if (alreadyUsedNames.containsKey(documentName)) {
                     int newCount = alreadyUsedNames.get(documentName) + 1;
                     alreadyUsedNames.put(documentName, newCount);
-                    documentName = StringUtils.substringBeforeLast(documentName, ".") + newCount + "." + StringUtils.substringAfterLast(documentName, ".");
+                    documentName = StringUtils.substringBeforeLast(documentName, ".")
+                            + newCount
+                            + "."
+                            + StringUtils.substringAfterLast(documentName, ".");
                     alreadyUsedNames.put(documentName, 1);
                 } else {
                     alreadyUsedNames.put(documentName, 1);
@@ -170,7 +173,7 @@ public class ReportingBean implements ReportingApi {
 
             //noinspection UnnecessaryLocalVariable
             ReportOutputDocument reportOutputDocument =
-                    new ReportOutputDocumentImpl(report, byteArrayOutputStream.toByteArray(), "Reports.zip", com.haulmont.yarg.structure.ReportOutputType.custom);
+                    new ReportOutputDocumentImpl(report, byteArrayOutputStream.toByteArray(), "Reports.zip", ReportOutputType.custom);
             return reportOutputDocument;
         } catch (IOException e) {
             throw new ReportingException("An error occurred while zipping report contents", e);
@@ -188,14 +191,12 @@ public class ReportingBean implements ReportingApi {
     }
 
     @Override
-    public ReportOutputDocument createReport(Report report, ReportTemplate template, Map<String, Object> params)
-            throws IOException {
+    public ReportOutputDocument createReport(Report report, ReportTemplate template, Map<String, Object> params) {
         report = reloadEntity(report, REPORT_EDIT_VIEW_NAME);
         return createReportDocument(report, template, params);
     }
 
-    protected ReportOutputDocument createReportDocument(Report report, ReportTemplate template, Map<String, Object> params)
-            throws IOException {
+    protected ReportOutputDocument createReportDocument(Report report, ReportTemplate template, Map<String, Object> params) {
         StopWatch stopWatch = null;
         try {
             stopWatch = new Log4JStopWatch("Reporting#" + report.getName());
@@ -291,7 +292,7 @@ public class ReportingBean implements ReportingApi {
         return copiedReport;
     }
 
-    public String generateReportName(String sourceName, int iteration) {
+    protected String generateReportName(String sourceName, int iteration) {
         if (iteration == 1) {
             iteration++; //like in win 7: duplicate of file 'a.txt' is 'a (2).txt', NOT 'a (1).txt'
         }
@@ -320,13 +321,12 @@ public class ReportingBean implements ReportingApi {
     }
 
     @Override
-    public byte[] exportReports(Collection<Report> reports) throws IOException, FileStorageException {
+    public byte[] exportReports(Collection<Report> reports) {
         return reportImportExport.exportReports(reports);
     }
 
     @Override
-    public FileDescriptor createAndSaveReport(Report report,
-                                              Map<String, Object> params, String fileName) throws IOException {
+    public FileDescriptor createAndSaveReport(Report report, Map<String, Object> params, String fileName) {
         report = reloadEntity(report, REPORT_EDIT_VIEW_NAME);
         ReportTemplate template = getDefaultTemplate(report);
         return createAndSaveReport(report, template, params, fileName);
@@ -334,7 +334,7 @@ public class ReportingBean implements ReportingApi {
 
     @Override
     public FileDescriptor createAndSaveReport(Report report, String templateCode,
-                                              Map<String, Object> params, String fileName) throws IOException {
+                                              Map<String, Object> params, String fileName) {
         report = reloadEntity(report, REPORT_EDIT_VIEW_NAME);
         ReportTemplate template = report.getTemplateByCode(templateCode);
         return createAndSaveReport(report, template, params, fileName);
@@ -342,19 +342,19 @@ public class ReportingBean implements ReportingApi {
 
     @Override
     public FileDescriptor createAndSaveReport(Report report, ReportTemplate template,
-                                              Map<String, Object> params, String fileName) throws IOException {
+                                              Map<String, Object> params, String fileName) {
         report = reloadEntity(report, REPORT_EDIT_VIEW_NAME);
         return createAndSaveReportDocument(report, template, params, fileName);
     }
 
-    protected FileDescriptor createAndSaveReportDocument(Report report, ReportTemplate template, Map<String, Object> params, String fileName) throws IOException {
+    protected FileDescriptor createAndSaveReportDocument(Report report, ReportTemplate template, Map<String, Object> params, String fileName) {
         byte[] reportData = createReportDocument(report, template, params).getContent();
         String ext = template.getReportOutputType().toString().toLowerCase();
 
         return saveReport(reportData, fileName, ext);
     }
 
-    protected FileDescriptor saveReport(byte[] reportData, String fileName, String ext) throws IOException {
+    protected FileDescriptor saveReport(byte[] reportData, String fileName, String ext) {
         FileDescriptor file = new FileDescriptor();
         file.setCreateDate(timeSource.currentTimestamp());
         file.setName(fileName + "." + ext);
@@ -364,7 +364,7 @@ public class ReportingBean implements ReportingApi {
         try {
             fileStorageAPI.saveFile(file, reportData);
         } catch (FileStorageException e) {
-            throw new IOException(e);
+            throw new ReportingException("An error occurred while saving the report to the file storage", e);
         }
 
         Transaction tx = persistence.createTransaction();
@@ -379,13 +379,14 @@ public class ReportingBean implements ReportingApi {
     }
 
     @Override
-    public Collection<Report> importReports(byte[] zipBytes) throws IOException, FileStorageException {
+    public Collection<Report> importReports(byte[] zipBytes) {
         return reportImportExport.importReports(zipBytes);
     }
 
     @Override
     public String convertToXml(Report report) {
         XStream xStream = createXStream();
+        //noinspection UnnecessaryLocalVariable
         String xml = xStream.toXML(report);
         return xml;
     }

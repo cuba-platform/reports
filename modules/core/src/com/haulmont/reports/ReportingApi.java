@@ -8,7 +8,6 @@ package com.haulmont.reports;
 import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.entity.FileDescriptor;
-import com.haulmont.cuba.core.global.FileStorageException;
 import com.haulmont.cuba.core.global.View;
 import com.haulmont.reports.app.ParameterPrototype;
 import com.haulmont.reports.entity.DataSetType;
@@ -17,7 +16,6 @@ import com.haulmont.reports.entity.ReportInputParameter;
 import com.haulmont.reports.entity.ReportTemplate;
 import com.haulmont.yarg.reporting.ReportOutputDocument;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -31,24 +29,24 @@ import java.util.Map;
 public interface ReportingApi {
     String NAME = "report_ReportingApi";
 
-    ReportOutputDocument createReport(Report report, Map<String, Object> params) throws IOException;
+    ReportOutputDocument createReport(Report report, Map<String, Object> params);
 
-    ReportOutputDocument createReport(Report report, String templateCode, Map<String, Object> params) throws IOException;
+    ReportOutputDocument createReport(Report report, String templateCode, Map<String, Object> params);
 
-    ReportOutputDocument createReport(Report report, ReportTemplate template, Map<String, Object> params) throws IOException;
+    ReportOutputDocument createReport(Report report, ReportTemplate template, Map<String, Object> params);
 
     FileDescriptor createAndSaveReport(Report report,
-                                              Map<String, Object> params, String fileName) throws IOException;
+                                              Map<String, Object> params, String fileName);
 
     FileDescriptor createAndSaveReport(Report report, String templateCode,
-                                              Map<String, Object> params, String fileName) throws IOException;
+                                              Map<String, Object> params, String fileName);
 
     FileDescriptor createAndSaveReport(Report report, ReportTemplate template,
-                                              Map<String, Object> params, String fileName) throws IOException;
+                                              Map<String, Object> params, String fileName);
 
-    byte[] exportReports(Collection<Report> reports) throws IOException, FileStorageException;
+    byte[] exportReports(Collection<Report> reports);
 
-    Collection<Report> importReports(byte[] zipBytes) throws IOException, FileStorageException;
+    Collection<Report> importReports(byte[] zipBytes);
 
     String convertToXml(Report report);
 
