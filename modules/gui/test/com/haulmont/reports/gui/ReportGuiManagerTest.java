@@ -24,7 +24,7 @@ import java.util.List;
  * @author degtyarjov
  * @version $Id$
  */
-public class ReportGuiManagerTest extends CubaClientTestCase {
+public class ReportGuiManagerTest {
 
     @Test
     public void testParameterConversion() throws Exception {
