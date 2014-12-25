@@ -5,7 +5,6 @@
 
 package com.haulmont.reports.gui;
 
-import com.haulmont.cuba.client.testsupport.CubaClientTestCase;
 import com.haulmont.reports.app.ParameterPrototype;
 import com.haulmont.reports.app.service.ReportService;
 import com.haulmont.reports.entity.ParameterType;
