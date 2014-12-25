@@ -55,6 +55,8 @@ def webModule = project(':reports-web')
 def desktopModule = project(':reports-desktop')
 def webLegacyModule = project(':reports-web6')
 
+apply from: "$rootProject.projectDir/lib.gradle"
+
 def servletApi = [group: 'org.apache.tomcat', name: 'tomcat-servlet-api', version: '7.0.53']
 def postgres = [group: 'postgresql', name: 'postgresql', version: '9.0-801.jdbc4']
 
@@ -69,7 +71,6 @@ configure([globalModule, coreModule, guiModule, webModule, webLegacyModule, desk
     apply(plugin: 'maven')
     apply(plugin: 'checkstyle')
     apply(plugin: 'cuba')
-    apply from: "$rootProject.projectDir/lib.gradle"
 
     dependencies {
         compile(group: 'com.haulmont.cuba', name: 'cuba-global', version: baseVersion)
