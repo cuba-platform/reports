@@ -10,6 +10,7 @@ import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.entity.FileDescriptor;
 import com.haulmont.cuba.core.global.FileStorageException;
 import com.haulmont.cuba.core.global.View;
+import com.haulmont.reports.app.ParameterPrototype;
 import com.haulmont.reports.entity.DataSetType;
 import com.haulmont.reports.entity.Report;
 import com.haulmont.reports.entity.ReportInputParameter;
@@ -62,4 +63,6 @@ public interface ReportingApi {
     MetaClass findMetaClassByDataSetEntityAlias(String alias, DataSetType dataSetType, List<ReportInputParameter> reportInputParameters);
 
     String generateReportName(String sourceName);
+
+    List loadDataForParameterPrototype(ParameterPrototype prototype);
 }

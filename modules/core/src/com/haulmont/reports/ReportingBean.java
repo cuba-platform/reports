@@ -208,7 +208,7 @@ public class ReportingBean implements ReportingApi {
 
             for (String paramName : prototypes) {
                 ParameterPrototype prototype = (ParameterPrototype) params.get(paramName);
-                List data = prototypesLoader.loadData(prototype);
+                List data = loadDataForParameterPrototype(prototype);
                 resultParams.put(paramName, data);
             }
 
@@ -243,6 +243,10 @@ public class ReportingBean implements ReportingApi {
                 stopWatch.stop();
             }
         }
+    }
+
+    public List loadDataForParameterPrototype(ParameterPrototype prototype) {
+        return prototypesLoader.loadData(prototype);
     }
 
     @Override

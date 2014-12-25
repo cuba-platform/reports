@@ -61,7 +61,7 @@ public class PrototypesLoader {
         if (parameterPrototype.isUseSecurityConstraints()) {
             boolean constraintsApplied = security.applyConstraints(query);
             if (constraintsApplied)
-                log.debug("Constraints applyed: " + printQuery(query.getQueryString()));
+                log.debug("Constraints applied: " + printQuery(query.getQueryString()));
         }
 
         query.setView(queryView);

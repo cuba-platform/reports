@@ -42,8 +42,7 @@ public abstract class AbstractPrintFormAction extends AbstractAction {
     protected void openRunReportScreen(final Window window, final Object selectedValue, final MetaClass inputValueMetaClass,
                                        @Nullable final String outputFileName) {
         User user = AppBeans.get(UserSessionSource.class).getUserSession().getUser();
-        boolean selectListReportsOnly = selectedValue instanceof ParameterPrototype;
-        List<Report> reports = reportGuiManager.getAvailableReports(window.getId(), user, inputValueMetaClass, selectListReportsOnly);
+        List<Report> reports = reportGuiManager.getAvailableReports(window.getId(), user, inputValueMetaClass);
 
         if (reports.size() > 1) {
             Map<String, Object> params = Collections.<String, Object>singletonMap(ReportRun.REPORTS_PARAMETER, reports);

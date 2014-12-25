@@ -7,6 +7,7 @@ package com.haulmont.reports;
 import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.cuba.core.entity.FileDescriptor;
 import com.haulmont.cuba.core.global.FileStorageException;
+import com.haulmont.reports.app.ParameterPrototype;
 import com.haulmont.reports.app.service.ReportService;
 import com.haulmont.reports.entity.DataSetType;
 import com.haulmont.reports.entity.Report;
@@ -96,6 +97,8 @@ public class ReportServiceBean implements ReportService {
         return reportingApi.findMetaClassByDataSetEntityAlias(alias, dataSetType, reportInputParameters);
     }
 
-
-
+    @Override
+    public List loadDataForParameterPrototype(ParameterPrototype prototype) {
+        return reportingApi.loadDataForParameterPrototype(prototype);
+    }
 }
