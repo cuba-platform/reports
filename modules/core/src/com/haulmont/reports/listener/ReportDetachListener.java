@@ -7,8 +7,9 @@ package com.haulmont.reports.listener;
 import com.haulmont.cuba.core.EntityManager;
 import com.haulmont.cuba.core.Persistence;
 import com.haulmont.cuba.core.listener.BeforeDetachEntityListener;
+import com.haulmont.cuba.security.entity.Role;
 import com.haulmont.reports.ReportingApi;
-import com.haulmont.reports.entity.Report;
+import com.haulmont.reports.entity.*;
 import org.apache.commons.lang.StringUtils;
 
 import javax.annotation.ManagedBean;
@@ -36,6 +37,26 @@ public class ReportDetachListener implements BeforeDetachEntityListener<Report> 
             entity.setReportScreens(reportFromXml.getReportScreens());
             entity.setRoles(reportFromXml.getRoles());
             entity.setValuesFormats(reportFromXml.getValuesFormats());
+
+            setRelevantReferencesToReport(entity);
+        }
+    }
+
+    protected void setRelevantReferencesToReport(Report entity) {
+        for (ReportValueFormat reportValueFormat : entity.getValuesFormats()) {
+            reportValueFormat.setReport(entity);
+        }
+
+        for (BandDefinition bandDefinition : entity.getBands()) {
+            bandDefinition.setReport(entity);
+        }
+
+        for (ReportInputParameter reportInputParameter : entity.getInputParameters()) {
+            reportInputParameter.setReport(entity);
+        }
+
+        for (ReportScreen reportScreen : entity.getReportScreens()) {
+            reportScreen.setReport(entity);
         }
     }
 }
