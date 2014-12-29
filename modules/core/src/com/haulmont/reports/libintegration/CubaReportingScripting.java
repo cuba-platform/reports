@@ -20,7 +20,7 @@ import java.util.Map;
  * @author degtyarjov
  * @version $Id$
  */
-public class ReportingScriptingImpl implements Scripting {
+public class CubaReportingScripting implements Scripting {
 
     @Inject
     private com.haulmont.cuba.core.global.Scripting  scripting;

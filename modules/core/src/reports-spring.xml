@@ -12,7 +12,7 @@
 
     <context:component-scan base-package="com.haulmont.reports"/>
 
-    <bean id="reporting_lib_Scripting" class="com.haulmont.reports.libintegration.ReportingScriptingImpl"/>
+    <bean id="reporting_lib_Scripting" class="com.haulmont.reports.libintegration.CubaReportingScripting"/>
     <bean id="reporting_lib_SqlParametersConverter" class="com.haulmont.reports.libintegration.SqlParametersConverter"/>
     <bean id="reporting_lib_JpqlParametersConverter"
           class="com.haulmont.reports.libintegration.JpqlParametersConverter"/>
@@ -76,14 +76,17 @@
         </property>
     </bean>
 
-    <bean name="reporting_lib_DataExtractor" class="com.haulmont.reports.libintegration.CubaDataExtractorImpl">
+    <bean name="reporting_lib_DataExtractor" class="com.haulmont.reports.libintegration.CubaDataExtractor">
         <constructor-arg ref="reporting_lib_LoaderFactory"/>
     </bean>
+
+    <bean name="reporting_lib_StringConverter" class="com.haulmont.reports.libintegration.CubaObjectToStringConverter"/>
 
     <bean id="reporting_lib_Reporting" class="com.haulmont.yarg.reporting.Reporting">
         <property name="formatterFactory" ref="reporting_lib_FormatterFactory"/>
         <property name="loaderFactory" ref="reporting_lib_LoaderFactory"/>
         <property name="dataExtractor" ref="reporting_lib_DataExtractor"/>
+        <property name="objectToStringConverter" ref="reporting_lib_StringConverter"/>
     </bean>
 
     <!-- MBeans registration -->

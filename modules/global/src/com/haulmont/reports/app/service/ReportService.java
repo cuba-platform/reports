@@ -79,4 +79,8 @@ public interface ReportService {
     MetaClass findMetaClassByDataSetEntityAlias(String alias, DataSetType dataSetType, List<ReportInputParameter> reportInputParameters);
 
     List loadDataForParameterPrototype(ParameterPrototype prototype);
+
+    String convertToString(Class parameterClass, Object paramValue);
+
+    Object convertFromString(Class parameterClass, String paramValueStr);
 }

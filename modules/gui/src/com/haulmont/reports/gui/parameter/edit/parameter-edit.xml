@@ -48,19 +48,23 @@
 
                         <row>
                             <label value="msg://parameters.metaClass"/>
-                            <lookupField id="metaClass" width="${width}"
-                                         requiredMessage="msg://parameters.requiredMetaClass"/>
+                            <lookupField id="metaClass" width="${width}" datasource="parameterDs" property="entityMetaClass"
+                                         requiredMessage="msg://parameters.requiredMetaClass" required="true"/>
                         </row>
 
                         <row>
                             <label value="msg://parameters.enum"/>
-                            <lookupField id="enumeration" width="${width}"
-                                         requiredMessage="msg://parameters.requiredEnumClass"/>
+                            <lookupField id="enumeration" width="${width}" datasource="parameterDs" property="enumerationClass"
+                                         requiredMessage="msg://parameters.requiredEnumClass" required="true"/>
                         </row>
 
                         <row>
                             <label value="msg://parameters.screen"/>
-                            <lookupField id="screen" width="${width}"/>
+                            <lookupField id="screen" width="${width}" datasource="parameterDs" property="screen"/>
+                        </row>
+                        <row>
+                            <label id="defaultValueLabel" value="msg://parameters.defaultValue"/>
+                            <hbox id="defaultValueBox"/>
                         </row>
                     </rows>
                 </grid>

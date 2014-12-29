@@ -16,11 +16,11 @@ import javax.inject.Inject;
  * @author degtyarjov
  * @version $Id$
  */
-public class CubaDataExtractorImpl extends DataExtractorImpl {
+public class CubaDataExtractor extends DataExtractorImpl {
     @Inject
     protected Configuration configuration;
 
-    public CubaDataExtractorImpl(ReportLoaderFactory loaderFactory) {
+    public CubaDataExtractor(ReportLoaderFactory loaderFactory) {
         super(loaderFactory);
     }
 

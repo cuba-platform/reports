@@ -9,8 +9,9 @@ import com.haulmont.chile.core.annotations.MetaProperty;
 import com.haulmont.chile.core.annotations.NamePattern;
 import com.haulmont.cuba.core.entity.AbstractNotPersistentEntity;
 import com.haulmont.cuba.core.entity.annotation.SystemLevel;
-import com.haulmont.yarg.structure.ReportParameter;
+import com.haulmont.yarg.structure.ReportParameterWithDefaultValue;
 import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang.StringUtils;
 
 import javax.persistence.Transient;
 
@@ -22,7 +23,7 @@ import javax.persistence.Transient;
 @SystemLevel
 @NamePattern("%s|locName")
 @SuppressWarnings("unused")
-public class ReportInputParameter extends AbstractNotPersistentEntity implements ReportParameter {
+public class ReportInputParameter extends AbstractNotPersistentEntity implements ReportParameterWithDefaultValue {
     private static final long serialVersionUID = 6231014880104406246L;
 
     @MetaProperty
@@ -54,6 +55,12 @@ public class ReportInputParameter extends AbstractNotPersistentEntity implements
 
     @MetaProperty
     protected Boolean required = false;
+
+    @MetaProperty
+    protected String defaultValue;
+
+    @MetaProperty
+    protected String parameterClassName;
 
     @Transient
     protected String localeName;
@@ -156,6 +163,37 @@ public class ReportInputParameter extends AbstractNotPersistentEntity implements
 
     @Override
     public Class getParameterClass() {
+        try {
+            if (StringUtils.isNotBlank(parameterClassName)) {
+                return Class.forName(parameterClassName);
+            }
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException("An error occurred while resolving class name " + parameterClassName, e);
+        }
+
         return null;
+    }
+
+    public void setParameterClass(Class parameterClass) {
+        if (parameterClass != null) {
+            parameterClassName = parameterClass.getName();
+        }
+    }
+
+    public String getParameterClassName() {
+        return parameterClassName;
+    }
+
+    public void setParameterClassName(String parameterClassName) {
+        this.parameterClassName = parameterClassName;
+    }
+
+    @Override
+    public String getDefaultValue() {
+        return defaultValue;
+    }
+
+    public void setDefaultValue(String defaultValue) {
+        this.defaultValue = defaultValue;
     }
 }

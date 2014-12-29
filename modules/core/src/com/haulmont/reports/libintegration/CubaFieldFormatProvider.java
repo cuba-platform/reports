@@ -6,6 +6,7 @@ package com.haulmont.reports.libintegration;
 
 import com.haulmont.chile.core.datatypes.Datatype;
 import com.haulmont.chile.core.datatypes.Datatypes;
+import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.core.global.UserSessionSource;
 import com.haulmont.yarg.formatters.impl.DefaultFormatProvider;
 
@@ -20,6 +21,9 @@ public class CubaFieldFormatProvider implements DefaultFormatProvider {
     @Inject
     protected UserSessionSource userSessionSource;
 
+    @Inject
+    protected Messages messages;
+
     @Override
     public String format(Object o) {
         if (o != null) {
@@ -30,8 +34,10 @@ public class CubaFieldFormatProvider implements DefaultFormatProvider {
                 } else {
                     return datatype.format(o);
                 }
+            } else if (o instanceof Enum) {
+                return messages.getMessage((Enum) o);
             } else {
-                return o.toString();
+                return String.valueOf(o);
             }
         } else {
             return null;

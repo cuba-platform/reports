@@ -13,6 +13,7 @@ import com.haulmont.reports.entity.Report;
 import com.haulmont.reports.entity.ReportInputParameter;
 import com.haulmont.reports.entity.ReportTemplate;
 import com.haulmont.yarg.reporting.ReportOutputDocument;
+import com.haulmont.yarg.util.converter.ObjectToStringConverter;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -27,38 +28,41 @@ import java.util.Map;
 @Service(ReportService.NAME)
 public class ReportServiceBean implements ReportService {
     @Inject
-    private ReportingApi reportingApi;
+    protected ReportingApi reportingApi;
+
+    @Inject
+    protected ObjectToStringConverter objectToStringConverter;
 
     @Override
-    public ReportOutputDocument createReport(Report report, Map<String, Object> params)  {
+    public ReportOutputDocument createReport(Report report, Map<String, Object> params) {
         return reportingApi.createReport(report, params);
     }
 
     @Override
-    public ReportOutputDocument createReport(Report report, String templateCode, Map<String, Object> params)  {
+    public ReportOutputDocument createReport(Report report, String templateCode, Map<String, Object> params) {
         return reportingApi.createReport(report, templateCode, params);
     }
 
     @Override
-    public ReportOutputDocument createReport(Report report, ReportTemplate template, Map<String, Object> params)  {
+    public ReportOutputDocument createReport(Report report, ReportTemplate template, Map<String, Object> params) {
         return reportingApi.createReport(report, template, params);
     }
 
     @Override
     public FileDescriptor createAndSaveReport(Report report,
-                                              Map<String, Object> params, String fileName)  {
+                                              Map<String, Object> params, String fileName) {
         return reportingApi.createAndSaveReport(report, params, fileName);
     }
 
     @Override
     public FileDescriptor createAndSaveReport(Report report, String templateCode,
-                                              Map<String, Object> params, String fileName)  {
+                                              Map<String, Object> params, String fileName) {
         return reportingApi.createAndSaveReport(report, templateCode, params, fileName);
     }
 
     @Override
     public FileDescriptor createAndSaveReport(Report report, ReportTemplate template,
-                                              Map<String, Object> params, String fileName)  {
+                                              Map<String, Object> params, String fileName) {
         return reportingApi.createAndSaveReport(report, template, params, fileName);
     }
 
@@ -98,5 +102,15 @@ public class ReportServiceBean implements ReportService {
     @Override
     public List loadDataForParameterPrototype(ParameterPrototype prototype) {
         return reportingApi.loadDataForParameterPrototype(prototype);
+    }
+
+    @Override
+    public String convertToString(Class parameterClass, Object paramValue) {
+        return objectToStringConverter.convertToString(parameterClass, paramValue);
+    }
+
+    @Override
+    public Object convertFromString(Class parameterClass, String paramValueStr) {
+        return objectToStringConverter.convertFromString(parameterClass, paramValueStr);
     }
 }
