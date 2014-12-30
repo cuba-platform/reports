@@ -205,6 +205,7 @@ public class ParameterFieldCreator {
                     .setId("entities_" + parameter.getAlias())
                     .setMetaClass(entityMetaClass)
                     .setViewName(View.LOCAL)
+                    .setAllowCommit(false)
                     .buildCollectionDatasource();
 
             cds.refresh();
