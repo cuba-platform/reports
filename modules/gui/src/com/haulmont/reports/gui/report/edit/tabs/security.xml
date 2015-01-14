@@ -8,7 +8,7 @@
         <split orientation="horizontal" width="100%" height="100%" pos="50">
             <vbox margin="true" spacing="true" expand="rolesTable" width="100%" height="100%">
                 <label value="msg://securityFrame.roles" stylename="h2"/>
-                <groupBox width="100%" caption="msg://roles.addRole">
+                <groupBox id="addRoleGroupBox" width="100%" caption="msg://roles.addRole">
                     <hbox expand="rolesLookup" spacing="true" width="100%">
                         <lookupField id="rolesLookup" optionsDatasource="lookupRolesDs"/>
                         <button id="addRoleBtn"/>
@@ -28,7 +28,7 @@
             </vbox>
             <vbox margin="true" spacing="true" expand="screenTable" width="100%" height="100%">
                 <label value="msg://securityFrame.screens" stylename="h2"/>
-                <groupBox width="100%" caption="msg://screens.createScreen">
+                <groupBox id="addScreenGroupBox"  width="100%" caption="msg://screens.createScreen">
                     <hbox expand="screenIdLookup" spacing="true" width="100%">
                         <lookupField id="screenIdLookup"/>
                         <button id="addReportScreenBtn"/>
