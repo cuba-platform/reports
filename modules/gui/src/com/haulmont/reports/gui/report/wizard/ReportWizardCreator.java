@@ -21,7 +21,6 @@ import com.haulmont.cuba.gui.export.ByteArrayDataProvider;
 import com.haulmont.cuba.gui.export.ExportDisplay;
 import com.haulmont.cuba.gui.export.ExportFormat;
 import com.haulmont.cuba.gui.xml.layout.ComponentsFactory;
-import com.haulmont.cuba.security.global.UserSession;
 import com.haulmont.reports.app.EntityTree;
 import com.haulmont.reports.app.service.ReportWizardService;
 import com.haulmont.reports.entity.Report;
@@ -49,7 +48,6 @@ import java.util.*;
  * @version $Id$
  */
 public class ReportWizardCreator extends AbstractEditor<ReportData> implements MainWizardFrame<AbstractEditor> {
-
     //injected UI and main form descriptor fields:
     @Inject
     protected Datasource reportDataDs;
@@ -67,26 +65,13 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
     protected Button saveBtn;
     //injected step UI frames fields:
     //detail frame
-//    @Named("detailsStep.isListed")
     protected OptionsGroup isListedReport;
-    //    @Named("detailsStep.templateFileFormat")
     protected LookupField templateFileFormat;
-    //    @Named("detailsStep.entity")
     protected LookupField entity;
-    //    @Named("detailsStep.reportName")
     protected TextField reportName;
 
     @Named("detailsStep.mainFields")
     protected FieldGroup mainFields;
-
-//    @Named("detailsStep.mainFields.templateFileFormat")
-//    protected LookupField templateFileFormat;
-//    @Named("detailsStep.entity")
-//    protected LookupField entity;
-//    @Named("detailsStep.reportName")
-//    protected TextField reportName;
-
-
     //regions frame
     @Named("regionsStep.addRegionDisabledBtn")
     protected Button addRegionDisabledBtn;
@@ -130,8 +115,6 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
     protected MetadataTools metadataTools;
     @Inject
     protected MessageTools messageTools;
-    @Inject
-    protected UserSession userSession;
     @Inject
     protected ComponentsFactory componentsFactory;
     @Inject
@@ -431,94 +414,6 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
         }
         return false;
     }
-    /*
-    protected class TreeModelBuilder {
-
-        public String[] IGNORED_ENTITIES_PREFIXES = new String[]{"sys$", "sec$"};
-
-        protected int entityTreeModelMaxDeep = 3;
-
-        public int getEntityTreeModelMaxDeep() {
-            return entityTreeModelMaxDeep;
-        }
-
-        public EntityTreeNode buildNewEntityTreeModelAndGetRoot(MetaClass metaClass) {
-            entityTreeHasSimpleAttrs = false;
-            entityTreeRootHasCollections = false;
-            EntityTreeNode root = metadata.create(EntityTreeNode.class);
-            root.setName(metaClass.getName());
-            root.setLocalizedName(messageTools.getEntityCaption(metaClass));
-            root.setWrappedMetaClass(metaClass);
-            fillChildNodes(root, 1, new HashSet<String>());
-            return root;
-        }
-
-        protected EntityTreeNode fillChildNodes(final EntityTreeNode parentEntityTreeNode, int depth, final Set<String> alreadyAddedMetaProps) {
-            if (depth > getEntityTreeModelMaxDeep()) {
-                return parentEntityTreeNode;
-            }
-            for (com.haulmont.chile.core.model.MetaProperty metaProperty : parentEntityTreeNode.getWrappedMetaClass().getProperties()) {
-                if (!reportWizardService.isPropertyAllowedForReportWizard(parentEntityTreeNode.getWrappedMetaClass(), metaProperty)) {
-                    continue;
-                }
-                if (metaProperty.getRange().isClass()) {
-                    MetaClass metaClass = metaProperty.getRange().asClass();
-                    MetaClass effectiveMetaClass = metadata.getExtendedEntities().getEffectiveMetaClass(metaClass);
-                    //does we need to do security checks here? no
-                    if (!StringUtils.startsWithAny(effectiveMetaClass.getName(), IGNORED_ENTITIES_PREFIXES)) {
-                        int newDepth = depth + 1;
-                        EntityTreeNode newParentModelNode = metadata.create(EntityTreeNode.class);
-                        newParentModelNode.setName(metaProperty.getName());
-                        //newParentModelNode.setLocalizedName(messageTools.getEntityCaption(effectiveMetaClass));
-                        newParentModelNode.setLocalizedName(messageTools.getPropertyCaption(parentEntityTreeNode.getWrappedMetaClass(), metaProperty.getName()));
-                        newParentModelNode.setWrappedMetaClass(effectiveMetaClass);
-                        newParentModelNode.setWrappedMetaProperty(metaProperty);
-                        newParentModelNode.setParent(parentEntityTreeNode);
-
-
-                        if (alreadyAddedMetaProps.contains(getTreeNodeInfo(parentEntityTreeNode) + "|" + getTreeNodeInfo(newParentModelNode))) {
-                            continue; //avoid parent-child-parent-... infinite loops
-                        }
-                        //alreadyAddedMetaProps.add(getTreeNodeInfo(parentEntityTreeNode) + "|" + getTreeNodeInfo(newParentModelNode));
-                        alreadyAddedMetaProps.add(getTreeNodeInfo(newParentModelNode) + "|" + getTreeNodeInfo(parentEntityTreeNode));
-
-                        //System.err.println(StringUtils.leftPad("", newDepth * 2, " ") + getTreeNodeInfo(parentEntityTreeNode) + "     |     " + getTreeNodeInfo(newParentModelNode));
-                        //System.err.println(StringUtils.leftPad("", newDepth * 2, " ") + getTreeNodeInfo(newParentModelNode) + "     |     " + getTreeNodeInfo(parentEntityTreeNode));
-                        //System.err.println("");
-
-                        if (!entityTreeRootHasCollections && metaProperty.getRange().getCardinality().isMany() && newDepth < getEntityTreeModelMaxDeep()) {
-                            entityTreeRootHasCollections = true;//TODO set to true if only simple attributes of that collection as children exists
-                            entityTreeRootHasCollections = true;//TODO set to true if only simple attributes of that collection as children exists
-                        }
-                        fillChildNodes(newParentModelNode, newDepth, alreadyAddedMetaProps);
-
-                        parentEntityTreeNode.getChildren().add(newParentModelNode);
-                    }
-                } else {
-                    if (!entityTreeHasSimpleAttrs) {
-                        entityTreeHasSimpleAttrs = true;
-                    }
-                    EntityTreeNode child = metadata.create(EntityTreeNode.class);
-                    child.setName(metaProperty.getName());
-                    child.setLocalizedName(messageTools.getPropertyCaption(metaProperty));
-                    child.setWrappedMetaProperty(metaProperty);
-                    child.setParent(parentEntityTreeNode);
-                    parentEntityTreeNode.getChildren().add(child);
-
-                }
-
-            }
-            return parentEntityTreeNode;
-        }
-
-        private String getTreeNodeInfo(EntityTreeNode parentEntityTreeNode) {
-            if (parentEntityTreeNode.getWrappedMetaProperty() != null) {
-                return parentEntityTreeNode.getWrappedMetaClass().getName() + " isMany:" + parentEntityTreeNode.getWrappedMetaProperty().getRange().getCardinality().isMany();
-            } else {
-                return parentEntityTreeNode.getWrappedMetaClass().getName() + " isMany:false";
-            }
-        }
-    }    */
 
     @Override
     public String getMessage(String key) {
@@ -595,7 +490,6 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
                                         public void actionPerform(Component component) {
                                             getItem().getReportRegions().clear();
                                             regionsTable.refresh(); //for web6
-                                            //((RegionsStepFrame) regionsStepFrame).isAddRegionActionPerformed = false;
                                             isListedReport.setValue(value);
                                         }
                                     },
@@ -934,7 +828,7 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
 
             protected void normalizeRegionPropertiesOrderNum() {
                 long normalizedIdx = 0;
-                List<ReportRegion> allItems = new ArrayList(reportRegionsDs.getItems());
+                List<ReportRegion> allItems = new ArrayList<>(reportRegionsDs.getItems());
                 for (ReportRegion item : allItems) {
                     item.setOrderNum(++normalizedIdx); //first must to be 1
                 }
@@ -977,8 +871,8 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
                 editRegionAction = new EditRegionAction();
                 removeRegionAction = new RemoveRegionAction();
 
-                moveDownBtn.setAction(new OrderableItemMoveAction("downItem", OrderableItemMoveAction.Direction.DOWN, regionsTable));
-                moveUpBtn.setAction(new OrderableItemMoveAction("upItem", OrderableItemMoveAction.Direction.UP, regionsTable));
+                moveDownBtn.setAction(new OrderableItemMoveAction<>("downItem", OrderableItemMoveAction.Direction.DOWN, regionsTable));
+                moveUpBtn.setAction(new OrderableItemMoveAction<>("upItem", OrderableItemMoveAction.Direction.UP, regionsTable));
                 removeBtn.setAction(removeRegionAction);
             }
         }
@@ -1027,7 +921,6 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
         protected class BeforeHideRegionsStepFrameHandler implements BeforeHideStepFrameHandler {
             @Override
             public void beforeHideFrame() {
-//                runBtn.setVisible(false);
             }
         }
     }

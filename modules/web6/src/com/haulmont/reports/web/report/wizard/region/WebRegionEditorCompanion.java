@@ -20,14 +20,16 @@ import com.vaadin.event.ItemClickEvent;
 import org.springframework.cglib.core.CollectionUtils;
 import org.springframework.cglib.core.Transformer;
 
+import java.util.UUID;
+
 /**
  * @author fedorchenko
  * @version $Id$
  */
 public class WebRegionEditorCompanion implements RegionEditor.Companion {
     @Override
-    public void addTreeTableDblClickListener(final Tree entityTree, final CollectionDatasource reportRegionPropertiesTableDs) {
-        final com.haulmont.cuba.web.toolkit.ui.Tree webTree = (com.haulmont.cuba.web.toolkit.ui.Tree) WebComponentsHelper.unwrap(entityTree);
+    public void addTreeTableDblClickListener(final Tree entityTree, final CollectionDatasource<RegionProperty, UUID> reportRegionPropertiesTableDs) {
+        final com.haulmont.cuba.web.toolkit.ui.Tree webTree = WebComponentsHelper.unwrap(entityTree);
         webTree.setDoubleClickMode(true);
         webTree.addListener(new ItemClickEvent.ItemClickListener() {
             @Override

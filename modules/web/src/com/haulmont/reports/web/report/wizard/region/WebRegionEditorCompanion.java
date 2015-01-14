@@ -13,6 +13,7 @@ import com.haulmont.cuba.gui.components.Tree;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
 import com.haulmont.cuba.web.gui.components.WebComponentsHelper;
 import com.haulmont.cuba.web.gui.data.ItemWrapper;
+import com.haulmont.cuba.web.toolkit.ui.CubaTree;
 import com.haulmont.reports.entity.wizard.EntityTreeNode;
 import com.haulmont.reports.entity.wizard.RegionProperty;
 import com.haulmont.reports.gui.report.wizard.region.RegionEditor;
@@ -20,14 +21,17 @@ import com.vaadin.event.ItemClickEvent;
 import org.springframework.cglib.core.CollectionUtils;
 import org.springframework.cglib.core.Transformer;
 
+import java.util.UUID;
+
 /**
  * @author fedorchenko
  * @version $Id$
  */
 public class WebRegionEditorCompanion implements RegionEditor.Companion {
     @Override
-    public void addTreeTableDblClickListener(final Tree entityTree, final CollectionDatasource reportRegionPropertiesTableDs) {
-        final com.vaadin.ui.Tree webTree = (com.vaadin.ui.Tree) WebComponentsHelper.unwrap(entityTree);
+    public void addTreeTableDblClickListener(final Tree entityTree, final CollectionDatasource<RegionProperty, UUID> reportRegionPropertiesTableDs) {
+        final CubaTree webTree = WebComponentsHelper.unwrap(entityTree);
+        webTree.setDoubleClickMode(true);
         webTree.addItemClickListener(new ItemClickEvent.ItemClickListener() {
             @Override
             public void itemClick(ItemClickEvent event) {
@@ -70,7 +74,7 @@ public class WebRegionEditorCompanion implements RegionEditor.Companion {
         ((com.vaadin.ui.Button) WebComponentsHelper.unwrap(button)).addClickListener(new com.vaadin.ui.Button.ClickListener() {
             @Override
             public void buttonClick(com.vaadin.ui.Button.ClickEvent event) {
-                com.vaadin.ui.Table vaadinTable = (com.vaadin.ui.Table) WebComponentsHelper.unwrap(table);
+                com.vaadin.ui.Table vaadinTable = WebComponentsHelper.unwrap(table);
                 vaadinTable.setCurrentPageFirstItemId(vaadinTable.lastItemId());
                 vaadinTable.refreshRowCache();
             }

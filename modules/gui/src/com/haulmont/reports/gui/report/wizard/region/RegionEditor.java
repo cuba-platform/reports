@@ -70,8 +70,11 @@ public class RegionEditor extends AbstractEditor<ReportRegion> {
     public void init(Map<String, Object> params) {
         super.init(params);
         Companion companion = getCompanion();
-        companion.addTreeTableDblClickListener(entityTree, reportRegionPropertiesTableDs);
-        companion.initControlBtnsActions(addItem, propertiesTable);
+        if (companion != null) {
+            companion.addTreeTableDblClickListener(entityTree, reportRegionPropertiesTableDs);
+            companion.initControlBtnsActions(addItem, propertiesTable);
+        }
+
         isTabulated = ((ReportRegion) WindowParams.ITEM.getEntity(params)).getIsTabulatedRegion();
         asViewEditor = BooleanUtils.isTrue((Boolean) params.get("asViewEditor"));
         params.put("component$reportPropertyName", reportPropertyName);
@@ -130,8 +133,6 @@ public class RegionEditor extends AbstractEditor<ReportRegion> {
     protected void initAsViewEditor() {
         reportRegionDs.setAllowCommit(false);
         reportRegionPropertiesTableDs.setAllowCommit(false);
-//        upItem.setVisible(false);
-//        downItem.setVisible(false);
         if (isTabulated) {
             setCaption(getMessage("singleEntityDataSetViewEditor"));
         } else {
@@ -148,15 +149,15 @@ public class RegionEditor extends AbstractEditor<ReportRegion> {
     }
 
     protected void addRegionPropertiesDsListener() {
-        reportRegionPropertiesTableDs.addListener(new CollectionDsListenerAdapter() {
+        reportRegionPropertiesTableDs.addListener(new CollectionDsListenerAdapter<RegionProperty>() {
             @Override
-            public void itemChanged(Datasource ds, @Nullable Entity prevItem, @Nullable Entity item) {
+            public void itemChanged(Datasource<RegionProperty> ds, @Nullable RegionProperty prevItem, @Nullable RegionProperty item) {
                 super.itemChanged(ds, prevItem, item);
                 showOrHideSortBtns();
             }
 
             @Override
-            public void collectionChanged(CollectionDatasource ds, Operation operation, List items) {
+            public void collectionChanged(CollectionDatasource ds, Operation operation, List<RegionProperty> items) {
                 super.collectionChanged(ds, operation, items);
                 showOrHideSortBtns();
             }
@@ -178,18 +179,17 @@ public class RegionEditor extends AbstractEditor<ReportRegion> {
         addItem.setAction(new AbstractAction("addItem") {
             @Override
             public void actionPerform(Component component) {
-
-                Set<EntityTreeNode> alreadyAddedNodes = new HashSet<>();
-
-                alreadyAddedNodes.addAll(CollectionUtils.transform(reportRegionPropertiesTableDs.getItems(), new Transformer() {
+                @SuppressWarnings("unchecked") List<EntityTreeNode> nodesList =
+                        CollectionUtils.transform(reportRegionPropertiesTableDs.getItems(), new Transformer() {
                     @Override
                     public Object transform(Object o) {
                         return ((RegionProperty) o).getEntityTreeNode();
                     }
-                }));
+                });
+                Set<EntityTreeNode> alreadyAddedNodes = new HashSet<>(nodesList);
 
                 Set<EntityTreeNode> selectedItems = entityTree.getSelected();
-                List addedItems = new ArrayList();
+                List<Entity> addedItems = new ArrayList<>();
                 boolean alreadyAdded = false;
                 for (EntityTreeNode entityTreeNode : selectedItems) {
                     if (entityTreeNode.getWrappedMetaClass() != null) {
@@ -236,13 +236,13 @@ public class RegionEditor extends AbstractEditor<ReportRegion> {
                 return "";
             }
         });
-        upItem.setAction(new OrderableItemMoveAction("upItem", OrderableItemMoveAction.Direction.UP, propertiesTable));
-        downItem.setAction(new OrderableItemMoveAction("downItem", OrderableItemMoveAction.Direction.DOWN, propertiesTable));
+        upItem.setAction(new OrderableItemMoveAction<>("upItem", OrderableItemMoveAction.Direction.UP, propertiesTable));
+        downItem.setAction(new OrderableItemMoveAction<>("downItem", OrderableItemMoveAction.Direction.DOWN, propertiesTable));
     }
 
     protected void normalizeRegionPropertiesOrderNum() {
         long normalizedIdx = 0;
-        List<RegionProperty> allItems = new ArrayList(reportRegionPropertiesTableDs.getItems());
+        List<RegionProperty> allItems = new ArrayList<>(reportRegionPropertiesTableDs.getItems());
         for (RegionProperty item : allItems) {
             item.setOrderNum(++normalizedIdx); //first must to be 1
         }
@@ -258,7 +258,7 @@ public class RegionEditor extends AbstractEditor<ReportRegion> {
     }
 
     public interface Companion {
-        void addTreeTableDblClickListener(Tree entityTree, final CollectionDatasource reportRegionPropertiesTableDs);
+        void addTreeTableDblClickListener(Tree entityTree, final CollectionDatasource<RegionProperty, UUID> reportRegionPropertiesTableDs);
 
         void initControlBtnsActions(Button button, Table table);
     }
