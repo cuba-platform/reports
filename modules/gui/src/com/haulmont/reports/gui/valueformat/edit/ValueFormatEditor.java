@@ -4,7 +4,6 @@
  */
 package com.haulmont.reports.gui.valueformat.edit;
 
-import com.haulmont.chile.core.model.Instance;
 import com.haulmont.chile.core.model.utils.InstanceUtils;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.gui.components.AbstractEditor;
@@ -17,7 +16,6 @@ import com.haulmont.cuba.gui.data.impl.DsListenerAdapter;
 import com.haulmont.cuba.gui.xml.layout.ComponentsFactory;
 import com.haulmont.reports.entity.ReportValueFormat;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
@@ -56,6 +54,8 @@ public class ValueFormatEditor extends AbstractEditor<ReportValueFormat> {
     public void init(Map<String, Object> params) {
         super.init(params);
 
+        getDialogParams().setWidthAuto();
+
         // Add default format strings to combobox
         formatFields.addCustomField("formatString", new FieldGroup.CustomFieldGenerator() {
             @Override
@@ -86,11 +86,9 @@ public class ValueFormatEditor extends AbstractEditor<ReportValueFormat> {
                 ((DatasourceImplementation) valuesFormatsDs).modified(source);
             }
         });
-
-        getDialogParams().setWidth(450);
     }
 
-    private void addFormatItem(String caption) {
+    protected void addFormatItem(String caption) {
         Map<String, Object> optionsMap = formatField.getOptionsMap();
         optionsMap.put(caption, caption);
         formatField.setOptionsMap(optionsMap);

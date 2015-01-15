@@ -14,17 +14,15 @@
         <datasource id="valuesFormatsDs" class="com.haulmont.reports.entity.ReportValueFormat"/>
     </dsContext>
 
-    <assign name="width" value="200"/>
-
     <layout spacing="true">
         <fieldGroup id="formatFields" datasource="valuesFormatsDs">
-            <column flex="1">
-                <field id="valueName" required="true" caption="msg://valuesFormats.name" width="${width}"
+            <column width="200">
+                <field id="valueName" required="true" caption="msg://valuesFormats.name"
                        requiredMessage="msg://valueNameMsg"/>
-                <field id="formatString" required="true"  caption="msg://valuesFormats.format" width="${width}"
+                <field id="formatString" required="true"  caption="msg://valuesFormats.format"
                        maxLength="255" custom="true" requiredMessage="msg://formatStringMsg"/>
             </column>
         </fieldGroup>
-        <iframe id="windowActions" screen="editWindowActions"/>
+        <iframe id="windowActions" screen="editWindowActions" width="AUTO"/>
     </layout>
 </window>

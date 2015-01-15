@@ -105,7 +105,7 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
     public void init(Map<String, Object> params) {
         super.init(params);
 
-        getDialogParams().setWidth(490);
+        getDialogParams().setWidthAuto();
 
         custom.addListener(new ValueListener() {
             @Override
