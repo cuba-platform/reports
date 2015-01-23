@@ -49,7 +49,9 @@ public class ReportingWizardBean implements ReportingWizardApi {
     @Inject
     protected ReportingApi reportingApi;
     @Inject
-    protected Configuration configuration;
+    protected Configuration configuration;    
+    @Inject
+    protected ExtendedEntities extendedEntities;
 
     protected Log log = LogFactory.getLog(ReportingBean.class);
 
@@ -403,7 +405,8 @@ public class ReportingWizardBean implements ReportingWizardApi {
         if (StringUtils.isNotBlank(entitiesBlackList)) {
             List<String> effectiveEntities = new ArrayList<>();
             for (String className : Arrays.asList(StringUtils.split(entitiesBlackList, ','))) {
-                effectiveEntities.add(metadata.getExtendedEntities().getEffectiveMetaClass(metadata.getClassNN(className)).getName());
+                MetaClass clazz=metadata.getClassNN(className);
+                effectiveEntities.add(extendedEntities.getEffectiveMetaClass(clazz).getName());
             }
             return effectiveEntities;
         }
@@ -416,7 +419,8 @@ public class ReportingWizardBean implements ReportingWizardApi {
         if (StringUtils.isNotBlank(entitiesWhiteList)) {
             List<String> effectiveEntities = new ArrayList<>();
             for (String className : Arrays.asList(StringUtils.split(entitiesWhiteList, ','))) {
-                effectiveEntities.add(metadata.getExtendedEntities().getEffectiveMetaClass(metadata.getClassNN(className)).getName());
+                MetaClass clazz=metadata.getClassNN(className);
+                effectiveEntities.add(extendedEntities.getEffectiveMetaClass(clazz).getName());
             }
             return effectiveEntities;
         }
