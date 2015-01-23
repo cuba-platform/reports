@@ -1,3 +1,3 @@
 --$Id$--
 
-alter table REPORT_TEMPLATE add column CUSTOM_DEFINED_BY integer default 100;
+alter table REPORT_TEMPLATE add CUSTOM_DEFINED_BY integer default 100;
