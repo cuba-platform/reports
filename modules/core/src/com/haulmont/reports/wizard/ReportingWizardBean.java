@@ -391,7 +391,7 @@ public class ReportingWizardBean implements ReportingWizardApi {
         String classAndPropertyName = metaClass.getName() + "." + metaProperty.getName();
         if (propertiesBlackList.contains(classAndPropertyName)
                 || (propertiesBlackList.contains(metaProperty.getDomain() + "." + metaProperty.getName())
-                        && !wizardPropertiesExcludedBlackList.contains(classAndPropertyName))) {
+                && !wizardPropertiesExcludedBlackList.contains(classAndPropertyName))) {
             return false;
         }
         return true;
@@ -401,7 +401,11 @@ public class ReportingWizardBean implements ReportingWizardApi {
     protected List<String> getWizardBlackListedEntities() {
         String entitiesBlackList = configuration.getConfig(ReportingConfig.class).getWizardEntitiesBlackList();
         if (StringUtils.isNotBlank(entitiesBlackList)) {
-            return Arrays.asList(StringUtils.split(entitiesBlackList, ','));
+            List<String> effectiveEntities = new ArrayList<>();
+            for (String className : Arrays.asList(StringUtils.split(entitiesBlackList, ','))) {
+                effectiveEntities.add(metadata.getExtendedEntities().getEffectiveMetaClass(metadata.getClassNN(className)).getName());
+            }
+            return effectiveEntities;
         }
 
         return Collections.emptyList();
@@ -410,9 +414,12 @@ public class ReportingWizardBean implements ReportingWizardApi {
     protected List<String> getWizardWhiteListedEntities() {
         String entitiesWhiteList = configuration.getConfig(ReportingConfig.class).getWizardEntitiesWhiteList();
         if (StringUtils.isNotBlank(entitiesWhiteList)) {
-            return Arrays.asList(StringUtils.split(entitiesWhiteList, ','));
+            List<String> effectiveEntities = new ArrayList<>();
+            for (String className : Arrays.asList(StringUtils.split(entitiesWhiteList, ','))) {
+                effectiveEntities.add(metadata.getExtendedEntities().getEffectiveMetaClass(metadata.getClassNN(className)).getName());
+            }
+            return effectiveEntities;
         }
-
         return Collections.emptyList();
     }
 
