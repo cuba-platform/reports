@@ -82,7 +82,7 @@
 
     <bean name="reporting_lib_StringConverter" class="com.haulmont.reports.libintegration.CubaObjectToStringConverter"/>
 
-    <bean id="reporting_lib_Reporting" class="com.haulmont.yarg.reporting.Reporting">
+    <bean id="reporting_lib_Reporting" class="com.haulmont.reports.libintegration.CubaReporting">
         <property name="formatterFactory" ref="reporting_lib_FormatterFactory"/>
         <property name="loaderFactory" ref="reporting_lib_LoaderFactory"/>
         <property name="dataExtractor" ref="reporting_lib_DataExtractor"/>
