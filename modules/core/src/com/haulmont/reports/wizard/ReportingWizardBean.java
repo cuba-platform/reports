@@ -49,7 +49,7 @@ public class ReportingWizardBean implements ReportingWizardApi {
     @Inject
     protected ReportingApi reportingApi;
     @Inject
-    protected Configuration configuration;    
+    protected Configuration configuration;
     @Inject
     protected ExtendedEntities extendedEntities;
 
@@ -402,29 +402,23 @@ public class ReportingWizardBean implements ReportingWizardApi {
 
     protected List<String> getWizardBlackListedEntities() {
         String entitiesBlackList = configuration.getConfig(ReportingConfig.class).getWizardEntitiesBlackList();
-        if (StringUtils.isNotBlank(entitiesBlackList)) {
-            List<String> effectiveEntities = new ArrayList<>();
-            for (String className : Arrays.asList(StringUtils.split(entitiesBlackList, ','))) {
-                MetaClass clazz=metadata.getClassNN(className);
-                effectiveEntities.add(extendedEntities.getEffectiveMetaClass(clazz).getName());
-            }
-            return effectiveEntities;
-        }
-
-        return Collections.emptyList();
+        return getEffectiveEntities(entitiesBlackList);
     }
 
     protected List<String> getWizardWhiteListedEntities() {
         String entitiesWhiteList = configuration.getConfig(ReportingConfig.class).getWizardEntitiesWhiteList();
-        if (StringUtils.isNotBlank(entitiesWhiteList)) {
-            List<String> effectiveEntities = new ArrayList<>();
-            for (String className : Arrays.asList(StringUtils.split(entitiesWhiteList, ','))) {
-                MetaClass clazz=metadata.getClassNN(className);
+        return getEffectiveEntities(entitiesWhiteList);
+    }
+
+    protected List<String> getEffectiveEntities(String entitiesList) {
+        List<String> effectiveEntities = new ArrayList<>();
+        if (StringUtils.isNotBlank(entitiesList)) {
+            for (String className : Arrays.asList(StringUtils.split(entitiesList, ','))) {
+                MetaClass clazz = metadata.getClassNN(className);
                 effectiveEntities.add(extendedEntities.getEffectiveMetaClass(clazz).getName());
             }
-            return effectiveEntities;
         }
-        return Collections.emptyList();
+        return effectiveEntities;
     }
 
     protected List<String> getWizardBlackListedProperties() {
