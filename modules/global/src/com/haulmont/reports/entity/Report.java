@@ -28,7 +28,7 @@ import java.util.*;
  */
 @Entity(name = "report$Report")
 @Table(name = "REPORT_REPORT")
-@NamePattern("%s|locName")
+@NamePattern("%s|locName,name,localeNames")
 @Listeners("report_ReportDetachListener")
 @SuppressWarnings("unused")
 public class Report extends BaseReportEntity implements com.haulmont.yarg.structure.Report {

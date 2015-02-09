@@ -19,7 +19,7 @@ import java.util.Set;
  */
 @Entity(name = "report$ReportGroup")
 @Table(name = "REPORT_GROUP")
-@NamePattern("%s|locName")
+@NamePattern("%s|locName,title,localeNames")
 @SuppressWarnings("unused")
 public class ReportGroup extends BaseReportEntity {
 
