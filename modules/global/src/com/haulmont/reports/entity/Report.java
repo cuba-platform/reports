@@ -55,6 +55,7 @@ public class Report extends BaseReportEntity implements com.haulmont.yarg.struct
     protected Integer reportType;
 
     @Column(name = "XML")
+    @Lob
     protected String xml;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "report")
