@@ -12,10 +12,10 @@ import com.haulmont.cuba.gui.AppConfig;
 import com.haulmont.cuba.gui.WindowManager;
 import com.haulmont.cuba.gui.app.core.file.FileUploadDialog;
 import com.haulmont.cuba.gui.components.*;
+import com.haulmont.cuba.gui.components.actions.BaseAction;
 import com.haulmont.cuba.gui.components.actions.CreateAction;
 import com.haulmont.cuba.gui.components.actions.ItemTrackingAction;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
-import com.haulmont.cuba.gui.data.Datasource;
 import com.haulmont.cuba.gui.export.ByteArrayDataProvider;
 import com.haulmont.cuba.gui.export.ExportDisplay;
 import com.haulmont.cuba.gui.export.ExportFormat;
@@ -77,25 +77,25 @@ public class ReportBrowser extends AbstractLookup {
         copyReport.setAction(new ItemTrackingAction("copy") {
             @Override
             public void actionPerform(Component component) {
-                Report report = reportsTable.getSingleSelected();
+                Report report = getTargetSingleSelected();
                 if (report != null) {
                     reportService.copyReport(report);
-                    reportsTable.refresh();
+                    target.refresh();
                 } else {
                     showNotification(getMessage("notification.selectReport"), NotificationType.HUMANIZED);
                 }
             }
 
             @Override
-            public boolean isApplicableTo(Datasource.State state, Entity item) {
-                return super.isApplicableTo(state, item) && hasPermissionsToCreateReports;
+            protected boolean isPermitted() {
+                return hasPermissionsToCreateReports;
             }
         });
 
         runReport.setAction(new ItemTrackingAction("runReport") {
             @Override
             public void actionPerform(Component component) {
-                Report report = reportsTable.getSingleSelected();
+                Report report = getTargetSingleSelected();
                 if (report != null) {
                     report = getDsContext().getDataSupplier().reload(report, "report.edit");
                     if (report.getInputParameters() != null && report.getInputParameters().size() > 0) {
@@ -104,7 +104,7 @@ public class ReportBrowser extends AbstractLookup {
                         paramsWindow.addListener(new CloseListener() {
                             @Override
                             public void windowClosed(String actionId) {
-                                reportsTable.requestFocus();
+                                target.requestFocus();
                             }
                         });
                     } else {
@@ -114,7 +114,7 @@ public class ReportBrowser extends AbstractLookup {
             }
         });
 
-        importReport.setAction(new AbstractAction("import") {
+        importReport.setAction(new BaseAction("import") {
             @Override
             public void actionPerform(Component component) {
                 final FileUploadDialog dialog = openWindow("fileUploadDialog", WindowManager.OpenType.DIALOG);
@@ -147,14 +147,17 @@ public class ReportBrowser extends AbstractLookup {
                     }
                 });
             }
-        });
 
-        importReport.setEnabled(hasPermissionsToCreateReports);
+            @Override
+            protected boolean isPermitted() {
+                return hasPermissionsToCreateReports;
+            }
+        });
 
         exportReport.setAction(new ItemTrackingAction("export") {
             @Override
             public void actionPerform(Component component) {
-                Set<Report> reports = reportsTable.getSelected();
+                Set<Report> reports = getTargetSelection();
                 if ((reports != null) && (!reports.isEmpty())) {
                     ExportDisplay exportDisplay = AppConfig.createExportDisplay(ReportBrowser.this);
                         ByteArrayDataProvider provider = new ByteArrayDataProvider(reportService.exportReports(reports));

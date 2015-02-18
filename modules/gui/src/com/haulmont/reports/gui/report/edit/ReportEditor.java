@@ -238,7 +238,7 @@ public class ReportEditor extends AbstractEditor<Report> {
         paramUpButton.setAction(new ItemTrackingAction("generalFrame.up") {
             @Override
             public void actionPerform(Component component) {
-                ReportInputParameter parameter = parametersDs.getItem();
+                ReportInputParameter parameter = getTargetSingleSelected();
                 if (parameter != null) {
                     List<ReportInputParameter> inputParameters = getItem().getInputParameters();
                     int index = parameter.getPosition();
@@ -261,19 +261,22 @@ public class ReportEditor extends AbstractEditor<Report> {
             }
 
             @Override
-            public boolean isApplicableTo(Datasource.State state, Entity item) {
-                if (Datasource.State.VALID.equals(state) && parametersDs.getItem() == item) {
-                    return super.isApplicableTo(state, item) && ((ReportInputParameter) item).getPosition() > 0;
-                } else {
-                    return isEnabled();
+            protected boolean isApplicable() {
+                if (super.isApplicable()) {
+                    ReportInputParameter item = getTargetSingleSelected();
+                    if (parametersDs.getItem() == item) {
+                        return item.getPosition() > 0;
+                    }
                 }
+
+                return false;
             }
         });
 
         paramDownButton.setAction(new ItemTrackingAction("generalFrame.down") {
             @Override
             public void actionPerform(Component component) {
-                ReportInputParameter parameter = parametersDs.getItem();
+                ReportInputParameter parameter = getTargetSingleSelected();
                 if (parameter != null) {
                     List<ReportInputParameter> inputParameters = getItem().getInputParameters();
                     int index = parameter.getPosition();
@@ -296,13 +299,15 @@ public class ReportEditor extends AbstractEditor<Report> {
             }
 
             @Override
-            public boolean isApplicableTo(Datasource.State state, Entity item) {
-                if (Datasource.State.VALID.equals(state) && parametersDs.getItem() == item) {
-                    return super.isApplicableTo(state, item) &&
-                            ((ReportInputParameter) item).getPosition() < parametersDs.size() - 1;
-                } else {
-                    return isEnabled();
+            protected boolean isApplicable() {
+                if (super.isApplicable()) {
+                    ReportInputParameter item = getTargetSingleSelected();
+                    if (parametersDs.getItem() == item) {
+                        return item.getPosition() < parametersDs.size() - 1;
+                    }
                 }
+
+                return false;
             }
         });
 
@@ -679,8 +684,10 @@ public class ReportEditor extends AbstractEditor<Report> {
             }
 
             @Override
-            public boolean isApplicableTo(Datasource.State state, Entity item) {
-                return super.isApplicableTo(state, item) && !ObjectUtils.equals(getItem().getRootBandDefinition(), item);
+            protected boolean isApplicable() {
+                return super.isApplicable()
+                        && !ObjectUtils.equals(getItem().getRootBandDefinition(), getTargetSingleSelected());
+
             }
 
             @Override
@@ -735,7 +742,7 @@ public class ReportEditor extends AbstractEditor<Report> {
 
             @Override
             public void actionPerform(Component component) {
-                BandDefinition definition = treeDs.getItem();
+                BandDefinition definition = getTargetSingleSelected();
                 if (definition != null && definition.getParentBandDefinition() != null) {
                     BandDefinition parentDefinition = definition.getParentBandDefinition();
                     List<BandDefinition> definitionsList = parentDefinition.getChildrenBandDefinitions();
@@ -754,8 +761,8 @@ public class ReportEditor extends AbstractEditor<Report> {
             }
 
             @Override
-            public boolean isApplicableTo(Datasource.State state, Entity item) {
-                return super.isApplicableTo(state, item) && ((BandDefinition) item).getPosition() > 0;
+            protected boolean isApplicable() {
+                return super.isApplicable() && ((BandDefinition) getTargetSingleSelected()).getPosition() > 0;
             }
         });
 
@@ -772,7 +779,7 @@ public class ReportEditor extends AbstractEditor<Report> {
 
             @Override
             public void actionPerform(Component component) {
-                BandDefinition definition = treeDs.getItem();
+                BandDefinition definition = getTargetSingleSelected();
                 if (definition != null && definition.getParentBandDefinition() != null) {
                     BandDefinition parentDefinition = definition.getParentBandDefinition();
                     List<BandDefinition> definitionsList = parentDefinition.getChildrenBandDefinitions();
@@ -791,9 +798,9 @@ public class ReportEditor extends AbstractEditor<Report> {
             }
 
             @Override
-            public boolean isApplicableTo(Datasource.State state, Entity item) {
-                if (super.isApplicableTo(state, item)) {
-                    BandDefinition bandDefinition = (BandDefinition) item;
+            protected boolean isApplicable() {
+                if (super.isApplicable()) {
+                    BandDefinition bandDefinition = getTargetSingleSelected();
                     BandDefinition parent = bandDefinition.getParentBandDefinition();
                     return parent != null &&
                             parent.getChildrenBandDefinitions() != null &&
@@ -873,24 +880,19 @@ public class ReportEditor extends AbstractEditor<Report> {
 
             @Override
             public void actionPerform(Component component) {
-                ReportTemplate template = templatesTable.getSingleSelected();
+                ReportTemplate template = getTargetSingleSelected();
                 if (template != null) {
                     getItem().setDefaultTemplate(template);
                 }
-                updateApplicableTo(false);
+
+                refreshState();
                 templatesTable.requestFocus();
             }
 
             @Override
-            public boolean isApplicableTo(Datasource.State state, Entity item) {
-                return super.isApplicableTo(state, item) && !ObjectUtils.equals(getItem().getDefaultTemplate(), item);
-            }
-
-            @Override
-            public void refreshState() {
-                super.refreshState();
-                updateApplicableTo(isApplicableTo(templatesDs.getState(),
-                        templatesDs.getState() == Datasource.State.VALID ? templatesDs.getItem() : null));
+            protected boolean isApplicable() {
+                return super.isApplicable()
+                        && !ObjectUtils.equals(getItem().getDefaultTemplate(), getTargetSingleSelected());
             }
         });
     }

@@ -6,10 +6,7 @@
 package com.haulmont.reports.gui.report.run;
 
 import com.haulmont.cuba.core.global.UserSessionSource;
-import com.haulmont.cuba.gui.components.AbstractAction;
-import com.haulmont.cuba.gui.components.AbstractLookup;
-import com.haulmont.cuba.gui.components.Component;
-import com.haulmont.cuba.gui.components.Table;
+import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.components.actions.ItemTrackingAction;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
 import com.haulmont.reports.app.service.ReportService;
@@ -57,10 +54,10 @@ public class ReportRun extends AbstractLookup {
             }
         }
 
-        AbstractAction runAction = new ItemTrackingAction(RUN_ACTION_ID) {
+        Action runAction = new ItemTrackingAction(RUN_ACTION_ID) {
             @Override
             public void actionPerform(Component component) {
-                Report report = reportsTable.getSingleSelected();
+                Report report = getTargetSingleSelected();
                 if (report != null) {
                     report = getDsContext().getDataSupplier().reload(report, ReportService.MAIN_VIEW_NAME);
                     reportGuiManager.runReport(report, ReportRun.this);
