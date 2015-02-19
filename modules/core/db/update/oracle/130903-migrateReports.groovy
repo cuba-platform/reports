@@ -279,7 +279,11 @@ postUpdate.add({
         }
 
         entityManager.flush();
-        entityManager.createNativeQuery("update report_report r set default_template_id = t.id from report_template t where r.default_template_id is null and t.report_id = r.id and t.is_default = true");
+        entityManager.createNativeQuery("update report_report r " +
+                "set default_template_id = t.id " +
+                "from report_template t " +
+                "where r.default_template_id is null and t.report_id = r.id and t.is_default = true")
+        .executeUpdate();
 
         tx.commit();
     } finally {
