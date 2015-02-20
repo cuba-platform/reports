@@ -38,6 +38,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.perf4j.StopWatch;
 import org.perf4j.log4j.Log4JStopWatch;
+import org.slf4j.MDC;
 
 import javax.annotation.ManagedBean;
 import javax.inject.Inject;
@@ -72,6 +73,10 @@ public class ReportingBean implements ReportingApi {
     protected ReportImportExportAPI reportImportExport;
     @Inject
     protected UuidSource uuidSource;
+    @Inject
+    protected UserSessionSource userSessionSource;
+    @Inject
+    protected GlobalConfig globalConfig;
 
     private static XStream createXStream() {
         XStream xStream = new XStream();
@@ -198,6 +203,8 @@ public class ReportingBean implements ReportingApi {
 
     protected ReportOutputDocument createReportDocument(Report report, ReportTemplate template, Map<String, Object> params) {
         StopWatch stopWatch = null;
+        MDC.put("user", userSessionSource.getUserSession().getUser().getLogin());
+        MDC.put("webContextName", globalConfig.getWebContextName());
         try {
             stopWatch = new Log4JStopWatch("Reporting#" + report.getName());
             List<String> prototypes = new LinkedList<>();
@@ -240,6 +247,8 @@ public class ReportingBean implements ReportingApi {
 
             throw new ReportingException(sb.toString());
         } finally {
+            MDC.remove("user");
+            MDC.remove("webContextName");
             if (stopWatch != null) {
                 stopWatch.stop();
             }
