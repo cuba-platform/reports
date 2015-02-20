@@ -36,6 +36,7 @@ String mapping = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n" +
         "        r.locale_names as report_locales,\n" +
         "        r.code as report_code,\n" +
         "        r.group_id as report_group_id,\n" +
+        "        r.default_template_id as report_default_template_id,\n" +
         "        case\n" +
         "        when r.report_type = 10 then 'SIMPLE'\n" +
         "        when r.report_type = 20 then 'PRINT_FORM'\n" +
@@ -119,6 +120,10 @@ String mapping = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n" +
         "\n" +
         "        <association property=\"group\" column=\"group_id\" javaType=\"com.haulmont.reports.entity.ReportGroup\">\n" +
         "            <id property=\"id\" column=\"report_group_id\"/>\n" +
+        "        </association>\n" +
+        "\n" +
+        "        <association property=\"defaultTemplate\" column=\"default_template_id\" javaType=\"com.haulmont.reports.entity.ReportTemplate\">\n" +
+        "            <id property=\"id\" column=\"report_default_template_id\"/>\n" +
         "        </association>\n" +
         "\n" +
         "        <collection property=\"templates\" ofType=\"com.haulmont.reports.entity.ReportTemplate\">\n" +
@@ -207,6 +212,11 @@ postUpdate.add({
     Transaction tx = persistence.createTransaction();
     try {
         EntityManager entityManager = persistence.getEntityManager();
+        entityManager.createNativeQuery("update report_report r " +
+                "set default_template_id = t.id " +
+                "from report_template t " +
+                "where r.default_template_id is null and t.report_id = r.id and t.is_default = true")
+                .executeUpdate();
 
         List<Report> reports = (List<Report>) sqlSessionTemplate.selectList("com.haulmont.report.selectReport");
         for (Report report : reports) {
@@ -232,7 +242,7 @@ postUpdate.add({
                         }
                     }
 
-                    if (ReportTemplate.DEFAULT_TEMPLATE_CODE.equals(reportTemplate.getCode()) || 'report$default'.equalsIgnoreCase(reportTemplate.getCode())) {
+                    if (reportTemplate.equals(report.defaultTemplate) || ReportTemplate.DEFAULT_TEMPLATE_CODE.equals(reportTemplate.getCode()) || 'report$default'.equalsIgnoreCase(reportTemplate.getCode())) {
                         report.setDefaultTemplate(reportTemplate);
                     }
 
@@ -277,13 +287,6 @@ postUpdate.add({
 
             Report updatedReport = entityManager.merge(report);
         }
-
-        entityManager.flush();
-        entityManager.createNativeQuery("update report_report r " +
-                "set default_template_id = t.id " +
-                "from report_template t " +
-                "where r.default_template_id is null and t.report_id = r.id and t.is_default = true")
-        .executeUpdate();
 
         tx.commit();
     } finally {
