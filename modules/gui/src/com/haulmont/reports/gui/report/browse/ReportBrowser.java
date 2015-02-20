@@ -16,6 +16,7 @@ import com.haulmont.cuba.gui.components.actions.BaseAction;
 import com.haulmont.cuba.gui.components.actions.CreateAction;
 import com.haulmont.cuba.gui.components.actions.ItemTrackingAction;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
+import com.haulmont.cuba.gui.data.impl.DatasourceImplementation;
 import com.haulmont.cuba.gui.export.ByteArrayDataProvider;
 import com.haulmont.cuba.gui.export.ExportDisplay;
 import com.haulmont.cuba.gui.export.ExportFormat;
@@ -195,12 +196,13 @@ public class ReportBrowser extends AbstractLookup {
                             @Override
                             public void windowClosed(String actionId) {
                                 if (actionId.equals(COMMIT_ACTION_ID)) {
-                                    reportsTable.refresh();
-
-                                    if (editor.getItem() != null && editor.getItem().getGeneratedReport() != null
-                                        /*&& reportDs.getItems() != null && !reportDs.getItems().isEmpty()*/) {
-
-                                        reportsTable.setSelected(editor.getItem().getGeneratedReport());
+                                    if (editor.getItem() != null && editor.getItem().getGeneratedReport() != null) {
+                                        Report item = editor.getItem().getGeneratedReport();
+                                        CollectionDatasource datasource = reportsTable.getDatasource();
+                                        boolean modified = datasource.isModified();
+                                        datasource.addItem(item);
+                                        ((DatasourceImplementation) datasource).setModified(modified);
+                                        reportsTable.setSelected(item);
                                         final AbstractEditor<Report> reportEditor = openEditor("report$Report.edit",
                                                 reportDs.getItem(), WindowManager.OpenType.THIS_TAB);
                                         reportEditor.addListener(new CloseListener() {
