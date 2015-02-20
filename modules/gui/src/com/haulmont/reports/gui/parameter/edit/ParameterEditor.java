@@ -7,11 +7,11 @@ package com.haulmont.reports.gui.parameter.edit;
 import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.chile.core.model.utils.InstanceUtils;
 import com.haulmont.cuba.core.entity.Entity;
+import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.Metadata;
-import com.haulmont.cuba.gui.ScreensHelper;
 import com.haulmont.cuba.gui.components.*;
+import com.haulmont.cuba.gui.config.ScreenWorker;
 import com.haulmont.cuba.gui.config.WindowConfig;
-import com.haulmont.cuba.gui.config.WindowInfo;
 import com.haulmont.cuba.gui.data.Datasource;
 import com.haulmont.cuba.gui.data.ValueListener;
 import com.haulmont.cuba.gui.data.impl.DatasourceImplementation;
@@ -90,8 +90,6 @@ public class ParameterEditor extends AbstractEditor {
 
         initEnumsLookup();
 
-        initScreensLookup();
-
         initListeners();
 
         getDialogParams().setWidth(450);
@@ -132,14 +130,8 @@ public class ParameterEditor extends AbstractEditor {
     }
 
     protected void initScreensLookup() {
-        List<WindowInfo> windowInfoCollection = new ArrayList<>(windowConfig.getWindows());
-        ScreensHelper.sortWindowInfos(windowInfoCollection);
-
-        List<String> screensList = new ArrayList<>();
-        for (WindowInfo windowInfo : windowInfoCollection) {
-            screensList.add(windowInfo.getId());
-        }
-        screen.setOptionsList(screensList);
+        Map<String, Object> screensMap = AppBeans.get(ScreenWorker.class).getAvailableScreensMap(parameter.getParameterClass());
+        screen.setOptionsMap(screensMap);
     }
 
     protected void initEnumsLookup() {
@@ -182,6 +174,7 @@ public class ParameterEditor extends AbstractEditor {
 
             if (parameter.getParameterClass() != null) {
                 field.setValue(reportService.convertFromString(parameter.getParameterClass(), parameter.getDefaultValue()));
+                initScreensLookup();
             }
 
             defaultValueBox.add(field);
