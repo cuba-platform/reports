@@ -159,6 +159,9 @@ public class ReportEditor extends AbstractEditor<Report> {
     @Inject
     protected CollectionDatasource<BandDefinition, UUID> availableParentBandsDs;
 
+    @Inject
+    protected ScreensHelper screensHelper;
+
     @Override
     protected void initNewItem(Report report) {
         report.setReportType(ReportType.SIMPLE);
@@ -365,7 +368,7 @@ public class ReportEditor extends AbstractEditor<Report> {
         screenTable.addAction(new RemoveAction(screenTable, false));
         List<WindowInfo> windowInfoCollection = new ArrayList<>(windowConfig.getWindows());
         // sort by screenId
-        ScreensHelper.sortWindowInfos(windowInfoCollection);
+        screensHelper.sortWindowInfos(windowInfoCollection);
 
         Map<String, Object> screens = new LinkedHashMap<>();
         for (WindowInfo windowInfo : windowInfoCollection) {

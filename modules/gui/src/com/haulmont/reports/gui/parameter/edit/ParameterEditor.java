@@ -7,10 +7,9 @@ package com.haulmont.reports.gui.parameter.edit;
 import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.chile.core.model.utils.InstanceUtils;
 import com.haulmont.cuba.core.entity.Entity;
-import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.Metadata;
+import com.haulmont.cuba.gui.ScreensHelper;
 import com.haulmont.cuba.gui.components.*;
-import com.haulmont.cuba.gui.config.ScreenWorker;
 import com.haulmont.cuba.gui.config.WindowConfig;
 import com.haulmont.cuba.gui.data.Datasource;
 import com.haulmont.cuba.gui.data.ValueListener;
@@ -61,6 +60,9 @@ public class ParameterEditor extends AbstractEditor {
 
     @Inject
     protected Datasource<ReportInputParameter> parameterDs;
+
+    @Inject
+    protected ScreensHelper screensHelper;
 
     protected ReportInputParameter parameter;
 
@@ -130,12 +132,12 @@ public class ParameterEditor extends AbstractEditor {
     }
 
     protected void initScreensLookup() {
-        Map<String, Object> screensMap = AppBeans.get(ScreenWorker.class).getAvailableScreensMap(parameter.getParameterClass());
+        Map<String, Object> screensMap = screensHelper.getAvailableScreensMap(parameter.getParameterClass());
         screen.setOptionsMap(screensMap);
     }
 
     protected void initEnumsLookup() {
-        Map<String, Object> enumsOptionsMap = new HashMap<>();
+        Map<String, Object> enumsOptionsMap = new TreeMap<>();
         for (Class enumClass : metadata.getTools().getAllEnums()) {
             String enumLocalizedName = messages.getMessage(enumClass, enumClass.getSimpleName());
             enumsOptionsMap.put(enumLocalizedName, enumClass.getCanonicalName());
@@ -144,7 +146,7 @@ public class ParameterEditor extends AbstractEditor {
     }
 
     protected void initMetaClassLookup() {
-        Map<String, Object> metaClassesOptionsMap = new HashMap<>();
+        Map<String, Object> metaClassesOptionsMap = new TreeMap<>();
         Collection<MetaClass> classes = metadata.getSession().getClasses();
         for (MetaClass clazz : classes) {
             Class javaClass = clazz.getJavaClass();
