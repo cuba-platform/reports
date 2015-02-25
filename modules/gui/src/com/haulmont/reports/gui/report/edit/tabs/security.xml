@@ -3,7 +3,7 @@
   ~ Use is subject to license terms, see http://www.cuba-platform.com/license for details.
   -->
 
-<window xmlns="http://schemas.haulmont.com/cuba/5.3/window.xsd">
+<window xmlns="http://schemas.haulmont.com/cuba/5.4/window.xsd">
     <layout>
         <split orientation="horizontal" width="100%" height="100%" pos="50">
             <vbox margin="true" spacing="true" expand="rolesTable" width="100%" height="100%">
