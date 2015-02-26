@@ -14,7 +14,7 @@
         <datasource id="parameterDs" class="com.haulmont.reports.entity.ReportInputParameter"/>
     </dsContext>
 
-    <assign name="width" value="200px"/>
+    <assign name="width" value="250px"/>
 
     <layout spacing="true">
         <tabSheet id="tabsheet">
@@ -64,7 +64,7 @@
                         </row>
                         <row>
                             <label id="defaultValueLabel" value="msg://parameters.defaultValue"/>
-                            <hbox id="defaultValueBox"/>
+                            <hbox id="defaultValueBox" width="${width}"/>
                         </row>
                     </rows>
                 </grid>
@@ -72,7 +72,7 @@
             <tab id="localesTab" caption="msg://parameters.localesTab" margin="true">
                 <label value="msg://localeCaption" stylename="h2"/>
                 <textArea id="localeTextField" datasource="parameterDs" property="localeNames"
-                           width="100%" height="240px"/>
+                           width="410" height="240px"/>
             </tab>
         </tabSheet>
         <iframe id="windowActions" screen="editWindowActions"/>

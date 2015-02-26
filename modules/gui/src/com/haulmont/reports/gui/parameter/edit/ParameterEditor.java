@@ -94,7 +94,7 @@ public class ParameterEditor extends AbstractEditor {
 
         initListeners();
 
-        getDialogParams().setWidth(450);
+        getDialogParams().setWidthAuto();
     }
 
     protected void initListeners() {
@@ -164,7 +164,6 @@ public class ParameterEditor extends AbstractEditor {
 
         if (canHaveDefaultValue()) {
             Field field = parameterFieldCreator.createField(parameter);
-            field.setWidth("200px");
             field.addListener(new ValueListener() {
                 @Override
                 public void valueChanged(Object source, String property, @Nullable Object prevValue, @Nullable Object value) {
