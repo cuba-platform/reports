@@ -149,9 +149,11 @@ public class ParameterEditor extends AbstractEditor {
         Map<String, Object> metaClassesOptionsMap = new TreeMap<>();
         Collection<MetaClass> classes = metadata.getSession().getClasses();
         for (MetaClass clazz : classes) {
-            Class javaClass = clazz.getJavaClass();
-            String caption = messages.getMessage(javaClass, javaClass.getSimpleName()) + " (" + clazz.getName() + ")";
-            metaClassesOptionsMap.put(caption, clazz.getName());
+            if (!metadata.getTools().isSystemLevel(clazz)) {
+                Class javaClass = clazz.getJavaClass();
+                String caption = messages.getMessage(javaClass, javaClass.getSimpleName()) + " (" + clazz.getName() + ")";
+                metaClassesOptionsMap.put(caption, clazz.getName());
+            }
         }
         metaClass.setOptionsMap(metaClassesOptionsMap);
     }
