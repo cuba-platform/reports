@@ -78,7 +78,7 @@ public class ReportBrowser extends AbstractLookup {
         copyReport.setAction(new ItemTrackingAction("copy") {
             @Override
             public void actionPerform(Component component) {
-                Report report = getTargetSingleSelected();
+                Report report = target.getSingleSelected();
                 if (report != null) {
                     reportService.copyReport(report);
                     target.refresh();
@@ -96,7 +96,7 @@ public class ReportBrowser extends AbstractLookup {
         runReport.setAction(new ItemTrackingAction("runReport") {
             @Override
             public void actionPerform(Component component) {
-                Report report = getTargetSingleSelected();
+                Report report = target.getSingleSelected();
                 if (report != null) {
                     report = getDsContext().getDataSupplier().reload(report, "report.edit");
                     if (report.getInputParameters() != null && report.getInputParameters().size() > 0) {
@@ -158,7 +158,7 @@ public class ReportBrowser extends AbstractLookup {
         exportReport.setAction(new ItemTrackingAction("export") {
             @Override
             public void actionPerform(Component component) {
-                Set<Report> reports = getTargetSelection();
+                Set<Report> reports = target.getSelected();
                 if ((reports != null) && (!reports.isEmpty())) {
                     ExportDisplay exportDisplay = AppConfig.createExportDisplay(ReportBrowser.this);
                         ByteArrayDataProvider provider = new ByteArrayDataProvider(reportService.exportReports(reports));

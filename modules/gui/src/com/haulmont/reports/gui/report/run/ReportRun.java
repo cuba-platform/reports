@@ -57,7 +57,7 @@ public class ReportRun extends AbstractLookup {
         Action runAction = new ItemTrackingAction(RUN_ACTION_ID) {
             @Override
             public void actionPerform(Component component) {
-                Report report = getTargetSingleSelected();
+                Report report = target.getSingleSelected();
                 if (report != null) {
                     report = getDsContext().getDataSupplier().reload(report, ReportService.MAIN_VIEW_NAME);
                     reportGuiManager.runReport(report, ReportRun.this);

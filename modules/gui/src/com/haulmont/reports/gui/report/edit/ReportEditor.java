@@ -238,10 +238,10 @@ public class ReportEditor extends AbstractEditor<Report> {
         });
         parametersTable.addAction(new EditAction(parametersTable, OpenType.DIALOG));
 
-        paramUpButton.setAction(new ItemTrackingAction("generalFrame.up") {
+        paramUpButton.setAction(new BaseAction("generalFrame.up") {
             @Override
             public void actionPerform(Component component) {
-                ReportInputParameter parameter = getTargetSingleSelected();
+                ReportInputParameter parameter = target.getSingleSelected();
                 if (parameter != null) {
                     List<ReportInputParameter> inputParameters = getItem().getInputParameters();
                     int index = parameter.getPosition();
@@ -265,9 +265,9 @@ public class ReportEditor extends AbstractEditor<Report> {
 
             @Override
             protected boolean isApplicable() {
-                if (super.isApplicable()) {
-                    ReportInputParameter item = getTargetSingleSelected();
-                    if (parametersDs.getItem() == item) {
+                if (target != null) {
+                    ReportInputParameter item = target.getSingleSelected();
+                    if (item != null && parametersDs.getItem() == item) {
                         return item.getPosition() > 0;
                     }
                 }
@@ -276,10 +276,10 @@ public class ReportEditor extends AbstractEditor<Report> {
             }
         });
 
-        paramDownButton.setAction(new ItemTrackingAction("generalFrame.down") {
+        paramDownButton.setAction(new BaseAction("generalFrame.down") {
             @Override
             public void actionPerform(Component component) {
-                ReportInputParameter parameter = getTargetSingleSelected();
+                ReportInputParameter parameter = target.getSingleSelected();
                 if (parameter != null) {
                     List<ReportInputParameter> inputParameters = getItem().getInputParameters();
                     int index = parameter.getPosition();
@@ -303,9 +303,9 @@ public class ReportEditor extends AbstractEditor<Report> {
 
             @Override
             protected boolean isApplicable() {
-                if (super.isApplicable()) {
-                    ReportInputParameter item = getTargetSingleSelected();
-                    if (parametersDs.getItem() == item) {
+                if (target != null) {
+                    ReportInputParameter item = target.getSingleSelected();
+                    if (item != null && parametersDs.getItem() == item) {
                         return item.getPosition() < parametersDs.size() - 1;
                     }
                 }
@@ -688,9 +688,14 @@ public class ReportEditor extends AbstractEditor<Report> {
 
             @Override
             protected boolean isApplicable() {
-                return super.isApplicable()
-                        && !ObjectUtils.equals(getItem().getRootBandDefinition(), getTargetSingleSelected());
+                if (target != null) {
+                    Entity selectedItem = target.getSingleSelected();
+                    if (selectedItem != null) {
+                        return !ObjectUtils.equals(getItem().getRootBandDefinition(), selectedItem);
+                    }
+                }
 
+                return false;
             }
 
             @Override
@@ -732,7 +737,7 @@ public class ReportEditor extends AbstractEditor<Report> {
             }
         });
 
-        bandUpButton.setAction(new ItemTrackingAction("generalFrame.up") {
+        bandUpButton.setAction(new BaseAction("generalFrame.up") {
             @Override
             public String getDescription() {
                 return getMessage("description.moveUp");
@@ -745,7 +750,7 @@ public class ReportEditor extends AbstractEditor<Report> {
 
             @Override
             public void actionPerform(Component component) {
-                BandDefinition definition = getTargetSingleSelected();
+                BandDefinition definition = target.getSingleSelected();
                 if (definition != null && definition.getParentBandDefinition() != null) {
                     BandDefinition parentDefinition = definition.getParentBandDefinition();
                     List<BandDefinition> definitionsList = parentDefinition.getChildrenBandDefinitions();
@@ -765,11 +770,16 @@ public class ReportEditor extends AbstractEditor<Report> {
 
             @Override
             protected boolean isApplicable() {
-                return super.isApplicable() && ((BandDefinition) getTargetSingleSelected()).getPosition() > 0;
+                if (target != null) {
+                    BandDefinition selectedItem = target.getSingleSelected();
+                    return selectedItem != null && selectedItem.getPosition() > 0;
+                }
+
+                return false;
             }
         });
 
-        bandDownButton.setAction(new ItemTrackingAction("generalFrame.down") {
+        bandDownButton.setAction(new BaseAction("generalFrame.down") {
             @Override
             public String getDescription() {
                 return getMessage("description.moveDown");
@@ -782,7 +792,7 @@ public class ReportEditor extends AbstractEditor<Report> {
 
             @Override
             public void actionPerform(Component component) {
-                BandDefinition definition = getTargetSingleSelected();
+                BandDefinition definition = target.getSingleSelected();
                 if (definition != null && definition.getParentBandDefinition() != null) {
                     BandDefinition parentDefinition = definition.getParentBandDefinition();
                     List<BandDefinition> definitionsList = parentDefinition.getChildrenBandDefinitions();
@@ -802,12 +812,14 @@ public class ReportEditor extends AbstractEditor<Report> {
 
             @Override
             protected boolean isApplicable() {
-                if (super.isApplicable()) {
-                    BandDefinition bandDefinition = getTargetSingleSelected();
-                    BandDefinition parent = bandDefinition.getParentBandDefinition();
-                    return parent != null &&
-                            parent.getChildrenBandDefinitions() != null &&
-                            bandDefinition.getPosition() < parent.getChildrenBandDefinitions().size() - 1;
+                if (target != null) {
+                    BandDefinition bandDefinition = target.getSingleSelected();
+                    if (bandDefinition != null) {
+                        BandDefinition parent = bandDefinition.getParentBandDefinition();
+                        return parent != null &&
+                                parent.getChildrenBandDefinitions() != null &&
+                                bandDefinition.getPosition() < parent.getChildrenBandDefinitions().size() - 1;
+                    }
                 }
                 return false;
             }
@@ -875,7 +887,7 @@ public class ReportEditor extends AbstractEditor<Report> {
             }
         });
 
-        templatesTable.addAction(new ItemTrackingAction("defaultTemplate") {
+        templatesTable.addAction(new BaseAction("defaultTemplate") {
             @Override
             public String getCaption() {
                 return getMessage("report.defaultTemplate");
@@ -883,7 +895,7 @@ public class ReportEditor extends AbstractEditor<Report> {
 
             @Override
             public void actionPerform(Component component) {
-                ReportTemplate template = getTargetSingleSelected();
+                ReportTemplate template = target.getSingleSelected();
                 if (template != null) {
                     getItem().setDefaultTemplate(template);
                 }
@@ -894,8 +906,14 @@ public class ReportEditor extends AbstractEditor<Report> {
 
             @Override
             protected boolean isApplicable() {
-                return super.isApplicable()
-                        && !ObjectUtils.equals(getItem().getDefaultTemplate(), getTargetSingleSelected());
+                if (target != null) {
+                    Entity selectedItem = target.getSingleSelected();
+                    if (selectedItem != null) {
+                        return !ObjectUtils.equals(getItem().getDefaultTemplate(), selectedItem);
+                    }
+                }
+
+                return false;
             }
         });
     }
