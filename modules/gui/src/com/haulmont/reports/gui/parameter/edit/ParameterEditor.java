@@ -150,8 +150,7 @@ public class ParameterEditor extends AbstractEditor {
         Collection<MetaClass> classes = metadata.getSession().getClasses();
         for (MetaClass clazz : classes) {
             if (!metadata.getTools().isSystemLevel(clazz)) {
-                Class javaClass = clazz.getJavaClass();
-                String caption = messages.getMessage(javaClass, javaClass.getSimpleName()) + " (" + clazz.getName() + ")";
+                String caption = messages.getTools().getDetailedEntityCaption(clazz);
                 metaClassesOptionsMap.put(caption, clazz.getName());
             }
         }
