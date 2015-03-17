@@ -4,39 +4,33 @@
  */
 package com.haulmont.reports.gui.report.wizard;
 
+import com.google.common.collect.ImmutableMap;
 import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.MessageTools;
 import com.haulmont.cuba.core.global.Metadata;
 import com.haulmont.cuba.core.global.MetadataTools;
 import com.haulmont.cuba.gui.AppConfig;
-import com.haulmont.cuba.gui.WindowManager;
+import com.haulmont.cuba.gui.WindowManagerProvider;
 import com.haulmont.cuba.gui.components.*;
+import com.haulmont.cuba.gui.config.WindowConfig;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
 import com.haulmont.cuba.gui.data.Datasource;
-import com.haulmont.cuba.gui.data.ValueChangingListener;
-import com.haulmont.cuba.gui.data.ValueListener;
 import com.haulmont.cuba.gui.data.impl.CollectionDsListenerAdapter;
-import com.haulmont.cuba.gui.export.ByteArrayDataProvider;
-import com.haulmont.cuba.gui.export.ExportDisplay;
-import com.haulmont.cuba.gui.export.ExportFormat;
 import com.haulmont.cuba.gui.xml.layout.ComponentsFactory;
 import com.haulmont.reports.app.EntityTree;
 import com.haulmont.reports.app.service.ReportWizardService;
 import com.haulmont.reports.entity.Report;
 import com.haulmont.reports.entity.ReportGroup;
 import com.haulmont.reports.entity.ReportOutputType;
-import com.haulmont.reports.entity.wizard.*;
+import com.haulmont.reports.entity.wizard.ReportData;
+import com.haulmont.reports.entity.wizard.ReportRegion;
+import com.haulmont.reports.entity.wizard.TemplateFileType;
 import com.haulmont.reports.exception.TemplateGenerationException;
 import com.haulmont.reports.gui.ReportGuiManager;
-import com.haulmont.reports.gui.components.actions.OrderableItemMoveAction;
 import com.haulmont.reports.gui.report.wizard.step.MainWizardFrame;
 import com.haulmont.reports.gui.report.wizard.step.StepFrame;
 import com.haulmont.reports.gui.report.wizard.step.StepFrameManager;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Transformer;
-import org.apache.commons.lang.BooleanUtils;
-import org.apache.commons.lang.StringUtils;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -48,7 +42,7 @@ import java.util.*;
  * @version $Id$
  */
 public class ReportWizardCreator extends AbstractEditor<ReportData> implements MainWizardFrame<AbstractEditor> {
-    //injected UI and main form descriptor fields:
+    //main wizard window
     @Inject
     protected Datasource reportDataDs;
     @Inject
@@ -63,15 +57,25 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
     protected Button bwdBtn;
     @Named("save")
     protected Button saveBtn;
-    //injected step UI frames fields:
+    @Inject
+    protected Label tipLabel;
+    @Inject
+    protected BoxLayout editAreaVbox;
+    @Inject
+    protected ButtonsPanel navBtnsPanel;
+    @Inject
+    protected GroupBoxLayout editAreaGroupBox;
+
     //detail frame
-    protected OptionsGroup isListedReport;
+    @Named("detailsStep.mainFields")
+    protected FieldGroup mainFields;
+    @Named("detailsStep.setQuery")
+    protected Button setQueryButton;
+    protected OptionsGroup reportTypeOptionGroup;//this and following are set during creation
     protected LookupField templateFileFormat;
     protected LookupField entity;
     protected TextField reportName;
 
-    @Named("detailsStep.mainFields")
-    protected FieldGroup mainFields;
     //regions frame
     @Named("regionsStep.addRegionDisabledBtn")
     protected Button addRegionDisabledBtn;
@@ -93,6 +97,7 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
     protected Table regionsTable;
     @Named("regionsStep.buttonsBox")
     protected BoxLayout buttonsBox;
+
     //save frame
     @Named("saveStep.outputFileFormat")
     protected LookupField outputFileFormat;
@@ -100,15 +105,8 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
     protected TextField outputFileName;
     @Named("saveStep.downloadTemplateFile")
     protected Button downloadTemplateFile;
-    @Inject
-    protected Label tipLabel;
-    @Inject
-    protected BoxLayout editAreaVbox;
-    @Inject
-    protected ButtonsPanel navBtnsPanel;
-    @Inject
-    protected GroupBoxLayout editAreaGroupBox;
-    //injected service fields:
+
+    //services
     @Inject
     protected Metadata metadata;
     @Inject
@@ -119,8 +117,12 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
     protected ComponentsFactory componentsFactory;
     @Inject
     protected ReportWizardService reportWizardService;
+    @Inject
+    protected WindowManagerProvider windowManagerProvider;
+    @Inject
+    protected WindowConfig windowConfig;
 
-    //non-injected fields:
+    //other
     protected StepFrame detailsStepFrame;
     protected StepFrame regionsStepFrame;
     protected StepFrame saveStepFrame;
@@ -133,7 +135,11 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
     protected boolean entityTreeHasCollections;
     protected boolean needUpdateEntityModel = false;
 
+    protected String query;
+    protected List<ReportData.Parameter> queryParameters;
+
     @Override
+    @SuppressWarnings("unchecked")
     public void init(Map<String, Object> params) {
         super.init(params);
 
@@ -143,9 +149,41 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
 
         stepFrameManager = new StepFrameManager(this, getStepFrames());
 
+        initMainButtons();
+        initMainFields();
+
+        stepFrameManager.showCurrentFrame();
+        tipLabel.setValue(getMessage("enterMainParameters"));
+        reportRegionsDs.addListener(new CollectionDsListenerAdapter<ReportRegion>() {
+            @Override
+            public void collectionChanged(CollectionDatasource ds, Operation operation, List<ReportRegion> items) {
+                super.collectionChanged(ds, operation, items);
+                if (Operation.ADD.equals(operation)) {
+                    regionsTable.setSelected((Collection) items);
+                }
+            }
+
+            @Override
+            public void itemChanged(Datasource<ReportRegion> ds, @Nullable ReportRegion prevItem, @Nullable ReportRegion item) {
+                super.itemChanged(ds, prevItem, item);
+                if (regionsTable.getSingleSelected() != null) {
+                    moveDownBtn.setEnabled(true);
+                    moveUpBtn.setEnabled(true);
+                    removeBtn.setEnabled(true);
+                }
+            }
+        });
+    }
+
+    protected void initMainButtons() {
         fwdBtn.setAction(new AbstractAction("fwd") {
             @Override
             public void actionPerform(Component component) {
+                if (entity.getValue() == null) {
+                    showNotification(getMessage("fillEntityMsg"), NotificationType.TRAY_HTML);
+                    return;
+                }
+
                 if (needUpdateEntityModel) {
                     EntityTree entityTree = reportWizardService.buildEntityTree((MetaClass) entity.getValue());
                     entityTreeHasSimpleAttrs = entityTree.getEntityTreeStructureInfo().isEntityTreeHasSimpleAttrs();
@@ -165,7 +203,9 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
                 refreshFrameVisible();
             }
         });
+    }
 
+    protected void initMainFields() {
         FieldGroup.FieldConfig f = mainFields.getField("entity");
         mainFields.addCustomField(f, new FieldGroup.CustomFieldGenerator() {
             @Override
@@ -193,35 +233,15 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
                 return lookupField;
             }
         });
-        f = mainFields.getField("isListed");
+        f = mainFields.getField("reportType");
         mainFields.addCustomField(f, new FieldGroup.CustomFieldGenerator() {
             @Override
             public Component generateField(Datasource datasource, String propertyId) {
                 final OptionsGroup optionsGroup = AppConfig.getFactory().createComponent(OptionsGroup.NAME);
                 optionsGroup.setMultiSelect(false);
                 optionsGroup.setOrientation(OptionsGroup.Orientation.VERTICAL);
-                isListedReport = optionsGroup;
+                reportTypeOptionGroup = optionsGroup;
                 return optionsGroup;
-            }
-        });
-
-        stepFrameManager.showCurrentFrame();
-        tipLabel.setValue(getMessage("enterMainParameters"));
-        reportRegionsDs.addListener(new CollectionDsListenerAdapter<ReportRegion>() {
-            @Override
-            public void collectionChanged(CollectionDatasource ds, Operation operation, List<ReportRegion> items) {
-                super.collectionChanged(ds, operation, items);
-                if (Operation.ADD.equals(operation)) regionsTable.setSelected((List) items);
-            }
-
-            @Override
-            public void itemChanged(Datasource<ReportRegion> ds, @Nullable ReportRegion prevItem, @Nullable ReportRegion item) {
-                super.itemChanged(ds, prevItem, item);
-                if (regionsTable.getSingleSelected() != null) {
-                    moveDownBtn.setEnabled(true);
-                    moveUpBtn.setEnabled(true);
-                    removeBtn.setEnabled(true);
-                }
             }
         });
     }
@@ -247,26 +267,10 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
     }
 
     protected List<StepFrame> getStepFrames() {
-        List<StepFrame> result = new ArrayList<>();
-        createDetailsStepFrame();
-        createRegionsStepFrame();
-        createSaveStepFrame();
-        result.add(detailsStepFrame);
-        result.add(regionsStepFrame);
-        result.add(saveStepFrame);
-        return result;
-    }
-
-    protected void createDetailsStepFrame() {
-        detailsStepFrame = new DetailsStepFrame();
-    }
-
-    protected void createRegionsStepFrame() {
-        regionsStepFrame = new RegionsStepFrame();
-    }
-
-    protected void createSaveStepFrame() {
-        saveStepFrame = new SaveStepFrame();
+        detailsStepFrame = new DetailsStepFrame(this);
+        regionsStepFrame = new RegionsStepFrame(this);
+        saveStepFrame = new SaveStepFrame(this);
+        return Arrays.asList(detailsStepFrame, regionsStepFrame, saveStepFrame);
     }
 
     protected String generateTemplateFileName(String fileExtension) {
@@ -321,13 +325,13 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
         return this;
     }
 
-    protected void showOrHideAddRegionBtns() {
+    protected void setupButtonsVisibility() {
         buttonsBox.remove(addRegionDisabledBtn);
         buttonsBox.remove(addTabulatedRegionDisabledBtn);
         buttonsBox.remove(addSimpleRegionBtn);
         buttonsBox.remove(addTabulatedRegionBtn);
         buttonsBox.remove(addRegionPopupBtn);
-        if (BooleanUtils.isTrue((Boolean) isListedReport.getValue())) {
+        if (((ReportData.ReportType) reportTypeOptionGroup.getValue()).isList()) {
             tipLabel.setValue(formatMessage("regionTabulatedMessage",
                     messages.getMessage(((MetaClass) entity.getValue()).getJavaClass(),
                             ((MetaClass) entity.getValue()).getJavaClass().getSimpleName())
@@ -341,14 +345,15 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
             tipLabel.setValue(getMessage("addPropertiesAndTableAreas"));
             if (entityTreeHasSimpleAttrs && entityTreeHasCollections) {
                 buttonsBox.add(addRegionPopupBtn);
-            } else if (entityTreeHasSimpleAttrs && !entityTreeHasCollections) {
+            } else if (entityTreeHasSimpleAttrs) {
                 buttonsBox.add(addSimpleRegionBtn);
-            } else if (!entityTreeHasSimpleAttrs && entityTreeHasCollections) {
+            } else if (entityTreeHasCollections) {
                 buttonsBox.add(addTabulatedRegionBtn);
             } else {
                 buttonsBox.add(addRegionDisabledBtn);
             }
         }
+
         if (regionsTable.getSingleSelected() != null) {
             moveDownBtn.setEnabled(true);
             moveUpBtn.setEnabled(true);
@@ -360,8 +365,7 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
         }
     }
 
-    protected Report toReport(boolean tmp) {
-        byte[] templateByteArray;
+    protected Report buildReport(boolean temporary) {
         ReportData reportData = getItem();
         reportData.setName((String) reportName.getValue());
         reportData.setTemplateFileName(generateTemplateFileName(templateFileFormat.getValue().toString().toLowerCase()));
@@ -371,22 +375,31 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
             //lets generate output report in same format as the template
             reportData.setOutputFileType((ReportOutputType) outputFileFormat.getValue());
         }
-        reportData.setIsTabulatedReport((Boolean) isListedReport.getValue());
+        reportData.setReportType((ReportData.ReportType) reportTypeOptionGroup.getValue());
         groupsDs.refresh();
         if (groupsDs.getItemIds() != null) {
             UUID id = groupsDs.getItemIds().iterator().next();
             reportData.setGroup(groupsDs.getItem(id));
         }
+
         //be sure that reportData.name and reportData.outputFileFormat is not null before generation of template
+        byte[] templateByteArray;
         try {
             templateByteArray = reportWizardService.generateTemplate(reportData, (TemplateFileType) templateFileFormat.getValue());
+            reportData.setTemplateContent(templateByteArray);
         } catch (TemplateGenerationException e) {
             showNotification(getMessage("templateGenerationException"), NotificationType.WARNING);
             return null;
         }
+        reportData.setTemplateFileType((TemplateFileType) templateFileFormat.getValue());
         reportData.setOutputNamePattern(outputFileName.<String>getValue());
 
-        Report report = reportWizardService.toReport(reportData, templateByteArray, tmp, (TemplateFileType) templateFileFormat.getValue());
+        if (query != null) {
+            reportData.setQuery(query);
+            reportData.setQueryParameters(queryParameters);
+        }
+
+        Report report = reportWizardService.toReport(reportData, temporary);
         reportData.setGeneratedReport(report);
         return report;
     }
@@ -446,565 +459,24 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
     }
 
     protected Map<String, Object> refreshOutputAvailableFormats(TemplateFileType templateFileType) {
-
-        Map<String, Object> result = new LinkedHashMap<>();
-        switch (templateFileType) {
-            case DOCX:
-                result.put(ReportOutputType.DOCX.toString().toLowerCase(), ReportOutputType.DOCX);
-                result.put(ReportOutputType.HTML.toString().toLowerCase(), ReportOutputType.HTML);
-                result.put(ReportOutputType.PDF.toString().toLowerCase(), ReportOutputType.PDF);
-                break;
-            case XLSX:
-                result.put(ReportOutputType.XLSX.toString().toLowerCase(), ReportOutputType.XLSX);
-                result.put(ReportOutputType.PDF.toString().toLowerCase(), ReportOutputType.PDF);
-                break;
-            case HTML:
-                result.put(ReportOutputType.HTML.toString().toLowerCase(), ReportOutputType.HTML);
-                result.put(ReportOutputType.PDF.toString().toLowerCase(), ReportOutputType.PDF);
-                break;
-        }
-        return result;
+        return availableOutputFormats.get(templateFileType);
     }
 
-    protected class DetailsStepFrame extends StepFrame {
-        public DetailsStepFrame() {
-            super(ReportWizardCreator.this, getMessage("reportDetails"), "detailsStep");
-            isFirst = true;
-            initFrameHandler = new InitDetailsStepFrameHandler();
-        }
+    protected Map<TemplateFileType, Map<String, Object>> availableOutputFormats =
+            new ImmutableMap.Builder<TemplateFileType, Map<String, Object>>()
+                    .put(TemplateFileType.DOCX, new ImmutableMap.Builder<String, Object>()
+                            .put(ReportOutputType.DOCX.toString().toLowerCase(), ReportOutputType.DOCX)
+                            .put(ReportOutputType.HTML.toString().toLowerCase(), ReportOutputType.HTML)
+                            .put(ReportOutputType.PDF.toString().toLowerCase(), ReportOutputType.PDF)
+                            .build())
+                    .put(TemplateFileType.XLSX, new ImmutableMap.Builder<String, Object>()
+                            .put(ReportOutputType.XLSX.toString().toLowerCase(), ReportOutputType.XLSX)
+                            .put(ReportOutputType.PDF.toString().toLowerCase(), ReportOutputType.PDF)
+                            .build())
+                    .put(TemplateFileType.HTML, new ImmutableMap.Builder<String, Object>()
+                            .put(ReportOutputType.HTML.toString().toLowerCase(), ReportOutputType.HTML)
+                            .put(ReportOutputType.PDF.toString().toLowerCase(), ReportOutputType.PDF)
+                            .build())
 
-        protected class InitDetailsStepFrameHandler implements InitStepFrameHandler {
-            @Override
-            public void initFrame() {
-
-                isListedReport.setOptionsMap(getListedReportOptionsMap());
-                isListedReport.setValue(Boolean.FALSE);
-                isListedReport.setValueChangingListener(new ValueChangingListener() {
-                    @Nullable
-                    @Override
-                    public Object valueChanging(Object source, String property, @Nullable final Object prevValue, @Nullable final Object value) {
-                        if (!getItem().getReportRegions().isEmpty()) {
-                            showOptionDialog(getMessage("dialogs.Confirmation"), getMessage("regionsClearConfirm"), MessageType.CONFIRMATION, new AbstractAction[]{
-                                    new DialogAction(DialogAction.Type.YES) {
-                                        @Override
-                                        public void actionPerform(Component component) {
-                                            getItem().getReportRegions().clear();
-                                            regionsTable.refresh(); //for web6
-                                            isListedReport.setValue(value);
-                                        }
-                                    },
-                                    new DialogAction(DialogAction.Type.NO) {
-                                    }
-
-                            });
-
-                            return prevValue;
-                        } else {
-                            return value;
-                        }
-                    }
-                });
-                templateFileFormat.setOptionsMap(getTemplateAvailableFormats());
-                templateFileFormat.setValue(templateFileFormat.getOptionsMap().
-                        get(ReportOutputType.fromId(40).toString().toLowerCase()));//select doc as default value
-
-
-                entity.setOptionsMap(getForReportAvailableEntities());
-
-                entity.setValueChangingListener(new ValueChangingListener() {
-                    @Nullable
-                    @Override
-                    public Object valueChanging(Object source, String property, @Nullable final Object prevValue, @Nullable final Object value) {
-                        if (!getItem().getReportRegions().isEmpty()) {
-                            showOptionDialog(getMessage("dialogs.Confirmation"), getMessage("regionsClearConfirm"), MessageType.CONFIRMATION, new AbstractAction[]{
-                                    new DialogAction(DialogAction.Type.YES) {
-                                        @Override
-                                        public void actionPerform(Component component) {
-                                            getItem().getReportRegions().clear();
-                                            regionsTable.refresh(); //for web6
-                                            needUpdateEntityModel = true;
-                                            entity.setValue(value);
-                                        }
-                                    },
-                                    new DialogAction(DialogAction.Type.NO) {
-                                    }
-
-                            });
-
-                            return prevValue;
-                        } else {
-                            needUpdateEntityModel = true;
-                            return value;
-                        }
-                    }
-                });
-
-                entity.addListener(new ValueListener() {
-                    @Override
-                    public void valueChanged(Object source, String property, @Nullable Object prevValue, @Nullable Object value) {
-                        setGeneratedReportName((MetaClass) prevValue, (MetaClass) value);
-                        outputFileName.setValue("");
-                    }
-
-                    private void setGeneratedReportName(MetaClass prevValue, MetaClass value) {
-                        String oldReportName = reportName.getValue();
-                        if (StringUtils.isBlank(oldReportName)) {
-                            String newText = formatMessage("reportNamePattern", messageTools.getEntityCaption(value));
-                            reportName.setValue(newText);
-                        } else {
-                            //if old text contains MetaClass name substring, just replace it
-                            if (prevValue != null && StringUtils.contains(oldReportName, messageTools.getEntityCaption(prevValue))) {
-                                String newText = StringUtils.replace(oldReportName, messageTools.getEntityCaption(prevValue), messageTools.getEntityCaption(value));
-                                reportName.setValue(newText);
-                                if (!oldReportName.equals(formatMessage("reportNamePattern", messageTools.getEntityCaption(prevValue)))) {
-                                    //if user changed auto generated report name and we have changed it, we show message to him
-                                    showNotification(getMessage("reportNameChanged"), NotificationType.TRAY);
-                                }
-                            } else {
-                                //do nothing. Do not change non-empty report name without entity simple name inside it
-                            }
-                        }
-                    }
-                });
-            }
-
-            protected Map<String, Object> getListedReportOptionsMap() {
-                Map<String, Object> result = new LinkedHashMap<>(2);
-                result.put(getMessage("isNotListed"), Boolean.FALSE);
-                result.put(getMessage("isListed"), Boolean.TRUE);
-                return result;
-            }
-
-            protected Map<String, Object> getTemplateAvailableFormats() {
-                Map<String, Object> result = new LinkedHashMap<>(3);
-                result.put(TemplateFileType.fromId(50).toString().toLowerCase(), TemplateFileType.fromId(50));
-                result.put(TemplateFileType.fromId(40).toString().toLowerCase(), TemplateFileType.fromId(40));
-                result.put(TemplateFileType.fromId(30).toString().toLowerCase(), TemplateFileType.fromId(30));
-                return result;
-            }
-
-            protected Map<String, Object> getForReportAvailableEntities() {
-                Map<String, Object> result = new TreeMap<>(new Comparator<String>() {
-                    @Override
-                    public int compare(String o1, String o2) {
-                        return o1.compareTo(o2);
-                    }
-                });
-                Collection<MetaClass> classes = metadataTools.getAllPersistentMetaClasses();
-                for (MetaClass metaClass : classes) {
-                    MetaClass effectiveMetaClass = metadata.getExtendedEntities().getEffectiveMetaClass(metaClass);
-                    if (!reportWizardService.isEntityAllowedForReportWizard(effectiveMetaClass)) {
-                        continue;
-                    }
-                    result.put(messageTools.getEntityCaption(effectiveMetaClass) + " (" + effectiveMetaClass.getName() + ")", effectiveMetaClass);
-                }
-                return result;
-            }
-
-        }
-    }
-
-    protected class RegionsStepFrame extends StepFrame {
-        protected static final String ADD_TABULATED_REGION_ACTION_ID = "tabulatedRegion";
-        protected static final String ADD_SIMPLE_REGION_ACTION_ID = "simpleRegion";
-        protected AddSimpleRegionAction addSimpleRegionAction;
-        protected AddTabulatedRegionAction addTabulatedRegionAction;
-        protected EditRegionAction editRegionAction;
-        protected RemoveRegionAction removeRegionAction;
-        //protected boolean isAddRegionActionPerformed;
-
-        public RegionsStepFrame() {
-            super(ReportWizardCreator.this, getMessage("reportRegions"), "regionsStep");
-            initFrameHandler = new InitRegionsStepFrameHandler();
-
-            beforeShowFrameHandler = new BeforeShowRegionsStepFrameHandler();
-
-            beforeHideFrameHandler = new BeforeHideRegionsStepFrameHandler();
-        }
-
-        protected abstract class AddRegionAction extends AbstractAction {
-
-            protected AddRegionAction(String id) {
-                super(id);
-            }
-
-            protected ReportRegion createReportRegion(boolean tabulated) {
-                ReportRegion reportRegion = metadata.create(ReportRegion.class);
-                reportRegion.setReportData(getItem());
-                reportRegion.setIsTabulatedRegion(tabulated);
-                reportRegion.setOrderNum((long) getItem().getReportRegions().size() + 1L);
-                return reportRegion;
-            }
-
-            protected void openRegionEditor(boolean tabulated, final ReportRegion item) {
-                if (tabulated && BooleanUtils.isFalse((Boolean) isListedReport.getValue())) {
-                    //show lookup for choosing parent collection for tabulated region
-                    final Map<String, Object> lookupParams = new HashMap<>();
-                    lookupParams.put("rootEntity", getItem().getEntityTreeRootNode());
-                    lookupParams.put("collectionsOnly", Boolean.TRUE);
-                    openLookup("report$ReportEntityTree.lookup", new Lookup.Handler() {
-                        @Override
-                        public void handleLookup(Collection items) {
-                            if (items.size() == 1) {
-                                Map<String, Object> editorParams = new HashMap<>();
-                                //editorParams.put("showRoot", false););
-                                editorParams.put("scalarOnly", Boolean.TRUE);
-                                EntityTreeNode regionPropertiesRootNode = (EntityTreeNode) CollectionUtils.get(items, 0);
-                                editorParams.put("rootEntity", regionPropertiesRootNode);
-                                item.setRegionPropertiesRootNode(regionPropertiesRootNode);
-                                Editor regionEditor = openEditor("report$Report.regionEditor", item, WindowManager.OpenType.DIALOG, editorParams, reportRegionsDs);
-                                regionEditor.addListener(new RegionEditorCloseListener());
-                            }
-                        }
-                    }, WindowManager.OpenType.DIALOG, lookupParams);
-                } else {
-                    Map<String, Object> editorParams = new HashMap<>();
-                    editorParams.put("rootEntity", getItem().getEntityTreeRootNode());
-                    item.setRegionPropertiesRootNode(getItem().getEntityTreeRootNode());
-                    editorParams.put("scalarOnly", Boolean.TRUE);
-                    Editor regionEditor = openEditor("report$Report.regionEditor", item, WindowManager.OpenType.DIALOG, editorParams, reportRegionsDs);
-                    regionEditor.addListener(new RegionEditorCloseListener());
-                }
-            }
-
-            protected class RegionEditorCloseListener implements CloseListener {
-                @Override
-                public void windowClosed(String actionId) {
-                    if (COMMIT_ACTION_ID.equals(actionId)) {
-                        regionsTable.refresh();
-                        showOrHideAddRegionBtns();
-                    }
-                }
-            }
-
-        }
-
-        protected class AddSimpleRegionAction extends AddRegionAction {
-            public AddSimpleRegionAction() {
-                super(ADD_SIMPLE_REGION_ACTION_ID);
-            }
-
-            @Override
-            public void actionPerform(Component component) {
-                openRegionEditor(false, createReportRegion(false));
-            }
-        }
-
-        protected class AddTabulatedRegionAction extends AddRegionAction {
-            public AddTabulatedRegionAction() {
-                super(ADD_TABULATED_REGION_ACTION_ID);
-            }
-
-            @Override
-            public void actionPerform(Component component) {
-                openRegionEditor(true, createReportRegion(true));
-            }
-        }
-
-        protected class ReportRegionTableColumnGenerator implements Table.ColumnGenerator<ReportRegion> {
-            protected static final String WIDTH_PERCENT_100 = "100%";
-            protected static final int MAX_ATTRS_BTN_CAPTION_WIDTH = 95;
-            protected static final String BOLD_LABEL_STYLE = "semi-bold-label";
-            private ReportRegion currentReportRegionGeneratedColumn;
-
-            @Override
-            public Component generateCell(ReportRegion entity) {
-                currentReportRegionGeneratedColumn = entity;
-                BoxLayout mainLayout = componentsFactory.createComponent(BoxLayout.VBOX);
-                mainLayout.setWidth(WIDTH_PERCENT_100);
-                mainLayout.add(createFirstTwoRowsLayout());
-                mainLayout.add(createThirdRowAttrsLayout());
-                return mainLayout;
-            }
-
-            private BoxLayout createFirstTwoRowsLayout() {
-                BoxLayout firstTwoRowsLayout = componentsFactory.createComponent(BoxLayout.HBOX);
-                BoxLayout expandedAttrsLayout = createExpandedAttrsLayout();
-                firstTwoRowsLayout.setWidth(WIDTH_PERCENT_100);
-                firstTwoRowsLayout.add(expandedAttrsLayout);
-                firstTwoRowsLayout.add(createBtnsLayout());
-                firstTwoRowsLayout.expand(expandedAttrsLayout);
-                return firstTwoRowsLayout;
-            }
-
-            private BoxLayout createExpandedAttrsLayout() {
-                BoxLayout expandedAttrsLayout = componentsFactory.createComponent(BoxLayout.VBOX);
-                expandedAttrsLayout.setWidth(WIDTH_PERCENT_100);
-                expandedAttrsLayout.add(createFirstRowAttrsLayout());
-                expandedAttrsLayout.add(createSecondRowAttrsLayout());
-                return expandedAttrsLayout;
-            }
-
-            private BoxLayout createFirstRowAttrsLayout() {
-                BoxLayout firstRowAttrsLayout = componentsFactory.createComponent(BoxLayout.HBOX);
-                firstRowAttrsLayout.setSpacing(true);
-                Label regionLbl = componentsFactory.createComponent(Label.NAME);
-                regionLbl.setStyleName(BOLD_LABEL_STYLE);
-                regionLbl.setValue(getMessage("region"));
-                Label regionValueLbl = componentsFactory.createComponent(Label.NAME);
-                regionValueLbl.setValue(currentReportRegionGeneratedColumn.getName());
-                regionValueLbl.setWidth(WIDTH_PERCENT_100);
-                firstRowAttrsLayout.add(regionLbl);
-                firstRowAttrsLayout.add(regionValueLbl);
-                return firstRowAttrsLayout;
-            }
-
-            private BoxLayout createSecondRowAttrsLayout() {
-                BoxLayout secondRowAttrsLayout = componentsFactory.createComponent(BoxLayout.HBOX);
-                secondRowAttrsLayout.setSpacing(true);
-                Label entityLbl = componentsFactory.createComponent(Label.NAME);
-                entityLbl.setStyleName(BOLD_LABEL_STYLE);
-                entityLbl.setValue(getMessage("entity"));
-                Label entityValueLbl = componentsFactory.createComponent(Label.NAME);
-                entityValueLbl.setValue(messageTools.getEntityCaption(currentReportRegionGeneratedColumn.getRegionPropertiesRootNode().getWrappedMetaClass()));
-                entityValueLbl.setWidth(WIDTH_PERCENT_100);
-                secondRowAttrsLayout.add(entityLbl);
-                secondRowAttrsLayout.add(entityValueLbl);
-                return secondRowAttrsLayout;
-            }
-
-            private BoxLayout createBtnsLayout() {
-                BoxLayout btnsLayout = componentsFactory.createComponent(BoxLayout.HBOX);
-                btnsLayout.setSpacing(true);
-                btnsLayout.setStyleName("on-hover-visible-layout");
-                return btnsLayout;
-            }
-
-            private BoxLayout createThirdRowAttrsLayout() {
-                BoxLayout thirdRowAttrsLayout = componentsFactory.createComponent(BoxLayout.HBOX);
-                thirdRowAttrsLayout.setSpacing(true);
-                Label entityLbl = componentsFactory.createComponent(Label.NAME);
-                entityLbl.setStyleName(BOLD_LABEL_STYLE);
-                entityLbl.setValue(getMessage("attributes"));
-                Button editBtn = componentsFactory.createComponent(Button.NAME);
-                editBtn.setCaption(generateAttrsBtnCaption());
-                editBtn.setStyleName("link");
-                editBtn.setWidth(WIDTH_PERCENT_100);
-                editBtn.setAction(editRegionAction);
-                thirdRowAttrsLayout.add(entityLbl);
-                thirdRowAttrsLayout.add(editBtn);
-                return thirdRowAttrsLayout;
-            }
-
-            private String generateAttrsBtnCaption() {
-
-                return StringUtils.abbreviate(StringUtils.join(CollectionUtils.collect(currentReportRegionGeneratedColumn.getRegionProperties(), new Transformer() {
-                    @Override
-                    public Object transform(Object input) {
-                        return ((RegionProperty) input).getHierarchicalLocalizedNameExceptRoot();
-                    }
-                }), ", "), MAX_ATTRS_BTN_CAPTION_WIDTH);
-            }
-        }
-
-        protected class RemoveRegionAction extends AbstractAction {
-            public RemoveRegionAction() {
-                super("removeRegion");
-            }
-
-            @Override
-            public void actionPerform(Component component) {
-                if (regionsTable.getSingleSelected() != null) {
-                    showOptionDialog(getMessage("dialogs.Confirmation"), formatMessage("deleteRegion", ((ReportRegion) regionsTable.getSingleSelected()).getName()), MessageType.CONFIRMATION, new Action[]{
-                            new DialogAction(DialogAction.Type.YES) {
-                                @Override
-                                public void actionPerform(Component component) {
-                                    reportRegionsDs.removeItem((ReportRegion) regionsTable.getSingleSelected());
-                                    normalizeRegionPropertiesOrderNum();
-                                    regionsTable.refresh();
-                                    showOrHideAddRegionBtns();
-                                }
-                            },
-                            new DialogAction(DialogAction.Type.NO) {
-                            }
-                    });
-                }
-            }
-
-            @Override
-            public String getCaption() {
-                return "";
-            }
-
-            protected void normalizeRegionPropertiesOrderNum() {
-                long normalizedIdx = 0;
-                List<ReportRegion> allItems = new ArrayList<>(reportRegionsDs.getItems());
-                for (ReportRegion item : allItems) {
-                    item.setOrderNum(++normalizedIdx); //first must to be 1
-                }
-            }
-        }
-
-        protected class EditRegionAction extends AddRegionAction {
-            public EditRegionAction() {
-                super("removeRegion");
-            }
-
-            @Override
-            public void actionPerform(Component component) {
-                if (regionsTable.getSingleSelected() != null) {
-                    Map<String, Object> editorParams = new HashMap<>();
-                    editorParams.put("rootEntity", ((ReportRegion) regionsTable.getSingleSelected()).getRegionPropertiesRootNode());
-                    editorParams.put("scalarOnly", Boolean.TRUE);
-                    Editor regionEditor = openEditor("report$Report.regionEditor", ((ReportRegion) regionsTable.getSingleSelected()), WindowManager.OpenType.DIALOG, editorParams, reportRegionsDs);
-                    regionEditor.addListener(new RegionEditorCloseListener());
-                }
-            }
-
-            @Override
-            public String getCaption() {
-                return "";
-            }
-
-        }
-
-        protected class InitRegionsStepFrameHandler implements InitStepFrameHandler {
-            @Override
-            public void initFrame() {
-                addSimpleRegionAction = new AddSimpleRegionAction();
-                addTabulatedRegionAction = new AddTabulatedRegionAction();
-                addSimpleRegionBtn.setAction(addSimpleRegionAction);
-                addTabulatedRegionBtn.setAction(addTabulatedRegionAction);
-                addRegionPopupBtn.addAction(addSimpleRegionAction);
-                addRegionPopupBtn.addAction(addTabulatedRegionAction);
-                regionsTable.addGeneratedColumn("regionsGeneratedColumn", new ReportRegionTableColumnGenerator());
-                editRegionAction = new EditRegionAction();
-                removeRegionAction = new RemoveRegionAction();
-
-                moveDownBtn.setAction(new OrderableItemMoveAction<>("downItem", OrderableItemMoveAction.Direction.DOWN, regionsTable));
-                moveUpBtn.setAction(new OrderableItemMoveAction<>("upItem", OrderableItemMoveAction.Direction.UP, regionsTable));
-                removeBtn.setAction(removeRegionAction);
-            }
-        }
-
-        protected class BeforeShowRegionsStepFrameHandler implements BeforeShowStepFrameHandler {
-            @Override
-            public void beforeShowFrame() {
-                showOrHideAddRegionBtns();
-                runBtn.setAction(new AbstractAction("runReport") {
-                    @Override
-                    public void actionPerform(Component component) {
-                        if (getItem().getReportRegions().isEmpty()) {
-                            showNotification(getMessage("addRegionsWarn"), NotificationType.TRAY);
-                            return;
-                        }
-                        lastGeneratedTmpReport = toReport(true);
-
-                        if (lastGeneratedTmpReport != null) {
-                            reportGuiManager.runReport(lastGeneratedTmpReport, stepFrameManager.getCurrentIFrame());
-                        }
-                    }
-                });
-                showAddRegion();
-                setCorrectReportOutputType();
-            }
-
-            private void showAddRegion() {
-                if (reportRegionsDs.getItems().isEmpty()) {
-                    if (BooleanUtils.isTrue((Boolean) isListedReport.getValue())) {
-                        if (entityTreeHasSimpleAttrs && getItem().getReportRegions().isEmpty()) {
-                            addTabulatedRegionAction.actionPerform(regionsStepFrame.getFrame());
-                        }
-                    } else {
-                        if (entityTreeHasSimpleAttrs && entityTreeHasCollections) {
-                            addSimpleRegionAction.actionPerform(regionsStepFrame.getFrame());
-                        } else if (entityTreeHasSimpleAttrs && !entityTreeHasCollections) {
-                            addSimpleRegionAction.actionPerform(regionsStepFrame.getFrame());
-                        } else if (!entityTreeHasSimpleAttrs && entityTreeHasCollections) {
-                            addTabulatedRegionAction.actionPerform(regionsStepFrame.getFrame());
-                        }
-                    }
-                }
-            }
-        }
-
-        protected class BeforeHideRegionsStepFrameHandler implements BeforeHideStepFrameHandler {
-            @Override
-            public void beforeHideFrame() {
-            }
-        }
-    }
-
-    protected class SaveStepFrame extends StepFrame {
-
-        public SaveStepFrame() {
-            super(ReportWizardCreator.this, getMessage("saveReport"), "saveStep");
-            isLast = true;
-            beforeShowFrameHandler = new BeforeShowSaveStepFrameHandler();
-
-            beforeHideFrameHandler = new BeforeHideSaveStepFrameHandler();
-        }
-
-        protected class BeforeShowSaveStepFrameHandler implements BeforeShowStepFrameHandler {
-            @Override
-            public void beforeShowFrame() {
-                saveBtn.setVisible(true);
-                saveBtn.setAction(new AbstractAction("saveReport") {
-                    @Override
-                    public void actionPerform(Component component) {
-                        try {
-                            outputFileName.validate();
-                        } catch (ValidationException e) {
-                            showNotification(getMessage("validationFail.caption"), e.getMessage(), NotificationType.TRAY);
-                            return;
-                        }
-                        if (getItem().getReportRegions().isEmpty()) {
-                            showOptionDialog(getMessage("dialogs.Confirmation"), getMessage("confirmSaveWithoutRegions"), MessageType.CONFIRMATION, new Action[]{
-                                    new DialogAction(DialogAction.Type.OK) {
-                                        @Override
-                                        public void actionPerform(Component component) {
-                                            convertToReportAndForceCloseWizard();
-                                        }
-                                    },
-                                    new DialogAction(DialogAction.Type.NO)
-                            });
-
-                        } else {
-                            convertToReportAndForceCloseWizard();
-                        }
-                    }
-
-                    private void convertToReportAndForceCloseWizard() {
-                        Report r = toReport(false);
-                        if (r != null) {
-                            ReportWizardCreator.this.close(COMMIT_ACTION_ID, true); //true is ok cause it is a save btn
-                        }
-                    }
-                });
-                downloadTemplateFile.setCaption(generateTemplateFileName(
-                        templateFileFormat.getValue().toString().toLowerCase()));
-                downloadTemplateFile.setAction(new AbstractAction("generateNewTemplateAndGet") {
-                    @Override
-                    public void actionPerform(Component component) {
-                        byte[] newTemplate = null;
-                        try {
-                            getItem().setName(reportName.getValue().toString());
-                            newTemplate = reportWizardService.generateTemplate(getItem(), (TemplateFileType) templateFileFormat.getValue());
-                            ExportDisplay exportDisplay = AppConfig.createExportDisplay((IFrame) getComponent("saveStep"));
-                            exportDisplay.show(new ByteArrayDataProvider(newTemplate),
-                                    downloadTemplateFile.getCaption(), ExportFormat.getByExtension(templateFileFormat.getValue().toString().toLowerCase()));
-                        } catch (TemplateGenerationException e) {
-                            showNotification(getMessage("templateGenerationException"), NotificationType.WARNING);
-                        }
-                        if (newTemplate != null) {
-                            lastGeneratedTemplate = newTemplate;
-                        }
-                    }
-                });
-                if (StringUtils.isEmpty(outputFileName.<String>getValue()))
-                    outputFileName.setValue(generateOutputFileName(templateFileFormat.getValue().toString().toLowerCase()));
-                setCorrectReportOutputType();
-
-            }
-
-        }
-
-        protected class BeforeHideSaveStepFrameHandler implements BeforeHideStepFrameHandler {
-            @Override
-            public void beforeHideFrame() {
-                saveBtn.setVisible(false);
-            }
-        }
-    }
-
+                    .build();
 }

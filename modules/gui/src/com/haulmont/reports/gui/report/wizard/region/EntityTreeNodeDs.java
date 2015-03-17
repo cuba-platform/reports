@@ -7,6 +7,8 @@ package com.haulmont.reports.gui.report.wizard.region;
 
 import com.haulmont.bali.datastruct.Node;
 import com.haulmont.bali.datastruct.Tree;
+import com.haulmont.cuba.core.global.AppBeans;
+import com.haulmont.cuba.core.global.Metadata;
 import com.haulmont.cuba.gui.components.TextField;
 import com.haulmont.cuba.gui.data.impl.AbstractTreeDatasource;
 import com.haulmont.reports.entity.wizard.EntityTreeNode;
@@ -25,6 +27,7 @@ import java.util.*;
 public class EntityTreeNodeDs extends AbstractTreeDatasource<EntityTreeNode, UUID> {
     protected boolean collectionsOnly;
     protected boolean scalarOnly;
+    protected boolean persistentOnly;
     protected boolean showRoot;
     protected Comparator<EntityTreeNode> nodeComparator = new Comparator<EntityTreeNode>() {
         @Override
@@ -35,10 +38,13 @@ public class EntityTreeNodeDs extends AbstractTreeDatasource<EntityTreeNode, UUI
         }
     };
 
+    protected Metadata metadata = AppBeans.get(Metadata.class);
+
     @Override
     protected Tree loadTree(Map<String, Object> params) {
         collectionsOnly = isTreeForCollectionsOnly(params);
         scalarOnly = isTreeForScalarOnly(params);
+        persistentOnly = isTreeForPersistentOnly(params);
         showRoot = isTreeMustContainRoot(params);
         Tree<EntityTreeNode> resultTree = new Tree<>();
         String searchValue = StringUtils.defaultIfBlank(((TextField) params.get("component$reportPropertyName")).<String>getValue(), "").toLowerCase().trim();
@@ -79,6 +85,10 @@ public class EntityTreeNodeDs extends AbstractTreeDatasource<EntityTreeNode, UUI
                 continue;
             }
 
+            if (scalarOnly && child.getWrappedMetaProperty().getRange().getCardinality().isMany()) {
+                continue;
+            }
+
             if (collectionsOnly && (
                     (showRoot && parentNode.getParent() != null && parentNode.getParent().getParent() == null) ||
                             (!showRoot && parentNode.getParent() == null)
@@ -86,11 +96,12 @@ public class EntityTreeNodeDs extends AbstractTreeDatasource<EntityTreeNode, UUI
                 //for collections max selection depth is limited to 2 cause reporting is not supported collection multiplying. And it is good )
                 continue;
             }
-            if (scalarOnly && child.getWrappedMetaProperty().getRange().getCardinality().isMany()) {
+
+            if (persistentOnly && !metadata.getTools().isPersistent(child.getWrappedMetaProperty())) {
                 continue;
             }
-            if (!child.getChildren().isEmpty()) {
 
+            if (!child.getChildren().isEmpty()) {
                 Node<EntityTreeNode> newParentNode = new Node<>(child);
                 newParentNode.parent = parentNode;
                 if (StringUtils.isEmpty(searchValue) || child.getLocalizedName().toLowerCase().contains(searchValue)) {
@@ -121,6 +132,10 @@ public class EntityTreeNodeDs extends AbstractTreeDatasource<EntityTreeNode, UUI
 
     protected boolean isTreeForScalarOnly(Map<String, Object> params) {
         return BooleanUtils.toBooleanDefaultIfNull((Boolean) params.get("scalarOnly"), false);
+    }
+
+    protected boolean isTreeForPersistentOnly(Map<String, Object> params) {
+        return BooleanUtils.toBooleanDefaultIfNull((Boolean) params.get("persistentOnly"), false);
     }
 
     protected boolean isTreeMustContainRoot(Map<String, Object> params) {

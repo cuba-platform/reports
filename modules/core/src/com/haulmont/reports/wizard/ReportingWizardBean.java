@@ -40,8 +40,9 @@ import java.util.*;
 @ManagedBean(ReportingWizardApi.NAME)
 public class ReportingWizardBean implements ReportingWizardApi {
     public static final String ROOT_BAND_DEFINITION_NAME = "Root";
-    protected static final String DEFAULT_ALIAS = "entity";//cause Thesis used it for running reports from screens without selection input params
-    protected static final String DEFAULT_TABULATED_REPORT_ALIAS = "entities";//cause Thesis will use it for running reports from screens without selection input params
+    protected static final String DEFAULT_SINGLE_ENTITY_ALIAS = "entity";//cause Thesis used it for running reports from screens without selection input params
+    protected static final String DEFAULT_LIST_OF_ENTITIES_ALIAS = "entities";//cause Thesis will use it for running reports from screens without selection input params
+
     @Inject
     protected Persistence persistence;
     @Inject
@@ -52,136 +53,31 @@ public class ReportingWizardBean implements ReportingWizardApi {
     protected Configuration configuration;
     @Inject
     protected ExtendedEntities extendedEntities;
+    @Inject
+    protected Messages messages;
 
     protected Log log = LogFactory.getLog(ReportingBean.class);
 
     @Override
-    public Report toReport(ReportData reportData, byte[] templateByteArray, boolean isTmp, TemplateFileType templateFileType) {
-        Report report = metadata.create(Report.class);
-        report.setIsTmp(isTmp);
-        report.setReportType(ReportType.SIMPLE);
-        report.setGroup(reportData.getGroup());
-        List<ReportValueFormat> reportValueFormatList = new ArrayList<>();
+    public Report toReport(ReportData reportData, boolean temporary) {
+        Report report = createReport(reportData, temporary);
+        ReportInputParameter mainParameter = createParameters(reportData, report);
+        BandDefinition rootReportBandDefinition = createRootBand(report);
+        Set<BandDefinition> bands = createBands(report, rootReportBandDefinition, reportData, mainParameter);
+        ReportTemplate defaultTemplate = createDefaultTemplate(report, reportData);
 
-        int reportInputParameterPos = 0;
-        ReportInputParameter reportInputParameter = metadata.create(ReportInputParameter.class);
-        reportInputParameter.setReport(report);
-        reportInputParameter.setName(reportData.getEntityTreeRootNode().getLocalizedName());
-        if (reportData.getIsTabulatedReport()) {
-            reportInputParameter.setType(ParameterType.ENTITY_LIST);
-            reportInputParameter.setAlias(DEFAULT_TABULATED_REPORT_ALIAS);
-        } else {
-            reportInputParameter.setType(ParameterType.ENTITY);
-            reportInputParameter.setAlias(DEFAULT_ALIAS);
-        }
-        reportInputParameter.setRequired(Boolean.TRUE);
-        //reportInputParameter.setAlias(reportData.getEntityTreeRootNode().getName());
-
-        reportInputParameter.setEntityMetaClass(reportData.getEntityTreeRootNode().getWrappedMetaClass().getName());
-        reportInputParameter.setPosition(++reportInputParameterPos);
-        report.getInputParameters().add(reportInputParameter);
-
-
-        View parameterView = createViewByReportRegions(reportData.getEntityTreeRootNode(), reportData.getReportRegions());
-        BandDefinition rootReportBandDefinition = metadata.create(BandDefinition.class);
-        rootReportBandDefinition.setPosition(0);
-        rootReportBandDefinition.setName(ROOT_BAND_DEFINITION_NAME);
-        rootReportBandDefinition.setReport(report);
-        Set<BandDefinition> bandDefinitions = new LinkedHashSet<>(reportData.getReportRegions().size() + 1); //plus rootBand
-        bandDefinitions.add(rootReportBandDefinition);
-        List<BandDefinition> childBands = new ArrayList<>();
-        int bandDefPos = 0;
-        Messages messages = AppBeans.get(Messages.NAME);
-        for (ReportRegion reportRegion : reportData.getReportRegions()) {
-            if (reportRegion.isTabulatedRegion() && (reportData.getOutputFileType() == ReportOutputType.XLSX ||
-                    reportData.getOutputFileType() == ReportOutputType.XLS ||
-                    (reportData.getOutputFileType() == ReportOutputType.PDF && TemplateFileType.XLSX.equals(templateFileType)))) {
-                BandDefinition headerBandDefinition = metadata.create(BandDefinition.class);
-                headerBandDefinition.setParentBandDefinition(rootReportBandDefinition);
-                headerBandDefinition.setOrientation(Orientation.HORIZONTAL);
-                headerBandDefinition.setName(reportRegion.getNameForHeaderBand());
-                headerBandDefinition.setPosition(bandDefPos++);
-                headerBandDefinition.setReport(report);
-                childBands.add(headerBandDefinition);
-                bandDefinitions.add(headerBandDefinition);
-            }
-            if (!reportData.getTemplateFileName().endsWith(".html"))
-                for (RegionProperty regionProperty : reportRegion.getRegionProperties()) {
-                    if (regionProperty.getEntityTreeNode().getWrappedMetaProperty().getJavaType().isAssignableFrom(Date.class)) {
-                        ReportValueFormat rvf = new ReportValueFormat();
-                        rvf.setReport(report);
-                        rvf.setValueName(reportRegion.getNameForBand() + "." + regionProperty.getEntityTreeNode().getWrappedMetaProperty().getName());
-                        rvf.setFormatString(messages.getMainMessage("dateTimeFormat"));
-                        AnnotatedElement annotatedElement = regionProperty.getEntityTreeNode().getWrappedMetaProperty().getAnnotatedElement();
-                        if (annotatedElement != null && annotatedElement.isAnnotationPresent(Temporal.class)) {
-                            switch (annotatedElement.getAnnotation(Temporal.class).value()) {
-                                case TIME:
-                                    rvf.setFormatString(messages.getMainMessage("timeFormat"));
-                                    break;
-                                case DATE:
-                                    rvf.setFormatString(messages.getMainMessage("dateFormat"));
-                                    break;
-                            }
-                        }
-                        reportValueFormatList.add(rvf);
-                    }
-                }
-            BandDefinition bandDefinition = metadata.create(BandDefinition.class);
-            bandDefinition.setParentBandDefinition(rootReportBandDefinition);
-            bandDefinition.setOrientation(Orientation.HORIZONTAL);
-            bandDefinition.setName(reportRegion.getNameForBand());
-            bandDefinition.setPosition(bandDefPos++);
-            bandDefinition.setReport(report);
-            DataSet bandDataSet = metadata.create(DataSet.class);
-
-            bandDataSet.setName(messages.getMessage(getClass(), "dataSet"));
-
-            if (reportData.getIsTabulatedReport()) {
-                bandDataSet.setType(DataSetType.MULTI);
-                bandDataSet.setListEntitiesParamName(reportInputParameter.getAlias());
-            } else {
-                if (reportRegion.getIsTabulatedRegion()) {
-                    bandDataSet.setType(DataSetType.MULTI);
-                    bandDataSet.setListEntitiesParamName(reportInputParameter.getAlias() + "#" + reportRegion.getRegionPropertiesRootNode().getName());
-                } else {
-                    bandDataSet.setType(DataSetType.SINGLE);
-                    bandDataSet.setEntityParamName(reportInputParameter.getAlias());
-                }
-            }
-            bandDataSet.setView(parameterView);
-
-            bandDataSet.setBandDefinition(bandDefinition);
-            bandDefinition.getDataSets().add(bandDataSet);
-            bandDefinitions.add(bandDefinition);
-            childBands.add(bandDefinition);
-        }
-        rootReportBandDefinition.getChildrenBandDefinitions().addAll(childBands);
-
-        report.setBands(bandDefinitions);
-        ReportTemplate reportTemplate = metadata.create(ReportTemplate.class);
-        reportTemplate.setReport(report);
-        reportTemplate.setCode(ReportService.DEFAULT_TEMPLATE_CODE);
-
-        reportTemplate.setName(reportData.getTemplateFileName());
-        reportTemplate.setContent(templateByteArray);
-        reportTemplate.setCustom(Boolean.FALSE);
-        Integer outputFileTypeId = reportData.getOutputFileType().getId();
-        reportTemplate.setReportOutputType(ReportOutputType.fromId(outputFileTypeId));
-        if (StringUtils.isNotEmpty(reportData.getOutputNamePattern()))
-            reportTemplate.setOutputNamePattern(reportData.getOutputNamePattern());
-        report.setDefaultTemplate(reportTemplate);
-        report.setTemplates(Collections.singletonList(reportTemplate));
-
-        report.setValuesFormats(reportValueFormatList);
+        HashSet<BandDefinition> childrenBandsDefinitionForRoot = new HashSet<>(bands);
+        childrenBandsDefinitionForRoot.remove(rootReportBandDefinition);
+        rootReportBandDefinition.getChildrenBandDefinitions().addAll(childrenBandsDefinitionForRoot);
 
         Transaction t = persistence.createTransaction();
         try {
             report.setName(reportingApi.generateReportName(reportData.getName()));
             String xml = reportingApi.convertToXml(report);
             report.setXml(xml);
-            if (!isTmp) {
+            if (!temporary) {
                 EntityManager em = persistence.getEntityManager();
-                em.persist(reportTemplate);
+                em.persist(defaultTemplate);
                 em.persist(report);
                 t.commit();
             }
@@ -190,6 +86,253 @@ public class ReportingWizardBean implements ReportingWizardApi {
         }
 
         return report;
+    }
+
+    protected Set<BandDefinition> createBands(Report report, BandDefinition rootReportBandDefinition,
+                                              ReportData reportData, ReportInputParameter mainParameter) {
+        int bandDefinitionPosition = 0;
+        for (ReportRegion reportRegion : reportData.getReportRegions()) {
+            if (reportRegion.isTabulatedRegion() &&
+                    (reportData.getOutputFileType() == ReportOutputType.XLSX || TemplateFileType.XLSX.equals(reportData.getTemplateFileType()))) {
+                BandDefinition headerBand = createHeaderBand(report, rootReportBandDefinition, bandDefinitionPosition++, reportRegion);
+                report.getBands().add(headerBand);
+            }
+
+            createDefaultFormats(report, reportData, reportRegion);
+
+            BandDefinition dataBand = createDataBand(report, rootReportBandDefinition, reportRegion.getNameForBand(), bandDefinitionPosition++);
+
+            if (reportData.getReportType().isEntity()) {
+                View parameterView = createViewByReportRegions(reportData.getEntityTreeRootNode(), reportData.getReportRegions());
+                createEntityDataSet(reportData, reportRegion, dataBand, mainParameter, parameterView);
+            } else {
+                createJpqlDataSet(reportData, reportRegion, dataBand);
+            }
+
+            report.getBands().add(dataBand);
+        }
+
+        return report.getBands();
+    }
+
+    @Nullable
+    protected ReportInputParameter createParameters(ReportData reportData, Report report) {
+        ReportInputParameter mainParameter = null;
+        if (reportData.getReportType().isEntity()) {
+            mainParameter = createMainInputParameter(report, reportData);
+            report.getInputParameters().add(mainParameter);
+        } else if (reportData.getQueryParameters() != null) {
+            int i = 1;
+            for (ReportData.Parameter queryParameter : reportData.getQueryParameters()) {
+                ReportInputParameter parameter = createParameter(report, i++);
+                parameter.setAlias(queryParameter.name);
+                parameter.setName(StringUtils.capitalize(queryParameter.name));
+                parameter.setType(queryParameter.parameterType);
+                parameter.setParameterClass(queryParameter.javaClass);
+
+                if (queryParameter.parameterType == ParameterType.ENTITY
+                        || queryParameter.parameterType == ParameterType.ENTITY_LIST) {
+                    MetaClass metaClass = metadata.getClass(queryParameter.javaClass);
+                    if (metaClass != null) {
+                        parameter.setEntityMetaClass(metaClass.getName());
+                    }
+                } else if (queryParameter.parameterType == ParameterType.ENUMERATION && queryParameter.javaClass != null) {
+                    parameter.setEnumerationClass(queryParameter.javaClass.getName());
+                }
+
+                report.getInputParameters().add(parameter);
+            }
+        }
+
+        return mainParameter;
+    }
+
+    protected Report createReport(ReportData reportData, boolean isTmp) {
+        Report report = metadata.create(Report.class);
+        report.setIsTmp(isTmp);
+        report.setReportType(ReportType.SIMPLE);
+        report.setGroup(reportData.getGroup());
+        report.setBands(new LinkedHashSet<BandDefinition>(reportData.getReportRegions().size() + 1)); //plus rootBand);
+        report.setValuesFormats(new ArrayList<ReportValueFormat>());
+        return report;
+    }
+
+    //todo eude move logic to separate class
+    protected void createJpqlDataSet(ReportData reportData, ReportRegion reportRegion, BandDefinition dataBand) {
+        DataSet dataSet = createEmptyDataSet(dataBand);
+        dataSet.setType(DataSetType.JPQL);
+
+        StringBuilder outputFieldsBuilder = new StringBuilder("select ");
+        StringBuilder joinsBuilder = new StringBuilder(" e ");
+        Map<String, String> entityNamesAndAliases = new HashMap<>();
+        for (RegionProperty regionProperty : reportRegion.getRegionProperties()) {
+            String propertyPath = regionProperty.getHierarchicalNameExceptRoot();
+            String nestedEntityAlias = null;
+            if (propertyPath.contains(".")) {
+                String entityName = StringUtils.substringBeforeLast(propertyPath, ".");
+
+                if (!entityNamesAndAliases.containsKey(entityName)) {
+                    nestedEntityAlias = entityName.replaceAll("\\.", "_");
+                    joinsBuilder.append(" \nleft join e.").append(entityName).append(" ").append(nestedEntityAlias);
+                    entityNamesAndAliases.put(entityName, nestedEntityAlias);
+                } else {
+                    nestedEntityAlias = entityNamesAndAliases.get(entityName);
+                }
+            }
+
+            if (nestedEntityAlias == null) {
+                outputFieldsBuilder.append("e.").append(propertyPath);
+            } else {
+                String propertyName = StringUtils.substringAfterLast(propertyPath, ".");
+                outputFieldsBuilder.append(nestedEntityAlias).append(".").append(propertyName);
+            }
+            outputFieldsBuilder.append(" as \"").append(propertyPath).append("\"")
+                    .append(",\n");
+        }
+
+        outputFieldsBuilder.delete(outputFieldsBuilder.length() - 2, outputFieldsBuilder.length());
+        outputFieldsBuilder.append("\n from ");
+
+        if (joinsBuilder.toString().contains("left join")) {
+            if (reportData.getQuery().contains(" where")) {
+                joinsBuilder.append("\n where ");
+            }
+
+            reportData.setQuery(reportData.getQuery().replaceAll(" e( where|$)", joinsBuilder.toString()));
+        }
+
+        reportData.setQuery(reportData.getQuery().replace("select e from", outputFieldsBuilder.toString()));
+        dataSet.setText(reportData.getQuery());
+    }
+
+    protected void createEntityDataSet(ReportData reportData, ReportRegion reportRegion, BandDefinition dataBand,
+                                       ReportInputParameter mainParameter, View parameterView) {
+        DataSet dataSet = createEmptyDataSet(dataBand);
+        if (ReportData.ReportType.LIST_OF_ENTITIES == reportData.getReportType()) {
+            dataSet.setType(DataSetType.MULTI);
+            dataSet.setListEntitiesParamName(mainParameter.getAlias());
+            dataSet.setView(parameterView);
+        } else if (ReportData.ReportType.SINGLE_ENTITY == reportData.getReportType()) {
+            if (reportRegion.getIsTabulatedRegion()) {
+                dataSet.setType(DataSetType.MULTI);
+                dataSet.setListEntitiesParamName(mainParameter.getAlias() + "#" + reportRegion.getRegionPropertiesRootNode().getName());
+            } else {
+                dataSet.setType(DataSetType.SINGLE);
+                dataSet.setEntityParamName(mainParameter.getAlias());
+            }
+            dataSet.setView(parameterView);
+        }
+    }
+
+    protected DataSet createEmptyDataSet(BandDefinition dataBand) {
+        DataSet dataSet = metadata.create(DataSet.class);
+        dataSet.setName(messages.getMessage(getClass(), "dataSet"));
+        dataSet.setBandDefinition(dataBand);
+        dataBand.getDataSets().add(dataSet);
+        return dataSet;
+    }
+
+    protected BandDefinition createRootBand(Report report) {
+        BandDefinition rootReportBandDefinition = metadata.create(BandDefinition.class);
+        rootReportBandDefinition.setPosition(0);
+        rootReportBandDefinition.setName(ROOT_BAND_DEFINITION_NAME);
+        rootReportBandDefinition.setReport(report);
+        report.getBands().add(rootReportBandDefinition);
+        return rootReportBandDefinition;
+    }
+
+    protected ReportInputParameter createMainInputParameter(Report report, ReportData reportData) {
+        ReportInputParameter reportInputParameter = createParameter(report, 1);
+
+        reportInputParameter.setName(reportData.getEntityTreeRootNode().getLocalizedName());
+        reportInputParameter.setEntityMetaClass(reportData.getEntityTreeRootNode().getWrappedMetaClass().getName());
+        if (ReportData.ReportType.LIST_OF_ENTITIES == reportData.getReportType()) {
+            reportInputParameter.setType(ParameterType.ENTITY_LIST);
+            reportInputParameter.setAlias(DEFAULT_LIST_OF_ENTITIES_ALIAS);
+        } else {
+            reportInputParameter.setType(ParameterType.ENTITY);
+            reportInputParameter.setAlias(DEFAULT_SINGLE_ENTITY_ALIAS);
+        }
+
+        return reportInputParameter;
+    }
+
+    protected ReportInputParameter createParameter(Report report, int position) {
+        ReportInputParameter reportInputParameter = metadata.create(ReportInputParameter.class);
+        reportInputParameter.setReport(report);
+        reportInputParameter.setRequired(Boolean.TRUE);
+        reportInputParameter.setPosition(position);
+        return reportInputParameter;
+    }
+
+    protected ReportTemplate createDefaultTemplate(Report report, ReportData reportData) {
+        ReportTemplate reportTemplate = metadata.create(ReportTemplate.class);
+        reportTemplate.setReport(report);
+        reportTemplate.setCode(ReportService.DEFAULT_TEMPLATE_CODE);
+
+        reportTemplate.setName(reportData.getTemplateFileName());
+        reportTemplate.setContent(reportData.getTemplateContent());
+        reportTemplate.setCustom(Boolean.FALSE);
+        Integer outputFileTypeId = reportData.getOutputFileType().getId();
+        reportTemplate.setReportOutputType(ReportOutputType.fromId(outputFileTypeId));
+        if (StringUtils.isNotEmpty(reportData.getOutputNamePattern())) {
+            reportTemplate.setOutputNamePattern(reportData.getOutputNamePattern());
+        }
+        report.setDefaultTemplate(reportTemplate);
+        report.setTemplates(Collections.singletonList(reportTemplate));
+
+        return reportTemplate;
+    }
+
+    protected BandDefinition createDataBand(Report report, BandDefinition rootBandDefinition, String name, int bandDefPos) {
+        BandDefinition bandDefinition = metadata.create(BandDefinition.class);
+        bandDefinition.setParentBandDefinition(rootBandDefinition);
+        bandDefinition.setOrientation(Orientation.HORIZONTAL);
+        bandDefinition.setName(name);
+        bandDefinition.setPosition(bandDefPos);
+        bandDefinition.setReport(report);
+        return bandDefinition;
+    }
+
+    protected void createDefaultFormats(Report report, ReportData reportData, ReportRegion reportRegion) {
+        ArrayList<ReportValueFormat> formats = new ArrayList<>();
+        if (!reportData.getTemplateFileName().endsWith(".html")) {
+            for (RegionProperty regionProperty : reportRegion.getRegionProperties()) {
+                if (regionProperty.getEntityTreeNode().getWrappedMetaProperty().getJavaType().isAssignableFrom(Date.class)) {
+                    ReportValueFormat rvf = new ReportValueFormat();
+                    rvf.setReport(report);
+                    rvf.setValueName(reportRegion.getNameForBand() + "." + regionProperty.getEntityTreeNode().getWrappedMetaProperty().getName());
+                    rvf.setFormatString(messages.getMainMessage("dateTimeFormat"));
+                    AnnotatedElement annotatedElement = regionProperty.getEntityTreeNode().getWrappedMetaProperty().getAnnotatedElement();
+                    if (annotatedElement != null && annotatedElement.isAnnotationPresent(Temporal.class)) {
+                        switch (annotatedElement.getAnnotation(Temporal.class).value()) {
+                            case TIME:
+                                rvf.setFormatString(messages.getMainMessage("timeFormat"));
+                                break;
+                            case DATE:
+                                rvf.setFormatString(messages.getMainMessage("dateFormat"));
+                                break;
+                        }
+                    }
+                    formats.add(rvf);
+                }
+            }
+        }
+
+        report.getValuesFormats().addAll(formats);
+    }
+
+    protected BandDefinition createHeaderBand(Report report,
+                                              BandDefinition rootReportBandDefinition,
+                                              int bandDefPos, ReportRegion reportRegion) {
+        BandDefinition headerBandDefinition = metadata.create(BandDefinition.class);
+        headerBandDefinition.setParentBandDefinition(rootReportBandDefinition);
+        headerBandDefinition.setOrientation(Orientation.HORIZONTAL);
+        headerBandDefinition.setName(reportRegion.getNameForHeaderBand());
+        headerBandDefinition.setPosition(bandDefPos);
+        headerBandDefinition.setReport(report);
+
+        return headerBandDefinition;
     }
 
     @Override
@@ -356,13 +499,6 @@ public class ReportingWizardBean implements ReportingWizardApi {
             }
         });
 
-        /*if (getWizardBlackListedProperties().isEmpty()) {
-            ownPropsNamesList.removeAll(IGNORED_ENTITY_PROPERTIES);
-            if (ownPropsNamesList.isEmpty()) {
-                return false;
-            }
-        }*/
-
         ownPropsNamesList.removeAll(CollectionUtils.collect(getWizardBlackListedProperties(), new Transformer() {
             @Override
             public Object transform(Object input) {
@@ -377,27 +513,15 @@ public class ReportingWizardBean implements ReportingWizardApi {
 
     @Override
     public boolean isPropertyAllowedForReportWizard(MetaClass metaClass, MetaProperty metaProperty) {
-        //decided to include metaproperties and transient properties into model
-        //if (metaProperty.getAnnotatedElement().
-        //        getAnnotation(com.haulmont.chile.core.annotations.MetaProperty.class) != null ||
-        //        metaProperty.getAnnotatedElement().
-        //                getAnnotation(javax.persistence.Transient.class) != null) {
-        //    return false;
-        //}
-
         //here we can`t just to determine metaclass using property argument cause it can be an ancestor of it
         ReportingConfig reportingConfig = configuration.getConfig(ReportingConfig.class);
         List propertiesBlackList = Arrays.asList(reportingConfig.getWizardPropertiesBlackList().split(","));
         List wizardPropertiesExcludedBlackList = Arrays.asList(reportingConfig.getWizardPropertiesExcludedBlackList().split(","));
 
         String classAndPropertyName = metaClass.getName() + "." + metaProperty.getName();
-        if (propertiesBlackList.contains(classAndPropertyName)
+        return !(propertiesBlackList.contains(classAndPropertyName)
                 || (propertiesBlackList.contains(metaProperty.getDomain() + "." + metaProperty.getName())
-                && !wizardPropertiesExcludedBlackList.contains(classAndPropertyName))) {
-            return false;
-        }
-        return true;
-
+                && !wizardPropertiesExcludedBlackList.contains(classAndPropertyName)));
     }
 
     protected List<String> getWizardBlackListedEntities() {

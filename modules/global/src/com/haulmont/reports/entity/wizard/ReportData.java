@@ -10,12 +10,14 @@ import com.haulmont.chile.core.annotations.MetaClass;
 import com.haulmont.chile.core.annotations.MetaProperty;
 import com.haulmont.cuba.core.entity.AbstractNotPersistentEntity;
 import com.haulmont.cuba.core.entity.annotation.SystemLevel;
+import com.haulmont.reports.entity.ParameterType;
 import com.haulmont.reports.entity.Report;
 import com.haulmont.reports.entity.ReportGroup;
 import com.haulmont.reports.entity.ReportOutputType;
 
 import javax.persistence.OneToMany;
 import javax.persistence.Transient;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,35 +28,89 @@ import java.util.List;
 @MetaClass(name = "report$WizardReportData")
 @SystemLevel
 public class ReportData extends AbstractNotPersistentEntity {
+    public static class Parameter implements Serializable {
+        public final String name;
+        public final Class javaClass;
+        public final ParameterType parameterType;
+
+        public Parameter(String name, Class javaClass, ParameterType parameterType) {
+            this.name = name;
+            this.javaClass = javaClass;
+            this.parameterType = parameterType;
+        }
+    }
+
+    public static enum ReportType {
+        SINGLE_ENTITY(false, true),
+        LIST_OF_ENTITIES(true, true),
+        LIST_OF_ENTITIES_WITH_QUERY(true, false);
+
+        private boolean list;
+        private boolean entity;
+
+        ReportType(boolean list, boolean entity) {
+            this.list = list;
+            this.entity = entity;
+        }
+
+        public boolean isList() {
+            return list;
+        }
+
+        public boolean isEntity() {
+            return entity;
+        }
+    }
+
     @MetaProperty
     @Transient
     protected String name;
+
     @MetaProperty
     @Transient
     protected EntityTreeNode entityTreeRootNode;
+
     @MetaProperty
     @Transient
     protected Report generatedReport;
+
     @MetaProperty
     @Transient
     protected ReportGroup group;
+
     @MetaProperty
     @Transient
-    protected Boolean isTabulatedReport;
+    protected ReportType reportType;
+
     @MetaProperty
     @Transient
     protected String templateFileName;
+
     @MetaProperty
     @Transient
     protected String outputNamePattern;
+
     @MetaProperty
     @Transient
     protected ReportOutputType outputFileType;
+
     @MetaProperty
     @Composition
     @Transient
     @OneToMany(targetEntity = RegionProperty.class)
     protected List<ReportRegion> reportRegions = new ArrayList<>();
+
+    @Transient
+    protected String query;
+
+    @Transient
+    protected List<Parameter> queryParameters;
+
+    @Transient
+    protected TemplateFileType templateFileType;
+
+    @Transient
+    byte[] templateContent;
 
     public Report getGeneratedReport() {
         return generatedReport;
@@ -72,12 +128,12 @@ public class ReportData extends AbstractNotPersistentEntity {
         this.group = group;
     }
 
-    public Boolean getIsTabulatedReport() {
-        return isTabulatedReport;
+    public ReportType getReportType() {
+        return reportType;
     }
 
-    public void setIsTabulatedReport(Boolean isTabulatedReport) {
-        this.isTabulatedReport = isTabulatedReport;
+    public void setReportType(ReportType reportType) {
+        this.reportType = reportType;
     }
 
     public String getTemplateFileName() {
@@ -150,4 +206,35 @@ public class ReportData extends AbstractNotPersistentEntity {
         reportRegions.clear();
     }
 
+    public String getQuery() {
+        return query;
+    }
+
+    public void setQuery(String query) {
+        this.query = query;
+    }
+
+    public List<Parameter> getQueryParameters() {
+        return queryParameters;
+    }
+
+    public void setQueryParameters(List<Parameter> queryParameters) {
+        this.queryParameters = queryParameters;
+    }
+
+    public TemplateFileType getTemplateFileType() {
+        return templateFileType;
+    }
+
+    public void setTemplateFileType(TemplateFileType templateFileType) {
+        this.templateFileType = templateFileType;
+    }
+
+    public byte[] getTemplateContent() {
+        return templateContent;
+    }
+
+    public void setTemplateContent(byte[] templateContent) {
+        this.templateContent = templateContent;
+    }
 }

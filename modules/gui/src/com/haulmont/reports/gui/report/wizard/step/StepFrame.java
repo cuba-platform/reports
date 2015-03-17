@@ -6,7 +6,6 @@
 package com.haulmont.reports.gui.report.wizard.step;
 
 import com.haulmont.cuba.core.global.AppBeans;
-import com.haulmont.cuba.core.global.MessageTools;
 import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.gui.components.Component;
 import com.haulmont.cuba.gui.components.Field;
@@ -23,9 +22,9 @@ import java.util.List;
  * @version $Id$
  */
 public class StepFrame {
-    private final String name;
-    private final IFrame frame;
-    private final MainWizardFrame mainWizardFrame;
+    protected final String name;
+    protected final IFrame frame;
+    protected final ReportWizardCreator wizard;
     protected InitStepFrameHandler initFrameHandler;
     protected BeforeHideStepFrameHandler beforeHideFrameHandler;
     protected BeforeShowStepFrameHandler beforeShowFrameHandler;
@@ -37,7 +36,7 @@ public class StepFrame {
     protected boolean isInitialized;
 
     public StepFrame(ReportWizardCreator reportWizardCreatorEditor, String name, String frameComponentName) {
-        this.mainWizardFrame = reportWizardCreatorEditor;
+        this.wizard = reportWizardCreatorEditor;
         this.name = name;
         this.frame = reportWizardCreatorEditor.getComponent(frameComponentName);
         if (frame == null) {
@@ -143,15 +142,13 @@ public class StepFrame {
     }
 
     protected class DefaultFrameInitializer implements InitStepFrameHandler {
-        MessageTools messageTools = AppBeans.get(MessageTools.NAME);
-
         @Override
         public void initFrame() {
             for (Component c : frame.getComponents()) {
                 if (c instanceof Field) {
                     Field field = (Field) c;
                     if (field.isRequired() && StringUtils.isBlank(field.getRequiredMessage()) && StringUtils.isBlank(field.getCaption())) {
-                        field.setRequiredMessage(getDefaultRequiredMessage(mainWizardFrame.getMessage(field.getId())));
+                        field.setRequiredMessage(getDefaultRequiredMessage(wizard.getMessage(field.getId())));
                     }
                 }
             }

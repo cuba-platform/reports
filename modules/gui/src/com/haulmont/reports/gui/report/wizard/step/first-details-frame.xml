@@ -4,7 +4,7 @@
   -->
 
 <window xmlns="http://schemas.haulmont.com/cuba/5.4/window.xsd">
-    <layout width="100%">
+    <layout width="100%" expand="spacer">
         <fieldGroup id="mainFields" width="100%">
             <field id="entity" caption="msg://entity" required="true" requiredMessage="msg://fillEntityMsg"
                    description="msg://entityHintMsg" custom="true" width="100%"/>
@@ -12,11 +12,13 @@
                    requiredMessage="msg://fillTemplateTypeMsg"
                    description="msg://templateTypeHintMsg" custom="true" width="100%"/>
             <field id="reportName" caption="msg://reportName" required="true"
-                   requiredMessage="msg://fillreportNameMsg" custom="true"
+                   requiredMessage="msg://fillReportNameMsg" custom="true"
                    width="100%"/>
-            <field id="isListed" caption="msg://reportBuildType"
+            <field id="reportType" caption="msg://reportBuildType"
                    width="-1px" custom="true"
                    description="msg://singleMultiEntityHintMsg"/>
         </fieldGroup>
+        <linkButton id="setQuery" caption="msg://setQuery"/>
+        <label id="spacer"/>
     </layout>
 </window>

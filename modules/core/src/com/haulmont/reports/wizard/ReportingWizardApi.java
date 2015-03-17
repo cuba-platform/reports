@@ -27,7 +27,7 @@ import java.util.List;
 public interface ReportingWizardApi {
     String NAME = "report_ReportingWizardApi";
 
-    Report toReport(ReportData reportData, byte[] templateByteArray, boolean isTmp, TemplateFileType templateFileType);
+    Report toReport(ReportData reportData, boolean temporary);
 
     View createViewByReportRegions(EntityTreeNode entityTreeRootNode, List<ReportRegion> reportRegions);
 

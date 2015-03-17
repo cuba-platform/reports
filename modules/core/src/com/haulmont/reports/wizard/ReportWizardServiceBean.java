@@ -36,8 +36,8 @@ public class ReportWizardServiceBean implements ReportWizardService {
     private Provider<EntityTreeModelBuilderApi> entityTreeModelBuilderApiProvider;
 
     @Override
-    public Report toReport(ReportData reportData, byte[] templateByteArray, boolean isTmp, TemplateFileType templateFileType) {
-        return reportingWizardApi.toReport(reportData, templateByteArray, isTmp, templateFileType);
+    public Report toReport(ReportData reportData, boolean temporary) {
+        return reportingWizardApi.toReport(reportData, temporary);
     }
 
     @Override

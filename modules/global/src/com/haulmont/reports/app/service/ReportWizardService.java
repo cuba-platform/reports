@@ -33,7 +33,7 @@ import java.util.Map;
 public interface ReportWizardService {
     String NAME = "report_ReportWizardService";
 
-    Report toReport(ReportData reportData, byte[] templateByteArray, boolean isTmp, TemplateFileType templateFileType);
+    Report toReport(ReportData reportData, boolean temporary);
 
     View createViewByReportRegions(EntityTreeNode entityTreeRootNode, List<ReportRegion> reportRegions);
 
