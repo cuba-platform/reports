@@ -206,38 +206,35 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
     }
 
     protected void initMainFields() {
-        FieldGroup.FieldConfig f = mainFields.getField("entity");
-        mainFields.addCustomField(f, new FieldGroup.CustomFieldGenerator() {
+        mainFields.addCustomField("entity", new FieldGroup.CustomFieldGenerator() {
             @Override
             public Component generateField(Datasource datasource, String propertyId) {
-                final LookupField lookupField = AppConfig.getFactory().createComponent(LookupField.NAME);
+                LookupField lookupField = componentsFactory.createComponent(LookupField.NAME);
+                lookupField.requestFocus();
                 entity = lookupField;
                 return lookupField;
             }
         });
-        f = mainFields.getField("reportName");
-        mainFields.addCustomField(f, new FieldGroup.CustomFieldGenerator() {
+        mainFields.addCustomField("reportName", new FieldGroup.CustomFieldGenerator() {
             @Override
             public Component generateField(Datasource datasource, String propertyId) {
-                final TextField textField = AppConfig.getFactory().createComponent(TextField.NAME);
+                TextField textField = componentsFactory.createComponent(TextField.NAME);
                 reportName = textField;
                 return textField;
             }
         });
-        f = mainFields.getField("templateFileFormat");
-        mainFields.addCustomField(f, new FieldGroup.CustomFieldGenerator() {
+        mainFields.addCustomField("templateFileFormat", new FieldGroup.CustomFieldGenerator() {
             @Override
             public Component generateField(Datasource datasource, String propertyId) {
-                final LookupField lookupField = AppConfig.getFactory().createComponent(LookupField.NAME);
+                LookupField lookupField = componentsFactory.createComponent(LookupField.NAME);
                 templateFileFormat = lookupField;
                 return lookupField;
             }
         });
-        f = mainFields.getField("reportType");
-        mainFields.addCustomField(f, new FieldGroup.CustomFieldGenerator() {
+        mainFields.addCustomField("reportType", new FieldGroup.CustomFieldGenerator() {
             @Override
             public Component generateField(Datasource datasource, String propertyId) {
-                final OptionsGroup optionsGroup = AppConfig.getFactory().createComponent(OptionsGroup.NAME);
+                OptionsGroup optionsGroup = AppConfig.getFactory().createComponent(OptionsGroup.NAME);
                 optionsGroup.setMultiSelect(false);
                 optionsGroup.setOrientation(OptionsGroup.Orientation.VERTICAL);
                 reportTypeOptionGroup = optionsGroup;
