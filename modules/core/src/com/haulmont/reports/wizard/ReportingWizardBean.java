@@ -157,52 +157,13 @@ public class ReportingWizardBean implements ReportingWizardApi {
         return report;
     }
 
-    //todo eude move logic to separate class
     protected void createJpqlDataSet(ReportData reportData, ReportRegion reportRegion, BandDefinition dataBand) {
         DataSet dataSet = createEmptyDataSet(dataBand);
         dataSet.setType(DataSetType.JPQL);
 
-        StringBuilder outputFieldsBuilder = new StringBuilder("select ");
-        StringBuilder joinsBuilder = new StringBuilder(" e ");
-        Map<String, String> entityNamesAndAliases = new HashMap<>();
-        for (RegionProperty regionProperty : reportRegion.getRegionProperties()) {
-            String propertyPath = regionProperty.getHierarchicalNameExceptRoot();
-            String nestedEntityAlias = null;
-            if (propertyPath.contains(".")) {
-                String entityName = StringUtils.substringBeforeLast(propertyPath, ".");
-
-                if (!entityNamesAndAliases.containsKey(entityName)) {
-                    nestedEntityAlias = entityName.replaceAll("\\.", "_");
-                    joinsBuilder.append(" \nleft join e.").append(entityName).append(" ").append(nestedEntityAlias);
-                    entityNamesAndAliases.put(entityName, nestedEntityAlias);
-                } else {
-                    nestedEntityAlias = entityNamesAndAliases.get(entityName);
-                }
-            }
-
-            if (nestedEntityAlias == null) {
-                outputFieldsBuilder.append("e.").append(propertyPath);
-            } else {
-                String propertyName = StringUtils.substringAfterLast(propertyPath, ".");
-                outputFieldsBuilder.append(nestedEntityAlias).append(".").append(propertyName);
-            }
-            outputFieldsBuilder.append(" as \"").append(propertyPath).append("\"")
-                    .append(",\n");
-        }
-
-        outputFieldsBuilder.delete(outputFieldsBuilder.length() - 2, outputFieldsBuilder.length());
-        outputFieldsBuilder.append("\n from ");
-
-        if (joinsBuilder.toString().contains("left join")) {
-            if (reportData.getQuery().contains(" where")) {
-                joinsBuilder.append("\n where ");
-            }
-
-            reportData.setQuery(reportData.getQuery().replaceAll(" e( where|$)", joinsBuilder.toString()));
-        }
-
-        reportData.setQuery(reportData.getQuery().replace("select e from", outputFieldsBuilder.toString()));
-        dataSet.setText(reportData.getQuery());
+        JpqlQueryBuilder jpqlQueryBuilder = new JpqlQueryBuilder(reportData, reportRegion);
+        String query = jpqlQueryBuilder.buildQuery();
+        dataSet.setText(query);
     }
 
     protected void createEntityDataSet(ReportData reportData, ReportRegion reportRegion, BandDefinition dataBand,

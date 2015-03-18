@@ -178,6 +178,7 @@ public class ParameterEditor extends AbstractEditor {
                 field.setValue(reportService.convertFromString(parameter.getParameterClass(), parameter.getDefaultValue()));
                 initScreensLookup();
             }
+            field.setRequired(false);
 
             defaultValueBox.add(field);
             defaultValueLabel.setVisible(true);

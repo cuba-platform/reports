@@ -222,6 +222,8 @@ class DetailsStepFrame extends StepFrame {
                         wizard.query = filter.getDatasource().getQuery();
                         wizard.queryParameters = Collections.emptyList();
                     }
+
+                    wizard.setQueryButton.setCaption(wizard.getMessage("changeQuery"));
                 }
 
                 protected List<ReportData.Parameter> collectQueryParameters(QueryFilter queryFilter) {
@@ -323,7 +325,7 @@ class DetailsStepFrame extends StepFrame {
         fakeDsContext.setFrameContext(fakeFrameContext);
         fakeDatasource.setDsContext(fakeDsContext);
         //Attention: this query should match the logic in com.haulmont.reports.wizard.ReportingWizardBean.createJpqlDataSet()
-        fakeDatasource.setQuery("select e from " + metaClass.getName() + " e");
+        fakeDatasource.setQuery("select queryEntity from " + metaClass.getName() + " queryEntity");
         fakeDatasource.setMetaClass(metaClass);
         fakeFilter.setDatasource(fakeDatasource);
         fakeFilter.setFrame(this.frame);
@@ -348,5 +350,6 @@ class DetailsStepFrame extends StepFrame {
         filter = null;
         filterEntity = null;
         conditionsTree = null;
+        wizard.setQueryButton.setCaption(wizard.getMessage("setQuery"));
     }
 }
