@@ -435,8 +435,7 @@ public class ReportingWizardBean implements ReportingWizardApi {
         if (StringUtils.startsWithAny(effectiveMetaClass.getName(), EntityTreeModelBuilder.IGNORED_ENTITIES_PREFIXES) ||
                 effectiveMetaClass.getJavaClass().isAnnotationPresent(Embeddable.class) ||
                 effectiveMetaClass.getJavaClass().isAnnotationPresent(SystemLevel.class) ||
-                //&& userSession.isEntityOpPermitted(effectiveMetaClass, EntityOp.READ)
-                effectiveMetaClass.getOwnProperties().isEmpty()) {
+                effectiveMetaClass.getProperties().isEmpty()) {
             return false;
         }
         List<String> whiteListedEntities = getWizardWhiteListedEntities();
@@ -453,14 +452,14 @@ public class ReportingWizardBean implements ReportingWizardApi {
         }
 
         @SuppressWarnings("unchecked")
-        Collection<Object> ownPropsNamesList = CollectionUtils.collect(effectiveMetaClass.getOwnProperties(), new Transformer() {
+        Collection<Object> propertiesNamesList = CollectionUtils.collect(effectiveMetaClass.getProperties(), new Transformer() {
             @Override
             public Object transform(Object input) {
                 return ((MetaProperty) input).getName();
             }
         });
 
-        ownPropsNamesList.removeAll(CollectionUtils.collect(getWizardBlackListedProperties(), new Transformer() {
+        propertiesNamesList.removeAll(CollectionUtils.collect(getWizardBlackListedProperties(), new Transformer() {
             @Override
             public Object transform(Object input) {
                 if (effectiveMetaClass.getName().equals(StringUtils.substringBefore((String) input, "."))) {
@@ -469,7 +468,7 @@ public class ReportingWizardBean implements ReportingWizardApi {
                 return null;
             }
         }));
-        return !ownPropsNamesList.isEmpty();
+        return !propertiesNamesList.isEmpty();
     }
 
     @Override
