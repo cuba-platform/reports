@@ -78,7 +78,7 @@ public class ReportingBean implements ReportingApi {
     @Inject
     protected GlobalConfig globalConfig;
 
-    private static XStream createXStream() {
+    protected XStream createXStream() {
         XStream xStream = new XStream();
         xStream.getConverterRegistry().removeConverter(ExternalizableConverter.class);
         xStream.registerConverter(new CollectionConverter(xStream.getMapper()) {
@@ -106,14 +106,20 @@ public class ReportingBean implements ReportingApi {
         xStream.alias("template", ReportTemplate.class);
         xStream.alias("screen", ReportScreen.class);
         xStream.alias("format", ReportValueFormat.class);
-        xStream.aliasField("customFlag", ReportTemplate.class, "custom");
         xStream.addDefaultImplementation(LinkedHashMap.class, Map.class);
         xStream.aliasSystemAttribute(null, "class");
+
+        xStream.omitField(Report.class, "xml");
+        xStream.omitField(Report.class, "deleteTs");
+        xStream.omitField(Report.class, "deletedBy");
         xStream.omitField(ReportTemplate.class, "content");
         xStream.omitField(ReportTemplate.class, "defaultFlag");
         xStream.omitField(ReportTemplate.class, "templateFileDescriptor");
+        xStream.omitField(ReportTemplate.class, "deleteTs");
+        xStream.omitField(ReportTemplate.class, "deletedBy");
         xStream.omitField(ReportInputParameter.class, "localeName");
-        xStream.omitField(Report.class, "xml");
+
+        xStream.aliasField("customFlag", ReportTemplate.class, "custom");
         xStream.aliasField("uuid", BandDefinition.class, "id");
         xStream.aliasField("uuid", DataSet.class, "id");
         xStream.aliasField("uuid", ReportInputParameter.class, "id");
@@ -123,6 +129,7 @@ public class ReportingBean implements ReportingApi {
 
         return xStream;
     }
+
 
     @Override
     public ReportOutputDocument createReport(Report report, Map<String, Object> params) {
