@@ -14,6 +14,7 @@ import com.haulmont.cuba.core.Persistence;
 import com.haulmont.cuba.core.Transaction;
 import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.Metadata;
+import com.haulmont.cuba.core.global.Resources;
 import com.haulmont.yarg.exception.DataLoadingException;
 import com.haulmont.yarg.exception.ValidationException;
 import com.haulmont.yarg.loaders.ReportDataLoader;
@@ -21,14 +22,19 @@ import com.haulmont.yarg.structure.BandData;
 import com.haulmont.yarg.structure.ReportQuery;
 import com.haulmont.yarg.util.groovy.Scripting;
 import groovy.lang.Closure;
+import org.apache.commons.lang.StringUtils;
 import org.codehaus.groovy.runtime.MethodClosure;
 
+import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class CubaGroovyDataLoader implements ReportDataLoader {
     protected Scripting scripting;
+
+    @Inject
+    protected Resources resources;
 
     public CubaGroovyDataLoader(Scripting scripting) {
         this.scripting = scripting;
@@ -47,6 +53,10 @@ public class CubaGroovyDataLoader implements ReportDataLoader {
             scriptParams.put("transactional", new MethodClosure(this, "transactional"));
             scriptParams.put("validationException", new MethodClosure(this, "validationException"));
 
+            script = StringUtils.trim(script);
+            if (script.endsWith(".groovy")) {
+                script = resources.getResourceAsString(script);
+            }
             return scripting.evaluateGroovy(script, scriptParams);
         } catch (ValidationException e) {
             throw e;
