@@ -53,7 +53,6 @@ def coreModule = project(':reports-core')
 def guiModule = project(':reports-gui')
 def webModule = project(':reports-web')
 def desktopModule = project(':reports-desktop')
-def webLegacyModule = project(':reports-web6')
 
 apply from: "$rootProject.projectDir/lib.gradle"
 
@@ -65,7 +64,7 @@ def asm = [group: 'asm', name: 'asm', version: '3.2']
 
 def baseVersion = artifactVersion + (isSnapshot ? '-SNAPSHOT' : '')
 
-configure([globalModule, coreModule, guiModule, webModule, webLegacyModule, desktopModule]) {
+configure([globalModule, coreModule, guiModule, webModule, desktopModule]) {
     apply(plugin: 'java')
     apply(plugin: 'idea')
     apply(plugin: 'maven')
@@ -220,26 +219,6 @@ task restart(dependsOn: ['stop', ':reports-core:deploy', ':reports-web:deploy'],
         }
     }
     start.execute()
-}
-
-configure(webLegacyModule) {
-    configurations {
-        webcontent
-    }
-
-    dependencies {
-        compile(globalModule)
-        compile(guiModule)
-        compile(group: 'com.haulmont.cuba', name: 'cuba-web6', version: baseVersion)
-        webcontent(group: 'com.haulmont.cuba', name: 'cuba-web6', version: baseVersion, classifier: 'web', ext: 'zip')
-    }
-
-    task deploy(dependsOn: assemble, type: CubaDeployment) {
-        appName = 'app6'
-        appJars('cuba-global', 'cuba-client', 'cuba-gui', 'cuba-web6',
-                'vaadin', 'popupbutton',
-                'reports-global', 'reports-gui', 'reports-web')
-    }
 }
 
 /***************************** Documentation  *****************************/

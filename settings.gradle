@@ -6,11 +6,10 @@
 
 rootProject.name = 'reports'
 
-include(':reports-global', ':reports-core', ':reports-gui', ':reports-web', ':reports-web6', ':reports-desktop')
+include(':reports-global', ':reports-core', ':reports-gui', ':reports-web', ':reports-desktop')
 
 project(':reports-global').projectDir = new File(settingsDir, 'modules/global')
 project(':reports-core').projectDir = new File(settingsDir, 'modules/core')
 project(':reports-gui').projectDir = new File(settingsDir, 'modules/gui')
 project(':reports-web').projectDir = new File(settingsDir, 'modules/web')
 project(':reports-desktop').projectDir = new File(settingsDir, 'modules/desktop')
-project(':reports-web6').projectDir = new File(settingsDir, 'modules/web6')
