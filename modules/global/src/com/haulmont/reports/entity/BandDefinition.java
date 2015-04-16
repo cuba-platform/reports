@@ -9,9 +9,9 @@ import com.haulmont.chile.core.annotations.MetaProperty;
 import com.haulmont.chile.core.annotations.NamePattern;
 import com.haulmont.cuba.core.entity.AbstractNotPersistentEntity;
 import com.haulmont.cuba.core.entity.annotation.SystemLevel;
+import com.haulmont.yarg.structure.BandOrientation;
 import com.haulmont.yarg.structure.ReportBand;
 import com.haulmont.yarg.structure.ReportQuery;
-import com.haulmont.yarg.structure.BandOrientation;
 
 import java.util.ArrayList;
 import java.util.List;
