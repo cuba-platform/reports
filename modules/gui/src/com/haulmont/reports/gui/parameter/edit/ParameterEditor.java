@@ -132,7 +132,7 @@ public class ParameterEditor extends AbstractEditor {
     }
 
     protected void initScreensLookup() {
-        Map<String, Object> screensMap = screensHelper.getAvailableBrowserScreens(parameter.getParameterClass());
+        Map<String, Object> screensMap = screensHelper.getAvailableScreensMap(parameter.getParameterClass());
         screen.setOptionsMap(screensMap);
     }
 
