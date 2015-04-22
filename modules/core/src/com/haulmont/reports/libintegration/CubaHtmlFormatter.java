@@ -48,6 +48,7 @@ public class CubaHtmlFormatter extends HtmlFormatter {
     protected static final String CUBA_FONTS_DIR = "/cuba/fonts";
 
     public static final String FS_PROTOCOL_PREFIX = "fs://";
+    public static final String SERVER_ADDRESS_PREFIX = "server://";
 
     protected Log log = LogFactory.getLog(getClass());
 
@@ -185,6 +186,9 @@ public class CubaHtmlFormatter extends HtmlFormatter {
                 }
 
                 return resource;
+            } else if (StringUtils.startsWith(uri, SERVER_ADDRESS_PREFIX)) {
+                String resolvedUri = resolveServerPrefix(uri);
+                return super.getImageResource(resolvedUri);
             }
 
             return super.getImageResource(uri);
@@ -220,27 +224,41 @@ public class CubaHtmlFormatter extends HtmlFormatter {
                     throw wrapWithReportingException(
                             format("An error occurred while loading file with id [%s] from file storage", id), e);
                 }
+            } else if (StringUtils.startsWith(uri, SERVER_ADDRESS_PREFIX)) {
+                String resolvedUri = resolveServerPrefix(uri);
+                return getInputStream(resolvedUri);
             } else {
-                uri = resolveURI(uri);
-                InputStream inputStream = null;
-                try {
-                    URL url = new URL(uri);
-                    URLConnection urlConnection = url.openConnection();
-                    urlConnection.setConnectTimeout(externalImagesTimeoutSec * 1000);
-                    inputStream = urlConnection.getInputStream();
-                } catch (java.net.SocketTimeoutException e) {
-                    throw new ReportFormattingException(format("Loading resource [%s] has been stopped by timeout", uri), e);
-                } catch (java.net.MalformedURLException e) {
-                    throw new ReportFormattingException(format("Bad URL given: [%s]", uri), e);
-                } catch (java.io.FileNotFoundException e) {
-                    throw new ReportFormattingException(format("Resource at URL [%s] not found", uri));
-                } catch (java.io.IOException e) {
-                    throw new ReportFormattingException(format("An IO problem occurred while loading resource [%s]", uri), e);
-                }
-
-                return inputStream;
+                return getInputStream(uri);
             }
         }
+
+        protected InputStream getInputStream(String uri) {
+            uri = resolveURI(uri);
+            InputStream inputStream = null;
+            try {
+                URL url = new URL(uri);
+                URLConnection urlConnection = url.openConnection();
+                urlConnection.setConnectTimeout(externalImagesTimeoutSec * 1000);
+                inputStream = urlConnection.getInputStream();
+            } catch (java.net.SocketTimeoutException e) {
+                throw new ReportFormattingException(format("Loading resource [%s] has been stopped by timeout", uri), e);
+            } catch (java.net.MalformedURLException e) {
+                throw new ReportFormattingException(format("Bad URL given: [%s]", uri), e);
+            } catch (FileNotFoundException e) {
+                throw new ReportFormattingException(format("Resource at URL [%s] not found", uri));
+            } catch (IOException e) {
+                throw new ReportFormattingException(format("An IO problem occurred while loading resource [%s]", uri), e);
+            }
+
+            return inputStream;
+        }
+    }
+
+    protected String resolveServerPrefix(String uri) {
+        Configuration configStorage = AppBeans.get(Configuration.NAME);
+        GlobalConfig globalConfig = configStorage.getConfig(GlobalConfig.class);
+        return uri.replace(CubaHtmlFormatter.SERVER_ADDRESS_PREFIX,
+                String.format("http://%s:%s/", globalConfig.getWebHostName(), globalConfig.getWebPort()));//todo handle https
     }
 
     @Override
