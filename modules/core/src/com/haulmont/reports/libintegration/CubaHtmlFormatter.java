@@ -42,24 +42,24 @@ import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.util.*;
 
-import static java.lang.String.*;
+import static java.lang.String.format;
 
 public class CubaHtmlFormatter extends HtmlFormatter {
     protected static final String CUBA_FONTS_DIR = "/cuba/fonts";
 
     public static final String FS_PROTOCOL_PREFIX = "fs://";
-    public static final String SERVER_ADDRESS_PREFIX = "server://";
+    public static final String WEB_APP_PREFIX = "web://";
+    public static final String CORE_APP_PREFIX = "core://";
 
     protected Log log = LogFactory.getLog(getClass());
 
-    protected int entityMapMaxDeep = AppBeans.get(Configuration.class).getConfig(ReportingConfig.class).getEntityTreeModelMaxDeep();
-
-    protected int externalImagesTimeoutSec = AppBeans.get(Configuration.class).getConfig(ReportingConfig.class).getHtmlExternalResourcesTimeoutSec();
+    protected final ReportingConfig reportingConfig = AppBeans.get(Configuration.class).getConfig(ReportingConfig.class);
+    protected int entityMapMaxDeep = reportingConfig.getEntityTreeModelMaxDeep();
+    protected int externalImagesTimeoutSec = reportingConfig.getHtmlExternalResourcesTimeoutSec();
 
     public CubaHtmlFormatter(FormatterFactoryInput formatterFactoryInput) {
         super(formatterFactoryInput);
     }
-
 
     //todo degtyarjov, artamonov - get rid of custom processing of file descriptors, use field formats
     // we can append <content> with Base64 to html and put reference to <img> for html
@@ -186,7 +186,7 @@ public class CubaHtmlFormatter extends HtmlFormatter {
                 }
 
                 return resource;
-            } else if (StringUtils.startsWith(uri, SERVER_ADDRESS_PREFIX)) {
+            } else if (StringUtils.startsWith(uri, WEB_APP_PREFIX) || StringUtils.startsWith(uri, CORE_APP_PREFIX)) {
                 String resolvedUri = resolveServerPrefix(uri);
                 return super.getImageResource(resolvedUri);
             }
@@ -224,7 +224,7 @@ public class CubaHtmlFormatter extends HtmlFormatter {
                     throw wrapWithReportingException(
                             format("An error occurred while loading file with id [%s] from file storage", id), e);
                 }
-            } else if (StringUtils.startsWith(uri, SERVER_ADDRESS_PREFIX)) {
+            } else if (StringUtils.startsWith(uri, WEB_APP_PREFIX) || StringUtils.startsWith(uri, CORE_APP_PREFIX)) {
                 String resolvedUri = resolveServerPrefix(uri);
                 return getInputStream(resolvedUri);
             } else {
@@ -257,8 +257,10 @@ public class CubaHtmlFormatter extends HtmlFormatter {
     protected String resolveServerPrefix(String uri) {
         Configuration configStorage = AppBeans.get(Configuration.NAME);
         GlobalConfig globalConfig = configStorage.getConfig(GlobalConfig.class);
-        return uri.replace(CubaHtmlFormatter.SERVER_ADDRESS_PREFIX,
-                String.format("http://%s:%s/", globalConfig.getWebHostName(), globalConfig.getWebPort()));//todo handle https
+        String coreUrl = String.format("http://%s:%s/%s/",
+                globalConfig.getWebHostName(), globalConfig.getWebPort(), globalConfig.getWebContextName());
+        String webUrl = globalConfig.getWebAppUrl() + "/";
+        return uri.replace(WEB_APP_PREFIX, webUrl).replace(CORE_APP_PREFIX, coreUrl);
     }
 
     @Override
