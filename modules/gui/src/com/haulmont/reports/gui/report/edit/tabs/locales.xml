@@ -3,7 +3,7 @@
   ~ Use is subject to license terms, see http://www.cuba-platform.com/license for details.
   -->
 
-<window xmlns="http://schemas.haulmont.com/cuba/5.4/window.xsd">
+<window xmlns="http://schemas.haulmont.com/cuba/5.5/window.xsd">
     <layout expand="localeTextField" margin="true" spacing="true">
         <textArea id="localeTextField" datasource="reportDs" property="localeNames"
                    rows="20" cols="30" width="100%"/>
