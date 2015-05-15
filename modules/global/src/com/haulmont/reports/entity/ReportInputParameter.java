@@ -30,7 +30,7 @@ public class ReportInputParameter extends AbstractNotPersistentEntity implements
     protected Report report;
 
     @MetaProperty
-    protected Integer type;
+    protected Integer type = ParameterType.TEXT.getId();
 
     @MetaProperty
     protected String name;
