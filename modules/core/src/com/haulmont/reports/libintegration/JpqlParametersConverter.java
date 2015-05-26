@@ -10,6 +10,7 @@
  */
 package com.haulmont.reports.libintegration;
 
+import com.haulmont.chile.core.datatypes.impl.EnumClass;
 import com.haulmont.cuba.core.Persistence;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.reports.exception.ReportingException;
@@ -34,7 +35,9 @@ public class JpqlParametersConverter implements ReportParametersConverter {
 
     @Override
     public <T> T convert(Object input) {
-        if (input instanceof Collection) {
+        if (input instanceof EnumClass) {
+            return (T) ((EnumClass) input).getId();
+        } else if (input instanceof Collection) {
             Collection collection = (Collection) input;
             if (CollectionUtils.isNotEmpty(collection)) {
                 Object firstObject = collection.iterator().next();
