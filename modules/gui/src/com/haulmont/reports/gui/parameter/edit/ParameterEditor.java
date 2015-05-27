@@ -140,7 +140,7 @@ public class ParameterEditor extends AbstractEditor {
         Map<String, Object> enumsOptionsMap = new TreeMap<>();
         for (Class enumClass : metadata.getTools().getAllEnums()) {
             String enumLocalizedName = messages.getMessage(enumClass, enumClass.getSimpleName());
-            enumsOptionsMap.put(enumLocalizedName, enumClass.getCanonicalName());
+            enumsOptionsMap.put(enumLocalizedName + " (" + enumClass.getSimpleName() + ")", enumClass.getCanonicalName());
         }
         enumeration.setOptionsMap(enumsOptionsMap);
     }
