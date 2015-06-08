@@ -5,6 +5,7 @@
 package com.haulmont.reports.gui;
 
 import com.haulmont.chile.core.model.MetaClass;
+import com.haulmont.chile.core.model.utils.InstanceUtils;
 import com.haulmont.cuba.core.app.DataService;
 import com.haulmont.cuba.core.global.*;
 import com.haulmont.cuba.gui.AppConfig;
@@ -323,13 +324,12 @@ public class ReportGuiManager {
 
 
     /**
-     * Prepare report for printing, use only Id from old instance
+     * Defensive copy
      */
     protected Report getReportForPrinting(Report report) {
-        final Report targetReport = new Report();
-        targetReport.setId(report.getId());
-
-        return targetReport;
+        Report copy = (Report) InstanceUtils.copy(report);
+        copy.setIsTmp(report.getIsTmp());
+        return copy;
     }
 
     protected List<Report> filterReportsByEntityParameters(@Nullable MetaClass inputValueMetaClass, List<Report> reports) {
