@@ -93,7 +93,7 @@
                     </columns>
                     <rows>
                         <row>
-                            <button id="viewEditButton" caption="msg://dataSet.editView" width="${width}"/>
+                            <button id="viewEditButton" caption="msg://dataSet.editView"/>
                             <label id="buttonEmptyElement"/>
                         </row>
                         <row>
