@@ -19,7 +19,7 @@
         </datasource>
     </dsContext>
 
-    <layout expand="mainContent" spacing="true">
+    <layout spacing="true">
         <label id="topSeparator" stylename="report-wizard-top-separator" width="100%"/>
         <label id="tipLabel"/>
         <label id="bottomSeparator" stylename="report-wizard-top-separator" width="100%"/>
