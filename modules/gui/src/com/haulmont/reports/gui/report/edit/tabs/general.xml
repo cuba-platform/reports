@@ -23,7 +23,7 @@
 
         <vbox id="bands" width="100%" height="100%" >
             <split orientation="horizontal" id="hSplit" pos="30" width="100%" height="100%">
-                <vbox margin="false;true;false;false" width="100%" height="100%">
+                <vbox id="treeVBox" margin="false;true;false;false" width="100%" height="100%">
                     <groupBox id="treeBox" expand="serviceTree" height="100%" width="100%" spacing="true"
                               caption="msg://report.bands">
                         <buttonsPanel>
@@ -39,7 +39,7 @@
                     </groupBox>
                 </vbox>
                 <!-- Split -->
-                <vbox margin="false;false;false;true" width="100%" height="100%">
+                <vbox id="bandDetailsVBox" margin="false;false;false;true" width="100%" height="100%">
                     <groupBox id="bandDetailsBox" height="100%" width="100%" caption="msg://report.bandDetails">
                         <iframe src="/com/haulmont/reports/gui/definition/edit/definition-edit.xml" id="bandEditor"
                                 width="100%"
