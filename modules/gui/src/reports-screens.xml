@@ -47,4 +47,9 @@
     <screen id="report$ReportGroup.edit"
             template="/com/haulmont/reports/gui/group/edit/group-edit.xml"/>
 
+    <screen id="chartEdit"
+            template="com/haulmont/reports/gui/template/edit/chart-edit-frame.xml"/>
+
+    <screen id="report$showChart"
+            template="com/haulmont/reports/gui/report/run/show-chart.xml"/>
 </screen-config>

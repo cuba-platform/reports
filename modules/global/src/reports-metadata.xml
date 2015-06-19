@@ -16,6 +16,9 @@
         <class>com.haulmont.reports.entity.wizard.ReportRegion</class>
         <class>com.haulmont.reports.entity.wizard.RegionProperty</class>
         <class>com.haulmont.reports.entity.wizard.EntityTreeNode</class>
+        <class>com.haulmont.reports.entity.charts.PieChartDescription</class>
+        <class>com.haulmont.reports.entity.charts.SerialChartDescription</class>
+        <class>com.haulmont.reports.entity.charts.ChartSeries</class>
     </metadata-model>
 
 </metadata>

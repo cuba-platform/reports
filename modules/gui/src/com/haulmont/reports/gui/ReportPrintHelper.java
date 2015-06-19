@@ -10,6 +10,8 @@ import com.haulmont.yarg.structure.ReportOutputType;
 
 import java.util.*;
 
+import static com.haulmont.reports.entity.ReportOutputType.*;
+
 /**
  * @author artamonov
  * @version $Id$
@@ -21,13 +23,13 @@ public class ReportPrintHelper {
     private static Map<String, List<com.haulmont.reports.entity.ReportOutputType>> inputOutputTypesMapping = new HashMap<>();
 
     static {
-        inputOutputTypesMapping.put("docx", new ArrayList<>(Arrays.asList(com.haulmont.reports.entity.ReportOutputType.DOCX, com.haulmont.reports.entity.ReportOutputType.HTML, com.haulmont.reports.entity.ReportOutputType.PDF)));
-        inputOutputTypesMapping.put("doc", new ArrayList<>(Arrays.asList(com.haulmont.reports.entity.ReportOutputType.DOC, com.haulmont.reports.entity.ReportOutputType.PDF)));
-        inputOutputTypesMapping.put("odt", new ArrayList<>(Arrays.asList(com.haulmont.reports.entity.ReportOutputType.DOC, com.haulmont.reports.entity.ReportOutputType.PDF)));
-        inputOutputTypesMapping.put("xlsx", new ArrayList<>(Arrays.asList(com.haulmont.reports.entity.ReportOutputType.XLSX, com.haulmont.reports.entity.ReportOutputType.PDF)));
-        inputOutputTypesMapping.put("xls", new ArrayList<>(Arrays.asList(com.haulmont.reports.entity.ReportOutputType.XLS, com.haulmont.reports.entity.ReportOutputType.PDF)));
-        inputOutputTypesMapping.put("html", new ArrayList<>(Arrays.asList(com.haulmont.reports.entity.ReportOutputType.HTML, com.haulmont.reports.entity.ReportOutputType.PDF)));
-        inputOutputTypesMapping.put("ftl", new ArrayList<>(Arrays.asList(com.haulmont.reports.entity.ReportOutputType.HTML, com.haulmont.reports.entity.ReportOutputType.PDF)));
+        inputOutputTypesMapping.put("docx", Arrays.asList(DOCX, HTML, PDF));
+        inputOutputTypesMapping.put("doc", Arrays.asList(DOC, PDF));
+        inputOutputTypesMapping.put("odt", Arrays.asList(DOC, PDF));
+        inputOutputTypesMapping.put("xlsx", Arrays.asList(XLSX, PDF));
+        inputOutputTypesMapping.put("xls", Arrays.asList(XLS, PDF));
+        inputOutputTypesMapping.put("html", Arrays.asList(HTML, PDF));
+        inputOutputTypesMapping.put("ftl", Arrays.asList(HTML, PDF));
         exportFormats.put(ReportOutputType.xls, ExportFormat.XLS);
         exportFormats.put(ReportOutputType.xlsx, ExportFormat.XLSX);
         exportFormats.put(ReportOutputType.doc, ExportFormat.DOC);

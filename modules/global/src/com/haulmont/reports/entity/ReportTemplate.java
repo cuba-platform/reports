@@ -5,11 +5,19 @@
 
 package com.haulmont.reports.entity;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.haulmont.chile.core.annotations.NamePattern;
 import com.haulmont.cuba.core.entity.annotation.SystemLevel;
+import com.haulmont.reports.entity.charts.AbstractChartDescription;
+import com.haulmont.reports.entity.charts.ChartType;
+import com.haulmont.reports.entity.charts.PieChartDescription;
+import com.haulmont.reports.entity.charts.SerialChartDescription;
 import com.haulmont.yarg.formatters.CustomReport;
 import org.apache.commons.lang.StringUtils;
 
+import javax.annotation.Nullable;
 import javax.persistence.*;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -23,7 +31,7 @@ import java.io.InputStream;
 @Entity(name = "report$ReportTemplate")
 @Table(name = "REPORT_TEMPLATE")
 @SystemLevel
-@NamePattern("#getCaption|code,name,customClass")
+@NamePattern("#getCaption|code,name,customDefinition")
 @SuppressWarnings("unused")
 public class ReportTemplate extends BaseReportEntity implements com.haulmont.yarg.structure.ReportTemplate {
     public static final String DEFAULT_TEMPLATE_CODE = "DEFAULT";
@@ -46,7 +54,7 @@ public class ReportTemplate extends BaseReportEntity implements com.haulmont.yar
     protected Boolean custom = false;
 
     @Column(name = "CUSTOM_CLASS")
-    protected String customClass;
+    protected String customDefinition;
 
     @Column(name = "CUSTOM_DEFINED_BY")
     protected Integer customDefinedBy = CustomTemplateDefinedBy.CLASS.getId();
@@ -96,12 +104,12 @@ public class ReportTemplate extends BaseReportEntity implements com.haulmont.yar
         this.custom = custom;
     }
 
-    public String getCustomClass() {
-        return customClass;
+    public String getCustomDefinition() {
+        return customDefinition;
     }
 
-    public void setCustomClass(String customClass) {
-        this.customClass = customClass;
+    public void setCustomDefinition(String customDefinition) {
+        this.customDefinition = customDefinition;
     }
 
     public byte[] getContent() {
@@ -177,9 +185,32 @@ public class ReportTemplate extends BaseReportEntity implements com.haulmont.yar
 
     public String getCaption() {
         if (isCustom()) {
-            return String.format(NAME_FORMAT, code, customClass);
+            return String.format(NAME_FORMAT, code, customDefinition);
         } else {
             return String.format(NAME_FORMAT, code, name);
+        }
+    }
+
+    @Nullable
+    public AbstractChartDescription getChartDescription() {
+        Gson gson = new Gson();
+        JsonObject jsonElement = gson.fromJson(getCustomDefinition(), JsonObject.class);
+        JsonPrimitive type = jsonElement.getAsJsonPrimitive("type");
+        if (ChartType.PIE.getId().equals(type.getAsString())) {
+            return gson.fromJson(getCustomDefinition(), PieChartDescription.class);
+        } else if (ChartType.SERIAL.getId().equals(type.getAsString())) {
+            return gson.fromJson(getCustomDefinition(), SerialChartDescription.class);
+        }
+
+        return null;
+    }
+
+    public void setChartDescription(@Nullable AbstractChartDescription chartDescription) {
+        if (chartDescription != null && getReportOutputType() == ReportOutputType.CHART) {
+            Gson gson = new Gson();
+            String json = gson.toJson(chartDescription);
+            setCustomDefinition(json);
+            setName(".chart");
         }
     }
 }

@@ -12,13 +12,14 @@ import org.apache.commons.lang.ObjectUtils;
  * @version $Id$
  */
 public enum ReportOutputType implements EnumClass<Integer> {
-    XLS(0, com.haulmont.yarg.structure.ReportOutputType.xls),
-    DOC(10, com.haulmont.yarg.structure.ReportOutputType.doc),
-    PDF(20, com.haulmont.yarg.structure.ReportOutputType.pdf),
-    HTML(30, com.haulmont.yarg.structure.ReportOutputType.html),
-    DOCX(40, com.haulmont.yarg.structure.ReportOutputType.docx),
-    XLSX(50, com.haulmont.yarg.structure.ReportOutputType.xlsx),
-    CUSTOM(60, com.haulmont.yarg.structure.ReportOutputType.custom);
+    XLS(0, CubaReportOutputType.xls),
+    DOC(10, CubaReportOutputType.doc),
+    PDF(20, CubaReportOutputType.pdf),
+    HTML(30, CubaReportOutputType.html),
+    DOCX(40, CubaReportOutputType.docx),
+    XLSX(50, CubaReportOutputType.xlsx),
+    CUSTOM(60, CubaReportOutputType.custom),
+    CHART(70, CubaReportOutputType.chart);
 
     private Integer id;
 

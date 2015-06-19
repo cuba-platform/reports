@@ -1,0 +1,68 @@
+<!--
+  ~ Copyright (c) 2008-2015 Haulmont. All rights reserved.
+  ~ Use is subject to license terms, see http://www.cuba-platform.com/license for details.
+  -->
+
+<window xmlns="http://schemas.haulmont.com/cuba/5.5/window.xsd"
+        class="com.haulmont.reports.gui.template.edit.ChartEditFrameController"
+        messagesPack="com.haulmont.reports.gui">
+
+    <companions>
+        <web class="com.haulmont.reports.web.report.template.WebChartEditControllerCompanion"/>
+    </companions>
+
+    <dsContext>
+        <datasource id="pieChartDs" class="com.haulmont.reports.entity.charts.PieChartDescription" view="_local"
+                    allowCommit="false"/>
+        <datasource id="serialChartDs" class="com.haulmont.reports.entity.charts.SerialChartDescription" view="_local"
+                    allowCommit="false">
+            <collectionDatasource id="seriesDs" property="series" allowCommit="false"/>
+        </datasource>
+    </dsContext>
+
+    <layout spacing="true">
+        <hbox spacing="true">
+            <label value="msg://com.haulmont.reports.entity.charts/AbstractChartDescription.type"
+                   align="MIDDLE_CENTER"/>
+            <lookupField id="type" width="200px" required="true"/>
+        </hbox>
+
+        <fieldGroup id="pieChartFieldGroup" datasource="pieChartDs">
+            <column width="200">
+                <field id="bandName"/>
+                <field id="titleField"/>
+                <field id="valueField"/>
+                <field id="colorField"/>
+                <field id="units"/>
+                <field id="showLegend"/>
+            </column>
+        </fieldGroup>
+        <fieldGroup id="serialChartFieldGroup" datasource="serialChartDs">
+            <column width="200">
+                <field id="bandName"/>
+                <field id="categoryField"/>
+                <field id="categoryAxisCaption"/>
+                <field id="valueAxisCaption"/>
+                <field id="valueAxisUnits"/>
+                <field id="valueStackType"/>
+            </column>
+        </fieldGroup>
+        <table id="seriesTable" editable="true" width="100%" height="200px">
+            <actions>
+                <action id="create"/>
+                <action id="remove"/>
+            </actions>
+            <buttonsPanel>
+                <button action="seriesTable.create"/>
+                <button action="seriesTable.remove"/>
+            </buttonsPanel>
+            <columns>
+                <column id="name" editable="true"/>
+                <column id="valueField" editable="true"/>
+                <column id="type" editable="true"/>
+                <column id="colorField" editable="true"/>
+            </columns>
+            <rows datasource="seriesDs"/>
+        </table>
+    </layout>
+</window>

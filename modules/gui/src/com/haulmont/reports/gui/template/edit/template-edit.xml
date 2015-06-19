@@ -21,58 +21,69 @@
     <assign name="width" value="300px"/>
 
     <layout spacing="true">
-        <grid spacing="true">
-            <columns>
-                <column flex="1"/>
-                <column flex="1"/>
-                <column flex="1"/>
-            </columns>
-            <rows>
-                <row>
-                    <label value="msg://template.code"/>
-                    <textField id="code" datasource="templateDs" property="code"
-                               width="${width}" required="true"
-                               requiredMessage="msg://template.codeMsg"/>
-                </row>
-                <row>
-                    <label value="msg://template.outputType"/>
-                    <lookupField id="outputType" datasource="templateDs"
-                                 property="reportOutputType"
-                                 width="${width}" required="true"
-                                 requiredMessage="msg://template.outputTypeMsg"/>
-                </row>
-                <row>
-                    <label value="msg://template.file"/>
-                    <hbox spacing="true" width="${width}" expand="templatePath">
-                        <upload id="uploadTemplate"/>
-                        <button id="templatePath" stylename="link"/>
-                    </hbox>
-                </row>
-                <row>
-                    <label value="msg://template.outputNamePattern"/>
-                    <textField id="outputNamePattern" datasource="templateDs" property="outputNamePattern"
-                               width="${width}">
-                        <validator
-                                class="com.haulmont.reports.gui.report.validators.OutputFileNameValidator"/>
-                    </textField>
-                </row>
-                <row>
-                    <label value="msg://template.isCustom"/>
-                    <checkBox id="custom" datasource="templateDs" property="custom"
-                              width="${width}"/>
-                </row>
-                <row>
-                    <label value="msg://template.customDefinedBy"/>
-                    <lookupField id="customDefinedBy" datasource="templateDs" property="customDefinedBy"
-                               width="${width}"/>
-                </row>
-                <row>
-                    <label value="msg://template.customClass"/>
-                    <textField id="customClass" datasource="templateDs" property="customClass"
-                               width="${width}"/>
-                </row>
-            </rows>
-        </grid>
+        <hbox width="100%" expand="chartPreviewBox">
+            <vbox spacing="true" width="AUTO">
+                <grid spacing="true">
+                    <columns>
+                        <column flex="1"/>
+                        <column flex="1"/>
+                        <column flex="1"/>
+                    </columns>
+                    <rows>
+                        <row>
+                            <label value="msg://template.code"/>
+                            <textField id="code" datasource="templateDs" property="code"
+                                       width="${width}" required="true"
+                                       requiredMessage="msg://template.codeMsg"/>
+                        </row>
+                        <row>
+                            <label value="msg://template.outputType"/>
+                            <lookupField id="outputType" datasource="templateDs"
+                                         property="reportOutputType"
+                                         width="${width}" required="true"
+                                         requiredMessage="msg://template.outputTypeMsg"/>
+                        </row>
+                        <row>
+                            <label id="templateFileLabel" value="msg://template.file"/>
+                            <hbox spacing="true" width="${width}" expand="templatePath">
+                                <upload id="uploadTemplate"/>
+                                <button id="templatePath" stylename="link"/>
+                            </hbox>
+                        </row>
+                        <row>
+                            <label id="outputNamePatternLabel" value="msg://template.outputNamePattern"/>
+                            <textField id="outputNamePattern" datasource="templateDs" property="outputNamePattern"
+                                       width="${width}">
+                                <validator
+                                        class="com.haulmont.reports.gui.report.validators.OutputFileNameValidator"/>
+                            </textField>
+                        </row>
+                        <row>
+                            <label value="msg://template.isCustom"/>
+                            <checkBox id="custom" datasource="templateDs" property="custom"
+                                      width="${width}"/>
+                        </row>
+                        <row>
+                            <label id="customDefinedByLabel" value="msg://template.customDefinedBy"/>
+                            <lookupField id="customDefinedBy" datasource="templateDs" property="customDefinedBy"
+                                         width="${width}"/>
+                        </row>
+                        <row>
+                            <label id="customDefinitionLabel" value="msg://template.customDefinition"/>
+                            <textField id="customDefinition" datasource="templateDs" property="customDefinition"
+                                       width="${width}"/>
+                        </row>
+                    </rows>
+                </grid>
+                <hbox id="chartEditBox" visible="false">
+                    <iframe id="chartEdit" screen="chartEdit" width="AUTO"/>
+                </hbox>
+            </vbox>
+            <vbox id="chartPreviewBox" visible="false">
+
+            </vbox>
+        </hbox>
+
         <iframe id="windowActions" screen="editWindowActions" width="AUTO"/>
     </layout>
 </window>

@@ -855,7 +855,7 @@ public class ReportEditor extends AbstractEditor<Report> {
 
     protected boolean validateInputOutputFormats() {
         ReportTemplate template = getItem().getDefaultTemplate();
-        if (template != null && !template.isCustom()) {
+        if (template != null && !template.isCustom() && template.getReportOutputType() != ReportOutputType.CHART) {
             String inputType = template.getExt();
             if (!ReportPrintHelper.getInputOutputTypesMapping().containsKey(inputType) ||
                     !ReportPrintHelper.getInputOutputTypesMapping().get(inputType).contains(template.getReportOutputType())) {
@@ -873,7 +873,18 @@ public class ReportEditor extends AbstractEditor<Report> {
                 return Collections.<String, Object>singletonMap("report", getItem());
             }
         });
-        templatesTable.addAction(new EditAction(templatesTable, OpenType.DIALOG));
+
+        templatesTable.addAction(new EditAction(templatesTable, OpenType.DIALOG){
+            @Override
+            protected void afterCommit(Entity entity) {
+                ReportTemplate reportTemplate = (ReportTemplate) entity;
+                ReportTemplate defaultTemplate = getItem().getDefaultTemplate();
+                if (defaultTemplate != null && defaultTemplate.equals(reportTemplate)) {
+                    getItem().setDefaultTemplate(reportTemplate);
+                }
+            }
+        });
+
         templatesTable.addAction(new RemoveAction(templatesTable, false) {
             @Override
             protected void afterRemove(Set selected) {

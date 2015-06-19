@@ -18,7 +18,7 @@
                 <column id="name"/>
                 <column id="code"/>
                 <column id="reportOutputType"/>
-                <column id="customClass"/>
+                <column id="customDefinition"/>
             </columns>
             <rows datasource="templatesDs"/>
         </table>

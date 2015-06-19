@@ -120,6 +120,7 @@ public class ReportingBean implements ReportingApi {
         xStream.omitField(ReportInputParameter.class, "localeName");
 
         xStream.aliasField("customFlag", ReportTemplate.class, "custom");
+        xStream.aliasField("customClass", ReportTemplate.class, "customDefinition");
         xStream.aliasField("uuid", BandDefinition.class, "id");
         xStream.aliasField("uuid", DataSet.class, "id");
         xStream.aliasField("uuid", ReportInputParameter.class, "id");

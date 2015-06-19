@@ -10,8 +10,11 @@ import com.haulmont.cuba.core.app.DataService;
 import com.haulmont.cuba.core.global.*;
 import com.haulmont.cuba.gui.AppConfig;
 import com.haulmont.cuba.gui.WindowManager;
+import com.haulmont.cuba.gui.WindowManagerProvider;
 import com.haulmont.cuba.gui.backgroundwork.BackgroundWorkWindow;
 import com.haulmont.cuba.gui.components.IFrame;
+import com.haulmont.cuba.gui.config.WindowConfig;
+import com.haulmont.cuba.gui.config.WindowInfo;
 import com.haulmont.cuba.gui.executors.BackgroundTask;
 import com.haulmont.cuba.gui.executors.TaskLifeCycle;
 import com.haulmont.cuba.gui.export.ByteArrayDataProvider;
@@ -23,10 +26,8 @@ import com.haulmont.cuba.security.entity.User;
 import com.haulmont.cuba.security.entity.UserRole;
 import com.haulmont.reports.app.ParameterPrototype;
 import com.haulmont.reports.app.service.ReportService;
-import com.haulmont.reports.entity.ParameterType;
-import com.haulmont.reports.entity.Report;
-import com.haulmont.reports.entity.ReportInputParameter;
-import com.haulmont.reports.entity.ReportScreen;
+import com.haulmont.reports.entity.*;
+import com.haulmont.reports.gui.report.run.ShowChartController;
 import com.haulmont.yarg.reporting.ReportOutputDocument;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
@@ -57,6 +58,12 @@ public class ReportGuiManager {
     @Inject
     protected Metadata metadata;
 
+    @Inject
+    protected WindowManagerProvider windowManagerProvider;
+
+    @Inject
+    protected WindowConfig windowConfig;
+
     public void runReport(Report report, IFrame window) {
         if (report == null) {
             throw new IllegalArgumentException("Can not run null report");
@@ -69,8 +76,8 @@ public class ReportGuiManager {
         }
     }
 
-    public void runReport(Report report, IFrame window, final ReportInputParameter parameter, final Object parameterValue, @Nullable String templateCode, @Nullable String
-            outputFileName) {
+    public void runReport(Report report, IFrame window, final ReportInputParameter parameter, final Object parameterValue,
+                          @Nullable String templateCode, @Nullable String outputFileName) {
         if (report == null) {
             throw new IllegalArgumentException("Can not run null report");
         }
@@ -98,8 +105,8 @@ public class ReportGuiManager {
 
 
     @Nullable
-    protected Object convertParameterIfNecessary(ReportInputParameter parameter, @Nullable Object paramValue, boolean
-            reportHasMoreThanOneParameter) {
+    protected Object convertParameterIfNecessary(ReportInputParameter parameter, @Nullable Object paramValue,
+                                                 boolean reportHasMoreThanOneParameter) {
         Object resultingParamValue = paramValue;
         if (ParameterType.ENTITY == parameter.getType()) {
             if (paramValue instanceof Collection || paramValue instanceof ParameterPrototype) {
@@ -156,7 +163,7 @@ public class ReportGuiManager {
         printReport(report, params, null, null, window);
     }
 
-    public void printReport(Report report, Map<String, Object> params, @Nullable String templateCode, @Nullable String outputFileName, @Nullable IFrame window) {
+    public void printReport(Report report, Map<String, Object> params, @Nullable String templateCode, @Nullable String outputFileName,@Nullable IFrame window) {
 
         Configuration configuration = AppBeans.get(Configuration.NAME);
         ReportingClientConfig reportingClientConfig = configuration.getConfig(ReportingClientConfig.class);
@@ -172,24 +179,48 @@ public class ReportGuiManager {
      * Print report synchronously
      */
     public void printReportSync(Report report, Map<String, Object> params, @Nullable String templateCode, @Nullable String outputFileName, @Nullable IFrame window) {
+        ReportOutputDocument document = getReportResult(report, params, templateCode);
+
+        showReportResult(document, templateCode, outputFileName, window);
+    }
+
+    public ReportOutputDocument getReportResult(Report report, Map<String, Object> params, @Nullable String templateCode) {
         ReportOutputDocument document;
         if (StringUtils.isBlank(templateCode)) {
             document = reportService.createReport(report, params);
         } else {
             document = reportService.createReport(report, templateCode, params);
         }
+        return document;
+    }
 
-        byte[] byteArr = document.getContent();
-        ExportFormat exportFormat = ReportPrintHelper.getExportFormat(document.getReportOutputType());
-        ExportDisplay exportDisplay = AppConfig.createExportDisplay(window);
-        String documentName = isNotBlank(outputFileName) ? outputFileName : document.getDocumentName();
-        exportDisplay.show(new ByteArrayDataProvider(byteArr), documentName, exportFormat);
+    protected void showReportResult(ReportOutputDocument document, @Nullable String templateCode, @Nullable String outputFileName, @Nullable IFrame window) {
+        if (document.getReportOutputType() == CubaReportOutputType.chart) {
+            HashMap<String, Object> screenParams = new HashMap<>();
+            screenParams.put(ShowChartController.CHART_JSON_PARAMETER, new String(document.getContent()));
+            screenParams.put(ShowChartController.REPORT_PARAMETER, document.getReport());
+            screenParams.put(ShowChartController.TEMPLATE_CODE_PARAMETER, templateCode);
+
+            if (window != null) {
+                window.openWindow("report$showChart", WindowManager.OpenType.NEW_TAB, screenParams);
+            } else {
+                WindowInfo windowInfo = windowConfig.getWindowInfo("report$showChart");
+                windowManagerProvider.get().openWindow(windowInfo, WindowManager.OpenType.NEW_TAB, screenParams);
+            }
+        } else {
+            byte[] byteArr = document.getContent();
+            ExportFormat exportFormat = ReportPrintHelper.getExportFormat(document.getReportOutputType());
+            ExportDisplay exportDisplay = AppConfig.createExportDisplay(window);
+            String documentName = isNotBlank(outputFileName) ? outputFileName : document.getDocumentName();
+            exportDisplay.show(new ByteArrayDataProvider(byteArr), documentName, exportFormat);
+        }
     }
 
     /**
      * Print report in background task with window, supports cancel
      */
-    public void printReportBackground(Report report, final Map<String, Object> params, final @Nullable String templateCode, final @Nullable String outputFileName, IFrame window) {
+    public void printReportBackground(Report report, final Map<String, Object> params,
+                                      final @Nullable String templateCode, final @Nullable String outputFileName, final IFrame window) {
 
         Configuration configuration = AppBeans.get(Configuration.NAME);
         ReportingClientConfig reportingClientConfig = configuration.getConfig(ReportingClientConfig.class);
@@ -201,22 +232,13 @@ public class ReportGuiManager {
 
             @Override
             public ReportOutputDocument run(TaskLifeCycle<Void> taskLifeCycle) throws Exception {
-                ReportOutputDocument result;
-                if (StringUtils.isBlank(templateCode)) {
-                    result = reportService.createReport(targetReport, params);
-                } else {
-                    result = reportService.createReport(targetReport, templateCode, params);
-                }
+                ReportOutputDocument result = getReportResult(targetReport, params, templateCode);
                 return result;
             }
 
             @Override
             public void done(ReportOutputDocument document) {
-                byte[] byteArr = document.getContent();
-                ExportFormat exportFormat = ReportPrintHelper.getExportFormat(document.getReportOutputType());
-                ExportDisplay exportDisplay = AppConfig.createExportDisplay(null);
-                String documentName = isNotBlank(outputFileName) ? outputFileName : document.getDocumentName();
-                exportDisplay.show(new ByteArrayDataProvider(byteArr), documentName, exportFormat);
+                showReportResult(document, templateCode, outputFileName, window);
             }
         };
 

@@ -46,6 +46,12 @@ public class CubaFormatterFactory extends DefaultFormatterFactory {
         };
 
         formattersMap.put("docx", docxCreator);
+        formattersMap.put("chart", new FormatterCreator() {
+            @Override
+            public ReportFormatter create(FormatterFactoryInput formatterFactoryInput) {
+                return new ChartFormatter(formatterFactoryInput);
+            }
+        });
     }
 
     @Override

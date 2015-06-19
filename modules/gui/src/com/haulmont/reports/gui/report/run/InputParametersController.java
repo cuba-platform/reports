@@ -57,6 +57,8 @@ public class InputParametersController extends AbstractWindow {
 
     protected ParameterClassResolver parameterClassResolver = new ParameterClassResolver();
 
+    protected PrintReportHandler printReportHandler;
+
     @Override
     public void init(Map<String, Object> params) {
         super.init(params);
@@ -88,14 +90,17 @@ public class InputParametersController extends AbstractWindow {
 
     public void printReport() {
         if (report != null) {
-            if (validateAll()) {
-                reportGuiManager.printReport(report,
-                        collectParameters(parameterComponents), templateCode, outputFileName, this);
+            if (printReportHandler == null) {
+                if (validateAll()) {
+                    reportGuiManager.printReport(report, collectParameters(), templateCode, outputFileName, this);
+                }
+            } else {
+                printReportHandler.handle();
             }
         }
     }
 
-    protected Map<String, Object> collectParameters(HashMap<String, Field> parameterComponents) {
+    public Map<String, Object> collectParameters() {
         Map<String, Object> parameters = new HashMap<>();
         for (String paramName : parameterComponents.keySet()) {
             Field parameterField = parameterComponents.get(paramName);
@@ -139,5 +144,13 @@ public class InputParametersController extends AbstractWindow {
         parameterComponents.put(parameter.getAlias(), field);
         parametersGrid.add(label, 0, currentGridRow);
         parametersGrid.add(field, 1, currentGridRow);
+    }
+
+    public void setPrintReportHandler(PrintReportHandler printReportHandler) {
+        this.printReportHandler = printReportHandler;
+    }
+
+    public interface PrintReportHandler {
+        public void handle();
     }
 }

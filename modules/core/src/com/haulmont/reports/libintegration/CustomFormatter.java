@@ -10,7 +10,10 @@
  */
 package com.haulmont.reports.libintegration;
 
-import com.haulmont.cuba.core.global.*;
+import com.haulmont.cuba.core.global.AppBeans;
+import com.haulmont.cuba.core.global.Configuration;
+import com.haulmont.cuba.core.global.GlobalConfig;
+import com.haulmont.cuba.core.global.Scripting;
 import com.haulmont.reports.ReportingConfig;
 import com.haulmont.reports.entity.CustomTemplateDefinedBy;
 import com.haulmont.reports.entity.Report;
@@ -56,12 +59,12 @@ public class CustomFormatter implements com.haulmont.yarg.formatters.CustomRepor
     }
 
     @Override
-    public byte[] createReport(com.haulmont.yarg.structure.Report report, BandData rootBand, Map<String, Object> stringObjectMap) {
+    public byte[] createReport(com.haulmont.yarg.structure.Report report, BandData rootBand, Map<String, Object> params) {
         return createDocument(rootBand);
     }
 
     public byte[] createDocument(BandData rootBand) {
-        String customDefinition = template.getCustomClass();
+        String customDefinition = template.getCustomDefinition();
         CustomTemplateDefinedBy definedBy = template.getCustomDefinedBy();
         if (CustomTemplateDefinedBy.CLASS == definedBy) {
             return generateReportWithClass(rootBand, customDefinition);
@@ -83,7 +86,7 @@ public class CustomFormatter implements com.haulmont.yarg.formatters.CustomRepor
         } catch (InstantiationException | IllegalAccessException e) {
             throw new ReportingException(
                     format("Could not instantiate class for custom template [%s]. Report name [%s]",
-                            template.getCustomClass(), report.getName()), e);
+                            template.getCustomDefinition(), report.getName()), e);
         }
     }
 
