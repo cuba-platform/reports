@@ -10,6 +10,7 @@
         <item id="report$Report.browse"/>
         <item id="report$ReportGroup.browse"/>
         <item id="report$Report.run"/>
+        <item id="report$showChart"/>
     </menu>
 
 </menu-config>

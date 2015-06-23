@@ -10,11 +10,18 @@
         messagesPack="com.haulmont.reports.gui.report.run"
         >
     <dsContext>
+        <collectionDatasource id="reportsDs" class="com.haulmont.reports.entity.Report">
+            <query>select r from report$Report r, in (r.templates) t where t.reportOutputType = 70</query>
+        </collectionDatasource>
     </dsContext>
     <layout expand="chartBox">
-        <groupBox id="reportParamsBox" collapsable="true" collapsed="false">
+        <hbox spacing="true">
+            <label id="reportLookupLabel" align="MIDDLE_CENTER" value="msg://caption.reportForChart"/>
+            <lookupField id="reportLookup" optionsDatasource="reportsDs" width="400px"/>
+        </hbox>
+        <groupBox id="reportParamsBox" collapsable="true" collapsed="false" caption="msg://caption.reportParameters">
         </groupBox>
-        <vbox id="chartBox" width="100%">
-        </vbox>
+        <groupBox id="chartBox" collapsable="true" collapsed="false" width="100%" caption="msg://caption.chart">
+        </groupBox>
     </layout>
 </window>

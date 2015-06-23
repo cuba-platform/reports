@@ -5,15 +5,14 @@
 
 package com.haulmont.reports.gui.report.run;
 
-import com.haulmont.cuba.gui.components.AbstractWindow;
-import com.haulmont.cuba.gui.components.BoxLayout;
-import com.haulmont.cuba.gui.components.GroupBoxLayout;
-import com.haulmont.cuba.gui.components.ValidationException;
+import com.haulmont.cuba.gui.components.*;
+import com.haulmont.cuba.gui.data.ValueListener;
 import com.haulmont.cuba.gui.theme.ThemeConstants;
 import com.haulmont.reports.entity.Report;
 import com.haulmont.reports.gui.ReportGuiManager;
 import com.haulmont.yarg.reporting.ReportOutputDocument;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.util.Collections;
 import java.util.Map;
@@ -33,13 +32,19 @@ public class ShowChartController extends AbstractWindow {
     protected GroupBoxLayout reportParamsBox;
 
     @Inject
-    protected BoxLayout chartBox;
+    protected GroupBoxLayout chartBox;
 
     @Inject
     protected ReportGuiManager reportGuiManager;
 
     @Inject
     protected ThemeConstants themeConstants;
+
+    @Inject
+    protected LookupField reportLookup;
+
+    @Inject
+    private Label reportLookupLabel;
 
     protected InputParametersController inputParametersController;
 
@@ -57,24 +62,53 @@ public class ShowChartController extends AbstractWindow {
         report = (Report) params.get(REPORT_PARAMETER);
         templateCode = (String) params.get(TEMPLATE_CODE_PARAMETER);
 
-        inputParametersController = openFrame(reportParamsBox, "report$inputParameters",
-                Collections.<String, Object>singletonMap(InputParametersController.REPORT_PARAMETER, report));
-        openFrame(chartBox, JSON_CHART_SCREEN_ID, Collections.<String, Object>singletonMap("Chart", chartJson));
+        if (report != null) {
+            reportLookup.setVisible(false);
+            reportLookupLabel.setVisible(false);
+            initFrames(chartJson);
+        }
 
-        inputParametersController.setPrintReportHandler(new InputParametersController.PrintReportHandler() {
+        reportLookup.addListener(new ValueListener() {
             @Override
-            public void handle() {
-                try {
-                    inputParametersController.validate();
-                    Map<String, Object> parameters = inputParametersController.collectParameters();
-                    ReportOutputDocument reportResult = reportGuiManager.getReportResult(report, parameters, templateCode);
-                    chartBox.removeAll();
-                    openFrame(chartBox, JSON_CHART_SCREEN_ID,
-                            Collections.<String, Object>singletonMap("Chart", new String(reportResult.getContent())));
-                } catch (ValidationException e) {
-                    showNotification(getMessage("validationFail.caption"), e.getLocalizedMessage(), NotificationType.TRAY);
-                }
+            public void valueChanged(Object source, String property, @Nullable Object prevValue, @Nullable Object value) {
+                report = (Report) value;
+                initFrames(null);
             }
         });
+    }
+
+    protected void initFrames(String chartJson) {
+        openChart(chartJson);
+        openReportParameters();
+    }
+
+    private void openReportParameters() {
+        reportParamsBox.removeAll();
+        if (report != null) {
+            inputParametersController = openFrame(reportParamsBox, "report$inputParameters",
+                    Collections.<String, Object>singletonMap(InputParametersController.REPORT_PARAMETER, report));
+
+            inputParametersController.setPrintReportHandler(new InputParametersController.PrintReportHandler() {
+                @Override
+                public void handle() {
+                    try {
+                        inputParametersController.validate();
+                        Map<String, Object> parameters = inputParametersController.collectParameters();
+                        ReportOutputDocument reportResult = reportGuiManager.getReportResult(report, parameters, templateCode);
+                        openChart(new String(reportResult.getContent()));
+                    } catch (ValidationException e) {
+                        showNotification(getMessage("validationFail.caption"), e.getLocalizedMessage(), NotificationType.TRAY);
+                    }
+                }
+            });
+        }
+    }
+
+    protected void openChart(String chartJson) {
+        chartBox.removeAll();
+        if (chartJson != null) {
+            openFrame(chartBox, JSON_CHART_SCREEN_ID,
+                    Collections.<String, Object>singletonMap("Chart", chartJson));
+        }
     }
 }

@@ -18,7 +18,8 @@ public class ChartToJsonConverter {
         HashMap<String, Object> chart = new HashMap<>();
         chart.put("type", "serial");
         chart.put("categoryField", description.getCategoryField());
-        chart.put("chartScrollbar", new HashMap<>());
+        chart.put("chartScrollbar", Collections.emptyMap());
+        exportConfig(chart);
 
         HashMap<Object, Object> valueAxis = new HashMap<>();
         valueAxis.put("gridColor", "#FFFFFF");
@@ -62,11 +63,24 @@ public class ChartToJsonConverter {
         return gson.toJson(chart);
     }
 
+    protected void exportConfig(HashMap<String, Object> chart) {
+        HashMap<Object, Object> exportConfig = new HashMap<>();
+        exportConfig.put("menuTop", "100px");
+        ArrayList<Object> menuItems = new ArrayList<>();
+        HashMap<Object, Object> menuItem = new HashMap<>();
+        menuItem.put("format", "png");
+        menuItem.put("icon", "VAADIN/resources/amcharts/images/export.png");
+        menuItems.add(menuItem);
+        exportConfig.put("menuItems", menuItems);
+        chart.put("exportConfig", exportConfig);
+    }
+
     public String convertPieChart(PieChartDescription description, List<Map<String, Object>> data) {
         HashMap<String, Object> chart = new HashMap<>();
         chart.put("type", "pie");
         chart.put("titleField", description.getTitleField());
         chart.put("valueField", description.getValueField());
+        exportConfig(chart);
 
         if (Boolean.TRUE.equals(description.getShowLegend())) {
             Map<String, Object> legend = new HashMap<>();
