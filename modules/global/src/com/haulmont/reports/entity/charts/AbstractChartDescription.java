@@ -28,11 +28,13 @@ public class AbstractChartDescription extends AbstractNotPersistentEntity {
         Preconditions.checkNotNullArgument(jsonString);
         Gson gson = new Gson();
         JsonObject jsonElement = gson.fromJson(jsonString, JsonObject.class);
-        JsonPrimitive type = jsonElement.getAsJsonPrimitive("type");
-        if (ChartType.PIE.getId().equals(type.getAsString())) {
-            return gson.fromJson(jsonString, PieChartDescription.class);
-        } else if (ChartType.SERIAL.getId().equals(type.getAsString())) {
-            return gson.fromJson(jsonString, SerialChartDescription.class);
+        if (jsonElement != null) {
+            JsonPrimitive type = jsonElement.getAsJsonPrimitive("type");
+            if (ChartType.PIE.getId().equals(type.getAsString())) {
+                return gson.fromJson(jsonString, PieChartDescription.class);
+            } else if (ChartType.SERIAL.getId().equals(type.getAsString())) {
+                return gson.fromJson(jsonString, SerialChartDescription.class);
+            }
         }
 
         return null;
