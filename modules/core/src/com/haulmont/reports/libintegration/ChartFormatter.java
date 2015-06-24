@@ -42,7 +42,7 @@ public class ChartFormatter extends AbstractFormatter {
         try {
             IOUtils.write(chartJson, outputStream);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("An error occurred while rendering chart",e);
         }
     }
 
@@ -53,7 +53,8 @@ public class ChartFormatter extends AbstractFormatter {
             data.add(bandData.getData());
         }
 
-        return new ChartToJsonConverter().convertSerialChart(description, data);
+        return new ChartToJsonConverter(((ReportTemplate) reportTemplate).getReport().getLocName())
+                .convertSerialChart(description, data);
     }
 
     protected String convertPieChart(PieChartDescription description) {
@@ -63,6 +64,7 @@ public class ChartFormatter extends AbstractFormatter {
             data.add(bandData.getData());
         }
 
-        return new ChartToJsonConverter().convertPieChart(description, data);
+        return new ChartToJsonConverter(((ReportTemplate) reportTemplate).getReport().getLocName())
+                .convertPieChart(description, data);
     }
 }

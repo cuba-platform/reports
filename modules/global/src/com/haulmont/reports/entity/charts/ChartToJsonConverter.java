@@ -6,6 +6,7 @@
 package com.haulmont.reports.entity.charts;
 
 import com.google.gson.Gson;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.*;
 
@@ -14,6 +15,15 @@ import java.util.*;
  * @version $Id$
  */
 public class ChartToJsonConverter {
+    protected String resultFileName;
+
+    public ChartToJsonConverter() {
+    }
+
+    public ChartToJsonConverter(String resultFileName) {
+        this.resultFileName = resultFileName;
+    }
+
     public String convertSerialChart(SerialChartDescription description, List<Map<String, Object>> data) {
         HashMap<String, Object> chart = new HashMap<>();
         chart.put("type", "serial");
@@ -72,6 +82,9 @@ public class ChartToJsonConverter {
         menuItem.put("icon", "VAADIN/resources/amcharts/images/export.png");
         menuItems.add(menuItem);
         exportConfig.put("menuItems", menuItems);
+        if (StringUtils.isNotBlank(resultFileName)) {
+            exportConfig.put("menuItemOutput", Collections.singletonMap("fileName", resultFileName));
+        }
         chart.put("exportConfig", exportConfig);
     }
 
