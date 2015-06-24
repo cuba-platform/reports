@@ -204,10 +204,10 @@ public class ReportGuiManager {
             screenParams.put(ShowChartController.PARAMS_PARAMETER, params);
 
             if (window != null) {
-                window.openWindow("report$showChart", WindowManager.OpenType.NEW_TAB, screenParams);
+                window.openWindow("report$showChart", WindowManager.OpenType.DIALOG, screenParams);
             } else {
                 WindowInfo windowInfo = windowConfig.getWindowInfo("report$showChart");
-                windowManagerProvider.get().openWindow(windowInfo, WindowManager.OpenType.NEW_TAB, screenParams);
+                windowManagerProvider.get().openWindow(windowInfo, WindowManager.OpenType.DIALOG, screenParams);
             }
         } else {
             byte[] byteArr = document.getContent();
