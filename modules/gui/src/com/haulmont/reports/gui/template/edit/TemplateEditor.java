@@ -126,6 +126,7 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
             }
         });
 
+        chartEdit.setBands(reportTemplate.getReport().getBands());
         if (reportTemplate.getReportOutputType() == ReportOutputType.CHART) {
             chartEdit.setChartDescription(reportTemplate.getChartDescription());
         }

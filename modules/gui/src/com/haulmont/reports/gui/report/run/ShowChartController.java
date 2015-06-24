@@ -17,6 +17,7 @@ import org.apache.commons.collections.CollectionUtils;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -29,6 +30,7 @@ public class ShowChartController extends AbstractWindow {
     public static final String CHART_JSON_PARAMETER = "chartJson";
     public static final String REPORT_PARAMETER = "report";
     public static final String TEMPLATE_CODE_PARAMETER = "templateCode";
+    public static final String PARAMS_PARAMETER = "reportParams";
 
     @Inject
     protected GroupBoxLayout reportParamsBox;
@@ -66,11 +68,13 @@ public class ShowChartController extends AbstractWindow {
         String chartJson = (String) params.get(CHART_JSON_PARAMETER);
         report = (Report) params.get(REPORT_PARAMETER);
         templateCode = (String) params.get(TEMPLATE_CODE_PARAMETER);
+        @SuppressWarnings("unchecked")
+        Map<String,Object> reportParameters = (Map<String, Object>) params.get(PARAMS_PARAMETER);
 
         if (report != null) {
             reportLookup.setVisible(false);
             reportLookupLabel.setVisible(false);
-            initFrames(chartJson);
+            initFrames(chartJson, reportParameters);
         } else {
             showDiagramStubText();
         }
@@ -79,22 +83,24 @@ public class ShowChartController extends AbstractWindow {
             @Override
             public void valueChanged(Object source, String property, @Nullable Object prevValue, @Nullable Object value) {
                 report = (Report) value;
-                initFrames(null);
+                initFrames(null, null);
             }
         });
     }
 
-    protected void initFrames(String chartJson) {
+    protected void initFrames(String chartJson, Map<String, Object> reportParameters) {
         openChart(chartJson);
-        openReportParameters();
+        openReportParameters(reportParameters);
     }
 
-    private void openReportParameters() {
+    private void openReportParameters(Map<String, Object> reportParameters) {
         reportParamsBox.removeAll();
         if (report != null) {
-            inputParametersController = openFrame(reportParamsBox, "report$inputParameters",
-                    Collections.<String, Object>singletonMap(InputParametersController.REPORT_PARAMETER, report));
+            Map<String, Object> params = new HashMap<>();
+            params.put(InputParametersController.REPORT_PARAMETER, report) ;
+            params.put(InputParametersController.PARAMETERS_PARAMETER, reportParameters) ;
 
+            inputParametersController = openFrame(reportParamsBox, "report$inputParameters", params);
             inputParametersController.setPrintReportHandler(new InputParametersController.PrintReportHandler() {
                 @Override
                 public void handle() {

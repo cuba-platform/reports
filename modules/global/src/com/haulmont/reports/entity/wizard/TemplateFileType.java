@@ -15,7 +15,9 @@ import org.apache.commons.lang.ObjectUtils;
 public enum TemplateFileType implements EnumClass<Integer> {
     HTML(30),
     DOCX(40),
-    XLSX(50);
+    XLSX(50),
+    CHART(60);
+
     private Integer id;
 
     private TemplateFileType(Integer id) {

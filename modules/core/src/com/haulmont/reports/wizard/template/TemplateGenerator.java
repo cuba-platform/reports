@@ -8,6 +8,7 @@ package com.haulmont.reports.wizard.template;
 import com.haulmont.reports.entity.wizard.ReportData;
 import com.haulmont.reports.entity.wizard.TemplateFileType;
 import com.haulmont.reports.exception.TemplateGenerationException;
+import com.haulmont.reports.wizard.template.generators.ChartGenerator;
 import com.haulmont.reports.wizard.template.generators.DocxGenerator;
 import com.haulmont.reports.wizard.template.generators.HtmlGenerator;
 import com.haulmont.reports.wizard.template.generators.XlsxGenerator;
@@ -53,6 +54,9 @@ public class TemplateGenerator implements TemplateGeneratorApi {
                 break;
             case HTML:
                 generator = new HtmlGenerator();
+                break;
+            case CHART:
+                generator = new ChartGenerator();
                 break;
             default:
                 throw new TemplateGenerationException(templateFileType + " format is unsupported yet");

@@ -7,7 +7,9 @@ package com.haulmont.reports.gui.report.wizard;
 
 import com.haulmont.bali.util.Dom4j;
 import com.haulmont.chile.core.model.MetaClass;
+import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.MessageTools;
+import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.gui.FrameContextImpl;
 import com.haulmont.cuba.gui.WindowManager;
 import com.haulmont.cuba.gui.components.*;
@@ -15,6 +17,7 @@ import com.haulmont.cuba.gui.components.filter.ConditionsTree;
 import com.haulmont.cuba.gui.components.filter.FilterParser;
 import com.haulmont.cuba.gui.components.filter.Param;
 import com.haulmont.cuba.gui.components.filter.edit.FilterEditor;
+import com.haulmont.cuba.gui.config.WindowConfig;
 import com.haulmont.cuba.gui.config.WindowInfo;
 import com.haulmont.cuba.gui.data.ValueListener;
 import com.haulmont.cuba.gui.data.impl.CollectionDatasourceImpl;
@@ -26,6 +29,7 @@ import com.haulmont.reports.entity.ParameterType;
 import com.haulmont.reports.entity.wizard.ReportData;
 import com.haulmont.reports.entity.wizard.TemplateFileType;
 import com.haulmont.reports.gui.report.run.ParameterClassResolver;
+import com.haulmont.reports.gui.report.run.ShowChartController;
 import com.haulmont.reports.gui.report.wizard.step.StepFrame;
 import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;
@@ -78,7 +82,7 @@ class DetailsStepFrame extends StepFrame {
 
         protected void initTemplateFormatLookupField() {
             wizard.templateFileFormat.setOptionsMap(getAvailableTemplateFormats());
-            wizard.templateFileFormat.setValue(TemplateFileType.fromId(40));//select docx as default value
+            wizard.templateFileFormat.setValue(TemplateFileType.DOCX);//select docx as default value
         }
 
         protected void initReportTypeOptionGroup() {
@@ -104,10 +108,15 @@ class DetailsStepFrame extends StepFrame {
         }
 
         protected Map<String, Object> getAvailableTemplateFormats() {
-            Map<String, Object> result = new LinkedHashMap<>(3);
-            result.put(TemplateFileType.fromId(50).toString().toLowerCase(), TemplateFileType.fromId(50));
-            result.put(TemplateFileType.fromId(40).toString().toLowerCase(), TemplateFileType.fromId(40));
-            result.put(TemplateFileType.fromId(30).toString().toLowerCase(), TemplateFileType.fromId(30));
+            Messages messages = AppBeans.get(Messages.NAME);
+            Map<String, Object> result = new LinkedHashMap<>(4);
+            result.put(messages.getMessage(TemplateFileType.XLSX), TemplateFileType.XLSX);
+            result.put(messages.getMessage(TemplateFileType.DOCX), TemplateFileType.DOCX);
+            result.put(messages.getMessage(TemplateFileType.HTML), TemplateFileType.HTML);
+            WindowConfig windowConfig = AppBeans.get(WindowConfig.NAME);
+            if (windowConfig.hasWindow(ShowChartController.JSON_CHART_SCREEN_ID)) {
+                result.put(messages.getMessage(TemplateFileType.CHART), TemplateFileType.CHART);
+            }
             return result;
         }
 

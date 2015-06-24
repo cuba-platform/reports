@@ -149,6 +149,7 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
 
         stepFrameManager = new StepFrameManager(this, getStepFrames());
 
+        initAvailableFormats();
         initMainButtons();
         initMainFields();
 
@@ -439,19 +440,20 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
     protected void setCorrectReportOutputType() {
         ReportOutputType outputFileFormatPrevValue = outputFileFormat.getValue();
         outputFileFormat.setValue(null);
-        outputFileFormat.setOptionsMap(
-                refreshOutputAvailableFormats(
-                        (TemplateFileType) templateFileFormat.getValue())
-        );
-
+        Map<String, Object> optionsMap = refreshOutputAvailableFormats((TemplateFileType) templateFileFormat.getValue());
+        outputFileFormat.setOptionsMap(optionsMap);
 
         if (outputFileFormatPrevValue != null) {
-            if (outputFileFormat.getOptionsMap().containsKey(outputFileFormatPrevValue.toString().toLowerCase())) {
+            if (optionsMap.containsKey(outputFileFormatPrevValue.toString().toLowerCase())) {
                 outputFileFormat.setValue(outputFileFormatPrevValue);
             }
         }
         if (outputFileFormat.getValue() == null) {
-            outputFileFormat.setValue(outputFileFormat.getOptionsMap().get(templateFileFormat.getValue().toString().toLowerCase()));
+            if (optionsMap.size() > 1) {
+                outputFileFormat.setValue(optionsMap.get(templateFileFormat.getValue().toString().toLowerCase()));
+            } else if (optionsMap.size() == 1) {
+                outputFileFormat.setValue(optionsMap.values().iterator().next());
+            }
         }
     }
 
@@ -459,21 +461,26 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
         return availableOutputFormats.get(templateFileType);
     }
 
-    protected Map<TemplateFileType, Map<String, Object>> availableOutputFormats =
-            new ImmutableMap.Builder<TemplateFileType, Map<String, Object>>()
-                    .put(TemplateFileType.DOCX, new ImmutableMap.Builder<String, Object>()
-                            .put(ReportOutputType.DOCX.toString().toLowerCase(), ReportOutputType.DOCX)
-                            .put(ReportOutputType.HTML.toString().toLowerCase(), ReportOutputType.HTML)
-                            .put(ReportOutputType.PDF.toString().toLowerCase(), ReportOutputType.PDF)
-                            .build())
-                    .put(TemplateFileType.XLSX, new ImmutableMap.Builder<String, Object>()
-                            .put(ReportOutputType.XLSX.toString().toLowerCase(), ReportOutputType.XLSX)
-                            .put(ReportOutputType.PDF.toString().toLowerCase(), ReportOutputType.PDF)
-                            .build())
-                    .put(TemplateFileType.HTML, new ImmutableMap.Builder<String, Object>()
-                            .put(ReportOutputType.HTML.toString().toLowerCase(), ReportOutputType.HTML)
-                            .put(ReportOutputType.PDF.toString().toLowerCase(), ReportOutputType.PDF)
-                            .build())
+    protected Map<TemplateFileType, Map<String, Object>> availableOutputFormats;
 
-                    .build();
+    private void initAvailableFormats() {
+        availableOutputFormats = new ImmutableMap.Builder<TemplateFileType, Map<String, Object>>()
+                .put(TemplateFileType.DOCX, new ImmutableMap.Builder<String, Object>()
+                        .put(ReportOutputType.DOCX.toString().toLowerCase(), ReportOutputType.DOCX)
+                        .put(ReportOutputType.HTML.toString().toLowerCase(), ReportOutputType.HTML)
+                        .put(ReportOutputType.PDF.toString().toLowerCase(), ReportOutputType.PDF)
+                        .build())
+                .put(TemplateFileType.XLSX, new ImmutableMap.Builder<String, Object>()
+                        .put(ReportOutputType.XLSX.toString().toLowerCase(), ReportOutputType.XLSX)
+                        .put(ReportOutputType.PDF.toString().toLowerCase(), ReportOutputType.PDF)
+                        .build())
+                .put(TemplateFileType.HTML, new ImmutableMap.Builder<String, Object>()
+                        .put(ReportOutputType.HTML.toString().toLowerCase(), ReportOutputType.HTML)
+                        .put(ReportOutputType.PDF.toString().toLowerCase(), ReportOutputType.PDF)
+                        .build())
+                .put(TemplateFileType.CHART, new ImmutableMap.Builder<String, Object>()
+                        .put(messages.getMessage(ReportOutputType.CHART), ReportOutputType.CHART)
+                        .build())
+                .build();
+    }
 }

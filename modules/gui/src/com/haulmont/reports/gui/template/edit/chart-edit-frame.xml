@@ -29,7 +29,7 @@
 
         <fieldGroup id="pieChartFieldGroup" datasource="pieChartDs">
             <column width="200">
-                <field id="bandName"/>
+                <field id="bandName" custom="true"/>
                 <field id="titleField"/>
                 <field id="valueField"/>
                 <field id="colorField"/>
@@ -39,7 +39,7 @@
         </fieldGroup>
         <fieldGroup id="serialChartFieldGroup" datasource="serialChartDs">
             <column width="200">
-                <field id="bandName"/>
+                <field id="bandName" custom="true"/>
                 <field id="categoryField"/>
                 <field id="categoryAxisCaption"/>
                 <field id="valueAxisCaption"/>

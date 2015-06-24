@@ -5,17 +5,18 @@
 
 package com.haulmont.reports.gui.template.edit;
 
-import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.components.actions.CreateAction;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
-import com.haulmont.cuba.gui.data.CollectionDatasourceListener;
 import com.haulmont.cuba.gui.data.Datasource;
 import com.haulmont.cuba.gui.data.ValueListener;
 import com.haulmont.cuba.gui.data.impl.CollectionDsListenerAdapter;
 import com.haulmont.cuba.gui.data.impl.DsListenerAdapter;
+import com.haulmont.cuba.gui.xml.layout.ComponentsFactory;
+import com.haulmont.reports.entity.BandDefinition;
 import com.haulmont.reports.entity.charts.*;
 import com.haulmont.reports.gui.report.run.ShowChartController;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.math.RandomUtils;
 
 import javax.annotation.Nullable;
@@ -28,17 +29,21 @@ import java.util.*;
  */
 public class ChartEditFrameController extends AbstractFrame {
     @Inject
-    private Datasource<PieChartDescription> pieChartDs;
+    protected ComponentsFactory componentsFactory;
     @Inject
-    private Datasource<SerialChartDescription> serialChartDs;
+    protected Datasource<PieChartDescription> pieChartDs;
     @Inject
-    private LookupField type;
+    protected Datasource<SerialChartDescription> serialChartDs;
     @Inject
-    private Table seriesTable;
+    protected CollectionDatasource<ChartSeries, UUID> seriesDs;
     @Inject
-    private FieldGroup pieChartFieldGroup;
+    protected LookupField type;
     @Inject
-    private FieldGroup serialChartFieldGroup;
+    protected Table seriesTable;
+    @Inject
+    protected FieldGroup pieChartFieldGroup;
+    @Inject
+    protected FieldGroup serialChartFieldGroup;
 
     public interface Companion {
         void setWindowWidth(Window window, int width);
@@ -74,28 +79,28 @@ public class ChartEditFrameController extends AbstractFrame {
             @Override
             public void actionPerform(Component component) {
                 ChartSeries chartSeries = new ChartSeries();
-                seriesTable.getDatasource().addItem(chartSeries);
+                seriesDs.addItem(chartSeries);
                 seriesTable.refresh();
             }
         });
 
-        pieChartDs.addListener(new DsListenerAdapter<PieChartDescription>(){
+        pieChartDs.addListener(new DsListenerAdapter<PieChartDescription>() {
             @Override
             public void valueChanged(PieChartDescription source, String property, @Nullable Object prevValue, @Nullable Object value) {
                 showChartPreviewBox();
             }
         });
 
-        serialChartDs.addListener(new DsListenerAdapter<SerialChartDescription>(){
+        serialChartDs.addListener(new DsListenerAdapter<SerialChartDescription>() {
             @Override
             public void valueChanged(SerialChartDescription source, String property, @Nullable Object prevValue, @Nullable Object value) {
                 showChartPreviewBox();
             }
         });
 
-        seriesTable.getDatasource().addListener(new CollectionDsListenerAdapter(){
+        seriesDs.addListener(new CollectionDsListenerAdapter<ChartSeries>() {
             @Override
-            public void valueChanged(Entity source, String property, @Nullable Object prevValue, @Nullable Object value) {
+            public void valueChanged(ChartSeries source, String property, @Nullable Object prevValue, @Nullable Object value) {
                 showChartPreviewBox();
             }
 
@@ -104,6 +109,17 @@ public class ChartEditFrameController extends AbstractFrame {
                 showChartPreviewBox();
             }
         });
+
+        FieldGroup.CustomFieldGenerator bandSelectorGenerator = new FieldGroup.CustomFieldGenerator() {
+            @Override
+            public Component generateField(Datasource datasource, String propertyId) {
+                LookupField lookupField = componentsFactory.createComponent(LookupField.NAME);
+                lookupField.setDatasource(datasource, propertyId);
+                return lookupField;
+            }
+        };
+        pieChartFieldGroup.addCustomField("bandName", bandSelectorGenerator);
+        serialChartFieldGroup.addCustomField("bandName", bandSelectorGenerator);
     }
 
     protected void previewChart(BoxLayout previewBox) {
@@ -199,5 +215,18 @@ public class ChartEditFrameController extends AbstractFrame {
             }
             type.setValue(chartDescription.getType());
         }
+    }
+
+    public void setBands(Collection<BandDefinition> bands) {
+        List<String> bandNames = new ArrayList<String>();
+        for (BandDefinition bandDefinition : bands) {
+            bandNames.add(bandDefinition.getName());
+        }
+
+        LookupField pieChartBandName = (LookupField) pieChartFieldGroup.getFieldComponent("bandName");
+        LookupField serialChartBandName = (LookupField) serialChartFieldGroup.getFieldComponent("bandName");
+
+        pieChartBandName.setOptionsList(bandNames);
+        serialChartBandName.setOptionsList(bandNames);
     }
 }

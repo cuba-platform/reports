@@ -14,8 +14,8 @@
                 <rows>
                     <row>
                         <label value="msg://downloadTemplateFile"/>
-                        <button id="downloadTemplateFile" width="100%" stylename="link"
-                                description="msg://templateHintMsg"/>
+                        <button id="downloadTemplateFile" stylename="link"
+                                description="msg://templateHintMsg" align="MIDDLE_LEFT"/>
                     </row>
                     <row>
                         <label value="msg://outputFileName"/>
@@ -27,7 +27,7 @@
                     </row>
                     <row>
                         <label value="msg://outputFileFormat"/>
-                        <lookupField id="outputFileFormat" required="true" width="100px"
+                        <lookupField id="outputFileFormat" required="true" width="100%"
                                      description="msg://outputFileTypeHintMsg"/>
                     </row>
                 </rows>

@@ -181,7 +181,7 @@ public class ReportGuiManager {
     public void printReportSync(Report report, Map<String, Object> params, @Nullable String templateCode, @Nullable String outputFileName, @Nullable IFrame window) {
         ReportOutputDocument document = getReportResult(report, params, templateCode);
 
-        showReportResult(document, templateCode, outputFileName, window);
+        showReportResult(document, params, templateCode, outputFileName, window);
     }
 
     public ReportOutputDocument getReportResult(Report report, Map<String, Object> params, @Nullable String templateCode) {
@@ -194,12 +194,14 @@ public class ReportGuiManager {
         return document;
     }
 
-    protected void showReportResult(ReportOutputDocument document, @Nullable String templateCode, @Nullable String outputFileName, @Nullable IFrame window) {
-        if (document.getReportOutputType() == CubaReportOutputType.chart) {
+    protected void showReportResult(ReportOutputDocument document, Map<String, Object> params,
+                                    @Nullable String templateCode,  @Nullable String outputFileName, @Nullable IFrame window) {
+        if (document.getReportOutputType().getId().equals(CubaReportOutputType.chart.getId())) {
             HashMap<String, Object> screenParams = new HashMap<>();
             screenParams.put(ShowChartController.CHART_JSON_PARAMETER, new String(document.getContent()));
             screenParams.put(ShowChartController.REPORT_PARAMETER, document.getReport());
             screenParams.put(ShowChartController.TEMPLATE_CODE_PARAMETER, templateCode);
+            screenParams.put(ShowChartController.PARAMS_PARAMETER, params);
 
             if (window != null) {
                 window.openWindow("report$showChart", WindowManager.OpenType.NEW_TAB, screenParams);
@@ -238,7 +240,7 @@ public class ReportGuiManager {
 
             @Override
             public void done(ReportOutputDocument document) {
-                showReportResult(document, templateCode, outputFileName, window);
+                showReportResult(document, params, templateCode, outputFileName, window);
             }
         };
 

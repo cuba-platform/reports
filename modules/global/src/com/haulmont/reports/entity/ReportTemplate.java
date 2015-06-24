@@ -21,6 +21,7 @@ import javax.annotation.Nullable;
 import javax.persistence.*;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 
 /**
  * Template for {@link Report}
@@ -34,11 +35,13 @@ import java.io.InputStream;
 @NamePattern("#getCaption|code,name,customDefinition")
 @SuppressWarnings("unused")
 public class ReportTemplate extends BaseReportEntity implements com.haulmont.yarg.structure.ReportTemplate {
-    public static final String DEFAULT_TEMPLATE_CODE = "DEFAULT";
-
     private static final long serialVersionUID = 3692751073234357754L;
 
+    public static final String DEFAULT_TEMPLATE_CODE = "DEFAULT";
+
     public static final String NAME_FORMAT = "(%s) %s";
+
+    public static final String BASE_ENCODING = "UTF-8";
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "REPORT_ID", nullable = false)
@@ -193,23 +196,23 @@ public class ReportTemplate extends BaseReportEntity implements com.haulmont.yar
 
     @Nullable
     public AbstractChartDescription getChartDescription() {
-        Gson gson = new Gson();
-        JsonObject jsonElement = gson.fromJson(getCustomDefinition(), JsonObject.class);
-        JsonPrimitive type = jsonElement.getAsJsonPrimitive("type");
-        if (ChartType.PIE.getId().equals(type.getAsString())) {
-            return gson.fromJson(getCustomDefinition(), PieChartDescription.class);
-        } else if (ChartType.SERIAL.getId().equals(type.getAsString())) {
-            return gson.fromJson(getCustomDefinition(), SerialChartDescription.class);
+        String jsonString = null;
+        try {
+            jsonString = new String(getContent(), BASE_ENCODING);
+        } catch (UnsupportedEncodingException e) {
+            jsonString = new String(getContent());
         }
-
-        return null;
+        return AbstractChartDescription.fromJsonString(jsonString);
     }
 
     public void setChartDescription(@Nullable AbstractChartDescription chartDescription) {
         if (chartDescription != null && getReportOutputType() == ReportOutputType.CHART) {
-            Gson gson = new Gson();
-            String json = gson.toJson(chartDescription);
-            setCustomDefinition(json);
+            String jsonString = AbstractChartDescription.toJsonString(chartDescription);
+            try {
+                setContent(jsonString.getBytes(BASE_ENCODING));
+            } catch (UnsupportedEncodingException e) {
+                setContent(jsonString.getBytes());
+            }
             setName(".chart");
         }
     }

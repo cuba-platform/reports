@@ -7,7 +7,11 @@
 <views xmlns="http://schemas.haulmont.com/cuba/5.5/view.xsd">
 
     <view entity="report$ReportTemplate" name="template.edit" extends="_local">
-        <property name="report" view="_minimal"/>
+        <property name="report">
+            <property name="xml"/>
+            <property name="name"/>
+            <property name="localeNames"/>
+        </property>
     </view>
 
     <view entity="report$Report" name="report.edit" extends="_local">
