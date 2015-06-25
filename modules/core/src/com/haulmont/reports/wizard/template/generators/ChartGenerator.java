@@ -19,6 +19,7 @@ import freemarker.template.TemplateException;
 import org.apache.commons.collections.CollectionUtils;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * @author degtyarjov
@@ -35,24 +36,26 @@ public class ChartGenerator implements Generator {
             serialChartDescription.setCategoryAxisCaption("");
             serialChartDescription.setValueAxisCaption("");
 
-            for (RegionProperty regionProperty : reportRegion.getRegionProperties()) {
-                MetaProperty wrappedMetaProperty = regionProperty.getEntityTreeNode().getWrappedMetaProperty();
-                Class<?> javaType = wrappedMetaProperty.getJavaType();
-                if (String.class.isAssignableFrom(javaType)) {
-                    serialChartDescription.setCategoryField(wrappedMetaProperty.getName());
-                    serialChartDescription.setCategoryAxisCaption(regionProperty.getLocalizedName());
-                } else if (Number.class.isAssignableFrom(javaType)) {
-                    ChartSeries chartSeries = new ChartSeries();
-                    chartSeries.setName(regionProperty.getLocalizedName());
-                    chartSeries.setValueField(wrappedMetaProperty.getName());
-                    chartSeries.setType(SeriesType.COLUMN);
-
-                    serialChartDescription.getSeries().add(chartSeries);
+            List<RegionProperty> regionProperties = reportRegion.getRegionProperties();
+            RegionProperty firstProperty = regionProperties.get(0);
+            serialChartDescription.setCategoryField(firstProperty.getEntityTreeNode().getWrappedMetaProperty().getName());
+            serialChartDescription.setCategoryAxisCaption(firstProperty.getLocalizedName());
+            if (regionProperties.size() > 1) {
+                for (int i = 1; i < regionProperties.size(); i++) {
+                    RegionProperty regionProperty = regionProperties.get(i);
+                    MetaProperty wrappedMetaProperty = regionProperty.getEntityTreeNode().getWrappedMetaProperty();
+                    Class<?> javaType = wrappedMetaProperty.getJavaType();
+                    if (Number.class.isAssignableFrom(javaType)) {
+                        ChartSeries chartSeries = new ChartSeries();
+                        chartSeries.setName(regionProperty.getLocalizedName());
+                        chartSeries.setValueField(wrappedMetaProperty.getName());
+                        chartSeries.setType(SeriesType.COLUMN);
+                        serialChartDescription.getSeries().add(chartSeries);
+                    }
                 }
             }
 
             return AbstractChartDescription.toJsonString(serialChartDescription).getBytes();
-
         }
 
         return new byte[0];
