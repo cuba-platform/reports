@@ -26,44 +26,40 @@
                     </columns>
                     <rows>
                         <row>
-                            <label value="msg://parameters.name"/>
+                            <label value="msg://parameters.name" align="MIDDLE_LEFT"/>
                             <textField id="name" datasource="parameterDs" property="name" required="true"
                                        width="${width}" requiredMessage="msg://parameters.nameMsg"/>
                         </row>
                         <row>
-                            <label value="msg://parameters.alias"/>
+                            <label value="msg://parameters.alias" align="MIDDLE_LEFT"/>
                             <textField id="alias" datasource="parameterDs" property="alias" required="true"
                                        width="${width}" requiredMessage="msg://parameters.aliasMsg"/>
                         </row>
                         <row>
-                            <label value="msg://parameters.type"/>
+                            <label value="msg://parameters.type" align="MIDDLE_LEFT"/>
                             <lookupField id="type" datasource="parameterDs" property="type" required="true"
                                          width="${width}" requiredMessage="msg://parameters.typeMsg"/>
                         </row>
-
                         <row>
-                            <label value="msg://parameters.required"/>
+                            <label value="msg://parameters.required" align="MIDDLE_LEFT"/>
                             <checkBox id="required" datasource="parameterDs" property="required"/>
                         </row>
-
                         <row>
-                            <label value="msg://parameters.metaClass"/>
+                            <label value="msg://parameters.metaClass" align="MIDDLE_LEFT"/>
                             <lookupField id="metaClass" width="${width}" datasource="parameterDs" property="entityMetaClass"
                                          requiredMessage="msg://parameters.requiredMetaClass" required="true"/>
                         </row>
-
                         <row>
-                            <label value="msg://parameters.enum"/>
+                            <label value="msg://parameters.enum" align="MIDDLE_LEFT"/>
                             <lookupField id="enumeration" width="${width}" datasource="parameterDs" property="enumerationClass"
                                          requiredMessage="msg://parameters.requiredEnumClass" required="true"/>
                         </row>
-
                         <row>
-                            <label value="msg://parameters.screen"/>
+                            <label value="msg://parameters.screen" align="MIDDLE_LEFT"/>
                             <lookupField id="screen" width="${width}" datasource="parameterDs" property="screen"/>
                         </row>
                         <row>
-                            <label id="defaultValueLabel" value="msg://parameters.defaultValue"/>
+                            <label id="defaultValueLabel" value="msg://parameters.defaultValue" align="MIDDLE_LEFT"/>
                             <hbox id="defaultValueBox" width="${width}"/>
                         </row>
                     </rows>
