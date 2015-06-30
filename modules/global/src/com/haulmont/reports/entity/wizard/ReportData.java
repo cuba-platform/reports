@@ -14,6 +14,7 @@ import com.haulmont.reports.entity.ParameterType;
 import com.haulmont.reports.entity.Report;
 import com.haulmont.reports.entity.ReportGroup;
 import com.haulmont.reports.entity.ReportOutputType;
+import com.haulmont.reports.entity.charts.ChartType;
 
 import javax.persistence.OneToMany;
 import javax.persistence.Transient;
@@ -110,7 +111,10 @@ public class ReportData extends AbstractNotPersistentEntity {
     protected TemplateFileType templateFileType;
 
     @Transient
-    byte[] templateContent;
+    protected byte[] templateContent;
+
+    @Transient
+    protected ChartType chartType = ChartType.SERIAL;
 
     public Report getGeneratedReport() {
         return generatedReport;
@@ -236,5 +240,13 @@ public class ReportData extends AbstractNotPersistentEntity {
 
     public void setTemplateContent(byte[] templateContent) {
         this.templateContent = templateContent;
+    }
+
+    public ChartType getChartType() {
+        return chartType;
+    }
+
+    public void setChartType(ChartType chartType) {
+        this.chartType = chartType;
     }
 }

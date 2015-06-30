@@ -17,6 +17,7 @@ import com.haulmont.cuba.gui.config.WindowConfig;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
 import com.haulmont.cuba.gui.data.Datasource;
 import com.haulmont.cuba.gui.data.impl.CollectionDsListenerAdapter;
+import com.haulmont.cuba.gui.theme.ThemeConstants;
 import com.haulmont.cuba.gui.xml.layout.ComponentsFactory;
 import com.haulmont.reports.app.EntityTree;
 import com.haulmont.reports.app.service.ReportWizardService;
@@ -105,6 +106,12 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
     protected TextField outputFileName;
     @Named("saveStep.downloadTemplateFile")
     protected Button downloadTemplateFile;
+    @Named("saveStep.diagramTypeLabel")
+    protected Label diagramTypeLabel;
+    @Named("saveStep.diagramType")
+    protected LookupField diagramType;
+    @Named("saveStep.chartPreviewBox")
+    protected BoxLayout chartPreviewBox;
 
     //services
     @Inject
@@ -121,6 +128,8 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
     protected WindowManagerProvider windowManagerProvider;
     @Inject
     protected WindowConfig windowConfig;
+    @Inject
+    protected ThemeConstants themeConstants;
 
     //other
     protected StepFrame detailsStepFrame;
@@ -137,15 +146,25 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
 
     protected String query;
     protected List<ReportData.Parameter> queryParameters;
+    protected int wizardWidth;
+    protected int wizardHeight;
+
+    public interface Companion {
+        void setWindowHeight(Window window, int height);
+
+        void center(Window window);
+    }
 
     @Override
     @SuppressWarnings("unchecked")
     public void init(Map<String, Object> params) {
         super.init(params);
 
+        wizardWidth = themeConstants.getInt("cuba.gui.report.ReportWizard.width");
+        wizardHeight = themeConstants.getInt("cuba.gui.report.ReportWizard.height");
         getDialogParams()
-                .setWidth(800)
-                .setHeight(400);
+                .setWidth(wizardWidth)
+                .setHeight(wizardHeight);
 
         stepFrameManager = new StepFrameManager(this, getStepFrames());
 

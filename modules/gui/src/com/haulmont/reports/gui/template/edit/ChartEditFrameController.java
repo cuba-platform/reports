@@ -16,8 +16,6 @@ import com.haulmont.cuba.gui.xml.layout.ComponentsFactory;
 import com.haulmont.reports.entity.BandDefinition;
 import com.haulmont.reports.entity.charts.*;
 import com.haulmont.reports.gui.report.run.ShowChartController;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.math.RandomUtils;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -123,49 +121,19 @@ public class ChartEditFrameController extends AbstractFrame {
     }
 
     protected void previewChart(BoxLayout previewBox) {
-        List<String> colors = Arrays.asList("red", "green", "blue", "yellow", "orange", "black", "magenta");
+        List<Map<String, Object>> data;
         String chartJson = null;
         if (ChartType.SERIAL == type.getValue()) {
             SerialChartDescription chartDescription = serialChartDs.getItem();
-            String categoryField = chartDescription.getCategoryField();
-
-            List<Map<String, Object>> data = new ArrayList<>();
-            for (int i = 1; i < 6; i++) {
-                HashMap<String, Object> map = new HashMap<>();
-                data.add(map);
-
-                map.put(categoryField, getMessage("caption.category") + i);
-
-                for (ChartSeries chartSeries : chartDescription.getSeries()) {
-                    String valueField = chartSeries.getValueField();
-                    String colorField = chartSeries.getColorField();
-                    map.put(valueField, Math.abs(RandomUtils.nextInt(100)));
-                    map.put(colorField, colors.get(RandomUtils.nextInt(6)));
-                }
-            }
-
+            data = new RandomChartDataGenerator().generateRandomChartData(chartDescription);
             ChartToJsonConverter chartToJsonConverter = new ChartToJsonConverter();
             chartJson = chartToJsonConverter.convertSerialChart(chartDescription, data);
         } else if (ChartType.PIE == type.getValue()) {
             PieChartDescription chartDescription = pieChartDs.getItem();
-            String titleField = chartDescription.getTitleField();
-            String valueField = chartDescription.getValueField();
-            String colorField = chartDescription.getColorField();
-
-            List<Map<String, Object>> data = new ArrayList<>();
-            for (int i = 1; i < 6; i++) {
-                HashMap<String, Object> map = new HashMap<>();
-                data.add(map);
-
-                map.put(titleField, getMessage("caption.category") + i);
-                map.put(valueField, Math.abs(RandomUtils.nextInt(100)));
-                map.put(colorField, colors.get(RandomUtils.nextInt(6)));
-            }
-
+            data = new RandomChartDataGenerator().generateRandomChartData(chartDescription);
             ChartToJsonConverter chartToJsonConverter = new ChartToJsonConverter();
             chartJson = chartToJsonConverter.convertPieChart(chartDescription, data);
         }
-
         openFrame(previewBox, ShowChartController.JSON_CHART_SCREEN_ID, Collections.<String, Object>singletonMap("Chart", chartJson));
     }
 
@@ -218,7 +186,7 @@ public class ChartEditFrameController extends AbstractFrame {
     }
 
     public void setBands(Collection<BandDefinition> bands) {
-        List<String> bandNames = new ArrayList<String>();
+        List<String> bandNames = new ArrayList<>();
         for (BandDefinition bandDefinition : bands) {
             bandNames.add(bandDefinition.getName());
         }

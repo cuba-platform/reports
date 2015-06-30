@@ -7,10 +7,7 @@ package com.haulmont.reports.gui.report.wizard;
 
 import com.haulmont.cuba.gui.WindowManager;
 import com.haulmont.cuba.gui.components.*;
-import com.haulmont.reports.entity.wizard.EntityTreeNode;
-import com.haulmont.reports.entity.wizard.RegionProperty;
-import com.haulmont.reports.entity.wizard.ReportData;
-import com.haulmont.reports.entity.wizard.ReportRegion;
+import com.haulmont.reports.entity.wizard.*;
 import com.haulmont.reports.gui.components.actions.OrderableItemMoveAction;
 import com.haulmont.reports.gui.report.wizard.step.StepFrame;
 import org.apache.commons.collections.CollectionUtils;
@@ -337,6 +334,11 @@ class RegionsStepFrame extends StepFrame {
             });
             showAddRegion();
             wizard.setCorrectReportOutputType();
+            ReportWizardCreator.Companion companion = wizard.getCompanion();
+            if (companion != null) {
+                companion.setWindowHeight(wizard, wizard.wizardHeight);
+                companion.center(wizard);
+            }
         }
 
         private void showAddRegion() {

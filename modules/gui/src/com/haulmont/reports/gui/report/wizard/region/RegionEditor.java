@@ -90,6 +90,7 @@ public class RegionEditor extends AbstractEditor<ReportRegion> {
         }
         tipLabel.setValue(
                 formatMessage(isTabulated ? "selectEntityPropertiesForTableArea" : "selectEntityProperties", rootNode.getLocalizedName()));
+        tipLabel.setHtmlEnabled(true);
         initComponents(params);
     }
 

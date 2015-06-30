@@ -50,6 +50,7 @@ class DetailsStepFrame extends StepFrame {
         super(wizard, wizard.getMessage("reportDetails"), "detailsStep");
         isFirst = true;
         initFrameHandler = new InitDetailsStepFrameHandler();
+        beforeShowFrameHandler = new BeforeShowDetailsStepFrameHandler();
     }
 
     protected class InitDetailsStepFrameHandler implements InitStepFrameHandler {
@@ -360,5 +361,16 @@ class DetailsStepFrame extends StepFrame {
         filterEntity = null;
         conditionsTree = null;
         wizard.setQueryButton.setCaption(wizard.getMessage("setQuery"));
+    }
+
+    protected class BeforeShowDetailsStepFrameHandler implements BeforeShowStepFrameHandler {
+        @Override
+        public void beforeShowFrame() {
+            ReportWizardCreator.Companion companion = wizard.getCompanion();
+            if (companion != null) {
+                companion.setWindowHeight(wizard, wizard.wizardHeight);
+                companion.center(wizard);
+            }
+        }
     }
 }

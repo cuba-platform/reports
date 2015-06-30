@@ -6,10 +6,7 @@
 package com.haulmont.reports.wizard.template.generators;
 
 import com.haulmont.chile.core.model.MetaProperty;
-import com.haulmont.reports.entity.charts.AbstractChartDescription;
-import com.haulmont.reports.entity.charts.ChartSeries;
-import com.haulmont.reports.entity.charts.SerialChartDescription;
-import com.haulmont.reports.entity.charts.SeriesType;
+import com.haulmont.reports.entity.charts.*;
 import com.haulmont.reports.entity.wizard.RegionProperty;
 import com.haulmont.reports.entity.wizard.ReportData;
 import com.haulmont.reports.entity.wizard.ReportRegion;
@@ -28,6 +25,15 @@ import java.util.List;
 public class ChartGenerator implements Generator {
     @Override
     public byte[] generate(ReportData reportData) throws TemplateGenerationException, TemplateException, IOException {
+        if (reportData.getChartType() == ChartType.SERIAL) {
+            return generateSerialChart(reportData);
+        } else if (reportData.getChartType() == ChartType.PIE) {
+            return generatePieChart(reportData);
+        }
+        return new byte[0];
+    }
+
+    protected byte[] generateSerialChart(ReportData reportData) {
         if (CollectionUtils.isNotEmpty(reportData.getReportRegions())) {
             ReportRegion reportRegion = reportData.getReportRegions().get(0);
             SerialChartDescription serialChartDescription = new SerialChartDescription();
@@ -59,5 +65,30 @@ public class ChartGenerator implements Generator {
         }
 
         return new byte[0];
+    }
+
+    protected byte[] generatePieChart(ReportData reportData) {
+        ReportRegion reportRegion = reportData.getReportRegions().get(0);
+        PieChartDescription pieChartDescription = new PieChartDescription();
+        pieChartDescription.setBandName(reportRegion.getNameForBand());
+//        pieChartDescription.setShowLegend(true);
+        pieChartDescription.setUnits("");
+
+        List<RegionProperty> regionProperties = reportRegion.getRegionProperties();
+        RegionProperty firstProperty = regionProperties.get(0);
+        pieChartDescription.setTitleField(firstProperty.getEntityTreeNode().getWrappedMetaProperty().getName());
+        if (regionProperties.size() > 1) {
+            for (int i = 1; i < regionProperties.size(); i++) {
+                RegionProperty regionProperty = regionProperties.get(i);
+                MetaProperty wrappedMetaProperty = regionProperty.getEntityTreeNode().getWrappedMetaProperty();
+                Class<?> javaType = wrappedMetaProperty.getJavaType();
+                if (Number.class.isAssignableFrom(javaType)) {
+                    pieChartDescription.setValueField(wrappedMetaProperty.getName());
+                    break;
+                }
+            }
+        }
+
+        return AbstractChartDescription.toJsonString(pieChartDescription).getBytes();
     }
 }

@@ -8,6 +8,10 @@
         messagesPack="com.haulmont.reports.gui.report.wizard"
         datasource="reportDataDs">
 
+    <companions>
+        <web class="com.haulmont.reports.web.report.wizard.ReportWizardCreatorCompanion"/>
+    </companions>
+
     <dsContext>
         <datasource
                 id="reportDataDs"
