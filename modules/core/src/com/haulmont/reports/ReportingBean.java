@@ -423,10 +423,8 @@ public class ReportingBean implements ReportingApi {
         Transaction tx = persistence.createTransaction();
         try {
             EntityManager em = persistence.getEntityManager();
-            em.setView(view);
-            entity = (T) em.find(entity.getClass(), entity.getId());
+            entity = (T) em.find(entity.getClass(), entity.getId(), view);
             if (entity != null) {
-                em.setView(null);
                 em.fetch(entity, view);
             }
             tx.commit();
@@ -518,10 +516,8 @@ public class ReportingBean implements ReportingApi {
         try {
             EntityManager em = persistence.getEntityManager();
             View targetView = metadata.getViewRepository().getView(entity.getClass(), viewName);
-            em.setView(targetView);
-            entity = (T) em.find(entity.getClass(), entity.getId());
+            entity = (T) em.find(entity.getClass(), entity.getId(), targetView);
             if (entity != null) {
-                em.setView(null);
                 em.fetch(entity, targetView);
             }
             tx.commit();
