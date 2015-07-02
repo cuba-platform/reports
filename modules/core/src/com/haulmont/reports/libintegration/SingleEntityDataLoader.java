@@ -44,6 +44,7 @@ public class SingleEntityDataLoader extends AbstractEntityDataLoader {
         }
 
         entity = reloadEntityByDataSetView(dataSet, entity);
+        params.put(paramName, entity);
         return Collections.singletonList((Map<String, Object>) new EntityMap((Entity) entity));
     }
 

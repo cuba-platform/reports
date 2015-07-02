@@ -63,6 +63,7 @@ public class MultiEntityDataLoader extends AbstractEntityDataLoader {
         }
 
         Collection<Entity> entitiesList = (Collection) entities;
+        params.put(paramName, entitiesList);
         List<Map<String, Object>> resultList = new ArrayList<>();
         for (Entity entity : entitiesList) {
             if (!hasNestedCollection) {
