@@ -12,10 +12,7 @@ import com.haulmont.reports.core.ReportsTestCase;
 import com.haulmont.reports.entity.DataSet;
 import com.haulmont.yarg.structure.BandData;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author degtyarjov
@@ -72,8 +69,8 @@ public class EntityDataLoaderTest extends ReportsTestCase {
 
     public void testSingleEntityLoad() throws Exception {
         DataSet dataSet = new DataSet();
-        Map<String, Object> params =
-                Collections.<String, Object>singletonMap(SingleEntityDataLoader.DEFAULT_ENTITY_PARAM_NAME, user);
+        Map<String, Object> params = new HashMap<>();
+        params.put(SingleEntityDataLoader.DEFAULT_ENTITY_PARAM_NAME, user);
 
         Transaction tx = persistence.createTransaction();
         try {
@@ -101,8 +98,8 @@ public class EntityDataLoaderTest extends ReportsTestCase {
 
     public void testMultiEntityLoad() throws Exception {
         DataSet dataSet = new DataSet();
-        Map<String, Object> params =
-                Collections.<String, Object>singletonMap(MultiEntityDataLoader.DEFAULT_LIST_ENTITIES_PARAM_NAME, Arrays.asList(user));
+        Map<String, Object> params = new HashMap<>();
+        params.put(MultiEntityDataLoader.DEFAULT_LIST_ENTITIES_PARAM_NAME, Arrays.asList(user));
 
         Transaction tx = persistence.createTransaction();
         try {
