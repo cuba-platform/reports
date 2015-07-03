@@ -229,7 +229,7 @@ public class ReportingBean implements ReportingApi {
             }
 
             if (template.isCustom()) {
-                CustomFormatter customFormatter = new CustomFormatter(report, template, params);
+                CustomFormatter customFormatter = new CustomFormatter(report, template);
                 template.setCustomReport(customFormatter);
             }
 

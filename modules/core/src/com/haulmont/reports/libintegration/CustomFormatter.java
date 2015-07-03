@@ -49,9 +49,8 @@ public class CustomFormatter implements com.haulmont.yarg.formatters.CustomRepor
     protected Configuration configuration;
     protected ReportingConfig reportingConfig;
 
-    public CustomFormatter(Report report, ReportTemplate template, Map<String, Object> params) {
+    public CustomFormatter(Report report, ReportTemplate template) {
         this.report = report;
-        this.params = params;
         this.template = template;
         this.scripting = AppBeans.get(Scripting.class);
         this.configuration = AppBeans.get(Configuration.class);
@@ -60,6 +59,7 @@ public class CustomFormatter implements com.haulmont.yarg.formatters.CustomRepor
 
     @Override
     public byte[] createReport(com.haulmont.yarg.structure.Report report, BandData rootBand, Map<String, Object> params) {
+        this.params = params;//we set params here because they might change inside YARG (for instance - default values)
         return createDocument(rootBand);
     }
 
