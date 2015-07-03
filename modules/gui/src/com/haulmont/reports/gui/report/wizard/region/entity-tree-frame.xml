@@ -5,7 +5,7 @@
 
 <!--CAUTION: for correct validation (correct messages) of required fields without caption in controller-->
 <!--their id must to be equal codes in localization props files-->
-<window xmlns="http://schemas.haulmont.com/cuba/5.5/window.xsd">
+<window xmlns="http://schemas.haulmont.com/cuba/window.xsd">
     <dsContext>
         <hierarchicalDatasource id="reportEntityTreeNodeDs"
                                 class="com.haulmont.reports.entity.wizard.EntityTreeNode"
