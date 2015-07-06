@@ -9,6 +9,9 @@ import com.haulmont.cuba.core.EntityManager;
 import com.haulmont.cuba.core.Persistence;
 import com.haulmont.cuba.core.Query;
 import com.haulmont.cuba.core.Transaction;
+import com.haulmont.cuba.core.entity.Entity;
+import com.haulmont.cuba.core.global.View;
+import com.haulmont.reports.app.EntityMap;
 import com.haulmont.yarg.exception.DataLoadingException;
 import com.haulmont.yarg.loaders.ReportDataLoader;
 import com.haulmont.yarg.loaders.impl.AbstractDbDataLoader;
@@ -75,7 +78,16 @@ public class JpqlDataDataLoader extends AbstractDbDataLoader implements ReportDa
         } finally {
             tx.end();
         }
-        return fillOutputData(queryResult, outputParameters);
+
+        if (queryResult.size() > 0 && queryResult.get(0) instanceof Entity) {
+            List<Map<String, Object>> wrappedResults = new ArrayList<>();
+            for (Object theResult : queryResult) {
+                wrappedResults.add(new EntityMap((Entity) theResult));
+            }
+            return wrappedResults;
+        } else {
+            return fillOutputData(queryResult, outputParameters);
+        }
     }
 
     protected Query insertParameters(String query, BandData parentBand, Map<String, Object> params) {
