@@ -6,7 +6,10 @@
 package com.haulmont.reports.gui.report.run;
 
 import com.haulmont.cuba.core.global.UserSessionSource;
-import com.haulmont.cuba.gui.components.*;
+import com.haulmont.cuba.gui.components.AbstractLookup;
+import com.haulmont.cuba.gui.components.Action;
+import com.haulmont.cuba.gui.components.Component;
+import com.haulmont.cuba.gui.components.Table;
 import com.haulmont.cuba.gui.components.actions.ItemTrackingAction;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
 import com.haulmont.reports.app.service.ReportService;
@@ -27,6 +30,7 @@ public class ReportRun extends AbstractLookup {
 
     protected static final String RUN_ACTION_ID = "runReport";
     public static final String REPORTS_PARAMETER = "reports";
+    public static final String SCREEN_PARAMETER = "screen";
 
     @Inject
     protected Table reportsTable;
@@ -45,7 +49,7 @@ public class ReportRun extends AbstractLookup {
         super.init(params);
         List<Report> reports = (List<Report>) params.get(REPORTS_PARAMETER);
         if (reports == null) {
-            reports = reportGuiManager.getAvailableReports(null, userSessionSource.getUserSession().getUser(), null);
+            reports = reportGuiManager.getAvailableReports((String) params.get(SCREEN_PARAMETER), userSessionSource.getUserSession().getUser(), null);
         }
 
         if (CollectionUtils.isNotEmpty(reports)) {

@@ -14,6 +14,7 @@ import com.haulmont.cuba.gui.components.IFrame;
 import com.haulmont.cuba.gui.components.Window;
 import com.haulmont.reports.entity.Report;
 import com.haulmont.reports.gui.ReportGuiManager;
+import com.haulmont.reports.gui.report.run.ReportRun;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -56,7 +57,7 @@ public class RunReportAction extends AbstractAction {
     @Override
     public void actionPerform(Component component) {
         final Map<String, Object> params = new HashMap<>();
-        params.put("screen", window.getId());
+        params.put(ReportRun.SCREEN_PARAMETER, window.getId());
 
         window.openLookup("report$Report.run", new Window.Lookup.Handler() {
             @Override
