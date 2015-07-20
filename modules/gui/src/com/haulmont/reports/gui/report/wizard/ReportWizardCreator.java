@@ -485,21 +485,21 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
     private void initAvailableFormats() {
         availableOutputFormats = new ImmutableMap.Builder<TemplateFileType, Map<String, Object>>()
                 .put(TemplateFileType.DOCX, new ImmutableMap.Builder<String, Object>()
-                        .put(ReportOutputType.DOCX.toString().toLowerCase(), ReportOutputType.DOCX)
-                        .put(ReportOutputType.HTML.toString().toLowerCase(), ReportOutputType.HTML)
-                        .put(ReportOutputType.PDF.toString().toLowerCase(), ReportOutputType.PDF)
+                        .put(messages.getMessage(ReportOutputType.DOCX), ReportOutputType.DOCX)
+                        .put(messages.getMessage(ReportOutputType.HTML), ReportOutputType.HTML)
+                        .put(messages.getMessage(ReportOutputType.PDF), ReportOutputType.PDF)
                         .build())
                 .put(TemplateFileType.XLSX, new ImmutableMap.Builder<String, Object>()
-                        .put(ReportOutputType.XLSX.toString().toLowerCase(), ReportOutputType.XLSX)
-                        .put(ReportOutputType.PDF.toString().toLowerCase(), ReportOutputType.PDF)
+                        .put(messages.getMessage(ReportOutputType.XLSX), ReportOutputType.XLSX)
+                        .put(messages.getMessage(ReportOutputType.PDF), ReportOutputType.PDF)
                         .build())
                 .put(TemplateFileType.HTML, new ImmutableMap.Builder<String, Object>()
-                        .put(ReportOutputType.HTML.toString().toLowerCase(), ReportOutputType.HTML)
-                        .put(ReportOutputType.PDF.toString().toLowerCase(), ReportOutputType.PDF)
-                        .build())
-                .put(TemplateFileType.CHART, new ImmutableMap.Builder<String, Object>()
-                        .put(messages.getMessage(ReportOutputType.CHART), ReportOutputType.CHART)
-                        .build())
-                .build();
+                        .put(messages.getMessage(ReportOutputType.HTML), ReportOutputType.HTML)
+                        .put(messages.getMessage(ReportOutputType.PDF), ReportOutputType.PDF)
+                                .build())
+                        .put(TemplateFileType.CHART, new ImmutableMap.Builder<String, Object>()
+                                .put(messages.getMessage(ReportOutputType.CHART), ReportOutputType.CHART)
+                                .build())
+                        .build();
     }
 }
