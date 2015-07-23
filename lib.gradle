@@ -3,5 +3,5 @@
  * Use is subject to license terms, see http://www.cuba-platform.com/license for details.
  */
 
-project.ext.yarg = [group: 'com.haulmont.yarg', name: 'yarg', version: '1.0.49']
-project.ext.yargApi = [group: 'com.haulmont.yarg', name: 'yarg-api', version: '1.0.49']
+project.ext.yarg = [group: 'com.haulmont.yarg', name: 'yarg', version: '1.0.50']
+project.ext.yargApi = [group: 'com.haulmont.yarg', name: 'yarg-api', version: '1.0.50']
