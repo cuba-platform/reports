@@ -121,7 +121,7 @@ public class ShowChartController extends AbstractWindow {
         chartBox.removeAll();
         if (chartJson != null) {
             openFrame(chartBox, JSON_CHART_SCREEN_ID,
-                    Collections.<String, Object>singletonMap("Chart", chartJson));
+                    Collections.<String, Object>singletonMap(CHART_JSON_PARAMETER, chartJson));
         }
 
         showDiagramStubText();

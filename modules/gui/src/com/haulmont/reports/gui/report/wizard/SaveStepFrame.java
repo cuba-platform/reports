@@ -162,7 +162,7 @@ class SaveStepFrame extends StepFrame {
             }
 
             wizard.openFrame(wizard.chartPreviewBox, ShowChartController.JSON_CHART_SCREEN_ID,
-                    Collections.<String, Object>singletonMap("Chart", chartJson));
+                    Collections.<String, Object>singletonMap(ShowChartController.CHART_JSON_PARAMETER, chartJson));
         }
     }
 

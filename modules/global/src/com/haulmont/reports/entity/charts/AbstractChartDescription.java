@@ -9,19 +9,24 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.haulmont.bali.util.Preconditions;
+import com.haulmont.chile.core.annotations.MetaClass;
 import com.haulmont.chile.core.annotations.MetaProperty;
 import com.haulmont.cuba.core.entity.AbstractNotPersistentEntity;
 import com.haulmont.reports.entity.ReportOutputType;
 
 import javax.annotation.Nullable;
+import javax.persistence.MappedSuperclass;
 
 /**
  * @author degtyarjov
  * @version $Id$
  */
-public class AbstractChartDescription extends AbstractNotPersistentEntity {
+@MappedSuperclass
+public abstract class AbstractChartDescription extends AbstractNotPersistentEntity {
     @MetaProperty
     protected final String type;
+    @MetaProperty
+    protected Boolean showLegend;
 
     @Nullable
     public static AbstractChartDescription fromJsonString(String jsonString) {
@@ -53,5 +58,13 @@ public class AbstractChartDescription extends AbstractNotPersistentEntity {
 
     public ChartType getType() {
         return ChartType.fromId(type);
+    }
+
+    public Boolean getShowLegend() {
+        return showLegend;
+    }
+
+    public void setShowLegend(Boolean showLegend) {
+        this.showLegend = showLegend;
     }
 }

@@ -66,9 +66,6 @@ public class ReportEditor extends AbstractEditor<Report> {
     @Named("securityFrame.screenTable")
     protected Table screenTable;
 
-    @Named("generalFrame.serviceTree")
-    protected Tree tree;
-
     @Named("templatesFrame.templatesTable")
     protected Table templatesTable;
 
@@ -192,6 +189,7 @@ public class ReportEditor extends AbstractEditor<Report> {
 
         bandTree.getDatasource().refresh();
         bandTree.expandTree();
+        bandTree.setSelected(reportDs.getItem().getRootBandDefinition());
 
         bandEditor.setBandDefinition(bandTree.<BandDefinition>getSingleSelected());
         if (bandTree.getSingleSelected() == null) {
@@ -655,7 +653,7 @@ public class ReportEditor extends AbstractEditor<Report> {
                 orderBandDefinitions(parentDefinition);
 
                 BandDefinition newBandDefinition = new BandDefinition();
-                newBandDefinition.setName("new Band " + (parentDefinition.getChildrenBandDefinitions().size() + 1));
+                newBandDefinition.setName("newBand" + (parentDefinition.getChildrenBandDefinitions().size() + 1));
                 newBandDefinition.setOrientation(Orientation.HORIZONTAL);
                 newBandDefinition.setParentBandDefinition(parentDefinition);
                 if (parentDefinition.getChildrenBandDefinitions() != null) {
@@ -669,9 +667,10 @@ public class ReportEditor extends AbstractEditor<Report> {
                 treeDs.addItem(newBandDefinition);
 
                 treeDs.refresh();
-                tree.expandTree();
+                bandTree.expandTree();
+                bandTree.setSelected(newBandDefinition);//let's try and see if it increases usability
 
-                tree.requestFocus();
+                bandTree.requestFocus();
             }
         });
 
@@ -709,7 +708,7 @@ public class ReportEditor extends AbstractEditor<Report> {
                         }
                     }
                 }
-                tree.requestFocus();
+                bandTree.requestFocus();
             }
 
             private void removeChildrenCascade(Collection selected) {
@@ -840,7 +839,7 @@ public class ReportEditor extends AbstractEditor<Report> {
                     runWindow.addListener(new CloseListener() {
                         @Override
                         public void windowClosed(String actionId) {
-                            tree.requestFocus();
+                            bandTree.requestFocus();
                         }
                     });
                 }

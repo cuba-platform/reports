@@ -31,6 +31,8 @@ public class SerialChartDescription extends AbstractChartDescription {
     protected String valueStackType;
     @MetaProperty
     protected List<ChartSeries> series = new ArrayList<>();
+    @MetaProperty
+    protected Integer categoryAxisLabelRotation = 0;
 
     public SerialChartDescription() {
         super(ChartType.SERIAL.getId());
@@ -90,5 +92,13 @@ public class SerialChartDescription extends AbstractChartDescription {
 
     public void setBandName(String bandName) {
         this.bandName = bandName;
+    }
+
+    public Integer getCategoryAxisLabelRotation() {
+        return categoryAxisLabelRotation;
+    }
+
+    public void setCategoryAxisLabelRotation(Integer categoryAxisLabelRotation) {
+        this.categoryAxisLabelRotation = categoryAxisLabelRotation;
     }
 }

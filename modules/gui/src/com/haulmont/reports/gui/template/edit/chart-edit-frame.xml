@@ -42,9 +42,11 @@
                 <field id="bandName" custom="true"/>
                 <field id="categoryField"/>
                 <field id="categoryAxisCaption"/>
+                <field id="categoryAxisLabelRotation"/>
                 <field id="valueAxisCaption"/>
                 <field id="valueAxisUnits"/>
                 <field id="valueStackType"/>
+                <field id="showLegend"/>
             </column>
         </fieldGroup>
         <table id="seriesTable" editable="true" width="100%" height="200px">

@@ -23,8 +23,6 @@ public class PieChartDescription extends AbstractChartDescription {
     @MetaProperty
     protected String colorField;
     @MetaProperty
-    protected Boolean showLegend;
-    @MetaProperty
     protected String units;
 
     public PieChartDescription() {
@@ -61,14 +59,6 @@ public class PieChartDescription extends AbstractChartDescription {
 
     public void setColorField(String colorField) {
         this.colorField = colorField;
-    }
-
-    public Boolean getShowLegend() {
-        return showLegend;
-    }
-
-    public void setShowLegend(Boolean showLegend) {
-        this.showLegend = showLegend;
     }
 
     public String getUnits() {

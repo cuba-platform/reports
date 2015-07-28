@@ -134,7 +134,8 @@ public class ChartEditFrameController extends AbstractFrame {
             ChartToJsonConverter chartToJsonConverter = new ChartToJsonConverter();
             chartJson = chartToJsonConverter.convertPieChart(chartDescription, data);
         }
-        openFrame(previewBox, ShowChartController.JSON_CHART_SCREEN_ID, Collections.<String, Object>singletonMap("Chart", chartJson));
+        openFrame(previewBox, ShowChartController.JSON_CHART_SCREEN_ID,
+                Collections.<String, Object>singletonMap(ShowChartController.CHART_JSON_PARAMETER, chartJson));
     }
 
     public BoxLayout showChartPreviewBox() {
