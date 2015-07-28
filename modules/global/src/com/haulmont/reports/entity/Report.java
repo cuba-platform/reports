@@ -32,13 +32,13 @@ import java.util.*;
 public class Report extends BaseReportEntity implements com.haulmont.yarg.structure.Report {
     private static final long serialVersionUID = -2817764915661205093L;
 
-    @Column(name = "NAME")
+    @Column(name = "NAME", length = 255)
     protected String name;
 
     @Column(name = "LOCALE_NAMES")
     protected String localeNames;
 
-    @Column(name = "CODE")
+    @Column(name = "CODE", length = 255)
     protected String code;
 
     @ManyToOne

@@ -62,7 +62,7 @@ public class ReportTemplate extends BaseReportEntity implements com.haulmont.yar
     @Column(name = "CUSTOM_DEFINED_BY")
     protected Integer customDefinedBy = CustomTemplateDefinedBy.CLASS.getId();
 
-    @Column(name = "OUTPUT_NAME_PATTERN")
+    @Column(name = "OUTPUT_NAME_PATTERN", length = 255)
     protected String outputNamePattern;
 
     @Column(name = "NAME", length = 500)
