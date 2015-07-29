@@ -44,7 +44,7 @@ public class ChartToJsonConverter {
         valueAxis.put("gridAlpha", 0.1);
         valueAxis.put("dashLength", 0);
         valueAxis.put("title", description.getValueAxisCaption());
-        valueAxis.put("unit", " " + description.getValueAxisUnits());
+        valueAxis.put("unit", join(" ", description.getValueAxisUnits()));
         if (description.getValueStackType() != null) {
             valueAxis.put("stackType", description.getValueStackType().getId());
         }
@@ -73,7 +73,7 @@ public class ChartToJsonConverter {
                 graph.put("lineThickness", 2);
             }
 
-            graph.put("balloonText", series.getName()+" : [[value]]");
+            graph.put("balloonText", join(series.getName(), series.getName() != null ? " : " : "", "[[value]]"));
             graph.put("title", series.getName());
 
             graphs.add(graph);
@@ -113,7 +113,7 @@ public class ChartToJsonConverter {
             legend.put("markerType", "circle");
             legend.put("position", "right");
             legend.put("autoMargins", false);
-            legend.put("valueText", "[[value]] " + description.getUnits());
+            legend.put("valueText", join("[[value]] ", description.getUnits()));
             legend.put("valueWidth", 100);
 
             chart.put("legend", legend);
@@ -123,5 +123,9 @@ public class ChartToJsonConverter {
 
         Gson gson = new Gson();
         return gson.toJson(chart);
+    }
+
+    protected String join(Object... objects) {
+        return StringUtils.join(objects, "");
     }
 }
