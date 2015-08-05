@@ -49,27 +49,9 @@ public class CommonLookupController extends AbstractLookup {
                 .buildCollectionDatasource();
 
         final Table table = cFactory.createComponent(Table.NAME);
-        MetaPropertyPath nameProperty = new MetaPropertyPath(metaClass,
-                new ArrayList<>(metaClass.getOwnProperties()).get(0));
         table.setId("lookupTable");
         table.setFrame(this);
-
-        Table.Column nameColumn = new Table.Column(nameProperty);
-        nameColumn.setCaption(messages.getMessage(getClass(), "name"));
-
-        table.addColumn(nameColumn);
         table.setDatasource(cds);
-
-        table.addGeneratedColumn(nameProperty.getMetaProperty().getName(), new Table.ColumnGenerator() {
-            @Override
-            public Component generateCell(Entity entity) {
-                // noinspection unchecked
-                Label label = cFactory.createComponent(Label.NAME);
-                label.setValue(entity.getInstanceName());
-                return label;
-            }
-        });
-
         table.setMultiSelect(true);
         table.setWidth("100%");
         table.setHeight("100%");
