@@ -28,8 +28,8 @@ import java.util.Map;
  * @author degtyarjov
  * @version $Id$
  */
-class EditViewAction extends AbstractAction {
-    private BandDefinitionEditor bandDefinitionEditor;
+public class EditViewAction extends AbstractAction {
+    protected BandDefinitionEditor bandDefinitionEditor;
 
     public EditViewAction(BandDefinitionEditor bandDefinitionEditor) {
         super("editView");
