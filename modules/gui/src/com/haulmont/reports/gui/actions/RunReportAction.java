@@ -65,12 +65,10 @@ public class RunReportAction extends AbstractAction {
                 if (items != null && items.size() > 0) {
                     Report report = (Report) items.iterator().next();
                     report = window.getDsContext().getDataSupplier().reload(report, "report.edit");
-                    if (report != null) {
-                        if (report.getInputParameters() != null && report.getInputParameters().size() > 0) {
-                            openReportParamsDialog(report, window);
-                        } else {
-                            reportGuiManager.printReport(report, Collections.<String, Object>emptyMap(), window);
-                        }
+                    if (report.getInputParameters() != null && report.getInputParameters().size() > 0) {
+                        openReportParamsDialog(report, window);
+                    } else {
+                        reportGuiManager.printReport(report, Collections.<String, Object>emptyMap(), window);
                     }
                 }
             }
