@@ -57,9 +57,9 @@ def desktopModule = project(':reports-desktop')
 apply from: "$rootProject.projectDir/lib.gradle"
 
 def servletApi = [group: 'org.apache.tomcat', name: 'tomcat-servlet-api', version: '7.0.53']
-def postgres = [group: 'postgresql', name: 'postgresql', version: '9.0-801.jdbc4']
+def postgres = 'org.postgresql:postgresql:9.4-1201-jdbc41'
 
-def groovyArtifact = [group: 'org.codehaus.groovy', name: 'groovy-all', version: '2.1.6']
+def groovyArtifact = [group: 'org.codehaus.groovy', name: 'groovy-all', version: '2.4.4']
 def asm = [group: 'asm', name: 'asm', version: '3.2']
 
 def baseVersion = artifactVersion + (isSnapshot ? '-SNAPSHOT' : '')
@@ -141,6 +141,7 @@ configure(coreModule) {
         }
 		
         testCompile(group: 'com.haulmont.cuba', name: 'cuba-core', version: baseVersion, classifier: 'tests')
+        testCompile('org.apache.commons:commons-dbcp2:2.1.1')
         provided(servletApi)
         jdbc(postgres)
 
