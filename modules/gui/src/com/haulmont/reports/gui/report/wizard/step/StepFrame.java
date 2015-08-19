@@ -38,7 +38,7 @@ public class StepFrame {
     public StepFrame(ReportWizardCreator reportWizardCreatorEditor, String name, String frameComponentName) {
         this.wizard = reportWizardCreatorEditor;
         this.name = name;
-        this.frame = reportWizardCreatorEditor.getComponent(frameComponentName);
+        this.frame = (IFrame) reportWizardCreatorEditor.getComponent(frameComponentName);
         if (frame == null) {
             throw new UnsupportedOperationException("Frame component is not found");
         }

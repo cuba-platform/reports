@@ -140,7 +140,7 @@ public class ChartEditFrameController extends AbstractFrame {
 
     public BoxLayout showChartPreviewBox() {
         Window parent = (Window) getFrame();
-        BoxLayout previewBox = parent.getComponentNN("chartPreviewBox");
+        BoxLayout previewBox = (BoxLayout) parent.getComponentNN("chartPreviewBox");
         previewBox.setVisible(true);
         previewBox.setHeight("100%");
         previewBox.setWidth("100%");
@@ -155,7 +155,7 @@ public class ChartEditFrameController extends AbstractFrame {
 
     public void hideChartPreviewBox() {
         Window parent = (Window) getFrame();
-        BoxLayout previewBox = parent.getComponentNN("chartPreviewBox");
+        BoxLayout previewBox = (BoxLayout) parent.getComponentNN("chartPreviewBox");
         previewBox.setVisible(false);
         previewBox.removeAll();
         Companion companion = getCompanion();

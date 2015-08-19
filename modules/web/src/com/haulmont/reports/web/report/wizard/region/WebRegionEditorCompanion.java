@@ -58,7 +58,7 @@ public class WebRegionEditorCompanion implements RegionEditor.Companion {
                         regionProperty.setEntityTreeNode(entityTreeNode);
                         regionProperty.setOrderNum((long) reportRegionPropertiesTableDs.getItemIds().size() + 1); //first element must be not zero cause later we do sorting by multiplying that values
                         reportRegionPropertiesTableDs.addItem(regionProperty);
-                        Table propertiesTable = entityTree.getFrame().getComponent("propertiesTable");
+                        Table propertiesTable = (Table) entityTree.getFrame().getComponent("propertiesTable");
                         if (propertiesTable != null) {
                             propertiesTable.setSelected(regionProperty);
                             ((com.vaadin.ui.Table) WebComponentsHelper.unwrap(propertiesTable)).setCurrentPageFirstItemId(regionProperty.getId());
