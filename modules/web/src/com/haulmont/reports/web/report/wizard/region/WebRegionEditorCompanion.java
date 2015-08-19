@@ -30,7 +30,7 @@ import java.util.UUID;
 public class WebRegionEditorCompanion implements RegionEditor.Companion {
     @Override
     public void addTreeTableDblClickListener(final Tree entityTree, final CollectionDatasource<RegionProperty, UUID> reportRegionPropertiesTableDs) {
-        final CubaTree webTree = WebComponentsHelper.unwrap(entityTree);
+        final CubaTree webTree = (CubaTree) WebComponentsHelper.unwrap(entityTree);
         webTree.setDoubleClickMode(true);
         webTree.addItemClickListener(new ItemClickEvent.ItemClickListener() {
             @Override
@@ -74,7 +74,7 @@ public class WebRegionEditorCompanion implements RegionEditor.Companion {
         ((com.vaadin.ui.Button) WebComponentsHelper.unwrap(button)).addClickListener(new com.vaadin.ui.Button.ClickListener() {
             @Override
             public void buttonClick(com.vaadin.ui.Button.ClickEvent event) {
-                com.vaadin.ui.Table vaadinTable = WebComponentsHelper.unwrap(table);
+                com.vaadin.ui.Table vaadinTable = (com.vaadin.ui.Table) WebComponentsHelper.unwrap(table);
                 vaadinTable.setCurrentPageFirstItemId(vaadinTable.lastItemId());
                 vaadinTable.refreshRowCache();
             }
