@@ -78,7 +78,7 @@ public class ReportBrowser extends AbstractLookup {
         copyReport.setAction(new ItemTrackingAction("copy") {
             @Override
             public void actionPerform(Component component) {
-                Report report = target.getSingleSelected();
+                Report report = (Report) target.getSingleSelected();
                 if (report != null) {
                     reportService.copyReport(report);
                     target.refresh();
@@ -96,7 +96,7 @@ public class ReportBrowser extends AbstractLookup {
         runReport.setAction(new ItemTrackingAction("runReport") {
             @Override
             public void actionPerform(Component component) {
-                Report report = target.getSingleSelected();
+                Report report = (Report) target.getSingleSelected();
                 if (report != null) {
                     report = getDsContext().getDataSupplier().reload(report, "report.edit");
                     if (report.getInputParameters() != null && report.getInputParameters().size() > 0) {

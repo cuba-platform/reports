@@ -38,9 +38,9 @@ public class EditViewAction extends AbstractAction {
 
     @Override
     public void actionPerform(Component component) {
-        if (bandDefinitionEditor.dataSets.getSingleSelected() instanceof DataSet) {
+        if (bandDefinitionEditor.dataSets.getSingleSelected() != null) {
             final DataSet dataSet = bandDefinitionEditor.dataSets.getSingleSelected();
-            if (dataSet != null && (DataSetType.SINGLE == dataSet.getType() || DataSetType.MULTI == dataSet.getType())) {
+            if (DataSetType.SINGLE == dataSet.getType() || DataSetType.MULTI == dataSet.getType()) {
                 MetaClass forEntityTreeModelMetaClass = findMetaClassByAlias(dataSet);
                 if (forEntityTreeModelMetaClass != null) {
 

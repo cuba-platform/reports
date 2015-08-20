@@ -64,7 +64,7 @@ public class ReportGroupBrowser extends AbstractLookup {
                 return;
             }
 
-            ReportGroup group = target.getSingleSelected();
+            ReportGroup group = (ReportGroup) target.getSingleSelected();
             if (group != null) {
                 if (group.getSystemFlag()) {
                     showNotification(getMessage("unableToDeleteSystemReportGroup"), NotificationType.WARNING);

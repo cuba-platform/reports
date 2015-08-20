@@ -27,6 +27,7 @@ import org.apache.commons.lang.StringUtils;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.xml.crypto.Data;
 import java.util.*;
 
 /**
@@ -48,7 +49,7 @@ public class BandDefinitionEditor extends AbstractEditor<BandDefinition> impleme
     private CollectionDatasource<ReportInputParameter, UUID> parametersDs;
 
     @Inject
-    protected Table dataSets;
+    protected Table<DataSet> dataSets;
     @Named("text")
     protected SourceCodeEditor dataSetScriptField;
     @Inject
@@ -405,10 +406,10 @@ public class BandDefinitionEditor extends AbstractEditor<BandDefinition> impleme
     protected void selectFirstDataSet() {
         dataSetsDs.refresh();
         if (!dataSetsDs.getItemIds().isEmpty()) {
-            Entity item = dataSetsDs.getItem(dataSetsDs.getItemIds().iterator().next());
+            DataSet item = dataSetsDs.getItem(dataSetsDs.getItemIds().iterator().next());
             dataSets.setSelected(item);
         } else {
-            dataSets.setSelected((Entity) null);
+            dataSets.setSelected((DataSet) null);
         }
     }
 

@@ -15,15 +15,16 @@ import javax.annotation.Nullable;
 import java.util.*;
 
 /**
- * Move items in ListComponent up or down. Items in datasource must to be an entity of type "OrderableEntity". <br/>
- * Note that order num of item will be changed for moving
+ * Move items in ListComponent up or down. Items in datasource must to be of type {@link OrderableEntity}. <br/>
+ * Note that order num of item will be changed for moving.
  * Move algorithm is differ from selected items count:
  * <ul><li>swap items algorithm if one item is selected </li><li>index recalculating algorithm if more than one item selected)</li><ul/>
  *
  * @author fedorchenko
  * @version $Id$
  */
-public class OrderableItemMoveAction<T extends ListComponent> extends AbstractAction {
+public class OrderableItemMoveAction<T extends ListComponent<E>, E  extends OrderableEntity> extends AbstractAction {
+
     protected T listComponent;
     protected Direction direction;
 
@@ -115,8 +116,8 @@ public class OrderableItemMoveAction<T extends ListComponent> extends AbstractAc
      */
     protected void moveFewItems() {
         //System.out.println("swap-------------");
-        List<OrderableEntity> allItems = new ArrayList(listComponent.getDatasource().getItems());
-        Set<OrderableEntity> selectedItems = listComponent.getSelected();
+        List<E> allItems = new ArrayList(listComponent.getDatasource().getItems());
+        Set<E> selectedItems = listComponent.getSelected();
         int spreadKoef = listComponent.getSelected().size();//U can use 10 for easier debug
 
         long idx = 0;

@@ -106,7 +106,7 @@ public class ReportEditor extends AbstractEditor<Report> {
     protected Button paramDownButton;
 
     @Named("generalFrame.serviceTree")
-    protected Tree bandTree;
+    protected Tree<BandDefinition> bandTree;
 
     @Inject
     protected WindowConfig windowConfig;
@@ -239,7 +239,7 @@ public class ReportEditor extends AbstractEditor<Report> {
         paramUpButton.setAction(new BaseAction("generalFrame.up") {
             @Override
             public void actionPerform(Component component) {
-                ReportInputParameter parameter = target.getSingleSelected();
+                ReportInputParameter parameter = (ReportInputParameter) target.getSingleSelected();
                 if (parameter != null) {
                     List<ReportInputParameter> inputParameters = getItem().getInputParameters();
                     int index = parameter.getPosition();
@@ -264,7 +264,7 @@ public class ReportEditor extends AbstractEditor<Report> {
             @Override
             protected boolean isApplicable() {
                 if (target != null) {
-                    ReportInputParameter item = target.getSingleSelected();
+                    ReportInputParameter item = (ReportInputParameter) target.getSingleSelected();
                     if (item != null && parametersDs.getItem() == item) {
                         return item.getPosition() > 0;
                     }
@@ -277,7 +277,7 @@ public class ReportEditor extends AbstractEditor<Report> {
         paramDownButton.setAction(new BaseAction("generalFrame.down") {
             @Override
             public void actionPerform(Component component) {
-                ReportInputParameter parameter = target.getSingleSelected();
+                ReportInputParameter parameter = (ReportInputParameter) target.getSingleSelected();
                 if (parameter != null) {
                     List<ReportInputParameter> inputParameters = getItem().getInputParameters();
                     int index = parameter.getPosition();
@@ -302,7 +302,7 @@ public class ReportEditor extends AbstractEditor<Report> {
             @Override
             protected boolean isApplicable() {
                 if (target != null) {
-                    ReportInputParameter item = target.getSingleSelected();
+                    ReportInputParameter item = (ReportInputParameter) target.getSingleSelected();
                     if (item != null && parametersDs.getItem() == item) {
                         return item.getPosition() < parametersDs.size() - 1;
                     }
@@ -749,7 +749,7 @@ public class ReportEditor extends AbstractEditor<Report> {
 
             @Override
             public void actionPerform(Component component) {
-                BandDefinition definition = target.getSingleSelected();
+                BandDefinition definition = (BandDefinition) target.getSingleSelected();
                 if (definition != null && definition.getParentBandDefinition() != null) {
                     BandDefinition parentDefinition = definition.getParentBandDefinition();
                     List<BandDefinition> definitionsList = parentDefinition.getChildrenBandDefinitions();
@@ -770,7 +770,7 @@ public class ReportEditor extends AbstractEditor<Report> {
             @Override
             protected boolean isApplicable() {
                 if (target != null) {
-                    BandDefinition selectedItem = target.getSingleSelected();
+                    BandDefinition selectedItem = (BandDefinition) target.getSingleSelected();
                     return selectedItem != null && selectedItem.getPosition() > 0;
                 }
 
@@ -791,7 +791,7 @@ public class ReportEditor extends AbstractEditor<Report> {
 
             @Override
             public void actionPerform(Component component) {
-                BandDefinition definition = target.getSingleSelected();
+                BandDefinition definition = (BandDefinition) target.getSingleSelected();
                 if (definition != null && definition.getParentBandDefinition() != null) {
                     BandDefinition parentDefinition = definition.getParentBandDefinition();
                     List<BandDefinition> definitionsList = parentDefinition.getChildrenBandDefinitions();
@@ -812,7 +812,7 @@ public class ReportEditor extends AbstractEditor<Report> {
             @Override
             protected boolean isApplicable() {
                 if (target != null) {
-                    BandDefinition bandDefinition = target.getSingleSelected();
+                    BandDefinition bandDefinition = (BandDefinition) target.getSingleSelected();
                     if (bandDefinition != null) {
                         BandDefinition parent = bandDefinition.getParentBandDefinition();
                         return parent != null &&
@@ -905,7 +905,7 @@ public class ReportEditor extends AbstractEditor<Report> {
 
             @Override
             public void actionPerform(Component component) {
-                ReportTemplate template = target.getSingleSelected();
+                ReportTemplate template = (ReportTemplate) target.getSingleSelected();
                 if (template != null) {
                     getItem().setDefaultTemplate(template);
                 }

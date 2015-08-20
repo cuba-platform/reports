@@ -54,7 +54,7 @@ public class RegionEditor extends AbstractEditor<ReportRegion> {
     @Inject
     protected Button downItem;
     @Inject
-    protected Table propertiesTable;
+    protected Table<RegionProperty> propertiesTable;
     @Inject
     protected Label tipLabel;
     @Inject
@@ -190,7 +190,7 @@ public class RegionEditor extends AbstractEditor<ReportRegion> {
                 Set<EntityTreeNode> alreadyAddedNodes = new HashSet<>(nodesList);
 
                 Set<EntityTreeNode> selectedItems = entityTree.getSelected();
-                List<Entity> addedItems = new ArrayList<>();
+                List<RegionProperty> addedItems = new ArrayList<>();
                 boolean alreadyAdded = false;
                 for (EntityTreeNode entityTreeNode : selectedItems) {
                     if (entityTreeNode.getWrappedMetaClass() != null) {
