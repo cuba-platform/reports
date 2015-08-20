@@ -206,7 +206,7 @@ class DetailsStepFrame extends StepFrame {
             params.put("useShortConditionForm", true);
 
             final FilterEditor filterEditor =
-                    wizard.windowManagerProvider.get().openWindow(windowInfo, WindowManager.OpenType.DIALOG, params);
+                    (FilterEditor) wizard.windowManagerProvider.get().openWindow(windowInfo, WindowManager.OpenType.DIALOG, params);
             filterEditor.addListener(new Window.CloseListener() {
                 private ParameterClassResolver parameterClassResolver = new ParameterClassResolver();
 

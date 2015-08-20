@@ -524,7 +524,7 @@ public class ReportEditor extends AbstractEditor<Report> {
                     public void actionPerform(Component component) {
                         final ReportTemplate defaultTemplate = getItem().getDefaultTemplate();
                         if (defaultTemplate != null) {
-                            final FileUploadDialog dialog = openWindow("fileUploadDialog", OpenType.DIALOG);
+                            final FileUploadDialog dialog = (FileUploadDialog) openWindow("fileUploadDialog", OpenType.DIALOG);
                             dialog.addListener(new CloseListener() {
                                 @Override
                                 public void windowClosed(String actionId) {

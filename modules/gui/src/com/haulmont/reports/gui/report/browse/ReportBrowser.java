@@ -118,7 +118,7 @@ public class ReportBrowser extends AbstractLookup {
         importReport.setAction(new BaseAction("import") {
             @Override
             public void actionPerform(Component component) {
-                final FileUploadDialog dialog = openWindow("fileUploadDialog", WindowManager.OpenType.DIALOG);
+                final FileUploadDialog dialog = (FileUploadDialog) openWindow("fileUploadDialog", WindowManager.OpenType.DIALOG);
                 dialog.addListener(new CloseListener() {
                     @Override
                     public void windowClosed(String actionId) {

@@ -100,7 +100,7 @@ public class ShowChartController extends AbstractWindow {
             params.put(InputParametersController.REPORT_PARAMETER, report) ;
             params.put(InputParametersController.PARAMETERS_PARAMETER, reportParameters) ;
 
-            inputParametersController = openFrame(reportParamsBox, "report$inputParameters", params);
+            inputParametersController = (InputParametersController) openFrame(reportParamsBox, "report$inputParameters", params);
             inputParametersController.setPrintReportHandler(new InputParametersController.PrintReportHandler() {
                 @Override
                 public void handle() {
