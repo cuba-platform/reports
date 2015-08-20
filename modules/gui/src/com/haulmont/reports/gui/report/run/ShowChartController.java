@@ -129,7 +129,7 @@ public class ShowChartController extends AbstractWindow {
 
     private void showDiagramStubText() {
         if (CollectionUtils.isEmpty(chartBox.getComponents())) {
-            Label label = componentsFactory.createComponent(Label.NAME);
+            Label label = componentsFactory.createComponent(Label.class);
             label.setValue(getMessage("showChart.caption"));
             label.setAlignment(Alignment.MIDDLE_CENTER);
             label.setStyleName("h1");

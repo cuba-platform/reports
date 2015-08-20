@@ -462,7 +462,7 @@ public class ReportEditor extends AbstractEditor<Report> {
         propertiesFieldGroup.addCustomField("defaultTemplate", new FieldGroup.CustomFieldGenerator() {
             @Override
             public Component generateField(Datasource datasource, String propertyId) {
-                final LookupPickerField lookupPickerField = componentsFactory.createComponent(LookupPickerField.NAME);
+                final LookupPickerField lookupPickerField = componentsFactory.createComponent(LookupPickerField.class);
 
                 lookupPickerField.setOptionsDatasource(templatesDs);
                 lookupPickerField.setDatasource(datasource, propertyId);

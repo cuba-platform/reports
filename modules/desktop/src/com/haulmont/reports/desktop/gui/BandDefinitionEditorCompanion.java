@@ -39,7 +39,7 @@ public class BandDefinitionEditorCompanion implements BandDefinitionEditor.Compa
         table.addGeneratedColumn("name", new Table.ColumnGenerator() {
             @Override
             public Component generateCell(Entity entity) {
-                TextField nameField = factory.createComponent(TextField.NAME);
+                TextField nameField = factory.createComponent(TextField.class);
                 final DataSet dataset = (DataSet) entity;
                 nameField.setValue(dataset.getName());
                 nameField.addListener(new ValueListener() {
@@ -55,7 +55,7 @@ public class BandDefinitionEditorCompanion implements BandDefinitionEditor.Compa
         table.addGeneratedColumn("type", new Table.ColumnGenerator() {
             @Override
             public Component generateCell(Entity entity) {
-                LookupField lookupField = factory.createComponent(LookupField.NAME);
+                LookupField lookupField = factory.createComponent(LookupField.class);
                 final DataSet dataset = (DataSet) entity;
                 Map<String, Object> options = new TreeMap<>();
                 for (DataSetType type : DataSetType.values()) {

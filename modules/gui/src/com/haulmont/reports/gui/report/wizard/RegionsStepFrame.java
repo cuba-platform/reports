@@ -139,7 +139,7 @@ class RegionsStepFrame extends StepFrame {
         @Override
         public Component generateCell(ReportRegion entity) {
             currentReportRegionGeneratedColumn = entity;
-            BoxLayout mainLayout = wizard.componentsFactory.createComponent(BoxLayout.VBOX);
+            BoxLayout mainLayout = wizard.componentsFactory.createComponent(VBoxLayout.class);
             mainLayout.setWidth(WIDTH_PERCENT_100);
             mainLayout.add(createFirstTwoRowsLayout());
             mainLayout.add(createThirdRowAttrsLayout());
@@ -147,7 +147,7 @@ class RegionsStepFrame extends StepFrame {
         }
 
         private BoxLayout createFirstTwoRowsLayout() {
-            BoxLayout firstTwoRowsLayout = wizard.componentsFactory.createComponent(BoxLayout.HBOX);
+            BoxLayout firstTwoRowsLayout = wizard.componentsFactory.createComponent(HBoxLayout.class);
             BoxLayout expandedAttrsLayout = createExpandedAttrsLayout();
             firstTwoRowsLayout.setWidth(WIDTH_PERCENT_100);
             firstTwoRowsLayout.add(expandedAttrsLayout);
@@ -157,7 +157,7 @@ class RegionsStepFrame extends StepFrame {
         }
 
         private BoxLayout createExpandedAttrsLayout() {
-            BoxLayout expandedAttrsLayout = wizard.componentsFactory.createComponent(BoxLayout.VBOX);
+            BoxLayout expandedAttrsLayout = wizard.componentsFactory.createComponent(HBoxLayout.class);
             expandedAttrsLayout.setWidth(WIDTH_PERCENT_100);
             expandedAttrsLayout.add(createFirstRowAttrsLayout());
             expandedAttrsLayout.add(createSecondRowAttrsLayout());
@@ -165,12 +165,12 @@ class RegionsStepFrame extends StepFrame {
         }
 
         private BoxLayout createFirstRowAttrsLayout() {
-            BoxLayout firstRowAttrsLayout = wizard.componentsFactory.createComponent(BoxLayout.HBOX);
+            BoxLayout firstRowAttrsLayout = wizard.componentsFactory.createComponent(HBoxLayout.class);
             firstRowAttrsLayout.setSpacing(true);
-            Label regionLbl = wizard.componentsFactory.createComponent(Label.NAME);
+            Label regionLbl = wizard.componentsFactory.createComponent(Label.class);
             regionLbl.setStyleName(BOLD_LABEL_STYLE);
             regionLbl.setValue(wizard.getMessage("region"));
-            Label regionValueLbl = wizard.componentsFactory.createComponent(Label.NAME);
+            Label regionValueLbl = wizard.componentsFactory.createComponent(Label.class);
             regionValueLbl.setValue(currentReportRegionGeneratedColumn.getName());
             regionValueLbl.setWidth(WIDTH_PERCENT_100);
             firstRowAttrsLayout.add(regionLbl);
@@ -179,12 +179,12 @@ class RegionsStepFrame extends StepFrame {
         }
 
         private BoxLayout createSecondRowAttrsLayout() {
-            BoxLayout secondRowAttrsLayout = wizard.componentsFactory.createComponent(BoxLayout.HBOX);
+            BoxLayout secondRowAttrsLayout = wizard.componentsFactory.createComponent(HBoxLayout.class);
             secondRowAttrsLayout.setSpacing(true);
-            Label entityLbl = wizard.componentsFactory.createComponent(Label.NAME);
+            Label entityLbl = wizard.componentsFactory.createComponent(Label.class);
             entityLbl.setStyleName(BOLD_LABEL_STYLE);
             entityLbl.setValue(wizard.getMessage("entity"));
-            Label entityValueLbl = wizard.componentsFactory.createComponent(Label.NAME);
+            Label entityValueLbl = wizard.componentsFactory.createComponent(Label.class);
             entityValueLbl.setValue(wizard.messageTools.getEntityCaption(currentReportRegionGeneratedColumn.getRegionPropertiesRootNode().getWrappedMetaClass()));
             entityValueLbl.setWidth(WIDTH_PERCENT_100);
             secondRowAttrsLayout.add(entityLbl);
@@ -193,19 +193,19 @@ class RegionsStepFrame extends StepFrame {
         }
 
         private BoxLayout createBtnsLayout() {
-            BoxLayout btnsLayout = wizard.componentsFactory.createComponent(BoxLayout.HBOX);
+            BoxLayout btnsLayout = wizard.componentsFactory.createComponent(HBoxLayout.class);
             btnsLayout.setSpacing(true);
             btnsLayout.setStyleName("on-hover-visible-layout");
             return btnsLayout;
         }
 
         private BoxLayout createThirdRowAttrsLayout() {
-            BoxLayout thirdRowAttrsLayout = wizard.componentsFactory.createComponent(BoxLayout.HBOX);
+            BoxLayout thirdRowAttrsLayout = wizard.componentsFactory.createComponent(HBoxLayout.class);
             thirdRowAttrsLayout.setSpacing(true);
-            Label entityLbl = wizard.componentsFactory.createComponent(Label.NAME);
+            Label entityLbl = wizard.componentsFactory.createComponent(Label.class);
             entityLbl.setStyleName(BOLD_LABEL_STYLE);
             entityLbl.setValue(wizard.getMessage("attributes"));
-            Button editBtn = wizard.componentsFactory.createComponent(Button.NAME);
+            Button editBtn = wizard.componentsFactory.createComponent(Button.class);
             editBtn.setCaption(generateAttrsBtnCaption());
             editBtn.setStyleName("link");
             editBtn.setWidth(WIDTH_PERCENT_100);

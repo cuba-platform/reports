@@ -51,7 +51,7 @@ public class ParameterFieldCreator {
     }
 
     public Label createLabel(ReportInputParameter parameter, Field field) {
-        Label label = componentsFactory.createComponent(Label.NAME);
+        Label label = componentsFactory.createComponent(Label.class);
         label.setAlignment(field instanceof TokenList ? Component.Alignment.TOP_LEFT : Component.Alignment.MIDDLE_LEFT);
         label.setWidth(Component.AUTO_SIZE);
         label.setValue(parameter.getLocName());
@@ -79,7 +79,7 @@ public class ParameterFieldCreator {
 
         @Override
         public Field createField(ReportInputParameter parameter) {
-            DateField dateField = componentsFactory.createComponent(DateField.NAME);
+            DateField dateField = componentsFactory.createComponent(DateField.class);
             dateField.setResolution(DateField.Resolution.DAY);
             dateField.setDateFormat(messages.getMessage(AppConfig.getMessagesPack(), "dateFormat"));
             return dateField;
@@ -90,7 +90,7 @@ public class ParameterFieldCreator {
 
         @Override
         public Field createField(ReportInputParameter parameter) {
-            DateField dateField = componentsFactory.createComponent(DateField.NAME);
+            DateField dateField = componentsFactory.createComponent(DateField.class);
             dateField.setResolution(DateField.Resolution.MIN);
             dateField.setDateFormat(messages.getMessage(AppConfig.getMessagesPack(), "dateTimeFormat"));
             return dateField;
@@ -101,7 +101,7 @@ public class ParameterFieldCreator {
 
         @Override
         public Field createField(ReportInputParameter parameter) {
-            return componentsFactory.createComponent(TimeField.NAME);
+            return componentsFactory.createComponent(TimeField.class);
         }
     }
 
@@ -109,7 +109,7 @@ public class ParameterFieldCreator {
 
         @Override
         public Field createField(ReportInputParameter parameter) {
-            return componentsFactory.createComponent(CheckBox.NAME);
+            return componentsFactory.createComponent(CheckBox.class);
         }
     }
 
@@ -117,7 +117,7 @@ public class ParameterFieldCreator {
 
         @Override
         public Field createField(ReportInputParameter parameter) {
-            return componentsFactory.createComponent(TextField.NAME);
+            return componentsFactory.createComponent(TextField.class);
         }
     }
 
@@ -125,7 +125,7 @@ public class ParameterFieldCreator {
 
         @Override
         public Field createField(ReportInputParameter parameter) {
-            TextField textField = componentsFactory.createComponent(TextField.NAME);
+            TextField textField = componentsFactory.createComponent(TextField.class);
             textField.addValidator(new DoubleValidator());
             textField.setDatatype(Datatypes.getNN(Double.class));
             return textField;
@@ -136,7 +136,7 @@ public class ParameterFieldCreator {
 
         @Override
         public Field createField(ReportInputParameter parameter) {
-            LookupField lookupField = componentsFactory.createComponent(LookupField.NAME);
+            LookupField lookupField = componentsFactory.createComponent(LookupField.class);
             String enumClassName = parameter.getEnumerationClass();
             if (StringUtils.isNotBlank(enumClassName)) {
                 Class enumClass = AppBeans.get(Scripting.class).loadClass(enumClassName);
@@ -158,7 +158,7 @@ public class ParameterFieldCreator {
 
         @Override
         public Field createField(ReportInputParameter parameter) {
-            PickerField pickerField = componentsFactory.createComponent(PickerField.NAME);
+            PickerField pickerField = componentsFactory.createComponent(PickerField.class);
             final com.haulmont.chile.core.model.MetaClass entityMetaClass =
                     metadata.getSession().getClass(parameter.getEntityMetaClass());
             pickerField.setMetaClass(entityMetaClass);
@@ -195,7 +195,7 @@ public class ParameterFieldCreator {
 
         @Override
         public Field createField(final ReportInputParameter parameter) {
-            TokenList tokenList = componentsFactory.createComponent(TokenList.NAME);
+            TokenList tokenList = componentsFactory.createComponent(TokenList.class);
             final com.haulmont.chile.core.model.MetaClass entityMetaClass =
                     metadata.getSession().getClass(parameter.getEntityMetaClass());
 

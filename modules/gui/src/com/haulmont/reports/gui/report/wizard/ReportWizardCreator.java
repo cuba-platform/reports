@@ -229,7 +229,7 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
         mainFields.addCustomField("entity", new FieldGroup.CustomFieldGenerator() {
             @Override
             public Component generateField(Datasource datasource, String propertyId) {
-                LookupField lookupField = componentsFactory.createComponent(LookupField.NAME);
+                LookupField lookupField = componentsFactory.createComponent(LookupField.class);
                 lookupField.requestFocus();
                 entity = lookupField;
                 return lookupField;
@@ -238,7 +238,7 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
         mainFields.addCustomField("reportName", new FieldGroup.CustomFieldGenerator() {
             @Override
             public Component generateField(Datasource datasource, String propertyId) {
-                TextField textField = componentsFactory.createComponent(TextField.NAME);
+                TextField textField = componentsFactory.createComponent(TextField.class);
                 reportName = textField;
                 return textField;
             }
@@ -246,7 +246,7 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
         mainFields.addCustomField("templateFileFormat", new FieldGroup.CustomFieldGenerator() {
             @Override
             public Component generateField(Datasource datasource, String propertyId) {
-                LookupField lookupField = componentsFactory.createComponent(LookupField.NAME);
+                LookupField lookupField = componentsFactory.createComponent(LookupField.class);
                 templateFileFormat = lookupField;
                 return lookupField;
             }
@@ -254,7 +254,7 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
         mainFields.addCustomField("reportType", new FieldGroup.CustomFieldGenerator() {
             @Override
             public Component generateField(Datasource datasource, String propertyId) {
-                OptionsGroup optionsGroup = AppConfig.getFactory().createComponent(OptionsGroup.NAME);
+                OptionsGroup optionsGroup = componentsFactory.createComponent(OptionsGroup.class);
                 optionsGroup.setMultiSelect(false);
                 optionsGroup.setOrientation(OptionsGroup.Orientation.VERTICAL);
                 reportTypeOptionGroup = optionsGroup;

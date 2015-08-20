@@ -48,7 +48,7 @@ public class CommonLookupController extends AbstractLookup {
                 .setViewName(View.MINIMAL)
                 .buildCollectionDatasource();
 
-        final Table table = cFactory.createComponent(Table.NAME);
+        final Table table = cFactory.createComponent(Table.class);
         table.setId("lookupTable");
         table.setFrame(this);
         table.setDatasource(cds);

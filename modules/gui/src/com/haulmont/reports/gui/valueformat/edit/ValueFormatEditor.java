@@ -60,7 +60,7 @@ public class ValueFormatEditor extends AbstractEditor<ReportValueFormat> {
         formatFields.addCustomField("formatString", new FieldGroup.CustomFieldGenerator() {
             @Override
             public Component generateField(Datasource datasource, String propertyId) {
-                formatField = componentsFactory.createComponent(LookupField.NAME);
+                formatField = componentsFactory.createComponent(LookupField.class);
                 Map<String, Object> options = new HashMap<>();
                 for (String format : defaultFormats) {
                     options.put(format, format);

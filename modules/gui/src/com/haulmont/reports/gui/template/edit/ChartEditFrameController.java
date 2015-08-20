@@ -111,7 +111,7 @@ public class ChartEditFrameController extends AbstractFrame {
         FieldGroup.CustomFieldGenerator bandSelectorGenerator = new FieldGroup.CustomFieldGenerator() {
             @Override
             public Component generateField(Datasource datasource, String propertyId) {
-                LookupField lookupField = componentsFactory.createComponent(LookupField.NAME);
+                LookupField lookupField = componentsFactory.createComponent(LookupField.class);
                 lookupField.setDatasource(datasource, propertyId);
                 return lookupField;
             }
