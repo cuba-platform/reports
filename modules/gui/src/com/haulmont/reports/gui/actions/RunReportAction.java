@@ -39,11 +39,6 @@ public class RunReportAction extends AbstractAction {
         this("runReport", window);
     }
 
-    @Deprecated
-    public RunReportAction(Frame window, String captionId) {
-        this(captionId, window);
-    }
-
     public RunReportAction(String id, Frame window) {
         super(id);
 

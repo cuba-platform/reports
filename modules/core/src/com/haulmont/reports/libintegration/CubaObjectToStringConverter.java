@@ -7,8 +7,8 @@ package com.haulmont.reports.libintegration;
 
 import com.haulmont.chile.core.datatypes.Datatype;
 import com.haulmont.chile.core.datatypes.Datatypes;
-import com.haulmont.cuba.core.app.DataWorker;
 import com.haulmont.cuba.core.entity.Entity;
+import com.haulmont.cuba.core.global.DataManager;
 import com.haulmont.cuba.core.global.EntityLoadInfo;
 import com.haulmont.cuba.core.global.LoadContext;
 import com.haulmont.yarg.exception.ReportingException;
@@ -23,7 +23,7 @@ import java.text.ParseException;
  */
 public class CubaObjectToStringConverter extends AbstractObjectToStringConverter {
     @Inject
-    protected DataWorker dataWorker;
+    protected DataManager dataManager;
 
     @Override
     public String convertToString(Class parameterClass, Object paramValue) {
@@ -52,7 +52,7 @@ public class CubaObjectToStringConverter extends AbstractObjectToStringConverter
         } else if (Entity.class.isAssignableFrom(parameterClass)) {
             EntityLoadInfo entityLoadInfo = EntityLoadInfo.parse(paramValueStr);
             if (entityLoadInfo != null) {
-                return dataWorker.load(new LoadContext(entityLoadInfo.getMetaClass()).setId(entityLoadInfo.getId()));
+                return dataManager.load(new LoadContext(entityLoadInfo.getMetaClass()).setId(entityLoadInfo.getId()));
             }
         } else {
             Datatype datatype = Datatypes.get(parameterClass);

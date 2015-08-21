@@ -11,7 +11,6 @@
 package com.haulmont.reports.libintegration;
 
 import com.haulmont.chile.core.model.MetaProperty;
-import com.haulmont.cuba.core.app.DataWorker;
 import com.haulmont.cuba.core.app.FileStorageAPI;
 import com.haulmont.cuba.core.entity.BaseUuidEntity;
 import com.haulmont.cuba.core.entity.FileDescriptor;
@@ -204,7 +203,7 @@ public class CubaHtmlFormatter extends HtmlFormatter {
             if (StringUtils.startsWith(uri, FS_PROTOCOL_PREFIX)) {
                 String uuidString = StringUtils.substring(uri, FS_PROTOCOL_PREFIX.length());
 
-                DataWorker dataWorker = AppBeans.get(DataWorker.class);
+                DataManager dataWorker = AppBeans.get(DataManager.class);
                 LoadContext loadContext = new LoadContext(FileDescriptor.class);
                 loadContext.setView(View.LOCAL);
 
