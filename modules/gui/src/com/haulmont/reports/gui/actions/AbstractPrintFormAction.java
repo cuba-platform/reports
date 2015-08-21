@@ -10,7 +10,7 @@ import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.UserSessionSource;
 import com.haulmont.cuba.gui.WindowManager;
 import com.haulmont.cuba.gui.components.AbstractAction;
-import com.haulmont.cuba.gui.components.IFrame;
+import com.haulmont.cuba.gui.components.Frame;
 import com.haulmont.cuba.gui.components.Window;
 import com.haulmont.cuba.security.entity.User;
 import com.haulmont.reports.app.ParameterPrototype;
@@ -70,7 +70,7 @@ public abstract class AbstractPrintFormAction extends AbstractAction {
             reportGuiManager.runReport(report, window, parameter, selectedValue, null, outputFileName);
         } else {
             window.showNotification(messages.getMessage(ReportGuiManager.class, "report.notFoundReports"),
-                    IFrame.NotificationType.HUMANIZED);
+                    Frame.NotificationType.HUMANIZED);
         }
     }
 

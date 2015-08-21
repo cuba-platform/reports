@@ -76,7 +76,7 @@
                     </rows>
                 </grid>
                 <hbox id="chartEditBox" visible="false">
-                    <iframe id="chartEdit" screen="chartEdit" width="AUTO"/>
+                    <frame id="chartEdit" screen="chartEdit" width="AUTO"/>
                 </hbox>
             </vbox>
             <vbox id="chartPreviewBox" visible="false">
@@ -84,6 +84,6 @@
             </vbox>
         </hbox>
 
-        <iframe id="windowActions" screen="editWindowActions" width="AUTO"/>
+        <frame id="windowActions" screen="editWindowActions" width="AUTO"/>
     </layout>
 </window>

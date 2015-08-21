@@ -10,7 +10,7 @@ import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.gui.WindowManager;
 import com.haulmont.cuba.gui.components.AbstractAction;
 import com.haulmont.cuba.gui.components.Component;
-import com.haulmont.cuba.gui.components.IFrame;
+import com.haulmont.cuba.gui.components.Frame;
 import com.haulmont.cuba.gui.components.Window;
 import com.haulmont.reports.entity.Report;
 import com.haulmont.reports.gui.ReportGuiManager;
@@ -29,22 +29,22 @@ import static com.google.common.base.Preconditions.checkArgument;
  */
 public class RunReportAction extends AbstractAction {
 
-    protected final IFrame window;
+    protected final Frame window;
 
     protected Messages messages = AppBeans.get(Messages.class);
 
     protected ReportGuiManager reportGuiManager = AppBeans.get(ReportGuiManager.class);
 
-    public RunReportAction(IFrame window) {
+    public RunReportAction(Frame window) {
         this("runReport", window);
     }
 
     @Deprecated
-    public RunReportAction(IFrame window, String captionId) {
+    public RunReportAction(Frame window, String captionId) {
         this(captionId, window);
     }
 
-    public RunReportAction(String id, IFrame window) {
+    public RunReportAction(String id, Frame window) {
         super(id);
 
         checkArgument(window != null, "Can not create RunReportAction with null window");
@@ -75,7 +75,7 @@ public class RunReportAction extends AbstractAction {
         }, WindowManager.OpenType.DIALOG, params);
     }
 
-    protected void openReportParamsDialog(Report report, IFrame window) {
+    protected void openReportParamsDialog(Report report, Frame window) {
         window.openWindow("report$inputParameters", WindowManager.OpenType.DIALOG,
                 Collections.<String, Object>singletonMap("report", report));
     }

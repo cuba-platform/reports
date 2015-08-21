@@ -9,7 +9,7 @@ import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.gui.components.Component;
 import com.haulmont.cuba.gui.components.Field;
-import com.haulmont.cuba.gui.components.IFrame;
+import com.haulmont.cuba.gui.components.Frame;
 import com.haulmont.cuba.gui.components.ValidationException;
 import com.haulmont.reports.gui.report.wizard.ReportWizardCreator;
 import org.apache.commons.lang.StringUtils;
@@ -23,7 +23,7 @@ import java.util.List;
  */
 public class StepFrame {
     protected final String name;
-    protected final IFrame frame;
+    protected final Frame frame;
     protected final ReportWizardCreator wizard;
     protected InitStepFrameHandler initFrameHandler;
     protected BeforeHideStepFrameHandler beforeHideFrameHandler;
@@ -38,7 +38,7 @@ public class StepFrame {
     public StepFrame(ReportWizardCreator reportWizardCreatorEditor, String name, String frameComponentName) {
         this.wizard = reportWizardCreatorEditor;
         this.name = name;
-        this.frame = (IFrame) reportWizardCreatorEditor.getComponent(frameComponentName);
+        this.frame = (Frame) reportWizardCreatorEditor.getComponent(frameComponentName);
         if (frame == null) {
             throw new UnsupportedOperationException("Frame component is not found");
         }
@@ -93,7 +93,7 @@ public class StepFrame {
         return name;
     }
 
-    public IFrame getFrame() {
+    public Frame getFrame() {
         return frame;
     }
 

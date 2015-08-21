@@ -74,7 +74,7 @@ public class TablePrintFormAction extends AbstractPrintFormAction {
 
                 window.showOptionDialog(messages.getMessage(ReportGuiManager.class, "notifications.confirmPrintSelectedheader"),
                         messages.getMessage(ReportGuiManager.class, "notifications.confirmPrintSelected"),
-                        IFrame.MessageType.CONFIRMATION,
+                        Frame.MessageType.CONFIRMATION,
                         actions);
             } else {
                 printSelected(selected);
@@ -92,10 +92,10 @@ public class TablePrintFormAction extends AbstractPrintFormAction {
 
                 window.showOptionDialog(messages.getMessage(getClass(), "notifications.confirmPrintAllheader"),
                         messages.getMessage(getClass(), "notifications.confirmPrintAll"),
-                        IFrame.MessageType.CONFIRMATION, new Action[]{yesAction, cancelAction});
+                        Frame.MessageType.CONFIRMATION, new Action[]{yesAction, cancelAction});
             } else {
                 window.showNotification(messages.getMessage(ReportGuiManager.class, "notifications.noSelectedEntity"),
-                        IFrame.NotificationType.HUMANIZED);
+                        Frame.NotificationType.HUMANIZED);
             }
         }
     }

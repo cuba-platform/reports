@@ -70,6 +70,6 @@
                            width="410" height="240px"/>
             </tab>
         </tabSheet>
-        <iframe id="windowActions" screen="editWindowActions"/>
+        <frame id="windowActions" screen="editWindowActions"/>
     </layout>
 </window>

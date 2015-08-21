@@ -25,7 +25,7 @@
         <label id="bottomSeparator" stylename="report-wizard-top-separator" width="100%"/>
         <hbox id="mainContent" width="100%" expand="treePanel">
             <groupBox id="treePanel" height="500px">
-                <iframe id="entityTreeFrame"
+                <frame id="entityTreeFrame"
                         src="/com/haulmont/reports/gui/report/wizard/region/entity-tree-frame.xml"
                         width="100%" height="100%"/>
             </groupBox>
@@ -46,6 +46,6 @@
                 </table>
             </groupBox>
         </hbox>
-        <iframe id="windowActions" screen="editWindowActions"/>
+        <frame id="windowActions" screen="editWindowActions"/>
     </layout>
 </window>

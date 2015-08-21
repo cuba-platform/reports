@@ -95,11 +95,11 @@ class SaveStepFrame extends StepFrame {
                     try {
                         wizard.getItem().setName(wizard.reportName.getValue().toString());
                         newTemplate = wizard.reportWizardService.generateTemplate(wizard.getItem(), (TemplateFileType) wizard.templateFileFormat.getValue());
-                        ExportDisplay exportDisplay = AppConfig.createExportDisplay((IFrame) wizard.getComponent("saveStep"));
+                        ExportDisplay exportDisplay = AppConfig.createExportDisplay((Frame) wizard.getComponent("saveStep"));
                         exportDisplay.show(new ByteArrayDataProvider(newTemplate),
                                 wizard.downloadTemplateFile.getCaption(), ExportFormat.getByExtension(wizard.templateFileFormat.getValue().toString().toLowerCase()));
                     } catch (TemplateGenerationException e) {
-                        wizard.showNotification(wizard.getMessage("templateGenerationException"), IFrame.NotificationType.WARNING);
+                        wizard.showNotification(wizard.getMessage("templateGenerationException"), Frame.NotificationType.WARNING);
                     }
                     if (newTemplate != null) {
                         wizard.lastGeneratedTemplate = newTemplate;
@@ -116,14 +116,14 @@ class SaveStepFrame extends StepFrame {
                     try {
                         wizard.outputFileName.validate();
                     } catch (ValidationException e) {
-                        wizard.showNotification(wizard.getMessage("validationFail.caption"), e.getMessage(), IFrame.NotificationType.TRAY);
+                        wizard.showNotification(wizard.getMessage("validationFail.caption"), e.getMessage(), Frame.NotificationType.TRAY);
                         return;
                     }
                     if (wizard.getItem().getReportRegions().isEmpty()) {
                         wizard.showOptionDialog(
                                 wizard.getMessage("dialogs.Confirmation"),
                                 wizard.getMessage("confirmSaveWithoutRegions"),
-                                IFrame.MessageType.CONFIRMATION,
+                                Frame.MessageType.CONFIRMATION,
                                 new Action[]{
                                         new DialogAction(DialogAction.Type.OK) {
                                             @Override

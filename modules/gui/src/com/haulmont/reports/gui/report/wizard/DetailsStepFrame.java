@@ -171,7 +171,7 @@ class DetailsStepFrame extends StepFrame {
                     wizard.reportName.setValue(newText);
                     if (!oldReportName.equals(wizard.formatMessage("reportNamePattern", prevEntityCaption))) {
                         //if user changed auto generated report name and we have changed it, we show message to him
-                        wizard.showNotification(wizard.getMessage("reportNameChanged"), IFrame.NotificationType.TRAY);
+                        wizard.showNotification(wizard.getMessage("reportNameChanged"), Frame.NotificationType.TRAY);
                     }
                 }
             }
@@ -189,7 +189,7 @@ class DetailsStepFrame extends StepFrame {
         @Override
         public void actionPerform(Component component) {
             if (wizard.entity.getValue() == null) {
-                wizard.showNotification(wizard.getMessage("fillEntityMsg"), IFrame.NotificationType.TRAY_HTML);
+                wizard.showNotification(wizard.getMessage("fillEntityMsg"), Frame.NotificationType.TRAY_HTML);
                 return;
             }
 
@@ -228,7 +228,7 @@ class DetailsStepFrame extends StepFrame {
                         wizard.query = collectQuery(queryFilter);
                         wizard.queryParameters = collectQueryParameters(queryFilter);
                     } else {
-                        wizard.showNotification(wizard.getMessage("defaultQueryHasBeenSet"), IFrame.NotificationType.HUMANIZED);
+                        wizard.showNotification(wizard.getMessage("defaultQueryHasBeenSet"), Frame.NotificationType.HUMANIZED);
                         wizard.query = filter.getDatasource().getQuery();
                         wizard.queryParameters = Collections.emptyList();
                     }
@@ -303,7 +303,7 @@ class DetailsStepFrame extends StepFrame {
                 wizard.showOptionDialog(
                         wizard.getMessage("dialogs.Confirmation"),
                         wizard.getMessage("regionsClearConfirm"),
-                        IFrame.MessageType.CONFIRMATION,
+                        Frame.MessageType.CONFIRMATION,
                         new AbstractAction[]{
                                 okAction.setValue(value),
                                 new DialogAction(DialogAction.Type.NO) {

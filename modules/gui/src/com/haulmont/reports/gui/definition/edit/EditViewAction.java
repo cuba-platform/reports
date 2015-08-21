@@ -12,7 +12,7 @@ import com.haulmont.cuba.core.global.ViewProperty;
 import com.haulmont.cuba.gui.WindowManager;
 import com.haulmont.cuba.gui.components.AbstractAction;
 import com.haulmont.cuba.gui.components.Component;
-import com.haulmont.cuba.gui.components.IFrame;
+import com.haulmont.cuba.gui.components.Frame;
 import com.haulmont.cuba.gui.components.Window;
 import com.haulmont.reports.app.EntityTree;
 import com.haulmont.reports.entity.DataSet;
@@ -51,7 +51,7 @@ public class EditViewAction extends AbstractAction {
                         if (reportRegion.getRegionPropertiesRootNode() == null) {
                             bandDefinitionEditor.showNotification(
                                     bandDefinitionEditor.formatMessage("dataSet.entityAliasInvalid",
-                                            getNameForEntityParameter(dataSet)), IFrame.NotificationType.TRAY);
+                                            getNameForEntityParameter(dataSet)), Frame.NotificationType.TRAY);
                             //without that root node region editor form will not initialized correctly and became empty. just return
                             return;
                         } else {
@@ -92,7 +92,7 @@ public class EditViewAction extends AbstractAction {
         if (byAliasMetaClass == null) {
             //Can`t determine parameter and its metaClass by alias
             bandDefinitionEditor.showNotification(
-                    bandDefinitionEditor.formatMessage("dataSet.entityAliasInvalid", dataSetAlias), IFrame.NotificationType.TRAY);
+                    bandDefinitionEditor.formatMessage("dataSet.entityAliasInvalid", dataSetAlias), Frame.NotificationType.TRAY);
             return null;
             //when byAliasMetaClass is null we return also null
         } else {
@@ -104,7 +104,7 @@ public class EditViewAction extends AbstractAction {
             if (viewMetaClass != null && !byAliasMetaClass.getName().equals(viewMetaClass.getName())) {
                 bandDefinitionEditor.showNotification(
                         bandDefinitionEditor.formatMessage("dataSet.entityWasChanged",
-                                byAliasMetaClass.getName()), IFrame.NotificationType.TRAY);
+                                byAliasMetaClass.getName()), Frame.NotificationType.TRAY);
             }
             return byAliasMetaClass;
         }
@@ -126,7 +126,7 @@ public class EditViewAction extends AbstractAction {
                 if (StringUtils.isBlank(collectionPropertyName) && dataSet.getListEntitiesParamName().contains("#")) {
                     bandDefinitionEditor.showNotification(
                             bandDefinitionEditor.formatMessage("dataSet.entityAliasInvalid",
-                                    getNameForEntityParameter(dataSet)), IFrame.NotificationType.TRAY);
+                                    getNameForEntityParameter(dataSet)), Frame.NotificationType.TRAY);
                     return null;
                 }
                 if (StringUtils.isNotBlank(collectionPropertyName)) {
@@ -145,7 +145,7 @@ public class EditViewAction extends AbstractAction {
                         } else {
                             bandDefinitionEditor.showNotification(
                                     bandDefinitionEditor.formatMessage("dataSet.cantFindCollectionProperty",
-                                            collectionPropertyName, metaClass.getName()), IFrame.NotificationType.TRAY);
+                                            collectionPropertyName, metaClass.getName()), Frame.NotificationType.TRAY);
                             return null;
                         }
                     }

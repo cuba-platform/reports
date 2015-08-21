@@ -8,7 +8,7 @@ package com.haulmont.reports.gui.actions;
 import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.gui.components.Component;
-import com.haulmont.cuba.gui.components.IFrame;
+import com.haulmont.cuba.gui.components.Frame;
 import com.haulmont.cuba.gui.components.Window;
 import com.haulmont.reports.gui.ReportGuiManager;
 
@@ -44,7 +44,7 @@ public class EditorPrintFormAction extends AbstractPrintFormAction {
             openRunReportScreen(editor, entity, metaClass, reportOutputName);
         } else {
             editor.showNotification(messages.getMessage(ReportGuiManager.class, "notifications.noSelectedEntity"),
-                    IFrame.NotificationType.HUMANIZED);
+                    Frame.NotificationType.HUMANIZED);
         }
     }
 }

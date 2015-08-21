@@ -12,7 +12,7 @@ import com.haulmont.cuba.gui.AppConfig;
 import com.haulmont.cuba.gui.WindowManager;
 import com.haulmont.cuba.gui.WindowManagerProvider;
 import com.haulmont.cuba.gui.backgroundwork.BackgroundWorkWindow;
-import com.haulmont.cuba.gui.components.IFrame;
+import com.haulmont.cuba.gui.components.Frame;
 import com.haulmont.cuba.gui.config.WindowConfig;
 import com.haulmont.cuba.gui.config.WindowInfo;
 import com.haulmont.cuba.gui.executors.BackgroundTask;
@@ -64,7 +64,7 @@ public class ReportGuiManager {
     @Inject
     protected WindowConfig windowConfig;
 
-    public void runReport(Report report, IFrame window) {
+    public void runReport(Report report, Frame window) {
         if (report == null) {
             throw new IllegalArgumentException("Can not run null report");
         }
@@ -76,7 +76,7 @@ public class ReportGuiManager {
         }
     }
 
-    public void runReport(Report report, IFrame window, final ReportInputParameter parameter, final Object parameterValue,
+    public void runReport(Report report, Frame window, final ReportInputParameter parameter, final Object parameterValue,
                           @Nullable String templateCode, @Nullable String outputFileName) {
         if (report == null) {
             throw new IllegalArgumentException("Can not run null report");
@@ -159,11 +159,11 @@ public class ReportGuiManager {
         printReportSync(report, params, null, null, null);
     }
 
-    public void printReport(Report report, Map<String, Object> params, IFrame window) {
+    public void printReport(Report report, Map<String, Object> params, Frame window) {
         printReport(report, params, null, null, window);
     }
 
-    public void printReport(Report report, Map<String, Object> params, @Nullable String templateCode, @Nullable String outputFileName,@Nullable IFrame window) {
+    public void printReport(Report report, Map<String, Object> params, @Nullable String templateCode, @Nullable String outputFileName,@Nullable Frame window) {
 
         Configuration configuration = AppBeans.get(Configuration.NAME);
         ReportingClientConfig reportingClientConfig = configuration.getConfig(ReportingClientConfig.class);
@@ -178,7 +178,7 @@ public class ReportGuiManager {
     /**
      * Print report synchronously
      */
-    public void printReportSync(Report report, Map<String, Object> params, @Nullable String templateCode, @Nullable String outputFileName, @Nullable IFrame window) {
+    public void printReportSync(Report report, Map<String, Object> params, @Nullable String templateCode, @Nullable String outputFileName, @Nullable Frame window) {
         ReportOutputDocument document = getReportResult(report, params, templateCode);
 
         showReportResult(document, params, templateCode, outputFileName, window);
@@ -195,7 +195,7 @@ public class ReportGuiManager {
     }
 
     protected void showReportResult(ReportOutputDocument document, Map<String, Object> params,
-                                    @Nullable String templateCode,  @Nullable String outputFileName, @Nullable IFrame window) {
+                                    @Nullable String templateCode,  @Nullable String outputFileName, @Nullable Frame window) {
         if (document.getReportOutputType().getId().equals(CubaReportOutputType.chart.getId())) {
             HashMap<String, Object> screenParams = new HashMap<>();
             screenParams.put(ShowChartController.CHART_JSON_PARAMETER, new String(document.getContent()));
@@ -222,7 +222,7 @@ public class ReportGuiManager {
      * Print report in background task with window, supports cancel
      */
     public void printReportBackground(Report report, final Map<String, Object> params,
-                                      final @Nullable String templateCode, final @Nullable String outputFileName, final IFrame window) {
+                                      final @Nullable String templateCode, final @Nullable String outputFileName, final Frame window) {
 
         Configuration configuration = AppBeans.get(Configuration.NAME);
         ReportingClientConfig reportingClientConfig = configuration.getConfig(ReportingClientConfig.class);
@@ -267,7 +267,7 @@ public class ReportGuiManager {
         return reports;
     }
 
-    public void bulkPrint(Report report, String alias, Collection selectedEntities, @Nullable IFrame window) {
+    public void bulkPrint(Report report, String alias, Collection selectedEntities, @Nullable Frame window) {
         Configuration configuration = AppBeans.get(Configuration.NAME);
         ReportingClientConfig reportingClientConfig = configuration.getConfig(ReportingClientConfig.class);
         if (window != null && reportingClientConfig.getUseBackgroundReportProcessing()) {
@@ -287,7 +287,7 @@ public class ReportGuiManager {
     /**
      * Print report synchronously for all selected entities
      */
-    public void bulkPrintSync(Report report, String alias, Collection selectedEntities, @Nullable IFrame window) {
+    public void bulkPrintSync(Report report, String alias, Collection selectedEntities, @Nullable Frame window) {
         List<Map<String, Object>> paramsList = new ArrayList<>();
         for (Object selectedEntity : selectedEntities) {
             paramsList.add(Collections.singletonMap(alias, selectedEntity));
@@ -302,7 +302,7 @@ public class ReportGuiManager {
     /**
      * Print report in background task for all selected entities
      */
-    public void bulkPrintBackground(Report report, String alias, Collection selectedEntities, final IFrame window) {
+    public void bulkPrintBackground(Report report, String alias, Collection selectedEntities, final Frame window) {
         Configuration configuration = AppBeans.get(Configuration.NAME);
         ReportingClientConfig reportingClientConfig = configuration.getConfig(ReportingClientConfig.class);
 
@@ -380,7 +380,7 @@ public class ReportGuiManager {
         return filter;
     }
 
-    protected void openReportParamsDialog(IFrame window, Report report, @Nullable Map<String, Object> parameters, @Nullable String templateCode, @Nullable String outputFileName) {
+    protected void openReportParamsDialog(Frame window, Report report, @Nullable Map<String, Object> parameters, @Nullable String templateCode, @Nullable String outputFileName) {
 
         Map<String, Object> params = new HashMap<>();
         params.put(REPORT_PARAMETER, report);

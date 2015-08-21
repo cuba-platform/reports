@@ -6,7 +6,7 @@ package com.haulmont.reports.web.exception;
 
 import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.Messages;
-import com.haulmont.cuba.gui.components.IFrame;
+import com.haulmont.cuba.gui.components.Frame;
 import com.haulmont.cuba.web.App;
 import com.haulmont.cuba.web.AppUI;
 import com.haulmont.cuba.web.exception.AbstractExceptionHandler;
@@ -41,12 +41,12 @@ public class ReportExceptionHandler extends AbstractExceptionHandler {
 
         if (FailedToConnectToOpenOfficeException.class.getName().equals(className)) {
             String msg = messages.getMessage(getClass(), "reportException.failedConnectToOffice");
-            app.getWindowManager().showNotification(msg, IFrame.NotificationType.ERROR);
+            app.getWindowManager().showNotification(msg, Frame.NotificationType.ERROR);
         } else if (NoOpenOfficeFreePortsException.class.getName().equals(className)) {
             String msg = messages.getMessage(getClass(), "reportException.noOpenOfficeFreePorts");
-            app.getWindowManager().showNotification(msg, IFrame.NotificationType.ERROR);
+            app.getWindowManager().showNotification(msg, Frame.NotificationType.ERROR);
         } else if (ValidationException.class.getName().equals(className)) {
-            app.getWindowManager().showNotification(message, IFrame.NotificationType.ERROR);
+            app.getWindowManager().showNotification(message, Frame.NotificationType.ERROR);
         } else {
             ExceptionDialog dialog = new ExceptionDialog(
                     throwable,

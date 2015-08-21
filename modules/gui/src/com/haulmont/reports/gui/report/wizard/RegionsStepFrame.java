@@ -237,7 +237,7 @@ class RegionsStepFrame extends StepFrame {
                 wizard.showOptionDialog(
                         wizard.getMessage("dialogs.Confirmation"),
                         wizard.formatMessage("deleteRegion", ((ReportRegion) wizard.regionsTable.getSingleSelected()).getName()),
-                        IFrame.MessageType.CONFIRMATION, new Action[]{
+                        Frame.MessageType.CONFIRMATION, new Action[]{
                                 new DialogAction(DialogAction.Type.YES) {
                                     @Override
                                     public void actionPerform(Component component) {
@@ -322,13 +322,13 @@ class RegionsStepFrame extends StepFrame {
                 @Override
                 public void actionPerform(Component component) {
                     if (wizard.getItem().getReportRegions().isEmpty()) {
-                        wizard.showNotification(wizard.getMessage("addRegionsWarn"), IFrame.NotificationType.TRAY);
+                        wizard.showNotification(wizard.getMessage("addRegionsWarn"), Frame.NotificationType.TRAY);
                         return;
                     }
                     wizard.lastGeneratedTmpReport = wizard.buildReport(true);
 
                     if (wizard.lastGeneratedTmpReport != null) {
-                        wizard.reportGuiManager.runReport(wizard.lastGeneratedTmpReport, wizard.stepFrameManager.getCurrentIFrame());
+                        wizard.reportGuiManager.runReport(wizard.lastGeneratedTmpReport, wizard.stepFrameManager.getCurrentFrame());
                     }
                 }
             });

@@ -12,7 +12,7 @@ import com.haulmont.cuba.desktop.TopLevelFrame;
 import com.haulmont.cuba.desktop.exception.AbstractExceptionHandler;
 import com.haulmont.cuba.desktop.sys.DialogWindow;
 import com.haulmont.cuba.desktop.sys.JXErrorPaneExt;
-import com.haulmont.cuba.gui.components.IFrame;
+import com.haulmont.cuba.gui.components.Frame;
 import com.haulmont.reports.exception.*;
 import org.jdesktop.swingx.JXErrorPane;
 import org.jdesktop.swingx.error.ErrorInfo;
@@ -50,10 +50,10 @@ public class ReportExceptionHandler extends AbstractExceptionHandler {
 
         if (FailedToConnectToOpenOfficeException.class.getName().equals(className)) {
             String msg = messages.getMessage(getClass(), "reportException.failedConnectToOffice");
-            mainFrame.getWindowManager().showNotification(msg, IFrame.NotificationType.ERROR);
+            mainFrame.getWindowManager().showNotification(msg, Frame.NotificationType.ERROR);
         } else if (NoOpenOfficeFreePortsException.class.getName().equals(className)) {
             String msg = messages.getMessage(getClass(), "reportException.noOpenOfficeFreePorts");
-            mainFrame.getWindowManager().showNotification(msg, IFrame.NotificationType.ERROR);
+            mainFrame.getWindowManager().showNotification(msg, com.haulmont.cuba.gui.components.Frame.NotificationType.ERROR);
         } else {
             JXErrorPane errorPane = new JXErrorPaneExt();
             ErrorInfo errorInfo = new ErrorInfo(

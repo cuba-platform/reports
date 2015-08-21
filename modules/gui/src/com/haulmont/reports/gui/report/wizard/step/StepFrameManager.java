@@ -5,7 +5,7 @@
 
 package com.haulmont.reports.gui.report.wizard.step;
 
-import com.haulmont.cuba.gui.components.IFrame;
+import com.haulmont.cuba.gui.components.Frame;
 import com.haulmont.cuba.gui.components.Window;
 
 import java.util.List;
@@ -40,7 +40,7 @@ public class StepFrameManager {
         return stepFrames.get(currentFrameIdx);
     }
 
-    public IFrame getCurrentIFrame() {
+    public Frame getCurrentFrame() {
         return stepFrames.get(currentFrameIdx).getFrame();
     }
 
@@ -111,7 +111,7 @@ public class StepFrameManager {
     protected boolean validateCurrentFrame() {
         List<String> validationErrors = getCurrentStepFrame().validateFrame();
         if (!validationErrors.isEmpty()) {
-            mainWizardFrame.getMainEditorFrame().showNotification(org.springframework.util.StringUtils.arrayToDelimitedString(validationErrors.toArray(), "<br/>"), IFrame.NotificationType.TRAY_HTML);
+            mainWizardFrame.getMainEditorFrame().showNotification(org.springframework.util.StringUtils.arrayToDelimitedString(validationErrors.toArray(), "<br/>"), Frame.NotificationType.TRAY_HTML);
             return false;
         }
         return true;

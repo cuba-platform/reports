@@ -23,6 +23,6 @@
                        maxLength="255" custom="true" requiredMessage="msg://formatStringMsg"/>
             </column>
         </fieldGroup>
-        <iframe id="windowActions" screen="editWindowActions" width="AUTO"/>
+        <frame id="windowActions" screen="editWindowActions" width="AUTO"/>
     </layout>
 </window>
