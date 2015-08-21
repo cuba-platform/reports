@@ -79,7 +79,7 @@ public class CustomFormatter implements com.haulmont.yarg.formatters.CustomRepor
     }
 
     protected byte[] generateReportWithClass(BandData rootBand, String customDefinition) {
-        Class clazz = scripting.loadClass(customDefinition);
+        Class clazz = scripting.loadClassNN(customDefinition);
         try {
             CustomReport customReport = (CustomReport) clazz.newInstance();
             return customReport.createReport(report, rootBand, params);
