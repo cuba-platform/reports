@@ -41,11 +41,9 @@ public class PrototypesLoader {
         MetaClass metaClass = metadata.getSession().getClass(parameterPrototype.getMetaClassName());
 
         PersistenceSecurity security = AppBeans.get(PersistenceSecurity.NAME);
-        if (parameterPrototype.isUseSecurityConstraints()) {
-            if (!security.isEntityOpPermitted(metaClass, EntityOp.READ)) {
-                log.debug("reading of " + metaClass + " not permitted, returning empty list");
-                return Collections.emptyList();
-            }
+        if (!security.isEntityOpPermitted(metaClass, EntityOp.READ)) {
+            log.debug("reading of " + metaClass + " not permitted, returning empty list");
+            return Collections.emptyList();
         }
 
         Map<String, Object> queryParams = parameterPrototype.getQueryParams();
@@ -58,11 +56,9 @@ public class PrototypesLoader {
         EntityManager entityManager = persistence.getEntityManager();
         Query query = entityManager.createQuery(parameterPrototype.getQueryString());
 
-        if (parameterPrototype.isUseSecurityConstraints()) {
-            boolean constraintsApplied = security.applyConstraints(query);
-            if (constraintsApplied)
-                log.debug("Constraints applied: " + printQuery(query.getQueryString()));
-        }
+        boolean constraintsApplied = security.applyConstraints(query);
+        if (constraintsApplied)
+            log.debug("Constraints applied: " + printQuery(query.getQueryString()));
 
         query.setView(queryView);
         if (queryParams != null) {

@@ -120,7 +120,6 @@ public class TablePrintFormAction extends AbstractPrintFormAction {
         parameterPrototype.setQueryString(query.getQueryString());
         parameterPrototype.setQueryParams(query.getParameters());
         parameterPrototype.setViewName(loadContext.getView().getName());
-        parameterPrototype.setUseSecurityConstraints(loadContext.isUseSecurityConstraints());
         parameterPrototype.setFirstResult(query.getFirstResult());
         parameterPrototype.setMaxResults(query.getMaxResults());
 

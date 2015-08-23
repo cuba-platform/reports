@@ -32,8 +32,6 @@ public class ParameterPrototype implements Serializable {
 
     private Map<String, Object> queryParams;
 
-    private boolean useSecurityConstraints = true;
-
     public ParameterPrototype(String paramName) {
         this.paramName = paramName;
     }
@@ -76,14 +74,6 @@ public class ParameterPrototype implements Serializable {
 
     public void setQueryParams(Map<String, Object> queryParams) {
         this.queryParams = queryParams;
-    }
-
-    public boolean isUseSecurityConstraints() {
-        return useSecurityConstraints;
-    }
-
-    public void setUseSecurityConstraints(boolean useSecurityConstraints) {
-        this.useSecurityConstraints = useSecurityConstraints;
     }
 
     public Integer getFirstResult() {
