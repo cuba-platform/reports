@@ -204,7 +204,7 @@ public class CubaHtmlFormatter extends HtmlFormatter {
                 String uuidString = StringUtils.substring(uri, FS_PROTOCOL_PREFIX.length());
 
                 DataManager dataWorker = AppBeans.get(DataManager.class);
-                LoadContext loadContext = new LoadContext(FileDescriptor.class);
+                LoadContext<FileDescriptor> loadContext = new LoadContext<>(FileDescriptor.class);
                 loadContext.setView(View.LOCAL);
 
                 UUID id = UUID.fromString(uuidString);

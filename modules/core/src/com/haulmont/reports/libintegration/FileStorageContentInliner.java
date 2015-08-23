@@ -40,7 +40,7 @@ public class FileStorageContentInliner extends AbstractInliner {
             DataManager dataManager = AppBeans.get(DataManager.class);
             FileStorageAPI fileStorageAPI = AppBeans.get(FileStorageAPI.class);
 
-            FileDescriptor file = dataManager.load(new LoadContext(FileDescriptor.class).setId(UUID.fromString(paramValue.toString())));
+            FileDescriptor file = dataManager.load(new LoadContext<>(FileDescriptor.class).setId(UUID.fromString(paramValue.toString())));
             byte[] bytes = fileStorageAPI.loadFile(file);
             return bytes;
         } catch (FileStorageException e) {

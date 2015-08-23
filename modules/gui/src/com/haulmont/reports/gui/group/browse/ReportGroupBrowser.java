@@ -69,8 +69,7 @@ public class ReportGroupBrowser extends AbstractLookup {
                 if (group.getSystemFlag()) {
                     showNotification(getMessage("unableToDeleteSystemReportGroup"), NotificationType.WARNING);
                 } else {
-                    MetaClass reportMetaClass = metadata.getSession().getClass(Report.class);
-                    LoadContext loadContext = new LoadContext(reportMetaClass);
+                    LoadContext<Report> loadContext = new LoadContext<>(Report.class);
                     loadContext.setView("report.view");
                     LoadContext.Query query =
                             new LoadContext.Query("select r from report$Report r where r.group.id = :groupId");
