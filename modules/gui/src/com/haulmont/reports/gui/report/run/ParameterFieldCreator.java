@@ -173,6 +173,7 @@ public class ParameterFieldCreator {
             };
             pickerLookupAction.setLookupScreenOpenType(WindowManager.OpenType.DIALOG);
             pickerField.addAction(pickerLookupAction);
+            pickerField.addAction(pickerLookupAction);
 
             String parameterScreen = parameter.getScreen();
 
