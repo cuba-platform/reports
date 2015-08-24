@@ -239,6 +239,7 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
             @Override
             public Component generateField(Datasource datasource, String propertyId) {
                 TextField textField = componentsFactory.createComponent(TextField.class);
+                textField.setMaxLength(255);
                 reportName = textField;
                 return textField;
             }
