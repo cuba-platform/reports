@@ -10,8 +10,8 @@ import com.haulmont.reports.app.service.ReportService;
 import com.haulmont.reports.entity.ParameterType;
 import com.haulmont.reports.entity.ReportInputParameter;
 import junit.framework.Assert;
-import mockit.Mock;
-import mockit.MockUp;
+import mockit.Mocked;
+import mockit.NonStrictExpectations;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -25,6 +25,8 @@ import java.util.List;
  */
 public class ReportGuiManagerTest {
 
+    @Mocked ReportService reportService;
+
     @Test
     public void testParameterConversion() throws Exception {
         String data1 = "data1";
@@ -32,14 +34,14 @@ public class ReportGuiManagerTest {
         String data3 = "data3";
         final List<String> collection = Arrays.asList(data1, data2, data3);
 
-        ReportGuiManager reportGuiManager = new ReportGuiManager();
-        reportGuiManager.reportService = new MockUp<ReportService>(){
-            @SuppressWarnings("UnusedDeclaration")
-            @Mock
-            public List loadDataForParameterPrototype(ParameterPrototype prototype) {
-                return collection;
+        new NonStrictExpectations() {
+            {
+                reportService.loadDataForParameterPrototype((ParameterPrototype) any); result = collection;
             }
-        }.getMockInstance();
+        };
+
+        ReportGuiManager reportGuiManager = new ReportGuiManager();
+        reportGuiManager.reportService = reportService;
 
         ReportInputParameter entityParameter = new ReportInputParameter();
         ParameterPrototype parameterPrototype = new ParameterPrototype("param");
