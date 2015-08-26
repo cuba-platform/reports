@@ -138,6 +138,8 @@ configure(coreModule) {
         compile(group: 'com.haulmont.cuba', name: 'cuba-core', version: baseVersion)
 		compile(yarg) {
             exclude group: 'org.codehaus.groovy'
+            exclude group: 'org.slf4j'
+            exclude group: 'log4j'
         }
 		
         testCompile(group: 'com.haulmont.cuba', name: 'cuba-core', version: baseVersion, classifier: 'tests')
