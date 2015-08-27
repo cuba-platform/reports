@@ -29,30 +29,23 @@
                 </filter>
             </query>
         </groupDatasource>
-        <!--<collectionDatasource id="reportWizardCreatorDs" class="com.haulmont.reports.entity.wizard.ReportData" view="_minimal"/>-->
     </dsContext>
 
     <layout expand="table" spacing="true">
         <filter id="genericFilter" datasource="reportDs">
             <properties include=".*"/>
         </filter>
-        <groupTable id="table" editable="false" multiselect="true" width="100%" height="100%">
+        <groupTable id="table" editable="false" multiselect="true" width="100%">
             <actions>
                 <action id="create"/>
                 <action id="edit"/>
                 <action id="remove"/>
             </actions>
             <buttonsPanel>
-                <!--<button id="wizard" icon="icons/wf-design-deploy.png" caption="msg://report.wizard"/>-->
-                <button id="createBtn" action="table.create" icon="icons/create.png"/>
-                <popupButton id="popupCreateBtn" icon="icons/create.png" caption="msg://actions.Create">
-                    <!--<actions>-->
-                    <!--<action id="table.create" caption="msg://actions.Create"/>-->
-                    <!--<action id="wizard"/>-->
-                    <!--</actions>-->
-                </popupButton>
-                <button action="table.edit" icon="icons/edit.png"/>
-                <button action="table.remove" icon="icons/remove.png"/>
+                <button id="createBtn" action="table.create"/>
+                <popupButton id="popupCreateBtn" icon="msg://actions.Create.icon" caption="msg://actions.Create"/>
+                <button action="table.edit"/>
+                <button action="table.remove"/>
                 <button id="copy"/>
                 <button id="import" caption="msg://button.import"/>
                 <button id="export"/>
