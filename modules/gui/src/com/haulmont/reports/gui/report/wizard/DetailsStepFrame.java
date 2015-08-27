@@ -166,14 +166,16 @@ class DetailsStepFrame extends StepFrame {
                 String newText = wizard.formatMessage("reportNamePattern", messageTools.getEntityCaption(value));
                 wizard.reportName.setValue(newText);
             } else {
-                //if old text contains MetaClass name substring, just replace it
-                String prevEntityCaption = messageTools.getEntityCaption(prevValue);
-                if (prevValue != null && StringUtils.contains(oldReportName, prevEntityCaption)) {
-                    String newText = StringUtils.replace(oldReportName, prevEntityCaption, messageTools.getEntityCaption(value));
-                    wizard.reportName.setValue(newText);
-                    if (!oldReportName.equals(wizard.formatMessage("reportNamePattern", prevEntityCaption))) {
-                        //if user changed auto generated report name and we have changed it, we show message to him
-                        wizard.showNotification(wizard.getMessage("reportNameChanged"), Frame.NotificationType.TRAY);
+                if (prevValue != null) {
+                    //if old text contains MetaClass name substring, just replace it
+                    String prevEntityCaption = messageTools.getEntityCaption(prevValue);
+                    if (StringUtils.contains(oldReportName, prevEntityCaption)) {
+                        String newText = StringUtils.replace(oldReportName, prevEntityCaption, messageTools.getEntityCaption(value));
+                        wizard.reportName.setValue(newText);
+                        if (!oldReportName.equals(wizard.formatMessage("reportNamePattern", prevEntityCaption))) {
+                            //if user changed auto generated report name and we have changed it, we show message to him
+                            wizard.showNotification(wizard.getMessage("reportNameChanged"), Frame.NotificationType.TRAY);
+                        }
                     }
                 }
             }
