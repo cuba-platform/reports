@@ -35,11 +35,11 @@ public class JpqlQueryBuilderTest {
         JpqlQueryBuilder jpqlQueryBuilder = new JpqlQueryBuilder(reportData, reportRegion);
         String result = jpqlQueryBuilder.buildQuery();
         Assert.assertEquals("select\n" +
-                "queryEntity.vin as \"vin\",\n" +
-                "queryEntity.createTs as \"createTs\",\n" +
-                "queryEntity.updateTs as \"updateTs\",\n" +
-                "queryEntity.deleteTs as \"deleteTs\"\n" +
-                "from ref$Car queryEntity", result);
+                "e.vin as \"vin\",\n" +
+                "e.createTs as \"createTs\",\n" +
+                "e.updateTs as \"updateTs\",\n" +
+                "e.deleteTs as \"deleteTs\"\n" +
+                "from ref$Car e", result);
     }
 
     @Test
@@ -63,17 +63,17 @@ public class JpqlQueryBuilderTest {
         JpqlQueryBuilder jpqlQueryBuilder = new JpqlQueryBuilder(reportData, reportRegion);
         String result = jpqlQueryBuilder.buildQuery();
         Assert.assertEquals("select\n" +
-                "queryEntity.vin as \"vin\",\n" +
-                "queryEntity.createTs as \"createTs\",\n" +
-                "queryEntity.updateTs as \"updateTs\",\n" +
-                "queryEntity.deleteTs as \"deleteTs\",\n" +
+                "e.vin as \"vin\",\n" +
+                "e.createTs as \"createTs\",\n" +
+                "e.updateTs as \"updateTs\",\n" +
+                "e.deleteTs as \"deleteTs\",\n" +
                 "model.name as \"model.name\",\n" +
                 "colour.name as \"colour.name\",\n" +
                 "seller.name as \"seller.name\"\n" +
-                "from ref$Car queryEntity  \n" +
-                "left join queryEntity.model model \n" +
-                "left join queryEntity.colour colour \n" +
-                "left join queryEntity.seller seller", result);
+                "from ref$Car e  \n" +
+                "left join e.model model \n" +
+                "left join e.colour colour \n" +
+                "left join e.seller seller", result);
     }
 
     @Test
@@ -97,18 +97,18 @@ public class JpqlQueryBuilderTest {
         JpqlQueryBuilder jpqlQueryBuilder = new JpqlQueryBuilder(reportData, reportRegion);
         String result = jpqlQueryBuilder.buildQuery();
         Assert.assertEquals("select\n" +
-                "queryEntity.vin as \"vin\",\n" +
-                "queryEntity.createTs as \"createTs\",\n" +
-                "queryEntity.updateTs as \"updateTs\",\n" +
-                "queryEntity.deleteTs as \"deleteTs\",\n" +
+                "e.vin as \"vin\",\n" +
+                "e.createTs as \"createTs\",\n" +
+                "e.updateTs as \"updateTs\",\n" +
+                "e.deleteTs as \"deleteTs\",\n" +
                 "model.name as \"model.name\",\n" +
                 "colour.name as \"colour.name\",\n" +
                 "seller.name as \"seller.name\"\n" +
-                "from ref$Car queryEntity  \n" +
-                "left join queryEntity.model model \n" +
-                "left join queryEntity.colour colour \n" +
-                "left join queryEntity.seller seller \n" +
-                ", in(queryEntity.repairs) repairs where queryEntity.model.id = ${param}", result);
+                "from ref$Car e  \n" +
+                "left join e.model model \n" +
+                "left join e.colour colour \n" +
+                "left join e.seller seller \n" +
+                ", in(e.repairs) repairs where e.model.id = ${param}", result);
     }
 
     protected void createProperty(ReportRegion reportRegion, EntityTreeNode root, String name) {

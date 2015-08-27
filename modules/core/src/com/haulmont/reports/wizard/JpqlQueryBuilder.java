@@ -48,7 +48,7 @@ public class JpqlQueryBuilder {
             insertJoins();
         }
 
-        return result.trim();
+        return result.trim().replace("queryEntity", "e");
     }
 
     protected void insertOutputFields() {
