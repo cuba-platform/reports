@@ -155,7 +155,11 @@ public class ReportTemplate extends BaseReportEntity implements com.haulmont.yar
 
     @Override
     public InputStream getDocumentContent() {
-        return new ByteArrayInputStream(content);
+        if (getContent() == null) {
+            return null;
+        }
+
+        return new ByteArrayInputStream(getContent());
     }
 
     @Override
@@ -196,7 +200,11 @@ public class ReportTemplate extends BaseReportEntity implements com.haulmont.yar
 
     @Nullable
     public AbstractChartDescription getChartDescription() {
-        String jsonString = null;
+        if (getContent() == null) {
+            return null;
+        }
+
+        String jsonString;
         try {
             jsonString = new String(getContent(), BASE_ENCODING);
         } catch (UnsupportedEncodingException e) {

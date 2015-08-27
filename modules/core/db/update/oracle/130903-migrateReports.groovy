@@ -282,7 +282,7 @@ postUpdate.add({
             }
 
             ReportService reportService = AppBeans.get(ReportService.NAME);
-            String xml = reportService.convertToXml(report);
+            String xml = reportService.convertToString(report);
             report.setXml(xml);
 
             Report updatedReport = entityManager.merge(report);

@@ -28,6 +28,8 @@ public interface ReportService {
 
     String DEFAULT_TEMPLATE_CODE = "DEFAULT";
 
+    Report storeReportEntity(Report report);
+
     ReportOutputDocument createReport(Report report, Map<String, Object> params);
 
     ReportOutputDocument createReport(Report report, String templateCode, Map<String, Object> params);
@@ -65,7 +67,7 @@ public interface ReportService {
      */
     Collection<Report> importReports(byte[] zipBytes);
 
-    String convertToXml(Report report);
+    String convertToString(Report report);
 
     Report convertToReport(String xml);
 

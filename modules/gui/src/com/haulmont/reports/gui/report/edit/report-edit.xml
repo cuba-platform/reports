@@ -10,6 +10,7 @@
         datasource="reportDs"
         caption="msg://reportEditor"
         focusComponent="generalFrame.propertiesFieldGroup"
+        dataSupplier="com.haulmont.reports.gui.report.ReportDataSupplier"
         >
 
     <dsContext>

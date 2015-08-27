@@ -960,7 +960,7 @@ public class ReportEditor extends AbstractEditor<Report> {
     }
 
     protected void addCommitListeners() {
-        String xml = reportService.convertToXml(getItem());
+        String xml = reportService.convertToString(getItem());
         getItem().setXml(xml);
 
         reportDs.getDsContext().addListener(new DsContext.CommitListener() {

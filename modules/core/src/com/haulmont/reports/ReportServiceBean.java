@@ -34,6 +34,11 @@ public class ReportServiceBean implements ReportService {
     protected ObjectToStringConverter objectToStringConverter;
 
     @Override
+    public Report storeReportEntity(Report report) {
+        return reportingApi.storeReportEntity(report);
+    }
+
+    @Override
     public ReportOutputDocument createReport(Report report, Map<String, Object> params) {
         return reportingApi.createReport(report, params);
     }
@@ -76,8 +81,8 @@ public class ReportServiceBean implements ReportService {
         return reportingApi.importReports(zipBytes);
     }
 
-    public String convertToXml(Report report) {
-        return reportingApi.convertToXml(report);
+    public String convertToString(Report report) {
+        return reportingApi.convertToString(report);
     }
 
     public Report convertToReport(String xml) {

@@ -7,9 +7,7 @@ package com.haulmont.reports.wizard;
 
 import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.chile.core.model.MetaProperty;
-import com.haulmont.cuba.core.EntityManager;
 import com.haulmont.cuba.core.Persistence;
-import com.haulmont.cuba.core.Transaction;
 import com.haulmont.cuba.core.entity.annotation.SystemLevel;
 import com.haulmont.cuba.core.global.*;
 import com.haulmont.reports.ReportingApi;
@@ -65,24 +63,17 @@ public class ReportingWizardBean implements ReportingWizardApi {
         BandDefinition rootReportBandDefinition = createRootBand(report);
         Set<BandDefinition> bands = createBands(report, rootReportBandDefinition, reportData, mainParameter);
         ReportTemplate defaultTemplate = createDefaultTemplate(report, reportData);
+        report.setDefaultTemplate(defaultTemplate);
 
         HashSet<BandDefinition> childrenBandsDefinitionForRoot = new HashSet<>(bands);
         childrenBandsDefinitionForRoot.remove(rootReportBandDefinition);
         rootReportBandDefinition.getChildrenBandDefinitions().addAll(childrenBandsDefinitionForRoot);
+        report.setName(reportingApi.generateReportName(reportData.getName()));
+        String xml = reportingApi.convertToString(report);
+        report.setXml(xml);
 
-        Transaction t = persistence.createTransaction();
-        try {
-            report.setName(reportingApi.generateReportName(reportData.getName()));
-            String xml = reportingApi.convertToXml(report);
-            report.setXml(xml);
-            if (!temporary) {
-                EntityManager em = persistence.getEntityManager();
-                em.persist(defaultTemplate);
-                em.persist(report);
-                t.commit();
-            }
-        } finally {
-            t.end();
+        if (!temporary) {
+            reportingApi.storeReportEntity(report);
         }
 
         return report;

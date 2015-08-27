@@ -7,16 +7,13 @@ package com.haulmont.reports;
 import com.haulmont.cuba.core.EntityManager;
 import com.haulmont.cuba.core.Persistence;
 import com.haulmont.cuba.core.Transaction;
-import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.View;
 import com.haulmont.cuba.core.global.ViewRepository;
 import com.haulmont.cuba.security.app.Authenticated;
-import com.haulmont.reports.app.service.ReportService;
-import com.haulmont.reports.entity.*;
+import com.haulmont.reports.converter.XStreamConverter;
+import com.haulmont.reports.entity.Report;
+import com.haulmont.reports.entity.ReportTemplate;
 import com.haulmont.reports.exception.ReportingException;
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.converters.reflection.ExternalizableConverter;
-import com.thoughtworks.xstream.mapper.MapperWrapper;
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
@@ -31,8 +28,10 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
 import java.util.zip.CRC32;
 
 /**
@@ -52,7 +51,7 @@ public class ReportImportExport implements ReportImportExportAPI, ReportImportEx
     @Inject
     protected Persistence persistence;
 
-    public byte[] exportReports(Collection<Report> reports){
+    public byte[] exportReports(Collection<Report> reports) {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
         ZipArchiveOutputStream zipOutputStream = new ZipArchiveOutputStream(byteArrayOutputStream);
@@ -108,13 +107,13 @@ public class ReportImportExport implements ReportImportExportAPI, ReportImportEx
     /**
      * Deploys report from folder
      * Folder should have the following structure, in other cases RuntimeException will be thrown
-     * <p/>
+     * <p>
      * folder
      * sub-folder1
-     * report.xml
+     * report.structure
      * template.doc
      * sub-folder2
-     * report.xml
+     * report.structure
      * template.docx
      *
      * @param path to folder with reports
@@ -153,7 +152,7 @@ public class ReportImportExport implements ReportImportExportAPI, ReportImportEx
 
     /**
      * Exports single report to ZIP archive with name <report name>.zip.
-     * There are 2 files in archive: report.xml and a template file (odt, xls or other..)
+     * There are 2 files in archive: report.structure and a template file (odt, xls or other..)
      *
      * @param report Report object that must be exported.
      * @return ZIP archive as a byte array.
@@ -170,7 +169,7 @@ public class ReportImportExport implements ReportImportExportAPI, ReportImportEx
 
         String xml = report.getXml();
         byte[] xmlBytes = xml.getBytes();
-        ArchiveEntry zipEntryReportObject = newStoredEntry("report.xml", xmlBytes);
+        ArchiveEntry zipEntryReportObject = newStoredEntry("report.structure", xmlBytes);
         zipOutputStream.putArchiveEntry(zipEntryReportObject);
         zipOutputStream.write(xmlBytes);
 
@@ -202,20 +201,13 @@ public class ReportImportExport implements ReportImportExportAPI, ReportImportEx
         ZipArchiveEntry archiveEntry;
         // importing report.xml to report object
         while (((archiveEntry = archiveReader.getNextZipEntry()) != null) && (report == null)) {
-            if (archiveEntry.getName().equals("report.xml")) {
+            if (isReportsStructureFile(archiveEntry.getName())) {
                 String xml = new String(readBytesFromEntry(archiveReader));
-                if (xml.startsWith("<Report>")) {//old versions
-                    report = legacyReportsFromXml(Report.class, xml);
-                    if (report.getDefaultTemplate() == null) {
-                        report.setDefaultTemplate(report.getTemplateByCode(ReportService.DEFAULT_TEMPLATE_CODE));
-                    }
-
-                    if (report.getBands() == null) {
-                        report.setBands(new HashSet<BandDefinition>());
-                    }
-                    collectBands(report.getRootBandDefinition(), report.getBands());
-                    report.setXml(reportingApi.convertToXml(report));
-                } else {
+                if (xml.startsWith("<")) {//previous xml structure version
+                    XStreamConverter xStreamConverter = new XStreamConverter();
+                    report = xStreamConverter.convertToReport(xml);
+                    report.setXml(xml);
+                } else {//current json structure
                     report = reportingApi.convertToReport(xml);
                     report.setXml(xml);
                 }
@@ -239,7 +231,8 @@ public class ReportImportExport implements ReportImportExportAPI, ReportImportEx
             while ((archiveEntry = archiveReader.getNextZipEntry()) != null
                     && (i < report.getTemplates().size())) {
 
-                if (!archiveEntry.getName().equals("report.xml") && !archiveEntry.isDirectory()) {
+                if (!isReportsStructureFile(archiveEntry.getName())
+                        && !archiveEntry.isDirectory()) {
                     String[] namePaths = archiveEntry.getName().split("/");
                     int index = Integer.parseInt(namePaths[1]);
 
@@ -261,37 +254,7 @@ public class ReportImportExport implements ReportImportExportAPI, ReportImportEx
     }
 
     protected Report saveReport(Report report) {
-        Persistence persistence = AppBeans.get(Persistence.class);
-        Transaction tx = persistence.createTransaction();
-        try {
-            EntityManager em = persistence.getEntityManager();
-            ReportTemplate defaultTemplate = report.getDefaultTemplate();
-            List<ReportTemplate> loadedTemplates = report.getTemplates();
-
-            report.setDefaultTemplate(null);
-            report.setTemplates(null);
-            if (report.getGroup() != null) {
-                ReportGroup reportGroup = em.merge(report.getGroup());
-                report.setGroup(reportGroup);
-            }
-            report = em.merge(report);
-
-            List<ReportTemplate> reportTemplates = new ArrayList<>();
-            for (ReportTemplate reportTemplate : loadedTemplates) {
-                reportTemplate.setReport(report);
-                ReportTemplate merged = em.merge(reportTemplate);
-                reportTemplates.add(merged);
-                if (merged.equals(defaultTemplate)) {
-                    report.setDefaultTemplate(merged);
-                }
-            }
-            report.setTemplates(reportTemplates);
-
-            tx.commit();
-        } finally {
-            tx.end();
-        }
-        return report;
+        return reportingApi.storeReportEntity(report);
     }
 
     protected byte[] zipSingleReportFiles(File[] files) throws IOException {
@@ -301,7 +264,7 @@ public class ReportImportExport implements ReportImportExportAPI, ReportImportEx
             if (!file.isDirectory()) {
                 byte[] data = FileUtils.readFileToByteArray(file);
                 String name;
-                if (file.getName().endsWith(".xml")) {
+                if (isReportsStructureFile(file.getName())) {
                     name = file.getName();
                 } else {
                     name = "templates/" + templatesCount++ + "/" + file.getName();
@@ -356,7 +319,6 @@ public class ReportImportExport implements ReportImportExportAPI, ReportImportEx
             EntityManager em = persistence.getEntityManager();
             View exportView = viewRepository.getView(report.getClass(), ReportingBean.REPORT_EDIT_VIEW_NAME);
             report = em.find(Report.class, report.getId(), exportView);
-            em.fetch(report, exportView);
             tx.commit();
             return report;
         } finally {
@@ -364,60 +326,7 @@ public class ReportImportExport implements ReportImportExportAPI, ReportImportEx
         }
     }
 
-    protected <T> T legacyReportsFromXml(Class clazz, String xml) {
-        XStream xStream = createLegacyReportsXStream(clazz);
-        Object o = xStream.fromXML(xml);
-        return (T) o;
-    }
-
-    protected XStream createLegacyReportsXStream(Class clazz) {
-        XStream xStream = new XStream() {
-            @Override
-            protected MapperWrapper wrapMapper(MapperWrapper next) {
-                return new MapperWrapper(next) {
-                    @Override
-                    public boolean shouldSerializeMember(Class definedIn, String fieldName) {
-                        if (definedIn == Object.class) {
-                            return false;
-                        }
-                        return super.shouldSerializeMember(definedIn, fieldName);
-                    }
-                };
-            }
-        };
-
-        xStream.aliasField("id", BandDefinition.class, "uuid");
-        xStream.aliasField("id", DataSet.class, "uuid");
-        xStream.aliasField("id", ReportInputParameter.class, "uuid");
-        xStream.aliasField("id", ReportValueFormat.class, "uuid");
-        xStream.aliasField("id", ReportScreen.class, "uuid");
-
-        xStream.alias("com.haulmont.cuba.report.DataSet", DataSet.class);
-        xStream.alias("com.haulmont.cuba.report.ReportTemplate", ReportTemplate.class);
-        xStream.alias("com.haulmont.cuba.report.ReportInputParameter", ReportInputParameter.class);
-        xStream.alias("com.haulmont.cuba.report.ReportValueFormat", ReportValueFormat.class);
-        xStream.alias("com.haulmont.cuba.report.BandDefinition", BandDefinition.class);
-        xStream.alias("com.haulmont.cuba.report.ReportGroup", ReportGroup.class);
-        xStream.alias("com.haulmont.cuba.report.ReportScreen", ReportScreen.class);
-        xStream.omitField(Report.class, "roles");
-
-        xStream.getConverterRegistry().removeConverter(ExternalizableConverter.class);
-        xStream.alias(clazz.getSimpleName(), clazz);
-        for (Field field : clazz.getDeclaredFields()) {
-            Class cl = field.getType();
-            xStream.alias(cl.getSimpleName(), cl);
-        }
-
-        return xStream;
-    }
-
-    protected void collectBands(BandDefinition band, Set<BandDefinition> bands) {
-        bands.add(band);
-
-        if (band.getChildrenBandDefinitions() != null) {
-            for (BandDefinition childBand : band.getChildrenBandDefinitions()) {
-                collectBands(childBand, bands);
-            }
-        }
+    protected boolean isReportsStructureFile(String name) {
+        return name.equals("report.xml") || name.equals("report.structure");
     }
 }

@@ -9,13 +9,14 @@ import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.chile.core.model.utils.InstanceUtils;
 import com.haulmont.cuba.core.EntityManager;
 import com.haulmont.cuba.core.Persistence;
-import com.haulmont.cuba.core.Query;
 import com.haulmont.cuba.core.Transaction;
 import com.haulmont.cuba.core.app.FileStorageAPI;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.entity.FileDescriptor;
 import com.haulmont.cuba.core.global.*;
 import com.haulmont.reports.app.ParameterPrototype;
+import com.haulmont.reports.converter.GsonConverter;
+import com.haulmont.reports.converter.XStreamConverter;
 import com.haulmont.reports.entity.*;
 import com.haulmont.reports.exception.*;
 import com.haulmont.reports.libintegration.CustomFormatter;
@@ -25,10 +26,6 @@ import com.haulmont.yarg.reporting.ReportOutputDocumentImpl;
 import com.haulmont.yarg.reporting.ReportingAPI;
 import com.haulmont.yarg.reporting.RunParams;
 import com.haulmont.yarg.structure.ReportOutputType;
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.converters.basic.DateConverter;
-import com.thoughtworks.xstream.converters.collections.CollectionConverter;
-import com.thoughtworks.xstream.converters.reflection.ExternalizableConverter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.compress.archivers.ArchiveEntry;
@@ -54,10 +51,7 @@ import java.util.zip.CRC32;
 @ManagedBean(ReportingApi.NAME)
 public class ReportingBean implements ReportingApi {
     public static final String REPORT_EDIT_VIEW_NAME = "report.edit";
-
     protected static final int MAX_REPORT_NAME_LENGTH = 255;
-
-    protected PrototypesLoader prototypesLoader = new PrototypesLoader();
 
     @Inject
     protected Persistence persistence;
@@ -78,59 +72,72 @@ public class ReportingBean implements ReportingApi {
     @Inject
     protected GlobalConfig globalConfig;
 
-    protected XStream createXStream() {
-        XStream xStream = new XStream();
-        xStream.getConverterRegistry().removeConverter(ExternalizableConverter.class);
-        xStream.registerConverter(new CollectionConverter(xStream.getMapper()) {
-            @Override
-            public boolean canConvert(Class type) {
-                return ArrayList.class.isAssignableFrom(type) ||
-                        HashSet.class.isAssignableFrom(type) ||
-                        LinkedList.class.isAssignableFrom(type) ||
-                        LinkedHashSet.class.isAssignableFrom(type);
+    protected PrototypesLoader prototypesLoader = new PrototypesLoader();
 
+    protected GsonConverter gsonConverter = new GsonConverter();
+    protected XStreamConverter xStreamConverter = new XStreamConverter();
+
+    //todo eude try to simplify report save logic
+    @Override
+    public Report storeReportEntity(Report report) {
+        Report savedReport = null;
+        Transaction tx = persistence.createTransaction();
+        try {
+            EntityManager em = persistence.getEntityManager();
+            ReportTemplate defaultTemplate = report.getDefaultTemplate();
+            List<ReportTemplate> loadedTemplates = report.getTemplates();
+            List<ReportTemplate> savedTemplates = new ArrayList<>();
+
+            report.setDefaultTemplate(null);
+            report.setTemplates(null);
+
+            if (report.getGroup() != null) {
+                ReportGroup existingGroup = em.find(ReportGroup.class, report.getGroup().getId());
+                if (existingGroup != null) {
+                    report.setGroup(existingGroup);
+                } else {
+                    em.persist(report.getGroup());
+                }
             }
-        }, XStream.PRIORITY_VERY_HIGH);
 
-        xStream.registerConverter(new DateConverter() {
-            @Override
-            public boolean canConvert(Class type) {
-                return Date.class.isAssignableFrom(type);
+            if (PersistenceHelper.isNew(report)) {
+                em.persist(report);
+            } else {
+                Report existingReport = em.find(Report.class, report.getId());
+                if (existingReport != null) {
+                    report.setVersion(existingReport.getVersion());
+                }
+                report = em.merge(report);
             }
-        });
 
-        xStream.alias("report", Report.class);
-        xStream.alias("band", BandDefinition.class);
-        xStream.alias("dataSet", DataSet.class);
-        xStream.alias("parameter", ReportInputParameter.class);
-        xStream.alias("template", ReportTemplate.class);
-        xStream.alias("screen", ReportScreen.class);
-        xStream.alias("format", ReportValueFormat.class);
-        xStream.addDefaultImplementation(LinkedHashMap.class, Map.class);
-        xStream.aliasSystemAttribute(null, "class");
+            for (ReportTemplate loadedTemplate : loadedTemplates) {
+                ReportTemplate existingTemplate = em.find(ReportTemplate.class, loadedTemplate.getId());
+                if (existingTemplate != null) {
+                    loadedTemplate.setVersion(existingTemplate.getVersion());
+                }
 
-        xStream.omitField(Report.class, "xml");
-        xStream.omitField(Report.class, "deleteTs");
-        xStream.omitField(Report.class, "deletedBy");
-        xStream.omitField(ReportTemplate.class, "content");
-        xStream.omitField(ReportTemplate.class, "defaultFlag");
-        xStream.omitField(ReportTemplate.class, "templateFileDescriptor");
-        xStream.omitField(ReportTemplate.class, "deleteTs");
-        xStream.omitField(ReportTemplate.class, "deletedBy");
-        xStream.omitField(ReportInputParameter.class, "localeName");
+                loadedTemplate.setReport(report);
+                savedTemplates.add(em.merge(loadedTemplate));
+            }
+            em.flush();
 
-        xStream.aliasField("customFlag", ReportTemplate.class, "custom");
-        xStream.aliasField("customClass", ReportTemplate.class, "customDefinition");
-        xStream.aliasField("uuid", BandDefinition.class, "id");
-        xStream.aliasField("uuid", DataSet.class, "id");
-        xStream.aliasField("uuid", ReportInputParameter.class, "id");
-        xStream.aliasField("uuid", ReportScreen.class, "id");
-        xStream.aliasField("definedBy", ReportTemplate.class, "customDefinedBy");
-        xStream.aliasField("uuid", ReportValueFormat.class, "id");
+            for (ReportTemplate savedTemplate : savedTemplates) {
+                if (savedTemplate.equals(defaultTemplate)) {
+                    defaultTemplate = savedTemplate;
+                    break;
+                }
+            }
+            report.setDefaultTemplate(defaultTemplate);
+            report.setTemplates(savedTemplates);
+            savedReport = report;
 
-        return xStream;
+            tx.commit();
+        } finally {
+            tx.end();
+        }
+
+        return savedReport;
     }
-
 
     @Override
     public ReportOutputDocument createReport(Report report, Map<String, Object> params) {
@@ -193,7 +200,7 @@ public class ReportingBean implements ReportingApi {
         }
     }
 
-    private ArchiveEntry newStoredEntry(String name, byte[] data) {
+    protected ArchiveEntry newStoredEntry(String name, byte[] data) {
         ZipArchiveEntry zipEntry = new ZipArchiveEntry(name);
         zipEntry.setSize(data.length);
         zipEntry.setCompressedSize(zipEntry.getSize());
@@ -263,6 +270,7 @@ public class ReportingBean implements ReportingApi {
         }
     }
 
+    @Override
     public List loadDataForParameterPrototype(ParameterPrototype prototype) {
         return prototypesLoader.loadData(prototype);
     }
@@ -300,7 +308,7 @@ public class ReportingBean implements ReportingApi {
             copiedReport.setTemplates(copiedTemplates);
             copiedReport.setDefaultTemplate(defaultCopiedTemplate);
 
-            copiedReport.setXml(convertToXml(copiedReport));
+            copiedReport.setXml(convertToString(copiedReport));
             tx.commit();
         } finally {
             tx.end();
@@ -313,7 +321,6 @@ public class ReportingBean implements ReportingApi {
         if (iteration == 1) {
             iteration++; //like in win 7: duplicate of file 'a.txt' is 'a (2).txt', NOT 'a (1).txt'
         }
-        EntityManager em = persistence.getEntityManager();
         String reportName = StringUtils.stripEnd(sourceName, null);
         if (iteration > 0) {
             String newReportName = String.format("%s (%s)", reportName, iteration);
@@ -328,12 +335,21 @@ public class ReportingBean implements ReportingApi {
             }
 
         }
-        Query q = em.createQuery("select r from report$Report r where r.name = :name");
-        q.setParameter("name", reportName);
-        if (q.getResultList().size() > 0) {
-            return generateReportName(sourceName, ++iteration);
-        }
 
+        Transaction tx = persistence.createTransaction();
+        try {
+
+            Long countOfReportsWithSameName = (Long) persistence.getEntityManager()
+                    .createQuery("select count(r) from report$Report r where r.name = :name")
+                    .setParameter("name", reportName)
+                    .getSingleResult();
+            tx.commit();
+            if (countOfReportsWithSameName > 0) {
+                return generateReportName(sourceName, ++iteration);
+            }
+        } finally {
+            tx.end();
+        }
         return reportName;
     }
 
@@ -401,17 +417,17 @@ public class ReportingBean implements ReportingApi {
     }
 
     @Override
-    public String convertToXml(Report report) {
-        XStream xStream = createXStream();
-        //noinspection UnnecessaryLocalVariable
-        String xml = xStream.toXML(report);
-        return xml;
+    public String convertToString(Report report) {
+        return gsonConverter.convertToString(report);
     }
 
     @Override
-    public Report convertToReport(String xml) {
-        XStream xStream = createXStream();
-        return (Report) xStream.fromXML(xml);
+    public Report convertToReport(String serializedReport) {
+        if (!serializedReport.startsWith("<")) {//for old xml reports
+            return gsonConverter.convertToReport(serializedReport);
+        } else {
+            return xStreamConverter.convertToReport(serializedReport);
+        }
     }
 
     @Override
