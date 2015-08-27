@@ -7,7 +7,11 @@ package com.haulmont.reports.gui.report.wizard;
 
 import com.haulmont.cuba.gui.WindowManager;
 import com.haulmont.cuba.gui.components.*;
-import com.haulmont.reports.entity.wizard.*;
+import com.haulmont.cuba.gui.components.DialogAction.Type;
+import com.haulmont.reports.entity.wizard.EntityTreeNode;
+import com.haulmont.reports.entity.wizard.RegionProperty;
+import com.haulmont.reports.entity.wizard.ReportData;
+import com.haulmont.reports.entity.wizard.ReportRegion;
 import com.haulmont.reports.gui.components.actions.OrderableItemMoveAction;
 import com.haulmont.reports.gui.report.wizard.step.StepFrame;
 import org.apache.commons.collections.CollectionUtils;
@@ -238,7 +242,7 @@ class RegionsStepFrame extends StepFrame {
                         wizard.getMessage("dialogs.Confirmation"),
                         wizard.formatMessage("deleteRegion", ((ReportRegion) wizard.regionsTable.getSingleSelected()).getName()),
                         Frame.MessageType.CONFIRMATION, new Action[]{
-                                new DialogAction(DialogAction.Type.YES) {
+                                new DialogAction(Type.YES) {
                                     @Override
                                     public void actionPerform(Component component) {
                                         wizard.reportRegionsDs.removeItem((ReportRegion) wizard.regionsTable.getSingleSelected());
@@ -247,8 +251,7 @@ class RegionsStepFrame extends StepFrame {
                                         wizard.setupButtonsVisibility();
                                     }
                                 },
-                                new DialogAction(DialogAction.Type.NO) {
-                                }
+                                new DialogAction(Type.NO, Status.PRIMARY)
                         });
             }
         }

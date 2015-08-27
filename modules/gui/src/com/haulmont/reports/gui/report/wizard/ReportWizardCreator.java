@@ -10,9 +10,10 @@ import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.MessageTools;
 import com.haulmont.cuba.core.global.Metadata;
 import com.haulmont.cuba.core.global.MetadataTools;
-import com.haulmont.cuba.gui.AppConfig;
 import com.haulmont.cuba.gui.WindowManagerProvider;
 import com.haulmont.cuba.gui.components.*;
+import com.haulmont.cuba.gui.components.Action.Status;
+import com.haulmont.cuba.gui.components.DialogAction.Type;
 import com.haulmont.cuba.gui.config.WindowConfig;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
 import com.haulmont.cuba.gui.data.Datasource;
@@ -432,15 +433,13 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
     public boolean preClose(String actionId) {
         if (!COMMIT_ACTION_ID.equals(actionId) && reportRegionsDs.getItems() != null) {
             showOptionDialog(getMessage("dialogs.Confirmation"), getMessage("interruptConfirm"), MessageType.CONFIRMATION, new Action[]{
-                    new DialogAction(DialogAction.Type.YES) {
+                    new DialogAction(Type.YES) {
                         @Override
                         public void actionPerform(Component component) {
                             ReportWizardCreator.this.close(CLOSE_ACTION_ID, true);
                         }
                     },
-                    new DialogAction(DialogAction.Type.NO) {
-
-                    }
+                    new DialogAction(Type.NO, Status.PRIMARY)
             });
         }
         return false;

@@ -13,6 +13,8 @@ import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.gui.FrameContextImpl;
 import com.haulmont.cuba.gui.WindowManager;
 import com.haulmont.cuba.gui.components.*;
+import com.haulmont.cuba.gui.components.Action.Status;
+import com.haulmont.cuba.gui.components.DialogAction.Type;
 import com.haulmont.cuba.gui.components.filter.ConditionsTree;
 import com.haulmont.cuba.gui.components.filter.FilterParser;
 import com.haulmont.cuba.gui.components.filter.Param;
@@ -68,7 +70,7 @@ class DetailsStepFrame extends StepFrame {
         protected void initEntityLookupField() {
             wizard.entity.setOptionsMap(getAvailableEntities());
             wizard.entity.addListener(new ClearRegionListener(
-                    new DialogActionWithChangedValue(DialogAction.Type.YES) {
+                    new DialogActionWithChangedValue(Type.YES) {
                         @Override
                         public void actionPerform(Component component) {
                             wizard.getItem().getReportRegions().clear();
@@ -90,7 +92,7 @@ class DetailsStepFrame extends StepFrame {
             wizard.reportTypeOptionGroup.setOptionsMap(getListedReportOptionsMap());
             wizard.reportTypeOptionGroup.setValue(ReportData.ReportType.SINGLE_ENTITY);
             wizard.reportTypeOptionGroup.addListener(new ClearRegionListener(
-                    new DialogActionWithChangedValue(DialogAction.Type.YES) {
+                    new DialogActionWithChangedValue(Type.YES) {
                         @Override
                         public void actionPerform(Component component) {
                             wizard.getItem().getReportRegions().clear();
@@ -306,8 +308,8 @@ class DetailsStepFrame extends StepFrame {
                         Frame.MessageType.CONFIRMATION,
                         new AbstractAction[]{
                                 okAction.setValue(value),
-                                new DialogAction(DialogAction.Type.NO) {
-                                }
+
+                                new DialogAction(Type.NO, Status.PRIMARY)
                         });
             } else {
                 wizard.needUpdateEntityModel = true;

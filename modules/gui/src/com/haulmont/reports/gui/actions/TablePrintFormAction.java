@@ -8,6 +8,7 @@ package com.haulmont.reports.gui.actions;
 import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.cuba.core.global.LoadContext;
 import com.haulmont.cuba.gui.components.*;
+import com.haulmont.cuba.gui.components.DialogAction.Type;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
 import com.haulmont.cuba.gui.data.Datasource;
 import com.haulmont.reports.app.ParameterPrototype;
@@ -41,10 +42,10 @@ public class TablePrintFormAction extends AbstractPrintFormAction {
     public void actionPerform(Component component) {
         final Set selected = table.getSelected();
 
-        Action cancelAction = new DialogAction(DialogAction.Type.CANCEL);
+        DialogAction cancelAction = new DialogAction(Type.CANCEL);
 
         if (CollectionUtils.isNotEmpty(selected)) {
-            Action printSelectedAction = new AbstractAction("actions.printSelected") {
+            Action printSelectedAction = new AbstractAction("actions.printSelected", Status.PRIMARY) {
                 @Override
                 public void actionPerform(Component component) {
                     printSelected(selected);
@@ -83,12 +84,14 @@ public class TablePrintFormAction extends AbstractPrintFormAction {
             CollectionDatasource ds = table.getDatasource();
 
             if ((ds.getState() == Datasource.State.VALID) && (ds.size() > 0)) {
-                Action yesAction = new DialogAction(DialogAction.Type.OK) {
+                Action yesAction = new DialogAction(Type.OK) {
                     @Override
                     public void actionPerform(Component component) {
                         printAll();
                     }
                 };
+
+                cancelAction.setPrimary(true);
 
                 window.showOptionDialog(messages.getMessage(getClass(), "notifications.confirmPrintAllheader"),
                         messages.getMessage(getClass(), "notifications.confirmPrintAll"),

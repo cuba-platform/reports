@@ -7,6 +7,7 @@ package com.haulmont.reports.gui.report.wizard;
 
 import com.haulmont.cuba.gui.AppConfig;
 import com.haulmont.cuba.gui.components.*;
+import com.haulmont.cuba.gui.components.DialogAction.Type;
 import com.haulmont.cuba.gui.data.ValueListener;
 import com.haulmont.cuba.gui.export.ByteArrayDataProvider;
 import com.haulmont.cuba.gui.export.ExportDisplay;
@@ -125,13 +126,13 @@ class SaveStepFrame extends StepFrame {
                                 wizard.getMessage("confirmSaveWithoutRegions"),
                                 Frame.MessageType.CONFIRMATION,
                                 new Action[]{
-                                        new DialogAction(DialogAction.Type.OK) {
+                                        new DialogAction(Type.OK) {
                                             @Override
                                             public void actionPerform(Component component) {
                                                 convertToReportAndForceCloseWizard();
                                             }
                                         },
-                                        new DialogAction(DialogAction.Type.NO)
+                                        new DialogAction(Type.NO, Status.PRIMARY)
                                 });
 
                     } else {
