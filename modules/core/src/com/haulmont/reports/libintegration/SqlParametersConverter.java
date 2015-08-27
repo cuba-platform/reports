@@ -13,13 +13,11 @@ package com.haulmont.reports.libintegration;
 import com.haulmont.chile.core.datatypes.impl.EnumClass;
 import com.haulmont.cuba.core.Persistence;
 import com.haulmont.cuba.core.entity.Entity;
-import com.haulmont.reports.exception.ReportingException;
 import com.haulmont.yarg.loaders.ReportParametersConverter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.ArrayUtils;
 
 import javax.inject.Inject;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -71,11 +69,6 @@ public class SqlParametersConverter implements ReportParametersConverter {
     }
 
     private Object dbSpecificConvert(Object object) {
-        try {
-
-            return persistence.getDbTypeConverter().getSqlObject(object);
-        } catch (SQLException e) {
-            throw new ReportingException("An error occurred ");
-        }
+        return persistence.getDbTypeConverter().getSqlObject(object);
     }
 }
