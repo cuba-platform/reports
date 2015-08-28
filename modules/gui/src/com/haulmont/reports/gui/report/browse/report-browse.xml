@@ -3,14 +3,12 @@
   ~ Use is subject to license terms, see http://www.cuba-platform.com/license for details.
   -->
 
-<window
-        xmlns="http://schemas.haulmont.com/cuba/window.xsd"
+<window xmlns="http://schemas.haulmont.com/cuba/window.xsd"
         class="com.haulmont.reports.gui.report.browse.ReportBrowser"
         messagesPack="com.haulmont.reports.gui.report"
         lookupComponent="table"
         caption="msg://reportBrowser"
-        focusComponent="table"
-        >
+        focusComponent="table">
 
     <dsContext>
         <groupDatasource
@@ -43,7 +41,7 @@
             </actions>
             <buttonsPanel>
                 <button id="createBtn" action="table.create"/>
-                <popupButton id="popupCreateBtn" icon="msg://actions.Create.icon" caption="msg://actions.Create"/>
+                <popupButton id="popupCreateBtn" icon="theme://actions.Create.icon" caption="msg://actions.Create"/>
                 <button action="table.edit"/>
                 <button action="table.remove"/>
                 <button id="copy"/>
