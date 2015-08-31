@@ -463,13 +463,13 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
         outputFileFormat.setOptionsMap(optionsMap);
 
         if (outputFileFormatPrevValue != null) {
-            if (optionsMap.containsKey(outputFileFormatPrevValue.toString().toLowerCase())) {
+            if (optionsMap.containsKey(outputFileFormatPrevValue.toString())) {
                 outputFileFormat.setValue(outputFileFormatPrevValue);
             }
         }
         if (outputFileFormat.getValue() == null) {
             if (optionsMap.size() > 1) {
-                outputFileFormat.setValue(optionsMap.get(templateFileFormat.getValue().toString().toLowerCase()));
+                outputFileFormat.setValue(optionsMap.get(templateFileFormat.getValue().toString()));
             } else if (optionsMap.size() == 1) {
                 outputFileFormat.setValue(optionsMap.values().iterator().next());
             }
