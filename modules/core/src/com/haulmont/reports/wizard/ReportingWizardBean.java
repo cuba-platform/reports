@@ -73,7 +73,7 @@ public class ReportingWizardBean implements ReportingWizardApi {
         report.setXml(xml);
 
         if (!temporary) {
-            reportingApi.storeReportEntity(report);
+            report = reportingApi.storeReportEntity(report);
         }
 
         return report;
