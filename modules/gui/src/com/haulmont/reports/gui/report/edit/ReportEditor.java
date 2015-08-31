@@ -8,7 +8,6 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.chile.core.model.MetaPropertyPath;
-import com.haulmont.cuba.core.app.FileStorageService;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.global.*;
 import com.haulmont.cuba.gui.AppConfig;
@@ -137,9 +136,6 @@ public class ReportEditor extends AbstractEditor<Report> {
 
     @Inject
     protected CollectionDatasource<ReportTemplate, UUID> templatesDs;
-
-    @Inject
-    protected FileStorageService fileStorageService;
 
     @Inject
     protected ComponentsFactory componentsFactory;

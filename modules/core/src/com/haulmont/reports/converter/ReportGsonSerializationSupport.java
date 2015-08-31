@@ -10,6 +10,8 @@ import com.google.gson.stream.JsonWriter;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.global.View;
 import com.haulmont.reports.entity.DataSet;
+import com.haulmont.reports.entity.Report;
+import com.haulmont.reports.entity.ReportTemplate;
 
 import java.io.IOException;
 
@@ -18,6 +20,12 @@ import java.io.IOException;
  * @version $Id$
  */
 public class ReportGsonSerializationSupport extends GsonSerializationSupport {
+    public ReportGsonSerializationSupport() {
+        exclusionPolicy = (objectClass, propertyName) ->
+                Report.class.isAssignableFrom(objectClass) && "xml".equalsIgnoreCase(propertyName)
+                        || ReportTemplate.class.isAssignableFrom(objectClass) && "content".equals(propertyName);
+    }
+
     @Override
     protected void writeFields(JsonWriter out, Entity entity) throws IOException {
         super.writeFields(out, entity);

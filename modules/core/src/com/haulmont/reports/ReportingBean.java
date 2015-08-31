@@ -92,7 +92,7 @@ public class ReportingBean implements ReportingApi {
             report.setTemplates(null);
 
             if (report.getGroup() != null) {
-                ReportGroup existingGroup = em.find(ReportGroup.class, report.getGroup().getId());
+                ReportGroup existingGroup = em.find(ReportGroup.class, report.getGroup().getId(), View.MINIMAL);
                 if (existingGroup != null) {
                     report.setGroup(existingGroup);
                 } else {
@@ -103,7 +103,7 @@ public class ReportingBean implements ReportingApi {
             if (PersistenceHelper.isNew(report)) {
                 em.persist(report);
             } else {
-                Report existingReport = em.find(Report.class, report.getId());
+                Report existingReport = em.find(Report.class, report.getId(), View.MINIMAL);
                 if (existingReport != null) {
                     report.setVersion(existingReport.getVersion());
                 }

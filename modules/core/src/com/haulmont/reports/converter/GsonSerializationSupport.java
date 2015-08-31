@@ -22,7 +22,6 @@ import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.Metadata;
 import com.haulmont.cuba.core.global.PersistenceHelper;
-import com.haulmont.reports.entity.DataSet;
 
 import javax.annotation.concurrent.NotThreadSafe;
 import java.io.IOException;
@@ -41,6 +40,11 @@ import static java.lang.String.format;
 public class GsonSerializationSupport {
     protected GsonBuilder gsonBuilder;
     protected Map<Object, Entity> processedObjects = new HashMap<>();
+    protected ExclusionPolicy exclusionPolicy;
+
+    public static interface ExclusionPolicy {
+        public boolean exclude(Class objectClass, String propertyName);
+    }
 
     public GsonSerializationSupport() {
         gsonBuilder = new GsonBuilder()
@@ -82,63 +86,64 @@ public class GsonSerializationSupport {
 
     private Entity readEntity(JsonReader in) throws IOException {
         in.beginObject();
+        in.nextName();
+        String metaClassName = in.nextString();
+        Metadata metadata = AppBeans.get(Metadata.NAME);
+        MetaClass metaClass = metadata.getSession().getClassNN(metaClassName);
+        Entity entity = metadata.create(metaClass);
+        in.nextName();
+        String id = in.nextString();
+        MetaProperty idProperty = metaClass.getPropertyNN("id");
         try {
-            in.nextName();
-            String metaClassName = in.nextString();
-            Metadata metadata = AppBeans.get(Metadata.NAME);
-            MetaClass metaClass = metadata.getSession().getClassNN(metaClassName);
-            Entity entity = metadata.create(metaClass);
-            in.nextName();
-            String id = in.nextString();
-            MetaProperty idProperty = metaClass.getPropertyNN("id");
-            try {
-                entity.setValue("id", Datatypes.getNN(idProperty.getJavaType()).parse(id));
-            } catch (ParseException e) {
-                throw new RuntimeException(
-                        format("An error occurred while parsing id. Class [%s]. Value [%s].", idProperty.getJavaType(), id));
-            }
-            Entity processedObject = processedObjects.get(entity.getId());
-            if (processedObject != null) {
-                return processedObject;
-            } else {
-                processedObjects.put(entity.getId(), entity);
-            }
+            entity.setValue("id", Datatypes.getNN(idProperty.getJavaType()).parse(id));
+        } catch (ParseException e) {
+            throw new RuntimeException(
+                    format("An error occurred while parsing id. Class [%s]. Value [%s].", idProperty.getJavaType(), id), e);
+        }
 
-            while (in.hasNext()) {
-                String propertyName = in.nextName();
-                MetaProperty property = metaClass.getProperty(propertyName);
-                if (property != null && !property.isReadOnly()) {
-                    Class<?> propertyType = property.getJavaType();
-                    Range propertyRange = property.getRange();
-                    if (propertyRange.isDatatype()) {
-                        Object value = readSimpleProperty(in, propertyType);
-                        entity.setValue(propertyName, value);
-                    } else if (propertyRange.isClass()) {
-                        if (Entity.class.isAssignableFrom(propertyType)) {
-                            entity.setValue(propertyName, readEntity(in));
-                        } else if (Collection.class.isAssignableFrom(propertyType)) {
-                            Collection entities = readCollection(in, propertyType);
-                            entity.setValue(propertyName, entities);
-                        } else {
-                            in.skipValue();
-                        }
-                    } else if (propertyRange.isEnum()) {
-                        String stringValue = in.nextString();
-                        try {
-                            Object value = propertyRange.asEnumeration().parse(stringValue);
-                            entity.setValue(propertyName, value);
-                        } catch (ParseException e) {
-                            throw new RuntimeException(
-                                    format("An error occurred while parsing enum. Class [%s]. Value [%s].", propertyType, stringValue));
-                        }
+        Entity processedObject = processedObjects.get(entity.getId());
+        if (processedObject != null) {
+            entity = processedObject;
+        } else {
+            processedObjects.put(entity.getId(), entity);
+            readFields(in, metaClass, entity);
+        }
+        in.endObject();
+        return entity;
+    }
+
+    protected void readFields(JsonReader in, MetaClass metaClass, Entity entity) throws IOException {
+        while (in.hasNext()) {
+            String propertyName = in.nextName();
+            MetaProperty property = metaClass.getProperty(propertyName);
+            if (property != null && !property.isReadOnly() && !exclude(entity.getClass(), propertyName)) {
+                Class<?> propertyType = property.getJavaType();
+                Range propertyRange = property.getRange();
+                if (propertyRange.isDatatype()) {
+                    Object value = readSimpleProperty(in, propertyType);
+                    entity.setValue(propertyName, value);
+                } else if (propertyRange.isClass()) {
+                    if (Entity.class.isAssignableFrom(propertyType)) {
+                        entity.setValue(propertyName, readEntity(in));
+                    } else if (Collection.class.isAssignableFrom(propertyType)) {
+                        Collection entities = readCollection(in, propertyType);
+                        entity.setValue(propertyName, entities);
+                    } else {
+                        in.skipValue();
                     }
-                } else {
-                    readUnresolvedProperty(entity, propertyName, in);
+                } else if (propertyRange.isEnum()) {
+                    String stringValue = in.nextString();
+                    try {
+                        Object value = propertyRange.asEnumeration().parse(stringValue);
+                        entity.setValue(propertyName, value);
+                    } catch (ParseException e) {
+                        throw new RuntimeException(
+                                format("An error occurred while parsing enum. Class [%s]. Value [%s].", propertyType, stringValue), e);
+                    }
                 }
+            } else {
+                readUnresolvedProperty(entity, propertyName, in);
             }
-            return entity;
-        } finally {
-            in.endObject();
         }
     }
 
@@ -157,7 +162,7 @@ public class GsonSerializationSupport {
             return parsedValue;
         } catch (ParseException e) {
             throw new RuntimeException(
-                    format("An error occurred while parsing property. Class [%s]. Value [%s].", propertyType, value));
+                    format("An error occurred while parsing property. Class [%s]. Value [%s].", propertyType, value), e);
         }
     }
 
@@ -206,6 +211,7 @@ public class GsonSerializationSupport {
         for (MetaProperty property : entity.getMetaClass().getProperties()) {
             if (!"id".equalsIgnoreCase(property.getName())
                     && !property.isReadOnly()
+                    && !exclude(entity.getClass(), property.getName())
                     && PersistenceHelper.isLoaded(entity, property.getName())) {
                 Range propertyRange = property.getRange();
                 if (propertyRange.isDatatype()) {
@@ -249,6 +255,10 @@ public class GsonSerializationSupport {
                 out.value(String.valueOf(value));
             }
         }
+    }
+
+    protected boolean exclude(Class objectClass, String propertyName) {
+        return exclusionPolicy != null && exclusionPolicy.exclude(objectClass, propertyName);
     }
 
     public String convertToString(Entity entity) {
