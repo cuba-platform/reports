@@ -100,15 +100,11 @@ public class ReportingBean implements ReportingApi {
                 }
             }
 
-            if (PersistenceHelper.isNew(report)) {
-                em.persist(report);
-            } else {
-                Report existingReport = em.find(Report.class, report.getId(), View.MINIMAL);
-                if (existingReport != null) {
-                    report.setVersion(existingReport.getVersion());
-                }
-                report = em.merge(report);
+            Report existingReport = em.find(Report.class, report.getId(), View.MINIMAL);
+            if (existingReport != null) {
+                report.setVersion(existingReport.getVersion());
             }
+            report = em.merge(report);
 
             for (ReportTemplate loadedTemplate : loadedTemplates) {
                 ReportTemplate existingTemplate = em.find(ReportTemplate.class, loadedTemplate.getId());
