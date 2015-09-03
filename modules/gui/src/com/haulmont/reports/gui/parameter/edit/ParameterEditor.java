@@ -10,9 +10,7 @@ import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.global.Metadata;
 import com.haulmont.cuba.gui.ScreensHelper;
 import com.haulmont.cuba.gui.components.*;
-import com.haulmont.cuba.gui.config.WindowConfig;
 import com.haulmont.cuba.gui.data.Datasource;
-import com.haulmont.cuba.gui.data.ValueListener;
 import com.haulmont.cuba.gui.data.impl.DatasourceImplementation;
 import com.haulmont.cuba.gui.data.impl.DsListenerAdapter;
 import com.haulmont.reports.app.service.ReportService;
@@ -22,7 +20,6 @@ import com.haulmont.reports.gui.report.run.ParameterClassResolver;
 import com.haulmont.reports.gui.report.run.ParameterFieldCreator;
 import org.apache.commons.lang.StringUtils;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.util.*;
 
@@ -48,9 +45,6 @@ public class ParameterEditor extends AbstractEditor {
 
     @Inject
     protected LookupField metaClass;
-
-    @Inject
-    protected WindowConfig windowConfig;
 
     @Inject
     protected Metadata metadata;
@@ -98,12 +92,7 @@ public class ParameterEditor extends AbstractEditor {
     }
 
     protected void initListeners() {
-        type.addListener(new ValueListener() {
-            @Override
-            public void valueChanged(Object source, String property, Object prevValue, Object value) {
-                enableControlsByParamType(value);
-            }
-        });
+        type.addValueChangeListener(e -> enableControlsByParamType(e.getValue()));
 
         parameterDs.addListener(new DsListenerAdapter<ReportInputParameter>() {
             @Override
@@ -165,12 +154,9 @@ public class ParameterEditor extends AbstractEditor {
 
         if (canHaveDefaultValue()) {
             Field field = parameterFieldCreator.createField(parameter);
-            field.addListener(new ValueListener() {
-                @Override
-                public void valueChanged(Object source, String property, @Nullable Object prevValue, @Nullable Object value) {
-                    if (value != null) {
-                        parameter.setDefaultValue(reportService.convertToString(value.getClass(), value));
-                    }
+            field.addValueChangeListener(e -> {
+                if (e.getValue() != null) {
+                    parameter.setDefaultValue(reportService.convertToString(e.getValue().getClass(), e.getValue()));
                 }
             });
 

@@ -9,7 +9,6 @@ import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.components.actions.CreateAction;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
 import com.haulmont.cuba.gui.data.Datasource;
-import com.haulmont.cuba.gui.data.ValueListener;
 import com.haulmont.cuba.gui.data.impl.CollectionDsListenerAdapter;
 import com.haulmont.cuba.gui.data.impl.DsListenerAdapter;
 import com.haulmont.cuba.gui.xml.layout.ComponentsFactory;
@@ -55,20 +54,19 @@ public class ChartEditFrameController extends AbstractFrame {
         pieChartDs.setItem(new PieChartDescription());
         serialChartDs.setItem(new SerialChartDescription());
         type.setOptionsList(Arrays.asList(ChartType.values()));
-        type.addListener(new ValueListener() {
-            @Override
-            public void valueChanged(Object source, String property, @Nullable Object prevValue, @Nullable Object value) {
-                pieChartFieldGroup.setVisible(ChartType.PIE == value);
-                serialChartFieldGroup.setVisible(ChartType.SERIAL == value);
-                seriesTable.setVisible(ChartType.SERIAL == value);
-                Companion companion = getCompanion();
-                if (companion != null) {
-                    companion.center((Window) getFrame());
-                }
 
-                showChartPreviewBox();
+        type.addValueChangeListener(e -> {
+            pieChartFieldGroup.setVisible(ChartType.PIE == e.getValue());
+            serialChartFieldGroup.setVisible(ChartType.SERIAL == e.getValue());
+            seriesTable.setVisible(ChartType.SERIAL == e.getValue());
+            Companion companion = getCompanion();
+            if (companion != null) {
+                companion.center((Window) getFrame());
             }
+
+            showChartPreviewBox();
         });
+
         pieChartFieldGroup.setVisible(false);
         serialChartFieldGroup.setVisible(false);
         seriesTable.setVisible(false);

@@ -6,7 +6,6 @@
 package com.haulmont.reports.gui.report.run;
 
 import com.haulmont.cuba.gui.components.*;
-import com.haulmont.cuba.gui.data.ValueListener;
 import com.haulmont.cuba.gui.theme.ThemeConstants;
 import com.haulmont.cuba.gui.xml.layout.ComponentsFactory;
 import com.haulmont.reports.entity.Report;
@@ -14,7 +13,6 @@ import com.haulmont.reports.gui.ReportGuiManager;
 import com.haulmont.yarg.reporting.ReportOutputDocument;
 import org.apache.commons.collections.CollectionUtils;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.util.Collections;
 import java.util.HashMap;
@@ -79,12 +77,9 @@ public class ShowChartController extends AbstractWindow {
             showDiagramStubText();
         }
 
-        reportLookup.addListener(new ValueListener() {
-            @Override
-            public void valueChanged(Object source, String property, @Nullable Object prevValue, @Nullable Object value) {
-                report = (Report) value;
-                initFrames(null, null);
-            }
+        reportLookup.addValueChangeListener(e -> {
+            report = (Report) e.getValue();
+            initFrames(null, null);
         });
     }
 

@@ -8,7 +8,6 @@ package com.haulmont.reports.gui.report.wizard;
 import com.haulmont.cuba.gui.AppConfig;
 import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.components.DialogAction.Type;
-import com.haulmont.cuba.gui.data.ValueListener;
 import com.haulmont.cuba.gui.export.ByteArrayDataProvider;
 import com.haulmont.cuba.gui.export.ExportDisplay;
 import com.haulmont.cuba.gui.export.ExportFormat;
@@ -22,7 +21,6 @@ import com.haulmont.reports.gui.report.wizard.step.StepFrame;
 import com.haulmont.reports.gui.template.edit.RandomChartDataGenerator;
 import org.apache.commons.lang.StringUtils;
 
-import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -72,13 +70,11 @@ class SaveStepFrame extends StepFrame {
                 wizard.diagramType.setRequired(true);
                 wizard.diagramType.setOptionsList(Arrays.asList(ChartType.values()));
                 wizard.diagramType.setValue(ChartType.SERIAL);
-                wizard.diagramType.addListener(new ValueListener() {
-                    @Override
-                    public void valueChanged(Object source, String property, @Nullable Object prevValue, @Nullable Object value) {
-                        wizard.getItem().setChartType((ChartType) value);
-                        wizard.chartPreviewBox.removeAll();
-                        showChart();
-                    }
+
+                wizard.diagramType.addValueChangeListener(e -> {
+                    wizard.getItem().setChartType((ChartType) e.getValue());
+                    wizard.chartPreviewBox.removeAll();
+                    showChart();
                 });
             } else {
                 wizard.chartPreviewBox.setVisible(false);
