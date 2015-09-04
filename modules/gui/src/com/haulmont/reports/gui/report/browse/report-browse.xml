@@ -30,7 +30,7 @@
     </dsContext>
 
     <layout expand="table" spacing="true">
-        <filter id="genericFilter" datasource="reportDs">
+        <filter id="genericFilter" datasource="reportDs" applyTo="table">
             <properties include=".*"/>
         </filter>
         <groupTable id="table" editable="false" multiselect="true" width="100%">
