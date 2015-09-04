@@ -5,7 +5,6 @@
 package com.haulmont.reports.gui.definition.edit;
 
 import com.haulmont.chile.core.model.MetaClass;
-import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.global.Metadata;
 import com.haulmont.cuba.core.global.View;
 import com.haulmont.cuba.gui.components.*;
@@ -14,10 +13,11 @@ import com.haulmont.cuba.gui.components.autocomplete.AutoCompleteSupport;
 import com.haulmont.cuba.gui.components.autocomplete.JpqlSuggestionFactory;
 import com.haulmont.cuba.gui.components.autocomplete.Suggester;
 import com.haulmont.cuba.gui.components.autocomplete.Suggestion;
-import com.haulmont.cuba.gui.data.*;
+import com.haulmont.cuba.gui.data.CollectionDatasource;
+import com.haulmont.cuba.gui.data.Datasource;
+import com.haulmont.cuba.gui.data.HierarchicalDatasource;
 import com.haulmont.cuba.gui.data.impl.CollectionDsListenerAdapter;
 import com.haulmont.cuba.gui.data.impl.DatasourceImplementation;
-import com.haulmont.cuba.gui.data.impl.DsListenerAdapter;
 import com.haulmont.reports.app.service.ReportService;
 import com.haulmont.reports.app.service.ReportWizardService;
 import com.haulmont.reports.entity.*;
@@ -27,7 +27,6 @@ import org.apache.commons.lang.StringUtils;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.xml.crypto.Data;
 import java.util.*;
 
 /**
@@ -237,47 +236,40 @@ public class BandDefinitionEditor extends AbstractEditor<BandDefinition> impleme
     }
 
     protected void initBandDefinitionsListeners() {
-        bandDefinitionDs.addListener(new DsListenerAdapter<BandDefinition>() {
-            @Override
-            public void itemChanged(Datasource<BandDefinition> ds, BandDefinition prevItem, BandDefinition item) {
-                updateRequiredIndicators(item);
-                selectFirstDataSet();
-            }
+        bandDefinitionDs.addItemChangeListener(e -> {
+            updateRequiredIndicators(e.getItem());
+            selectFirstDataSet();
         });
     }
 
     protected void initDataSetListeners() {
-        dataSetsDs.addListener(new DsListenerAdapter<DataSet>() {
-            @Override
-            public void valueChanged(DataSet source, String property, @Nullable Object prevValue, @Nullable Object value) {
-                applyVisibilityRules(source);
-                if ("entityParamName".equals(property) || "listEntitiesParamName".equals(property)) {
-                    ReportInputParameter linkedParameter = findParameterByAlias(String.valueOf(value));
+        dataSetsDs.addItemChangeListener(e -> {
+            if (e.getItem() != null) {
+                applyVisibilityRules(e.getItem());
+
+                ReportInputParameter linkedParameter = null;
+                if (e.getItem().getType() == DataSetType.SINGLE) {
+                    linkedParameter = findParameterByAlias(e.getItem().getEntityParamName());
+                    refreshViewNames(linkedParameter);
+                } else if (e.getItem().getType() == DataSetType.MULTI) {
+                    linkedParameter = findParameterByAlias(e.getItem().getListEntitiesParamName());
                     refreshViewNames(linkedParameter);
                 }
+            } else {
+                hideAllDataSetEditComponents();
+            }
+        });
 
-                @SuppressWarnings("unchecked")
-                DatasourceImplementation<DataSet> implementation = (DatasourceImplementation<DataSet>) dataSetsDs;
-                implementation.modified(source);
+        dataSetsDs.addItemPropertyChangeListener(e -> {
+            applyVisibilityRules(e.getItem());
+            if ("entityParamName".equals(e.getProperty()) || "listEntitiesParamName".equals(e.getProperty())) {
+                ReportInputParameter linkedParameter = findParameterByAlias(String.valueOf(e.getValue()));
+                refreshViewNames(linkedParameter);
             }
 
-            @Override
-            public void itemChanged(Datasource ds, @Nullable DataSet prevItem, @Nullable DataSet item) {
-                if (item != null) {
-                    applyVisibilityRules(item);
-
-                    ReportInputParameter linkedParameter = null;
-                    if (item.getType() == DataSetType.SINGLE) {
-                        linkedParameter = findParameterByAlias(item.getEntityParamName());
-                        refreshViewNames(linkedParameter);
-                    } else if (item.getType() == DataSetType.MULTI) {
-                        linkedParameter = findParameterByAlias(item.getListEntitiesParamName());
-                        refreshViewNames(linkedParameter);
-                    }
-                } else {
-                    hideAllDataSetEditComponents();
-                }
-            }
+            @SuppressWarnings("unchecked")
+            DatasourceImplementation<DataSet> implementation = (DatasourceImplementation<DataSet>) dataSetsDs;
+            implementation.modified(e.getItem());
         });
 
         hideAllDataSetEditComponents();
@@ -414,6 +406,7 @@ public class BandDefinitionEditor extends AbstractEditor<BandDefinition> impleme
     }
 
     // For EditViewAction
+    @Override
     protected String formatMessage(String key, Object... params) {
         return super.formatMessage(key, params);
     }

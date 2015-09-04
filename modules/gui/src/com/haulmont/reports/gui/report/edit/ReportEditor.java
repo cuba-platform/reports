@@ -22,7 +22,10 @@ import com.haulmont.cuba.gui.data.CollectionDatasource;
 import com.haulmont.cuba.gui.data.Datasource;
 import com.haulmont.cuba.gui.data.DsContext;
 import com.haulmont.cuba.gui.data.HierarchicalDatasource;
-import com.haulmont.cuba.gui.data.impl.*;
+import com.haulmont.cuba.gui.data.impl.CollectionPropertyDatasourceImpl;
+import com.haulmont.cuba.gui.data.impl.DatasourceImpl;
+import com.haulmont.cuba.gui.data.impl.DatasourceImplementation;
+import com.haulmont.cuba.gui.data.impl.HierarchicalPropertyDatasourceImpl;
 import com.haulmont.cuba.gui.export.ByteArrayDataProvider;
 import com.haulmont.cuba.gui.export.ExportDisplay;
 import com.haulmont.cuba.gui.export.ExportFormat;
@@ -162,7 +165,7 @@ public class ReportEditor extends AbstractEditor<Report> {
         BandDefinition rootDefinition = new BandDefinition();
         rootDefinition.setName("Root");
         rootDefinition.setPosition(0);
-        report.setBands(new HashSet<BandDefinition>());
+        report.setBands(new HashSet<>());
         report.getBands().add(rootDefinition);
 
         rootDefinition.setReport(report);
@@ -311,12 +314,9 @@ public class ReportEditor extends AbstractEditor<Report> {
         parametersTable.addAction(paramUpButton.getAction());
         parametersTable.addAction(paramDownButton.getAction());
 
-        parametersDs.addListener(new DsListenerAdapter<ReportInputParameter>() {
-            @Override
-            public void valueChanged(ReportInputParameter source, String property, Object prevValue, Object value) {
-                if ("position".equals(property)) {
-                    ((DatasourceImplementation) parametersDs).modified(source);
-                }
+        parametersDs.addItemPropertyChangeListener(e -> {
+            if ("position".equals(e.getProperty())) {
+                ((DatasourceImplementation) parametersDs).modified(e.getItem());
             }
         });
     }
@@ -411,48 +411,42 @@ public class ReportEditor extends AbstractEditor<Report> {
     }
 
     protected void initGeneral() {
-        treeDs.addListener(new DsListenerAdapter<BandDefinition>() {
-            @Override
-            public void itemChanged(Datasource<BandDefinition> ds, BandDefinition prevItem, BandDefinition item) {
-                bandEditor.setBandDefinition(item);
-                bandEditor.setEnabled(item != null);
-                availableParentBandsDs.clear();
-                if (item != null) {
-                    for (BandDefinition bandDefinition : bandsDs.getItems()) {
-                        if (!isChildOrEqual(item, bandDefinition) ||
-                                ObjectUtils.equals(item.getParentBandDefinition(), bandDefinition)) {
-                            availableParentBandsDs.addItem(bandDefinition);
-                        }
+        treeDs.addItemChangeListener(e -> {
+            bandEditor.setBandDefinition(e.getItem());
+            bandEditor.setEnabled(e.getItem() != null);
+            availableParentBandsDs.clear();
+            if (e.getItem() != null) {
+                for (BandDefinition bandDefinition : bandsDs.getItems()) {
+                    if (!isChildOrEqual(e.getItem(), bandDefinition) ||
+                            ObjectUtils.equals(e.getItem().getParentBandDefinition(), bandDefinition)) {
+                        availableParentBandsDs.addItem(bandDefinition);
                     }
                 }
             }
         });
 
-        bandEditor.getBandDefinitionDs().addListener(new DsListenerAdapter<BandDefinition>() {
-            @Override
-            public void valueChanged(BandDefinition source, String property, Object prevValue, Object value) {
-                if ("parentBandDefinition".equals(property)) {
-                    BandDefinition previousParent = (BandDefinition) prevValue;
-                    BandDefinition parent = (BandDefinition) value;
+        bandEditor.getBandDefinitionDs().addItemPropertyChangeListener(e -> {
+            if ("parentBandDefinition".equals(e.getProperty())) {
+                BandDefinition previousParent = (BandDefinition) e.getPrevValue();
+                BandDefinition parent = (BandDefinition) e.getValue();
 
-                    if (value == source) {
-                        source.setParentBandDefinition(previousParent);
-                    } else {
-                        treeDs.refresh();
-                        previousParent.getChildrenBandDefinitions().remove(source);
-                        parent.getChildrenBandDefinitions().add(source);
-                    }
-
-                    if (prevValue != null) {
-                        orderBandDefinitions(previousParent);
-                    }
-
-                    if (value != null) {
-                        orderBandDefinitions(parent);
-                    }
+                if (e.getValue() == e.getItem()) {
+                    e.getItem().setParentBandDefinition(previousParent);
+                } else {
+                    treeDs.refresh();
+                    previousParent.getChildrenBandDefinitions().remove(e.getItem());
+                    parent.getChildrenBandDefinitions().add(e.getItem());
                 }
-                treeDs.modifyItem(source);
+
+                if (e.getPrevValue() != null) {
+                    orderBandDefinitions(previousParent);
+                }
+
+                if (e.getValue() != null) {
+                    orderBandDefinitions(parent);
+                }
             }
+            treeDs.modifyItem(e.getItem());
         });
 
         propertiesFieldGroup.addCustomField("defaultTemplate", new FieldGroup.CustomFieldGenerator() {

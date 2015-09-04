@@ -9,8 +9,6 @@ import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.components.actions.CreateAction;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
 import com.haulmont.cuba.gui.data.Datasource;
-import com.haulmont.cuba.gui.data.impl.CollectionDsListenerAdapter;
-import com.haulmont.cuba.gui.data.impl.DsListenerAdapter;
 import com.haulmont.cuba.gui.xml.layout.ComponentsFactory;
 import com.haulmont.reports.entity.BandDefinition;
 import com.haulmont.reports.entity.charts.*;
@@ -80,31 +78,12 @@ public class ChartEditFrameController extends AbstractFrame {
             }
         });
 
-        pieChartDs.addListener(new DsListenerAdapter<PieChartDescription>() {
-            @Override
-            public void valueChanged(PieChartDescription source, String property, @Nullable Object prevValue, @Nullable Object value) {
-                showChartPreviewBox();
-            }
-        });
+        pieChartDs.addItemPropertyChangeListener(e -> showChartPreviewBox());
 
-        serialChartDs.addListener(new DsListenerAdapter<SerialChartDescription>() {
-            @Override
-            public void valueChanged(SerialChartDescription source, String property, @Nullable Object prevValue, @Nullable Object value) {
-                showChartPreviewBox();
-            }
-        });
+        serialChartDs.addItemPropertyChangeListener(e -> showChartPreviewBox());
 
-        seriesDs.addListener(new CollectionDsListenerAdapter<ChartSeries>() {
-            @Override
-            public void valueChanged(ChartSeries source, String property, @Nullable Object prevValue, @Nullable Object value) {
-                showChartPreviewBox();
-            }
-
-            @Override
-            public void collectionChanged(CollectionDatasource ds, Operation operation, List items) {
-                showChartPreviewBox();
-            }
-        });
+        seriesDs.addItemPropertyChangeListener(e -> showChartPreviewBox());
+        seriesDs.addCollectionChangeListener(e -> showChartPreviewBox());
 
         FieldGroup.CustomFieldGenerator bandSelectorGenerator = new FieldGroup.CustomFieldGenerator() {
             @Override

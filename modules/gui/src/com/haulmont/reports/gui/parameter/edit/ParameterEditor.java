@@ -12,7 +12,6 @@ import com.haulmont.cuba.gui.ScreensHelper;
 import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.data.Datasource;
 import com.haulmont.cuba.gui.data.impl.DatasourceImplementation;
-import com.haulmont.cuba.gui.data.impl.DsListenerAdapter;
 import com.haulmont.reports.app.service.ReportService;
 import com.haulmont.reports.entity.ParameterType;
 import com.haulmont.reports.entity.ReportInputParameter;
@@ -94,29 +93,25 @@ public class ParameterEditor extends AbstractEditor {
     protected void initListeners() {
         type.addValueChangeListener(e -> enableControlsByParamType(e.getValue()));
 
-        parameterDs.addListener(new DsListenerAdapter<ReportInputParameter>() {
-            @Override
-            @SuppressWarnings("unchecked")
-            public void valueChanged(ReportInputParameter source, String property, Object prevValue, Object value) {
-                boolean typeChanged = property.equalsIgnoreCase("type");
-                boolean classChanged = property.equalsIgnoreCase("entityMetaClass")
-                        || property.equalsIgnoreCase("enumerationClass");
-                if (typeChanged || classChanged) {
-                    parameter.setParameterClass(parameterClassResolver.resolveClass(parameter));
+        parameterDs.addItemPropertyChangeListener(e -> {
+            boolean typeChanged = e.getProperty().equalsIgnoreCase("type");
+            boolean classChanged = e.getProperty().equalsIgnoreCase("entityMetaClass")
+                    || e.getProperty().equalsIgnoreCase("enumerationClass");
+            if (typeChanged || classChanged) {
+                parameter.setParameterClass(parameterClassResolver.resolveClass(parameter));
 
-                    if (typeChanged) {
-                        parameter.setEntityMetaClass(null);
-                        parameter.setEnumerationClass(null);
-                    }
-
-                    parameter.setDefaultValue(null);
-                    parameter.setScreen(null);
-
-                    initDefaultValueField();
+                if (typeChanged) {
+                    parameter.setEntityMetaClass(null);
+                    parameter.setEnumerationClass(null);
                 }
 
-                ((DatasourceImplementation<ReportInputParameter>) parameterDs).modified(source);
+                parameter.setDefaultValue(null);
+                parameter.setScreen(null);
+
+                initDefaultValueField();
             }
+
+            ((DatasourceImplementation<ReportInputParameter>) parameterDs).modified(e.getItem());
         });
     }
 
