@@ -17,7 +17,6 @@ import com.haulmont.cuba.gui.components.DialogAction.Type;
 import com.haulmont.cuba.gui.config.WindowConfig;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
 import com.haulmont.cuba.gui.data.Datasource;
-import com.haulmont.cuba.gui.data.impl.CollectionDsListenerAdapter;
 import com.haulmont.cuba.gui.theme.ThemeConstants;
 import com.haulmont.cuba.gui.xml.layout.ComponentsFactory;
 import com.haulmont.reports.app.EntityTree;
@@ -34,7 +33,6 @@ import com.haulmont.reports.gui.report.wizard.step.MainWizardFrame;
 import com.haulmont.reports.gui.report.wizard.step.StepFrame;
 import com.haulmont.reports.gui.report.wizard.step.StepFrameManager;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.*;
@@ -175,23 +173,18 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
 
         stepFrameManager.showCurrentFrame();
         tipLabel.setValue(getMessage("enterMainParameters"));
-        reportRegionsDs.addListener(new CollectionDsListenerAdapter<ReportRegion>() {
-            @Override
-            public void collectionChanged(CollectionDatasource ds, Operation operation, List<ReportRegion> items) {
-                super.collectionChanged(ds, operation, items);
-                if (Operation.ADD.equals(operation)) {
-                    regionsTable.setSelected((Collection) items);
-                }
-            }
 
-            @Override
-            public void itemChanged(Datasource<ReportRegion> ds, @Nullable ReportRegion prevItem, @Nullable ReportRegion item) {
-                super.itemChanged(ds, prevItem, item);
-                if (regionsTable.getSingleSelected() != null) {
-                    moveDownBtn.setEnabled(true);
-                    moveUpBtn.setEnabled(true);
-                    removeBtn.setEnabled(true);
-                }
+        reportRegionsDs.addCollectionChangeListener(e -> {
+            if (e.getOperation() == CollectionDatasource.Operation.ADD) {
+                regionsTable.setSelected((Collection) e.getItems());
+            }
+        });
+
+        reportRegionsDs.addItemChangeListener(e -> {
+            if (regionsTable.getSingleSelected() != null) {
+                moveDownBtn.setEnabled(true);
+                moveUpBtn.setEnabled(true);
+                removeBtn.setEnabled(true);
             }
         });
     }

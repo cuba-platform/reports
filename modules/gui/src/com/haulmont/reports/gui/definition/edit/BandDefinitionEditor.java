@@ -15,8 +15,6 @@ import com.haulmont.cuba.gui.components.autocomplete.Suggester;
 import com.haulmont.cuba.gui.components.autocomplete.Suggestion;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
 import com.haulmont.cuba.gui.data.Datasource;
-import com.haulmont.cuba.gui.data.HierarchicalDatasource;
-import com.haulmont.cuba.gui.data.impl.CollectionDsListenerAdapter;
 import com.haulmont.cuba.gui.data.impl.DatasourceImplementation;
 import com.haulmont.reports.app.service.ReportService;
 import com.haulmont.reports.app.service.ReportWizardService;
@@ -41,12 +39,7 @@ public class BandDefinitionEditor extends AbstractEditor<BandDefinition> impleme
     @Inject
     protected Datasource<Report> reportDs;
     @Inject
-    protected CollectionDatasource<ReportTemplate, UUID> templatesDs;
-    @Inject
-    protected HierarchicalDatasource<BandDefinition, UUID> treeDs;
-    @Inject
-    private CollectionDatasource<ReportInputParameter, UUID> parametersDs;
-
+    protected CollectionDatasource<ReportInputParameter, UUID> parametersDs;
     @Inject
     protected Table<DataSet> dataSets;
     @Named("text")
@@ -189,7 +182,7 @@ public class BandDefinitionEditor extends AbstractEditor<BandDefinition> impleme
                 BandDefinition selectedBand = bandDefinitionDs.getItem();
                 if (selectedBand != null) {
                     if (CollectionUtils.isEmpty(selectedBand.getDataSets())) {
-                        selectedBand.setDataSets(new ArrayList<DataSet>());
+                        selectedBand.setDataSets(new ArrayList<>());
                     }
                     dataset.setBandDefinition(selectedBand);
                     dataset.setName(selectedBand.getName() != null ? selectedBand.getName() : "dataset");
@@ -210,7 +203,7 @@ public class BandDefinitionEditor extends AbstractEditor<BandDefinition> impleme
         Action editDataSetViewAction = new EditViewAction(this);
         viewEditButton.setAction(editDataSetViewAction);
 
-        viewNameLookup.setOptionsMap(new HashMap<String, Object>());
+        viewNameLookup.setOptionsMap(new HashMap<>());
 
         entitiesParamLookup.setNewOptionAllowed(true);
         entityParamLookup.setNewOptionAllowed(true);
@@ -221,17 +214,14 @@ public class BandDefinitionEditor extends AbstractEditor<BandDefinition> impleme
     }
 
     protected void initParametersListeners() {
-        parametersDs.addListener(new CollectionDsListenerAdapter<ReportInputParameter>() {
-            @Override
-            public void collectionChanged(CollectionDatasource ds, Operation operation, List<ReportInputParameter> items) {
-                super.collectionChanged(ds, operation, items);
-                Map<String, Object> paramAliases = new HashMap<>();
-                for (ReportInputParameter item : (Collection<ReportInputParameter>) ds.getItems()) {
-                    paramAliases.put(item.getName(), item.getAlias());
-                }
-                entitiesParamLookup.setOptionsMap(paramAliases);
-                entityParamLookup.setOptionsMap(paramAliases);
+        parametersDs.addCollectionChangeListener(e -> {
+            Map<String, Object> paramAliases = new HashMap<>();
+
+            for (ReportInputParameter item : e.getDs().getItems()) {
+                paramAliases.put(item.getName(), item.getAlias());
             }
+            entitiesParamLookup.setOptionsMap(paramAliases);
+            entityParamLookup.setOptionsMap(paramAliases);
         });
     }
 
@@ -308,7 +298,7 @@ public class BandDefinitionEditor extends AbstractEditor<BandDefinition> impleme
             }
         }
 
-        viewNameLookup.setOptionsMap(new HashMap<String, Object>());
+        viewNameLookup.setOptionsMap(new HashMap<>());
     }
 
     protected void applyVisibilityRules(DataSet item) {
@@ -423,5 +413,4 @@ public class BandDefinitionEditor extends AbstractEditor<BandDefinition> impleme
     protected boolean isViewEditAllowed(DataSet dataSet) {
         return true;
     }
-
 }

@@ -14,16 +14,13 @@ import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
 import com.haulmont.cuba.gui.data.Datasource;
 import com.haulmont.cuba.gui.data.impl.AbstractTreeDatasource;
-import com.haulmont.cuba.gui.data.impl.CollectionDsListenerAdapter;
 import com.haulmont.reports.entity.wizard.EntityTreeNode;
 import com.haulmont.reports.entity.wizard.RegionProperty;
 import com.haulmont.reports.entity.wizard.ReportRegion;
 import com.haulmont.reports.gui.components.actions.OrderableItemMoveAction;
 import org.apache.commons.lang.BooleanUtils;
 import org.springframework.cglib.core.CollectionUtils;
-import org.springframework.cglib.core.Transformer;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.*;
@@ -38,7 +35,7 @@ public class RegionEditor extends AbstractEditor<ReportRegion> {
     @Inject
     protected CollectionDatasource<RegionProperty, UUID> reportRegionPropertiesTableDs;
     @Named("entityTreeFrame.entityTree")
-    protected Tree entityTree;
+    protected Tree<EntityTreeNode> entityTree;
     @Named("entityTreeFrame.reportPropertyName")
     protected TextField reportPropertyName;
     @Named("entityTreeFrame.reportPropertyNameSearchButton")
@@ -150,43 +147,29 @@ public class RegionEditor extends AbstractEditor<ReportRegion> {
     }
 
     protected void addRegionPropertiesDsListener() {
-        reportRegionPropertiesTableDs.addListener(new CollectionDsListenerAdapter<RegionProperty>() {
-            @Override
-            public void itemChanged(Datasource<RegionProperty> ds, @Nullable RegionProperty prevItem, @Nullable RegionProperty item) {
-                super.itemChanged(ds, prevItem, item);
-                showOrHideSortBtns();
-            }
+        reportRegionPropertiesTableDs.addItemChangeListener(e -> showOrHideSortBtns());
+        reportRegionPropertiesTableDs.addCollectionChangeListener(e -> showOrHideSortBtns());
+    }
 
-            @Override
-            public void collectionChanged(CollectionDatasource ds, Operation operation, List<RegionProperty> items) {
-                super.collectionChanged(ds, operation, items);
-                showOrHideSortBtns();
-            }
-
-            void showOrHideSortBtns() {
-                if (propertiesTable.getSelected().size() == reportRegionPropertiesTableDs.getItems().size() ||
-                        propertiesTable.getSelected().size() == 0) {
-                    upItem.setEnabled(false);
-                    downItem.setEnabled(false);
-                } else {
-                    upItem.setEnabled(true);
-                    downItem.setEnabled(true);
-                }
-            }
-        });
+    protected void showOrHideSortBtns() {
+        if (propertiesTable.getSelected().size() == reportRegionPropertiesTableDs.getItems().size() ||
+                propertiesTable.getSelected().size() == 0) {
+            upItem.setEnabled(false);
+            downItem.setEnabled(false);
+        } else {
+            upItem.setEnabled(true);
+            downItem.setEnabled(true);
+        }
     }
 
     protected void initControlBtnsActions() {
         addItem.setAction(new AbstractAction("addItem") {
             @Override
             public void actionPerform(Component component) {
-                @SuppressWarnings("unchecked") List<EntityTreeNode> nodesList =
-                        CollectionUtils.transform(reportRegionPropertiesTableDs.getItems(), new Transformer() {
-                    @Override
-                    public Object transform(Object o) {
-                        return ((RegionProperty) o).getEntityTreeNode();
-                    }
-                });
+                @SuppressWarnings("unchecked")
+                List<EntityTreeNode> nodesList = CollectionUtils.transform(
+                        reportRegionPropertiesTableDs.getItems(), o -> ((RegionProperty) o).getEntityTreeNode());
+
                 Set<EntityTreeNode> alreadyAddedNodes = new HashSet<>(nodesList);
 
                 Set<EntityTreeNode> selectedItems = entityTree.getSelected();
@@ -264,4 +247,3 @@ public class RegionEditor extends AbstractEditor<ReportRegion> {
         void initControlBtnsActions(Button button, Table table);
     }
 }
-
