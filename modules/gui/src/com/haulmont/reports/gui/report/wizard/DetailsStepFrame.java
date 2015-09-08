@@ -14,6 +14,7 @@ import com.haulmont.cuba.gui.FrameContextImpl;
 import com.haulmont.cuba.gui.WindowManager;
 import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.components.Action.Status;
+import com.haulmont.cuba.gui.components.Component.ValueChangeListener;
 import com.haulmont.cuba.gui.components.DialogAction.Type;
 import com.haulmont.cuba.gui.components.filter.ConditionsTree;
 import com.haulmont.cuba.gui.components.filter.FilterParser;
@@ -21,7 +22,6 @@ import com.haulmont.cuba.gui.components.filter.Param;
 import com.haulmont.cuba.gui.components.filter.edit.FilterEditor;
 import com.haulmont.cuba.gui.config.WindowConfig;
 import com.haulmont.cuba.gui.config.WindowInfo;
-import com.haulmont.cuba.gui.data.ValueListener;
 import com.haulmont.cuba.gui.data.impl.CollectionDatasourceImpl;
 import com.haulmont.cuba.gui.data.impl.DsContextImpl;
 import com.haulmont.cuba.gui.filter.QueryFilter;
@@ -36,7 +36,6 @@ import com.haulmont.reports.gui.report.wizard.step.StepFrame;
 import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;
 
-import javax.annotation.Nullable;
 import java.util.*;
 
 /**
@@ -62,14 +61,14 @@ class DetailsStepFrame extends StepFrame {
             initTemplateFormatLookupField();
             initEntityLookupField();
 
-            wizard.entity.addListener(new ChangeReportNameListener());
+            wizard.entity.addValueChangeListener(new ChangeReportNameListener());
 
             wizard.setQueryButton.setAction(new SetQueryAction());
         }
 
         protected void initEntityLookupField() {
             wizard.entity.setOptionsMap(getAvailableEntities());
-            wizard.entity.addListener(new ClearRegionListener(
+            wizard.entity.addValueChangeListener(new ClearRegionListener(
                     new DialogActionWithChangedValue(Type.YES) {
                         @Override
                         public void actionPerform(Component component) {
@@ -91,7 +90,7 @@ class DetailsStepFrame extends StepFrame {
         protected void initReportTypeOptionGroup() {
             wizard.reportTypeOptionGroup.setOptionsMap(getListedReportOptionsMap());
             wizard.reportTypeOptionGroup.setValue(ReportData.ReportType.SINGLE_ENTITY);
-            wizard.reportTypeOptionGroup.addListener(new ClearRegionListener(
+            wizard.reportTypeOptionGroup.addValueChangeListener(new ClearRegionListener(
                     new DialogActionWithChangedValue(Type.YES) {
                         @Override
                         public void actionPerform(Component component) {
@@ -152,14 +151,18 @@ class DetailsStepFrame extends StepFrame {
         return errors;
     }
 
-    protected class ChangeReportNameListener implements ValueListener {
+    protected class ChangeReportNameListener implements ValueChangeListener {
+
+        public ChangeReportNameListener() {
+        }
+
         @Override
-        public void valueChanged(Object source, String property, @Nullable Object prevValue, @Nullable Object value) {
-            setGeneratedReportName((MetaClass) prevValue, (MetaClass) value);
+        public void valueChanged(Component.ValueChangeEvent e) {
+            setGeneratedReportName((MetaClass) e.getPrevValue(), (MetaClass) e.getValue());
             wizard.outputFileName.setValue("");
         }
 
-        private void setGeneratedReportName(MetaClass prevValue, MetaClass value) {
+        protected void setGeneratedReportName(MetaClass prevValue, MetaClass value) {
             String oldReportName = wizard.reportName.getValue();
             MessageTools messageTools = wizard.messageTools;
             if (StringUtils.isBlank(oldReportName)) {
@@ -183,7 +186,9 @@ class DetailsStepFrame extends StepFrame {
     }
 
     protected class SetQueryAction extends AbstractAction {
-        public SetQueryAction() {super("setQuery");}
+        public SetQueryAction() {
+            super("setQuery");
+        }
 
         @Override
         public boolean isVisible() {
@@ -294,7 +299,7 @@ class DetailsStepFrame extends StepFrame {
         }
     }
 
-    protected class ClearRegionListener implements ValueListener {
+    protected class ClearRegionListener implements Component.ValueChangeListener {
         protected DialogActionWithChangedValue okAction;
 
         public ClearRegionListener(DialogActionWithChangedValue okAction) {
@@ -302,14 +307,14 @@ class DetailsStepFrame extends StepFrame {
         }
 
         @Override
-        public void valueChanged(Object source, String property, @Nullable final Object prevValue, @Nullable final Object value) {
+        public void valueChanged(Component.ValueChangeEvent e) {
             if (!wizard.getItem().getReportRegions().isEmpty()) {
                 wizard.showOptionDialog(
                         wizard.getMessage("dialogs.Confirmation"),
                         wizard.getMessage("regionsClearConfirm"),
                         Frame.MessageType.CONFIRMATION,
                         new AbstractAction[]{
-                                okAction.setValue(value),
+                                okAction.setValue(e.getValue()),
 
                                 new DialogAction(Type.NO, Status.PRIMARY)
                         });
