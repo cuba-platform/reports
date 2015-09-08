@@ -9,7 +9,10 @@ import com.google.common.collect.Multimap;
 import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.chile.core.model.MetaPropertyPath;
 import com.haulmont.cuba.core.entity.Entity;
-import com.haulmont.cuba.core.global.*;
+import com.haulmont.cuba.core.global.AppBeans;
+import com.haulmont.cuba.core.global.Messages;
+import com.haulmont.cuba.core.global.Metadata;
+import com.haulmont.cuba.core.global.PersistenceHelper;
 import com.haulmont.cuba.gui.AppConfig;
 import com.haulmont.cuba.gui.ScreensHelper;
 import com.haulmont.cuba.gui.WindowManager.OpenType;
@@ -20,7 +23,6 @@ import com.haulmont.cuba.gui.config.WindowConfig;
 import com.haulmont.cuba.gui.config.WindowInfo;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
 import com.haulmont.cuba.gui.data.Datasource;
-import com.haulmont.cuba.gui.data.DsContext;
 import com.haulmont.cuba.gui.data.HierarchicalDatasource;
 import com.haulmont.cuba.gui.data.impl.CollectionPropertyDatasourceImpl;
 import com.haulmont.cuba.gui.data.impl.DatasourceImpl;
@@ -58,9 +60,6 @@ public class ReportEditor extends AbstractEditor<Report> {
 
     @Named("generalFrame.bandEditor")
     protected BandDefinitionEditor bandEditor;
-
-    @Named("generalFrame.bandEditor.parentBand")
-    protected LookupField parentBand;
 
     @Named("securityFrame.screenIdLookup")
     protected LookupField screenIdLookup;
@@ -953,19 +952,12 @@ public class ReportEditor extends AbstractEditor<Report> {
         String xml = reportService.convertToString(getItem());
         getItem().setXml(xml);
 
-        reportDs.getDsContext().addListener(new DsContext.CommitListener() {
-            @Override
-            public void beforeCommit(CommitContext context) {
-                for (Iterator<Entity> iterator = context.getCommitInstances().iterator(); iterator.hasNext(); ) {
-                    Entity entity = iterator.next();
-                    if (!(entity instanceof Report || entity instanceof ReportTemplate)) {
-                        iterator.remove();
-                    }
+        reportDs.getDsContext().addBeforeCommitListener(context -> {
+            for (Iterator<Entity> iterator = context.getCommitInstances().iterator(); iterator.hasNext(); ) {
+                Entity entity = iterator.next();
+                if (!(entity instanceof Report || entity instanceof ReportTemplate)) {
+                    iterator.remove();
                 }
-            }
-
-            @Override
-            public void afterCommit(CommitContext context, Set<Entity> result) {
             }
         });
     }

@@ -181,42 +181,28 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
 
         getDialogParams().setWidth(themeConstants.getInt("cuba.gui.report.TemplateEditor.width")).setResizable(true);
 
-        FileUploadField.Listener uploadListener = new FileUploadField.ListenerAdapter() {
+        uploadTemplate.addFileUploadStartListener(e -> uploadTemplate.setEnabled(false));
 
-            @Override
-            public void uploadStarted(Event event) {
-                uploadTemplate.setEnabled(false);
-            }
+        uploadTemplate.addFileUploadFinishListener(e -> uploadTemplate.setEnabled(true));
 
-            @Override
-            public void uploadFinished(Event event) {
-                uploadTemplate.setEnabled(true);
-            }
+        uploadTemplate.addFileUploadErrorListener(e ->
+                showNotification(messages.getMessage(TemplateEditor.class, "templateEditor.uploadUnsuccess"), NotificationType.WARNING));
 
-            @Override
-            public void uploadSucceeded(Event event) {
-                getItem().setName(uploadTemplate.getFileName());
-                File file = fileUploading.getFile(uploadTemplate.getFileId());
-                try {
-                    byte[] data = FileUtils.readFileToByteArray(file);
-                    getItem().setContent(data);
-                } catch (IOException e) {
-                    throw new RuntimeException(
-                            String.format("An error occurred while uploading file for template [%s]", getItem().getCode()));
-                }
-                templatePath.setCaption(uploadTemplate.getFileName());
-                setupVisibility(getItem().isCustom(), getItem().getReportOutputType());
-                showNotification(messages.getMessage(TemplateEditor.class,
-                        "templateEditor.uploadSuccess"), NotificationType.TRAY);
+        uploadTemplate.addFileUploadSucceedListener(e -> {
+            getItem().setName(uploadTemplate.getFileName());
+            File file = fileUploading.getFile(uploadTemplate.getFileId());
+            try {
+                byte[] data = FileUtils.readFileToByteArray(file);
+                getItem().setContent(data);
+            } catch (IOException ex) {
+                throw new RuntimeException(
+                        String.format("An error occurred while uploading file for template [%s]", getItem().getCode()), ex);
             }
-
-            @Override
-            public void uploadFailed(Event event) {
-                showNotification(messages.getMessage(TemplateEditor.class,
-                        "templateEditor.uploadUnsuccess"), NotificationType.WARNING);
-            }
-        };
-        uploadTemplate.addListener(uploadListener);
+            templatePath.setCaption(uploadTemplate.getFileName());
+            setupVisibility(getItem().isCustom(), getItem().getReportOutputType());
+            showNotification(messages.getMessage(TemplateEditor.class,
+                    "templateEditor.uploadSuccess"), NotificationType.TRAY);
+        });
 
         templatePath.setAction(new AbstractAction("report.template") {
             @Override
