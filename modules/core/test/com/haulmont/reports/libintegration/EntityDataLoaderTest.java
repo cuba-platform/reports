@@ -50,7 +50,6 @@ public class EntityDataLoaderTest extends ReportsTestCase {
 
     @Override
     public void tearDown() throws Exception {
-        super.tearDown();
         Transaction tx = persistence.createTransaction();
         try {
             persistence.getEntityManager()
@@ -65,6 +64,7 @@ public class EntityDataLoaderTest extends ReportsTestCase {
         } finally {
             tx.end();
         }
+        super.tearDown();
     }
 
     public void testSingleEntityLoad() throws Exception {
