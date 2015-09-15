@@ -11,7 +11,7 @@ import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.MessageTools;
 import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.gui.FrameContextImpl;
-import com.haulmont.cuba.gui.WindowManager;
+import com.haulmont.cuba.gui.WindowManager.OpenType;
 import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.components.Action.Status;
 import com.haulmont.cuba.gui.components.Component.ValueChangeListener;
@@ -214,9 +214,9 @@ class DetailsStepFrame extends StepFrame {
             params.put("conditions", conditionsTree);
             params.put("useShortConditionForm", true);
 
-            final FilterEditor filterEditor =
-                    (FilterEditor) wizard.windowManagerProvider.get().openWindow(windowInfo, WindowManager.OpenType.DIALOG, params);
-            filterEditor.addListener(new Window.CloseListener() {
+            FilterEditor filterEditor =
+                    (FilterEditor) wizard.windowManagerProvider.get().openWindow(windowInfo, OpenType.DIALOG, params);
+            filterEditor.addCloseListener(new Window.CloseListener() {
                 private ParameterClassResolver parameterClassResolver = new ParameterClassResolver();
 
                 @Override

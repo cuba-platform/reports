@@ -6,6 +6,7 @@ package com.haulmont.reports.gui.report.edit;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import com.haulmont.bali.util.ParamsMap;
 import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.chile.core.model.MetaPropertyPath;
 import com.haulmont.cuba.core.entity.Entity;
@@ -514,24 +515,21 @@ public class ReportEditor extends AbstractEditor<Report> {
                         final ReportTemplate defaultTemplate = getItem().getDefaultTemplate();
                         if (defaultTemplate != null) {
                             final FileUploadDialog dialog = (FileUploadDialog) openWindow("fileUploadDialog", OpenType.DIALOG);
-                            dialog.addListener(new CloseListener() {
-                                @Override
-                                public void windowClosed(String actionId) {
-                                    if (Window.COMMIT_ACTION_ID.equals(actionId)) {
-                                        File file = fileUpload.getFile(dialog.getFileId());
-                                        try {
-                                            byte[] data = FileUtils.readFileToByteArray(file);
-                                            defaultTemplate.setContent(data);
-                                            defaultTemplate.setName(dialog.getFileName());
-                                            templatesDs.modifyItem(defaultTemplate);
-                                        } catch (IOException e) {
-                                            throw new RuntimeException(String.format(
-                                                    "An error occurred while uploading file for template [%s]",
-                                                    defaultTemplate.getCode()));
-                                        }
+                            dialog.addCloseListener(actionId -> {
+                                if (COMMIT_ACTION_ID.equals(actionId)) {
+                                    File file = fileUpload.getFile(dialog.getFileId());
+                                    try {
+                                        byte[] data = FileUtils.readFileToByteArray(file);
+                                        defaultTemplate.setContent(data);
+                                        defaultTemplate.setName(dialog.getFileName());
+                                        templatesDs.modifyItem(defaultTemplate);
+                                    } catch (IOException e) {
+                                        throw new RuntimeException(String.format(
+                                                "An error occurred while uploading file for template [%s]",
+                                                defaultTemplate.getCode()));
                                     }
-                                    lookupPickerField.requestFocus();
                                 }
+                                lookupPickerField.requestFocus();
                             });
                         } else {
                             showNotification(getMessage("notification.defaultTemplateIsEmpty"), NotificationType.HUMANIZED);
@@ -555,21 +553,17 @@ public class ReportEditor extends AbstractEditor<Report> {
                     public void actionPerform(Component component) {
                         ReportTemplate template = new ReportTemplate();
                         template.setReport(getItem());
-                        final Editor editor = openEditor("report$ReportTemplate.edit",
-                                template, OpenType.DIALOG, templatesDs);
-                        editor.addListener(new CloseListener() {
-                            @Override
-                            public void windowClosed(String actionId) {
-                                if (Window.COMMIT_ACTION_ID.equals(actionId)) {
-                                    ReportTemplate item = (ReportTemplate) editor.getItem();
-                                    templatesDs.addItem(item);
-                                    getItem().setDefaultTemplate(item);
-                                    //Workaround to disable button after default template setting
-                                    Action defaultTemplate = templatesTable.getAction("defaultTemplate");
-                                    defaultTemplate.refreshState();
-                                }
-                                lookupPickerField.requestFocus();
+                        Editor editor = openEditor("report$ReportTemplate.edit", template, OpenType.DIALOG, templatesDs);
+                        editor.addCloseListener(actionId -> {
+                            if (COMMIT_ACTION_ID.equals(actionId)) {
+                                ReportTemplate item = (ReportTemplate) editor.getItem();
+                                templatesDs.addItem(item);
+                                getItem().setDefaultTemplate(item);
+                                //Workaround to disable button after default template setting
+                                Action defaultTemplate = templatesTable.getAction("defaultTemplate");
+                                defaultTemplate.refreshState();
                             }
+                            lookupPickerField.requestFocus();
                         });
                     }
                 });
@@ -589,18 +583,16 @@ public class ReportEditor extends AbstractEditor<Report> {
                     public void actionPerform(Component component) {
                         ReportTemplate defaultTemplate = getItem().getDefaultTemplate();
                         if (defaultTemplate != null) {
-                            final Editor editor = openEditor("report$ReportTemplate.edit",
+                            Editor editor = openEditor("report$ReportTemplate.edit",
                                     defaultTemplate, OpenType.DIALOG, templatesDs);
-                            editor.addListener(new CloseListener() {
-                                @Override
-                                public void windowClosed(String actionId) {
-                                    if (Window.COMMIT_ACTION_ID.equals(actionId)) {
-                                        ReportTemplate item = (ReportTemplate) editor.getItem();
-                                        getItem().setDefaultTemplate(item);
-                                        templatesDs.modifyItem(item);
-                                    }
-                                    lookupPickerField.requestFocus();
+
+                            editor.addCloseListener(actionId -> {
+                                if (Window.COMMIT_ACTION_ID.equals(actionId)) {
+                                    ReportTemplate item = (ReportTemplate) editor.getItem();
+                                    getItem().setDefaultTemplate(item);
+                                    templatesDs.modifyItem(item);
                                 }
+                                lookupPickerField.requestFocus();
                             });
                         } else {
                             showNotification(getMessage("notification.defaultTemplateIsEmpty"), NotificationType.HUMANIZED);
@@ -823,13 +815,11 @@ public class ReportEditor extends AbstractEditor<Report> {
             public void actionPerform(Component component) {
                 if (validateAll()) {
                     getItem().setIsTmp(true);
-                    Window runWindow = openWindow("report$inputParameters", OpenType.DIALOG,
-                            Collections.<String, Object>singletonMap("report", getItem()));
-                    runWindow.addListener(new CloseListener() {
-                        @Override
-                        public void windowClosed(String actionId) {
-                            bandTree.requestFocus();
-                        }
+                    Window runWindow = openWindow("report$inputParameters",
+                            OpenType.DIALOG, ParamsMap.of("report", getItem()));
+
+                    runWindow.addCloseListener(actionId -> {
+                        bandTree.requestFocus();
                     });
                 }
             }

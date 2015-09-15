@@ -56,7 +56,7 @@ public class ReportBrowser extends AbstractLookup {
     @Named("copy")
     protected Button copyReport;
     @Named("table")
-    protected GroupTable reportsTable;
+    protected GroupTable<Report> reportsTable;
     @Inject
     protected Security security;
     @Inject
@@ -102,11 +102,8 @@ public class ReportBrowser extends AbstractLookup {
                     if (report.getInputParameters() != null && report.getInputParameters().size() > 0) {
                         Window paramsWindow = openWindow("report$inputParameters", WindowManager.OpenType.DIALOG,
                                 Collections.<String, Object>singletonMap("report", report));
-                        paramsWindow.addListener(new CloseListener() {
-                            @Override
-                            public void windowClosed(String actionId) {
-                                target.requestFocus();
-                            }
+                        paramsWindow.addCloseListener(actionId -> {
+                            target.requestFocus();
                         });
                     } else {
                         reportGuiManager.printReport(report, Collections.<String, Object>emptyMap(), ReportBrowser.this);
@@ -119,7 +116,7 @@ public class ReportBrowser extends AbstractLookup {
             @Override
             public void actionPerform(Component component) {
                 final FileUploadDialog dialog = (FileUploadDialog) openWindow("fileUploadDialog", WindowManager.OpenType.DIALOG);
-                dialog.addListener(new CloseListener() {
+                dialog.addCloseListener(new CloseListener() {
                     @Override
                     public void windowClosed(String actionId) {
                         if (Window.COMMIT_ACTION_ID.equals(actionId)) {
@@ -196,32 +193,27 @@ public class ReportBrowser extends AbstractLookup {
                     @Override
                     public void actionPerform(Component component) {
                         editor = openEditor("report$Report.wizard", metadata.create(ReportData.class), WindowManager.OpenType.DIALOG, reportsTable.getDatasource());
-                        editor.addListener(new CloseListener() {
-                            @Override
-                            public void windowClosed(String actionId) {
-                                if (actionId.equals(COMMIT_ACTION_ID)) {
-                                    if (editor.getItem() != null && editor.getItem().getGeneratedReport() != null) {
-                                        Report item = editor.getItem().getGeneratedReport();
-                                        CollectionDatasource datasource = reportsTable.getDatasource();
-                                        boolean modified = datasource.isModified();
-                                        datasource.addItem(item);
-                                        ((DatasourceImplementation) datasource).setModified(modified);
-                                        reportsTable.setSelected(item);
-                                        final AbstractEditor<Report> reportEditor = openEditor("report$Report.edit",
-                                                reportDs.getItem(), WindowManager.OpenType.THIS_TAB);
-                                        reportEditor.addListener(new CloseListener() {
-                                            @Override
-                                            public void windowClosed(String actionId) {
-                                                if (Window.COMMIT_ACTION_ID.equals(actionId)) {
-                                                    Report item = reportEditor.getItem();
-                                                    if (item != null) {
-                                                        reportDs.updateItem(item);
-                                                    }
-                                                }
-                                                reportsTable.requestFocus();
+                        editor.addCloseListener(actionId -> {
+                            if (COMMIT_ACTION_ID.equals(actionId)) {
+                                if (editor.getItem() != null && editor.getItem().getGeneratedReport() != null) {
+                                    Report item = editor.getItem().getGeneratedReport();
+                                    CollectionDatasource datasource = reportsTable.getDatasource();
+                                    boolean modified = datasource.isModified();
+                                    datasource.addItem(item);
+                                    ((DatasourceImplementation) datasource).setModified(modified);
+                                    reportsTable.setSelected(item);
+                                    final AbstractEditor<Report> reportEditor = openEditor("report$Report.edit",
+                                            reportDs.getItem(), WindowManager.OpenType.THIS_TAB);
+
+                                    reportEditor.addCloseListener(reportEditorActionId -> {
+                                        if (COMMIT_ACTION_ID.equals(reportEditorActionId)) {
+                                            Report item1 = reportEditor.getItem();
+                                            if (item1 != null) {
+                                                reportDs.updateItem(item1);
                                             }
-                                        });
-                                    }
+                                        }
+                                        reportsTable.requestFocus();
+                                    });
                                 }
                             }
                         });

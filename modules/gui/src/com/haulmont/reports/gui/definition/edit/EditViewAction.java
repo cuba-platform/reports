@@ -9,7 +9,7 @@ import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.chile.core.model.MetaProperty;
 import com.haulmont.cuba.core.global.View;
 import com.haulmont.cuba.core.global.ViewProperty;
-import com.haulmont.cuba.gui.WindowManager;
+import com.haulmont.cuba.gui.WindowManager.OpenType;
 import com.haulmont.cuba.gui.components.AbstractAction;
 import com.haulmont.cuba.gui.components.Component;
 import com.haulmont.cuba.gui.components.Frame;
@@ -61,15 +61,12 @@ public class EditViewAction extends AbstractAction {
                             editorParams.put("rootEntity", reportRegion.getRegionPropertiesRootNode());
                             editorParams.put("scalarOnly", Boolean.TRUE);
 
-                            final Window.Editor regionEditor =
+                            Window.Editor regionEditor =
                                     bandDefinitionEditor.openEditor("report$Report.regionEditor",
-                                            reportRegion, WindowManager.OpenType.DIALOG, editorParams, bandDefinitionEditor.dataSetsDs);
-                            regionEditor.addListener(new Window.CloseListener() {
-                                @Override
-                                public void windowClosed(String actionId) {
-                                    if (Window.COMMIT_ACTION_ID.equals(actionId)) {
-                                        dataSet.setView(reportRegionToView(entityTree, (ReportRegion) regionEditor.getItem()));
-                                    }
+                                            reportRegion, OpenType.DIALOG, editorParams, bandDefinitionEditor.dataSetsDs);
+                            regionEditor.addCloseListener(actionId -> {
+                                if (Window.COMMIT_ACTION_ID.equals(actionId)) {
+                                    dataSet.setView(reportRegionToView(entityTree, (ReportRegion) regionEditor.getItem()));
                                 }
                             });
                         }

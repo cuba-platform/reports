@@ -81,7 +81,7 @@ class RegionsStepFrame extends StepFrame {
                         editorParams.put("rootEntity", regionPropertiesRootNode);
                         item.setRegionPropertiesRootNode(regionPropertiesRootNode);
                         Window.Editor regionEditor = wizard.openEditor("report$Report.regionEditor", item, WindowManager.OpenType.DIALOG, editorParams, wizard.reportRegionsDs);
-                        regionEditor.addListener(new RegionEditorCloseListener());
+                        regionEditor.addCloseListener(new RegionEditorCloseListener());
                     }
                 }
             }, WindowManager.OpenType.DIALOG, lookupParams);
@@ -96,9 +96,8 @@ class RegionsStepFrame extends StepFrame {
             editorParams.put("persistentOnly", ReportData.ReportType.LIST_OF_ENTITIES_WITH_QUERY == wizard.reportTypeOptionGroup.getValue());
 
             Window.Editor regionEditor = wizard.openEditor("report$Report.regionEditor", item, WindowManager.OpenType.DIALOG, editorParams, wizard.reportRegionsDs);
-            regionEditor.addListener(new AddRegionAction.RegionEditorCloseListener());
+            regionEditor.addCloseListener(new AddRegionAction.RegionEditorCloseListener());
         }
-
 
         protected class RegionEditorCloseListener implements Window.CloseListener {
             @Override
@@ -109,7 +108,6 @@ class RegionsStepFrame extends StepFrame {
                 }
             }
         }
-
     }
 
     protected class AddSimpleRegionAction extends AddRegionAction {
@@ -287,7 +285,7 @@ class RegionsStepFrame extends StepFrame {
                         WindowManager.OpenType.DIALOG,
                         editorParams,
                         wizard.reportRegionsDs);
-                regionEditor.addListener(new RegionEditorCloseListener());
+                regionEditor.addCloseListener(new RegionEditorCloseListener());
             }
         }
 
@@ -295,7 +293,6 @@ class RegionsStepFrame extends StepFrame {
         public String getCaption() {
             return "";
         }
-
     }
 
     protected class InitRegionsStepFrameHandler implements InitStepFrameHandler {
