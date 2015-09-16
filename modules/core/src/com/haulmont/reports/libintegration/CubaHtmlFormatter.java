@@ -38,7 +38,7 @@ import java.io.*;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.net.URLConnection;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import static java.lang.String.format;
@@ -64,12 +64,13 @@ public class CubaHtmlFormatter extends HtmlFormatter {
     // we can append <content> with Base64 to html and put reference to <img> for html
     // and some custom reference if we need pdf and then implement ResourcesITextUserAgentCallback which will
     // take base64 from appropriate content
+    @Override
     protected void renderPdfDocument(String htmlContent, OutputStream outputStream) {
         ITextRenderer renderer = new ITextRenderer();
         try {
             File tmpFile = File.createTempFile("htmlReport", ".htm");
             DataOutputStream dataOutputStream = new DataOutputStream(new FileOutputStream(tmpFile));
-            dataOutputStream.write(htmlContent.getBytes(Charset.forName("UTF-8")));
+            dataOutputStream.write(htmlContent.getBytes(StandardCharsets.UTF_8));
             dataOutputStream.close();
 
             loadFonts(renderer);
@@ -122,10 +123,8 @@ public class CubaHtmlFormatter extends HtmlFormatter {
                     try {
                         // Usage of some fonts may be not permitted
                         renderer.getFontResolver().addFont(file.getAbsolutePath(), BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
-                    } catch (IOException e) {
+                    } catch (IOException | DocumentException e) {
                         log.warn(e.getMessage());
-                    } catch (DocumentException e) {
-                        e.printStackTrace();
                     }
                 }
             } else
@@ -233,7 +232,7 @@ public class CubaHtmlFormatter extends HtmlFormatter {
 
         protected InputStream getInputStream(String uri) {
             uri = resolveURI(uri);
-            InputStream inputStream = null;
+            InputStream inputStream;
             try {
                 URL url = new URL(uri);
                 URLConnection urlConnection = url.openConnection();
@@ -264,19 +263,19 @@ public class CubaHtmlFormatter extends HtmlFormatter {
 
     @Override
     protected Map getBandModel(BandData band) {
-        Map<String, Object> model = new HashMap<String, Object>();
+        Map<String, Object> model = new HashMap<>();
 
-        Map<String, Object> bands = new HashMap<String, Object>();
+        Map<String, Object> bands = new HashMap<>();
         for (String bandName : band.getChildrenBands().keySet()) {
             List<BandData> subBands = band.getChildrenBands().get(bandName);
-            List<Map> bandModels = new ArrayList<Map>();
+            List<Map> bandModels = new ArrayList<>();
             for (BandData child : subBands)
                 bandModels.add(getBandModel(child));
 
             bands.put(bandName, bandModels);
         }
         model.put("bands", bands);
-        Map<String, Object> data = new HashMap<String, Object>();
+        Map<String, Object> data = new HashMap<>();
         for (String key : band.getData().keySet()) {
             if (band.getData().get(key) instanceof Enum)
                 data.put(key, defaultFormat(band.getData().get(key)));
@@ -292,7 +291,7 @@ public class CubaHtmlFormatter extends HtmlFormatter {
     }
 
     protected Map<String, Object> transformEntityToMap(BaseUuidEntity entity, int deep) {
-        Map<String, Object> resultMap = new HashMap<String, Object>();
+        Map<String, Object> resultMap = new HashMap<>();
         for (MetaProperty property : entity.getMetaClass().getProperties()) {
             Object value = null;
             try {

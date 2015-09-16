@@ -20,7 +20,7 @@ import freemarker.template.TemplateException;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,6 +37,7 @@ public class HtmlGenerator implements Generator {
     protected volatile static Configuration freeMarkerConfiguration;
     protected ReportData reportData;
 
+    @Override
     public byte[] generate(ReportData reportData) throws TemplateException, IOException {
         this.reportData = reportData;
         byte[] template;
@@ -48,7 +49,7 @@ public class HtmlGenerator implements Generator {
         putStylesHtml(templateParameters);
         putBodyHtml(templateParameters);
         freeMarkerHtmlReportTemplate.process(templateParameters, out);
-        template = out.toString().getBytes(Charset.forName("UTF-8"));
+        template = out.toString().getBytes(StandardCharsets.UTF_8);
         return template;
     }
 

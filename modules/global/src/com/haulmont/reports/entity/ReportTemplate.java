@@ -5,15 +5,9 @@
 
 package com.haulmont.reports.entity;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 import com.haulmont.chile.core.annotations.NamePattern;
 import com.haulmont.cuba.core.entity.annotation.SystemLevel;
 import com.haulmont.reports.entity.charts.AbstractChartDescription;
-import com.haulmont.reports.entity.charts.ChartType;
-import com.haulmont.reports.entity.charts.PieChartDescription;
-import com.haulmont.reports.entity.charts.SerialChartDescription;
 import com.haulmont.yarg.formatters.CustomReport;
 import org.apache.commons.lang.StringUtils;
 
@@ -21,7 +15,7 @@ import javax.annotation.Nullable;
 import javax.persistence.*;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Template for {@link Report}
@@ -40,8 +34,6 @@ public class ReportTemplate extends BaseReportEntity implements com.haulmont.yar
     public static final String DEFAULT_TEMPLATE_CODE = "DEFAULT";
 
     public static final String NAME_FORMAT = "(%s) %s";
-
-    public static final String BASE_ENCODING = "UTF-8";
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "REPORT_ID", nullable = false)
@@ -83,6 +75,7 @@ public class ReportTemplate extends BaseReportEntity implements com.haulmont.yar
         this.reportOutputType = reportOutputType != null ? reportOutputType.getId() : null;
     }
 
+    @Override
     public String getCode() {
         return code;
     }
@@ -205,22 +198,14 @@ public class ReportTemplate extends BaseReportEntity implements com.haulmont.yar
         }
 
         String jsonString;
-        try {
-            jsonString = new String(getContent(), BASE_ENCODING);
-        } catch (UnsupportedEncodingException e) {
-            jsonString = new String(getContent());
-        }
+        jsonString = new String(getContent(), StandardCharsets.UTF_8);
         return AbstractChartDescription.fromJsonString(jsonString);
     }
 
     public void setChartDescription(@Nullable AbstractChartDescription chartDescription) {
         if (chartDescription != null && getReportOutputType() == ReportOutputType.CHART) {
             String jsonString = AbstractChartDescription.toJsonString(chartDescription);
-            try {
-                setContent(jsonString.getBytes(BASE_ENCODING));
-            } catch (UnsupportedEncodingException e) {
-                setContent(jsonString.getBytes());
-            }
+            setContent(jsonString.getBytes(StandardCharsets.UTF_8));
             setName(".chart");
         }
     }
