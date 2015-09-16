@@ -466,10 +466,14 @@ public class ReportingWizardBean implements ReportingWizardApi {
     public boolean isPropertyAllowedForReportWizard(MetaClass metaClass, MetaProperty metaProperty) {
         //here we can`t just to determine metaclass using property argument cause it can be an ancestor of it
         ReportingConfig reportingConfig = configuration.getConfig(ReportingConfig.class);
-        List propertiesBlackList = Arrays.asList(reportingConfig.getWizardPropertiesBlackList().split(","));
-        List wizardPropertiesExcludedBlackList = Arrays.asList(reportingConfig.getWizardPropertiesExcludedBlackList().split(","));
+        List<String> propertiesBlackList = reportingConfig.getWizardPropertiesBlackList();
+        List<String> wizardPropertiesExcludedBlackList =reportingConfig.getWizardPropertiesExcludedBlackList();
 
-        String classAndPropertyName = metaClass.getName() + "." + metaProperty.getName();
+        MetaClass originalMetaClass = metadata.getExtendedEntities().getOriginalMetaClass(metaClass);
+        if (originalMetaClass == null) {
+            originalMetaClass = metaClass;
+        }
+        String classAndPropertyName = originalMetaClass.getName() + "." + metaProperty.getName();
         return !(propertiesBlackList.contains(classAndPropertyName)
                 || (propertiesBlackList.contains(metaProperty.getDomain() + "." + metaProperty.getName())
                 && !wizardPropertiesExcludedBlackList.contains(classAndPropertyName)));
@@ -497,20 +501,10 @@ public class ReportingWizardBean implements ReportingWizardApi {
     }
 
     protected List<String> getWizardBlackListedProperties() {
-        String propertiesBlackList = configuration.getConfig(ReportingConfig.class).getWizardPropertiesBlackList();
-        if (StringUtils.isNotBlank(propertiesBlackList)) {
-            return Arrays.asList(StringUtils.split(propertiesBlackList, ','));
-        }
-
-        return Collections.emptyList();
+        return configuration.getConfig(ReportingConfig.class).getWizardPropertiesBlackList();
     }
 
     protected List<String> getWizardPropertiesExcludedBlackList() {
-        String propertiesBlackList = configuration.getConfig(ReportingConfig.class).getWizardPropertiesExcludedBlackList();
-        if (StringUtils.isNotBlank(propertiesBlackList)) {
-            return Arrays.asList(StringUtils.split(propertiesBlackList, ','));
-        }
-
-        return Collections.emptyList();
+        return configuration.getConfig(ReportingConfig.class).getWizardPropertiesExcludedBlackList();
     }
 }

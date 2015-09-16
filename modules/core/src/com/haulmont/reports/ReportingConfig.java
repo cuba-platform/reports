@@ -12,6 +12,10 @@ import com.haulmont.cuba.core.config.SourceType;
 import com.haulmont.cuba.core.config.defaults.DefaultBoolean;
 import com.haulmont.cuba.core.config.defaults.DefaultInteger;
 import com.haulmont.cuba.core.config.defaults.DefaultString;
+import com.haulmont.cuba.core.config.type.CommaSeparatedStringListTypeFactory;
+import com.haulmont.cuba.core.config.type.Factory;
+
+import java.util.List;
 
 /**
  * @author krivopustov
@@ -105,9 +109,10 @@ public interface ReportingConfig extends Config {
      */
     @Property("cuba.reporting.wizardPropertiesBlackList")
     @DefaultString("")
-    String getWizardPropertiesBlackList();
+    @Factory(factory =  CommaSeparatedStringListTypeFactory.class)
+    List<String> getWizardPropertiesBlackList();
 
-    void setWizardPropertiesBlackList(String wizardPropertiesBlackList);
+    void setWizardPropertiesBlackList(List<String> wizardPropertiesBlackList);
 
     /**
      * Entity properties that will not to be excluded by 'cuba.reporting.wizardPropertiesBlackList' setting
@@ -115,9 +120,10 @@ public interface ReportingConfig extends Config {
      */
     @Property("cuba.reporting.wizardPropertiesExcludedBlackList")
     @DefaultString("")
-    String getWizardPropertiesExcludedBlackList();
+    @Factory(factory =  CommaSeparatedStringListTypeFactory.class)
+    List<String> getWizardPropertiesExcludedBlackList();
 
-    void setWizardPropertiesExcludedBlackList(String wizardPropertiesExcludedBlackList);
+    void setWizardPropertiesExcludedBlackList(List<String> wizardPropertiesExcludedBlackList);
 
     /**
      * Maximum deep of builded entity model that is used in report wizard or report dataset view editor
