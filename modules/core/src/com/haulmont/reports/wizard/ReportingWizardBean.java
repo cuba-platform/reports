@@ -467,15 +467,13 @@ public class ReportingWizardBean implements ReportingWizardApi {
         //here we can`t just to determine metaclass using property argument cause it can be an ancestor of it
         ReportingConfig reportingConfig = configuration.getConfig(ReportingConfig.class);
         List<String> propertiesBlackList = reportingConfig.getWizardPropertiesBlackList();
-        List<String> wizardPropertiesExcludedBlackList =reportingConfig.getWizardPropertiesExcludedBlackList();
+        List<String> wizardPropertiesExcludedBlackList = reportingConfig.getWizardPropertiesExcludedBlackList();
 
-        MetaClass originalMetaClass = metadata.getExtendedEntities().getOriginalMetaClass(metaClass);
-        if (originalMetaClass == null) {
-            originalMetaClass = metaClass;
-        }
+        MetaClass originalMetaClass = getOriginalMetaClass(metaClass);
+        MetaClass originalDomainMetaClass = getOriginalMetaClass(metaProperty.getDomain());
         String classAndPropertyName = originalMetaClass.getName() + "." + metaProperty.getName();
         return !(propertiesBlackList.contains(classAndPropertyName)
-                || (propertiesBlackList.contains(metaProperty.getDomain() + "." + metaProperty.getName())
+                || (propertiesBlackList.contains(originalDomainMetaClass.getName() + "." + metaProperty.getName())
                 && !wizardPropertiesExcludedBlackList.contains(classAndPropertyName)));
     }
 
@@ -506,5 +504,13 @@ public class ReportingWizardBean implements ReportingWizardApi {
 
     protected List<String> getWizardPropertiesExcludedBlackList() {
         return configuration.getConfig(ReportingConfig.class).getWizardPropertiesExcludedBlackList();
+    }
+
+    protected MetaClass getOriginalMetaClass(MetaClass metaClass) {
+        MetaClass originalMetaClass = metadata.getExtendedEntities().getOriginalMetaClass(metaClass);
+        if (originalMetaClass == null) {
+            originalMetaClass = metaClass;
+        }
+        return originalMetaClass;
     }
 }
