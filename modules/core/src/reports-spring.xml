@@ -21,7 +21,7 @@
         <constructor-arg ref="reporting_lib_Scripting"/>
     </bean>
     <bean id="reporting_lib_SqlDataLoader" class="com.haulmont.yarg.loaders.impl.SqlDataLoader">
-        <constructor-arg ref="dataSource"/>
+        <constructor-arg ref="cubaDataSource"/>
         <property name="parametersConverter" ref="reporting_lib_SqlParametersConverter"/>
     </bean>
     <bean id="reporting_lib_JpqlDataLoader" class="com.haulmont.reports.libintegration.JpqlDataDataLoader">
