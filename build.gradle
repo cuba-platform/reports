@@ -118,7 +118,7 @@ configure(globalModule) {
     dependencies {
 		compile(group: 'com.google.code.gson', name: 'gson', version: '2.2.4')
 		compile(yargApi) {
-            exclude group: 'org.codehaus.groovy'
+            exclude group: 'org.codehaus.groovy', module: 'groovy-all'
         }
     }
 }
@@ -143,9 +143,9 @@ configure(coreModule) {
         compile(globalModule)
         compile(group: 'com.haulmont.cuba', name: 'cuba-core', version: baseVersion)
 		compile(yarg) {
-            exclude group: 'org.codehaus.groovy'
-            exclude group: 'org.slf4j'
-            exclude group: 'log4j'
+            exclude group: 'org.codehaus.groovy', module: 'groovy-all'
+            exclude group: 'org.slf4j', module: 'slf4j-log4j12'
+            exclude group: 'log4j', module: 'log4j'
         }
 		
         testCompile(group: 'com.haulmont.cuba', name: 'cuba-core', version: baseVersion, classifier: 'tests')
