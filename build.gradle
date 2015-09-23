@@ -156,7 +156,7 @@ configure(coreModule) {
             exclude group: 'commons-dbcp', module: 'commons-dbcp'
         }
 		
-        testCompile(group: 'com.haulmont.cuba', name: 'cuba-core', version: baseVersion, classifier: 'tests')
+        testCompile(group: 'com.haulmont.cuba', name: 'cuba-core-tests', version: baseVersion)
         testCompile('org.apache.commons:commons-dbcp2:2.1.1')
         provided(servletApi)
         jdbc(postgres)
