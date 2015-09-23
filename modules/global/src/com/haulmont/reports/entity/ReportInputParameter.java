@@ -81,6 +81,7 @@ public class ReportInputParameter extends AbstractNotPersistentEntity implements
         this.type = type != null ? type.getId() : null;
     }
 
+    @Override
     public String getName() {
         return name;
     }
@@ -92,6 +93,7 @@ public class ReportInputParameter extends AbstractNotPersistentEntity implements
         this.name = name;
     }
 
+    @Override
     public String getAlias() {
         return alias;
     }
@@ -116,6 +118,7 @@ public class ReportInputParameter extends AbstractNotPersistentEntity implements
         this.enumerationClass = enumerationClass;
     }
 
+    @Override
     public Boolean getRequired() {
         return required;
     }
