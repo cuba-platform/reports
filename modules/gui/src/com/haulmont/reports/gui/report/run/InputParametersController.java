@@ -156,6 +156,6 @@ public class InputParametersController extends AbstractWindow {
     }
 
     public interface PrintReportHandler {
-        public void handle();
+        void handle();
     }
 }

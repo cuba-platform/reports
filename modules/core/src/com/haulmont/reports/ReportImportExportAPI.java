@@ -14,7 +14,7 @@ import java.util.Collection;
  * @version $Id$
  */
 public interface ReportImportExportAPI {
-    final String NAME = "reporting_ReportImportExport";
+    String NAME = "reporting_ReportImportExport";
 
     byte[] exportReports(Collection<Report> reports);
     Collection<Report> importReports(byte[] zipBytes);

@@ -11,15 +11,15 @@ package com.haulmont.reports.libintegration;
  */
 public interface CubaOfficeIntegrationMBean {
 
-    public void setTimeoutInSeconds(Integer timeoutInSeconds);
-    public Integer getTimeoutInSeconds();
+    void setTimeoutInSeconds(Integer timeoutInSeconds);
+    Integer getTimeoutInSeconds();
 
-    public void setDisplayDeviceAvailable(Boolean displayDeviceAvailable);
-    public Boolean isDisplayDeviceAvailable();
+    void setDisplayDeviceAvailable(Boolean displayDeviceAvailable);
+    Boolean isDisplayDeviceAvailable();
 
     void setTemporaryDirPath(String temporaryDirPath);
     String getTemporaryDirPath();
 
-    public String getAvailablePorts();
-    public void hardReloadAccessPorts();
+    String getAvailablePorts();
+    void hardReloadAccessPorts();
 }

@@ -42,8 +42,8 @@ public class GsonSerializationSupport {
     protected Map<Object, Entity> processedObjects = new HashMap<>();
     protected ExclusionPolicy exclusionPolicy;
 
-    public static interface ExclusionPolicy {
-        public boolean exclude(Class objectClass, String propertyName);
+    public interface ExclusionPolicy {
+        boolean exclude(Class objectClass, String propertyName);
     }
 
     public GsonSerializationSupport() {
