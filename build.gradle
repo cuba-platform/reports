@@ -117,10 +117,7 @@ configure([globalModule, coreModule, guiModule, webModule, desktopModule]) {
 }
 
 configure(globalModule) {
-    task enhance(type: CubaEnhancing) {
-        persistenceConfig = 'cuba-persistence.xml reports-persistence.xml'
-        metadataXml = "$globalModule.projectDir/src/reports-metadata.xml"
-    }
+    task enhance(type: CubaEnhancing)
 
     dependencies {
 		compile(group: 'com.google.code.gson', name: 'gson', version: '2.2.4')
