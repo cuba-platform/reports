@@ -23,7 +23,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import javax.annotation.ManagedBean;
+import org.springframework.stereotype.Component;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.persistence.Embeddable;
@@ -35,7 +35,7 @@ import java.util.*;
  * @author artamonov
  * @version $Id$
  */
-@ManagedBean(ReportingWizardApi.NAME)
+@Component(ReportingWizardApi.NAME)
 public class ReportingWizardBean implements ReportingWizardApi {
     public static final String ROOT_BAND_DEFINITION_NAME = "Root";
     protected static final String DEFAULT_SINGLE_ENTITY_ALIAS = "entity";//cause Thesis used it for running reports from screens without selection input params

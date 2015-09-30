@@ -12,7 +12,7 @@ import com.haulmont.reports.entity.*;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 
-import javax.annotation.ManagedBean;
+import org.springframework.stereotype.Component;
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,7 +23,7 @@ import java.util.List;
  * @author degtyarjov
  * @version $Id$
  */
-@ManagedBean("report_ReportDetachListener")
+@Component("report_ReportDetachListener")
 public class ReportDetachListener implements BeforeDetachEntityListener<Report> {
 
     @Inject

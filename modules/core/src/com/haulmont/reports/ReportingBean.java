@@ -37,7 +37,7 @@ import org.perf4j.StopWatch;
 import org.perf4j.log4j.Log4JStopWatch;
 import org.slf4j.MDC;
 
-import javax.annotation.ManagedBean;
+import org.springframework.stereotype.Component;
 import javax.inject.Inject;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -48,7 +48,7 @@ import java.util.zip.CRC32;
  * @author artamonov
  * @version $Id$
  */
-@ManagedBean(ReportingApi.NAME)
+@Component(ReportingApi.NAME)
 public class ReportingBean implements ReportingApi {
     public static final String REPORT_EDIT_VIEW_NAME = "report.edit";
     protected static final int MAX_REPORT_NAME_LENGTH = 255;

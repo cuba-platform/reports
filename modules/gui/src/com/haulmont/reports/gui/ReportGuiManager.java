@@ -33,7 +33,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.lang.StringUtils;
 
-import javax.annotation.ManagedBean;
+import org.springframework.stereotype.Component;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.util.*;
@@ -46,7 +46,7 @@ import static org.apache.commons.lang.StringUtils.isNotBlank;
  * @author degtyarjov
  * @version $Id$
  */
-@ManagedBean("cuba_ReportGuiManager")
+@Component("cuba_ReportGuiManager")
 public class ReportGuiManager {
 
     @Inject

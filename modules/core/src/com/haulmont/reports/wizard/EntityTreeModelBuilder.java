@@ -17,7 +17,7 @@ import com.haulmont.reports.entity.wizard.EntityTreeNode;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.context.annotation.Scope;
 
-import javax.annotation.ManagedBean;
+import org.springframework.stereotype.Component;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -25,7 +25,7 @@ import java.util.Set;
  * @author fedorchenko
  * @version $Id$
  */
-@ManagedBean(EntityTreeModelBuilderApi.NAME)
+@Component(EntityTreeModelBuilderApi.NAME)
 @Scope("prototype")
 public class EntityTreeModelBuilder implements EntityTreeModelBuilderApi {
     public static String[] IGNORED_ENTITIES_PREFIXES = new String[]{"sys$", "sec$"};

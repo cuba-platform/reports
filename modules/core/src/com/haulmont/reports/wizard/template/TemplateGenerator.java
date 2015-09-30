@@ -11,13 +11,13 @@ import com.haulmont.reports.exception.TemplateGenerationException;
 import com.haulmont.reports.wizard.template.generators.*;
 import org.springframework.context.annotation.Scope;
 
-import javax.annotation.ManagedBean;
+import org.springframework.stereotype.Component;
 
 /**
  * @author fedorchenko
  * @version $Id$
  */
-@ManagedBean(TemplateGeneratorApi.NAME)
+@Component(TemplateGeneratorApi.NAME)
 @Scope("prototype")
 public class TemplateGenerator implements TemplateGeneratorApi {
 

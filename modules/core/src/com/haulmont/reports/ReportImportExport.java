@@ -22,7 +22,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 
-import javax.annotation.ManagedBean;
+import org.springframework.stereotype.Component;
 import javax.inject.Inject;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -38,7 +38,7 @@ import java.util.zip.CRC32;
  * @author degtyarjov
  * @version $Id$
  */
-@ManagedBean(ReportImportExportAPI.NAME)
+@Component(ReportImportExportAPI.NAME)
 public class ReportImportExport implements ReportImportExportAPI, ReportImportExportMBean {
     public static final String ENCODING = "CP866";
 
