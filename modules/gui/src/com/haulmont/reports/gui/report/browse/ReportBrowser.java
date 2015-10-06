@@ -26,6 +26,7 @@ import com.haulmont.reports.app.service.ReportService;
 import com.haulmont.reports.entity.Report;
 import com.haulmont.reports.entity.wizard.ReportData;
 import com.haulmont.reports.gui.ReportGuiManager;
+import com.haulmont.reports.gui.report.edit.ReportEditor;
 import org.apache.commons.io.FileUtils;
 
 import javax.inject.Inject;
@@ -202,7 +203,7 @@ public class ReportBrowser extends AbstractLookup {
                                     datasource.addItem(item);
                                     ((DatasourceImplementation) datasource).setModified(modified);
                                     reportsTable.setSelected(item);
-                                    final AbstractEditor<Report> reportEditor = openEditor("report$Report.edit",
+                                    ReportEditor reportEditor = (ReportEditor) openEditor("report$Report.edit",
                                             reportDs.getItem(), WindowManager.OpenType.THIS_TAB);
 
                                     reportEditor.addCloseListener(reportEditorActionId -> {
