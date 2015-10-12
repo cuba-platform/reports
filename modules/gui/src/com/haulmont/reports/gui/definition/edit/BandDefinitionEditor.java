@@ -31,7 +31,8 @@ import java.util.*;
  * @author degtyarjov
  * @version $Id$
  */
-public class BandDefinitionEditor extends AbstractEditor<BandDefinition> implements Suggester {
+public class BandDefinitionEditor extends AbstractFrame implements Suggester {
+
     @Inject
     protected Datasource<BandDefinition> bandDefinitionDs;
     @Inject
@@ -118,16 +119,6 @@ public class BandDefinitionEditor extends AbstractEditor<BandDefinition> impleme
         int queryPosition = cursorPosition - 1;
 
         return JpqlSuggestionFactory.requestHint(text, queryPosition, source, cursorPosition);
-    }
-
-    @Override
-    protected void initNewItem(BandDefinition item) {
-        item.setOrientation(Orientation.HORIZONTAL);
-    }
-
-    @Override
-    protected void postInit() {
-        selectFirstDataSet();
     }
 
     @Override
