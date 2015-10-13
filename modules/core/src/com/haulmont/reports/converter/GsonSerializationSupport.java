@@ -243,7 +243,6 @@ public class GsonSerializationSupport {
         out.endArray();
     }
 
-    @SuppressWarnings("unchecked")
     protected void writeSimpleProperty(JsonWriter out, Entity entity, MetaProperty property) throws IOException {
         Object value = entity.getValue(property.getName());
         if (value != null) {
