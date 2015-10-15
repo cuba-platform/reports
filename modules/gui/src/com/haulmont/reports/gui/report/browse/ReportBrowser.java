@@ -9,7 +9,7 @@ import com.haulmont.cuba.core.global.ClientType;
 import com.haulmont.cuba.core.global.Metadata;
 import com.haulmont.cuba.core.global.Security;
 import com.haulmont.cuba.gui.AppConfig;
-import com.haulmont.cuba.gui.WindowManager;
+import com.haulmont.cuba.gui.WindowManager.OpenType;
 import com.haulmont.cuba.gui.app.core.file.FileUploadDialog;
 import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.components.actions.BaseAction;
@@ -101,7 +101,7 @@ public class ReportBrowser extends AbstractLookup {
                 if (report != null) {
                     report = getDsContext().getDataSupplier().reload(report, "report.edit");
                     if (report.getInputParameters() != null && report.getInputParameters().size() > 0) {
-                        Window paramsWindow = openWindow("report$inputParameters", WindowManager.OpenType.DIALOG,
+                        Window paramsWindow = openWindow("report$inputParameters", OpenType.DIALOG,
                                 Collections.<String, Object>singletonMap("report", report));
                         paramsWindow.addCloseListener(actionId -> {
                             target.requestFocus();
@@ -116,7 +116,7 @@ public class ReportBrowser extends AbstractLookup {
         importReport.setAction(new BaseAction("import") {
             @Override
             public void actionPerform(Component component) {
-                final FileUploadDialog dialog = (FileUploadDialog) openWindow("fileUploadDialog", WindowManager.OpenType.DIALOG);
+                final FileUploadDialog dialog = (FileUploadDialog) openWindow("fileUploadDialog", OpenType.DIALOG);
                 dialog.addCloseListener(new CloseListener() {
                     @Override
                     public void windowClosed(String actionId) {
@@ -187,12 +187,12 @@ public class ReportBrowser extends AbstractLookup {
                     return getMessage("report.new");
                 }
             });
-            popupCreateBtn.addAction(new AbstractAction("wizard") {
-                AbstractEditor<ReportData> editor;
 
+            popupCreateBtn.addAction(new AbstractAction("wizard") {
                 @Override
                 public void actionPerform(Component component) {
-                    editor = openEditor("report$Report.wizard", metadata.create(ReportData.class), WindowManager.OpenType.DIALOG, reportsTable.getDatasource());
+                    AbstractEditor<ReportData> editor = openEditor("report$Report.wizard", metadata.create(ReportData.class),
+                            OpenType.DIALOG, reportsTable.getDatasource());
                     editor.addCloseListener(actionId -> {
                         if (COMMIT_ACTION_ID.equals(actionId)) {
                             if (editor.getItem() != null && editor.getItem().getGeneratedReport() != null) {
@@ -203,7 +203,7 @@ public class ReportBrowser extends AbstractLookup {
                                 ((DatasourceImplementation) datasource).setModified(modified);
                                 reportsTable.setSelected(item);
                                 ReportEditor reportEditor = (ReportEditor) openEditor("report$Report.edit",
-                                        reportDs.getItem(), WindowManager.OpenType.THIS_TAB);
+                                        reportDs.getItem(), OpenType.THIS_TAB);
 
                                 reportEditor.addCloseListener(reportEditorActionId -> {
                                     if (COMMIT_ACTION_ID.equals(reportEditorActionId)) {
