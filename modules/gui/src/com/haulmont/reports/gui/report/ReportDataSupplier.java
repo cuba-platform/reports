@@ -11,6 +11,7 @@ import com.haulmont.cuba.core.global.CommitContext;
 import com.haulmont.cuba.gui.data.impl.GenericDataSupplier;
 import com.haulmont.reports.app.service.ReportService;
 import com.haulmont.reports.entity.Report;
+import com.haulmont.reports.entity.ReportTemplate;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -24,10 +25,17 @@ public class ReportDataSupplier extends GenericDataSupplier {
     public Set<Entity> commit(CommitContext context) {
         Set<Entity> result = new HashSet<>();
         ReportService reportService = AppBeans.get(ReportService.NAME, ReportService.class);
+        Report reportToStore = null;
         for (Entity entity : context.getCommitInstances()) {
             if (entity instanceof Report) {
-                result.add(reportService.storeReportEntity((Report) entity));
+                reportToStore = (Report) entity;
+            } else if (entity instanceof ReportTemplate) {
+                reportToStore = ((ReportTemplate) entity).getReport();
             }
+        }
+
+        if (reportToStore != null) {
+            result.add(reportService.storeReportEntity(reportToStore));
         }
 
         return result;

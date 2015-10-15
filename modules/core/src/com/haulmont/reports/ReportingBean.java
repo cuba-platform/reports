@@ -106,14 +106,16 @@ public class ReportingBean implements ReportingApi {
             }
             report = em.merge(report);
 
-            for (ReportTemplate loadedTemplate : loadedTemplates) {
-                ReportTemplate existingTemplate = em.find(ReportTemplate.class, loadedTemplate.getId());
-                if (existingTemplate != null) {
-                    loadedTemplate.setVersion(existingTemplate.getVersion());
-                }
+            if (loadedTemplates != null) {
+                for (ReportTemplate loadedTemplate : loadedTemplates) {
+                    ReportTemplate existingTemplate = em.find(ReportTemplate.class, loadedTemplate.getId());
+                    if (existingTemplate != null) {
+                        loadedTemplate.setVersion(existingTemplate.getVersion());
+                    }
 
-                loadedTemplate.setReport(report);
-                savedTemplates.add(em.merge(loadedTemplate));
+                    loadedTemplate.setReport(report);
+                    savedTemplates.add(em.merge(loadedTemplate));
+                }
             }
             em.flush();
 

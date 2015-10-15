@@ -33,9 +33,6 @@ public class ReportGroup extends BaseReportEntity {
     @Column(name = "LOCALE_NAMES")
     private String localeNames;
 
-    @OneToMany(mappedBy = "group", fetch = FetchType.LAZY)
-    private Set<Report> reports;
-
     @Transient
     private String localeName;
 
@@ -53,14 +50,6 @@ public class ReportGroup extends BaseReportEntity {
 
     public void setCode(String code) {
         this.code = code;
-    }
-
-    public Set<Report> getReports() {
-        return reports;
-    }
-
-    public void setReports(Set<Report> reports) {
-        this.reports = reports;
     }
 
     public String getLocaleNames() {
