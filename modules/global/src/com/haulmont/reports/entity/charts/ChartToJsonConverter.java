@@ -86,18 +86,12 @@ public class ChartToJsonConverter {
     }
 
     protected void exportConfig(HashMap<String, Object> chart) {
-        HashMap<Object, Object> exportConfig = new HashMap<>();
-        exportConfig.put("menuTop", "100px");
-        ArrayList<Object> menuItems = new ArrayList<>();
-        HashMap<Object, Object> menuItem = new HashMap<>();
-        menuItem.put("format", "png");
-        menuItem.put("icon", "VAADIN/resources/amcharts/images/export.png");
-        menuItems.add(menuItem);
-        exportConfig.put("menuItems", menuItems);
+        HashMap<Object, Object> export = new HashMap<>();
+        export.put("enabled", true);
         if (StringUtils.isNotBlank(resultFileName)) {
-            exportConfig.put("menuItemOutput", Collections.singletonMap("fileName", resultFileName));
+            export.put("fileName", resultFileName);
         }
-        chart.put("exportConfig", exportConfig);
+        chart.put("export", export);
     }
 
     public String convertPieChart(PieChartDescription description, List<Map<String, Object>> data) {
