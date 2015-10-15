@@ -179,55 +179,55 @@ public class ReportBrowser extends AbstractLookup {
             }
         });
 
-        if (hasPermissionsToCreateReports) {
-            if (AppConfig.getClientType().equals(ClientType.WEB)) {
-                reportsTable.getButtonsPanel().remove(createBtn);
-                popupCreateBtn.addAction(new CreateAction(reportsTable) {
-                    @Override
-                    public String getCaption() {
-                        return getMessage("report.new");
-                    }
-                });
-                popupCreateBtn.addAction(new AbstractAction("wizard") {
-                    AbstractEditor<ReportData> editor;
+        if (AppConfig.getClientType() == ClientType.WEB) {
+            reportsTable.getButtonsPanel().remove(createBtn);
+            popupCreateBtn.addAction(new CreateAction(reportsTable) {
+                @Override
+                public String getCaption() {
+                    return getMessage("report.new");
+                }
+            });
+            popupCreateBtn.addAction(new AbstractAction("wizard") {
+                AbstractEditor<ReportData> editor;
 
-                    @Override
-                    public void actionPerform(Component component) {
-                        editor = openEditor("report$Report.wizard", metadata.create(ReportData.class), WindowManager.OpenType.DIALOG, reportsTable.getDatasource());
-                        editor.addCloseListener(actionId -> {
-                            if (COMMIT_ACTION_ID.equals(actionId)) {
-                                if (editor.getItem() != null && editor.getItem().getGeneratedReport() != null) {
-                                    Report item = editor.getItem().getGeneratedReport();
-                                    CollectionDatasource datasource = reportsTable.getDatasource();
-                                    boolean modified = datasource.isModified();
-                                    datasource.addItem(item);
-                                    ((DatasourceImplementation) datasource).setModified(modified);
-                                    reportsTable.setSelected(item);
-                                    ReportEditor reportEditor = (ReportEditor) openEditor("report$Report.edit",
-                                            reportDs.getItem(), WindowManager.OpenType.THIS_TAB);
+                @Override
+                public void actionPerform(Component component) {
+                    editor = openEditor("report$Report.wizard", metadata.create(ReportData.class), WindowManager.OpenType.DIALOG, reportsTable.getDatasource());
+                    editor.addCloseListener(actionId -> {
+                        if (COMMIT_ACTION_ID.equals(actionId)) {
+                            if (editor.getItem() != null && editor.getItem().getGeneratedReport() != null) {
+                                Report item = editor.getItem().getGeneratedReport();
+                                CollectionDatasource datasource = reportsTable.getDatasource();
+                                boolean modified = datasource.isModified();
+                                datasource.addItem(item);
+                                ((DatasourceImplementation) datasource).setModified(modified);
+                                reportsTable.setSelected(item);
+                                ReportEditor reportEditor = (ReportEditor) openEditor("report$Report.edit",
+                                        reportDs.getItem(), WindowManager.OpenType.THIS_TAB);
 
-                                    reportEditor.addCloseListener(reportEditorActionId -> {
-                                        if (COMMIT_ACTION_ID.equals(reportEditorActionId)) {
-                                            Report item1 = reportEditor.getItem();
-                                            if (item1 != null) {
-                                                reportDs.updateItem(item1);
-                                            }
+                                reportEditor.addCloseListener(reportEditorActionId -> {
+                                    if (COMMIT_ACTION_ID.equals(reportEditorActionId)) {
+                                        Report item1 = reportEditor.getItem();
+                                        if (item1 != null) {
+                                            reportDs.updateItem(item1);
                                         }
-                                        reportsTable.requestFocus();
-                                    });
-                                }
+                                    }
+                                    reportsTable.requestFocus();
+                                });
                             }
-                        });
-                    }
+                        }
+                    });
+                }
 
-                    @Override
-                    public String getCaption() {
-                        return getMessage("report.wizard");
-                    }
-                });
-            } else {
-                reportsTable.getButtonsPanel().remove(popupCreateBtn);
-            }
+                @Override
+                public String getCaption() {
+                    return getMessage("report.wizard");
+                }
+            });
+
+            popupCreateBtn.setEnabled(hasPermissionsToCreateReports);
+        } else {
+            reportsTable.getButtonsPanel().remove(popupCreateBtn);
         }
     }
 }
