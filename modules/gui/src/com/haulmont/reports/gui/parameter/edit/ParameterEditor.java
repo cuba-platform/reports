@@ -68,11 +68,12 @@ public class ParameterEditor extends AbstractEditor {
         ReportInputParameter newItem = parameterDs.getDataSupplier().newInstance(parameterDs.getMetaClass());
         InstanceUtils.copy(item, newItem);
         newItem.setId((UUID) item.getId());
+        if (newItem.getParameterClass() == null) {
+            newItem.setParameterClass(parameterClassResolver.resolveClass(newItem));
+        }
+
         super.setItem(newItem);
         parameter = (ReportInputParameter) getItem();
-        if (parameter.getParameterClass() == null) {
-            parameter.setParameterClass(parameterClassResolver.resolveClass(parameter));
-        }
         enableControlsByParamType(parameter.getType());
     }
 
