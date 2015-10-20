@@ -20,6 +20,7 @@ import java.util.Set;
  * @version $Id$
  */
 public class EntityMap implements Map<String, Object> {
+    public static final String INSTANCE_NAME_KEY = "_instanceName";
     private Instance instance;
     private HashMap<String, Object> explicitData;
 
@@ -62,8 +63,14 @@ public class EntityMap implements Map<String, Object> {
 
     @Override
     public Object get(Object key) {
+        if (INSTANCE_NAME_KEY.equals(key)) {
+            return instance.getInstanceName();
+        }
+
         Object value = getValue(instance, key);
+
         if (value != null) return value;
+
         return explicitData.get(key);
     }
 
@@ -111,6 +118,8 @@ public class EntityMap implements Map<String, Object> {
             for (MetaProperty property : metaClass.getProperties()) {
                 explicitData.put(property.getName(), getValue(instance, property.getName()));
             }
+            explicitData.put(INSTANCE_NAME_KEY, instance.getInstanceName());
+
             loaded = true;
         }
     }
