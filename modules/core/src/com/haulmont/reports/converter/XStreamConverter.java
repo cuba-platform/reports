@@ -5,6 +5,7 @@
 
 package com.haulmont.reports.converter;
 
+import com.haulmont.cuba.core.global.ViewProperty;
 import com.haulmont.reports.entity.*;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.basic.DateConverter;
@@ -79,6 +80,7 @@ public class XStreamConverter {
         xStream.omitField(ReportTemplate.class, "detached");
         xStream.omitField(ReportInputParameter.class, "localeName");
         xStream.omitField(ReportGroup.class, "detached");
+        xStream.omitField(ViewProperty.class, "lazy");
 
         xStream.aliasField("customFlag", ReportTemplate.class, "custom");
         xStream.aliasField("customClass", ReportTemplate.class, "customDefinition");
