@@ -16,7 +16,10 @@ import com.haulmont.reports.gui.ReportGuiManager;
 import org.apache.commons.collections.CollectionUtils;
 
 import javax.inject.Inject;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author degtyarjov
@@ -157,5 +160,9 @@ public class InputParametersController extends AbstractWindow {
 
     public interface PrintReportHandler {
         void handle();
+    }
+
+    public void cancel() {
+        close(CLOSE_ACTION_ID);
     }
 }

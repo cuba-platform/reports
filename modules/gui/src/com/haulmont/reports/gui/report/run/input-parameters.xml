@@ -19,7 +19,10 @@
                 </row>
             </rows>
         </grid>
-        <button id="printReportBtn" invoke="printReport"
-                caption="msg://input.printReport" icon="icons/run.png"/>
+        <hbox spacing="true">
+            <button id="printReportBtn" invoke="printReport"
+                    caption="msg://input.printReport" icon="icons/run.png"/>
+            <button id="cancel" invoke="cancel" caption="msg://actions.Cancel"/>
+        </hbox>
     </layout>
 </window>
