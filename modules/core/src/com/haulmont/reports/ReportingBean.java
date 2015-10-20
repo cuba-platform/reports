@@ -103,6 +103,8 @@ public class ReportingBean implements ReportingApi {
             Report existingReport = em.find(Report.class, report.getId(), View.MINIMAL);
             if (existingReport != null) {
                 report.setVersion(existingReport.getVersion());
+            } else {
+                report.setVersion(0);
             }
             report = em.merge(report);
 
@@ -111,6 +113,8 @@ public class ReportingBean implements ReportingApi {
                     ReportTemplate existingTemplate = em.find(ReportTemplate.class, loadedTemplate.getId());
                     if (existingTemplate != null) {
                         loadedTemplate.setVersion(existingTemplate.getVersion());
+                    } else {
+                        loadedTemplate.setVersion(0);
                     }
 
                     loadedTemplate.setReport(report);
