@@ -32,6 +32,7 @@ import com.haulmont.reports.gui.ReportGuiManager;
 import com.haulmont.reports.gui.report.wizard.step.MainWizardFrame;
 import com.haulmont.reports.gui.report.wizard.step.StepFrame;
 import com.haulmont.reports.gui.report.wizard.step.StepFrameManager;
+import org.apache.commons.lang.StringUtils;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -199,7 +200,7 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
                 }
 
                 if (needUpdateEntityModel) {
-                    EntityTree entityTree = reportWizardService.buildEntityTree((MetaClass) entity.getValue());
+                    EntityTree entityTree = reportWizardService.buildEntityTree(entity.getValue());
                     entityTreeHasSimpleAttrs = entityTree.getEntityTreeStructureInfo().isEntityTreeHasSimpleAttrs();
                     entityTreeHasCollections = entityTree.getEntityTreeStructureInfo().isEntityTreeRootHasCollections();
                     entityTree.getEntityTreeRootNode().getLocalizedName();
@@ -220,41 +221,29 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
     }
 
     protected void initMainFields() {
-        mainFields.addCustomField("entity", new FieldGroup.CustomFieldGenerator() {
-            @Override
-            public Component generateField(Datasource datasource, String propertyId) {
-                LookupField lookupField = componentsFactory.createComponent(LookupField.class);
-                lookupField.requestFocus();
-                entity = lookupField;
-                return lookupField;
-            }
+        mainFields.addCustomField("entity", (datasource, propertyId) -> {
+            LookupField lookupField = componentsFactory.createComponent(LookupField.class);
+            lookupField.requestFocus();
+            entity = lookupField;
+            return lookupField;
         });
-        mainFields.addCustomField("reportName", new FieldGroup.CustomFieldGenerator() {
-            @Override
-            public Component generateField(Datasource datasource, String propertyId) {
-                TextField textField = componentsFactory.createComponent(TextField.class);
-                textField.setMaxLength(255);
-                reportName = textField;
-                return textField;
-            }
+        mainFields.addCustomField("reportName", (datasource, propertyId) -> {
+            TextField textField = componentsFactory.createComponent(TextField.class);
+            textField.setMaxLength(255);
+            reportName = textField;
+            return textField;
         });
-        mainFields.addCustomField("templateFileFormat", new FieldGroup.CustomFieldGenerator() {
-            @Override
-            public Component generateField(Datasource datasource, String propertyId) {
-                LookupField lookupField = componentsFactory.createComponent(LookupField.class);
-                templateFileFormat = lookupField;
-                return lookupField;
-            }
+        mainFields.addCustomField("templateFileFormat", (datasource, propertyId) -> {
+            LookupField lookupField = componentsFactory.createComponent(LookupField.class);
+            templateFileFormat = lookupField;
+            return lookupField;
         });
-        mainFields.addCustomField("reportType", new FieldGroup.CustomFieldGenerator() {
-            @Override
-            public Component generateField(Datasource datasource, String propertyId) {
-                OptionsGroup optionsGroup = componentsFactory.createComponent(OptionsGroup.class);
-                optionsGroup.setMultiSelect(false);
-                optionsGroup.setOrientation(OptionsGroup.Orientation.VERTICAL);
-                reportTypeOptionGroup = optionsGroup;
-                return optionsGroup;
-            }
+        mainFields.addCustomField("reportType", (datasource, propertyId) -> {
+            OptionsGroup optionsGroup = componentsFactory.createComponent(OptionsGroup.class);
+            optionsGroup.setMultiSelect(false);
+            optionsGroup.setOrientation(OptionsGroup.Orientation.VERTICAL);
+            reportTypeOptionGroup = optionsGroup;
+            return optionsGroup;
         });
     }
 
@@ -289,14 +278,19 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
         if (entity.getValue() == null) {
             return "";
         }
-        return formatMessage("downloadTemplateFileNamePattern", messageTools.getEntityCaption((MetaClass) entity.getValue()), fileExtension);
+        return formatMessage("downloadTemplateFileNamePattern", reportName.getValue(), fileExtension);
     }
 
     protected String generateOutputFileName(String fileExtension) {
-        if (entity.getValue() == null) {
-            return "";
+        if (StringUtils.isBlank(reportName.getValue())) {
+            if (entity.getValue() != null) {
+                return formatMessage("downloadOutputFileNamePattern", messageTools.getEntityCaption(entity.getValue()), fileExtension);
+            } else {
+                return "";
+            }
+        } else {
+            return reportName.getValue() + "." + fileExtension;
         }
-        return formatMessage("downloadOutputFileNamePattern", messageTools.getEntityCaption((MetaClass) entity.getValue()), fileExtension);
     }
 
 
@@ -419,7 +413,7 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
     /**
      * Dead code. Must to be tested after platform fixes in com.haulmont.cuba.web.WebWindowManager
      * Web modal editor window always closed forced, therefore that preClose method is not called
-     * <p/>
+     * <p>
      * Confirm closing without save if regions are created
      */
     @Override
@@ -489,10 +483,10 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
                 .put(TemplateFileType.HTML, new ImmutableMap.Builder<String, Object>()
                         .put(messages.getMessage(ReportOutputType.HTML), ReportOutputType.HTML)
                         .put(messages.getMessage(ReportOutputType.PDF), ReportOutputType.PDF)
-                                .build())
-                        .put(TemplateFileType.CHART, new ImmutableMap.Builder<String, Object>()
-                                .put(messages.getMessage(ReportOutputType.CHART), ReportOutputType.CHART)
-                                .build())
-                        .build();
+                        .build())
+                .put(TemplateFileType.CHART, new ImmutableMap.Builder<String, Object>()
+                        .put(messages.getMessage(ReportOutputType.CHART), ReportOutputType.CHART)
+                        .build())
+                .build();
     }
 }
