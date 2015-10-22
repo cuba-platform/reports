@@ -9,6 +9,7 @@ import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.chile.core.model.MetaProperty;
 import com.haulmont.cuba.core.entity.Entity;
 import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -63,10 +64,6 @@ public class EntityMap implements Map<String, Object> {
 
     @Override
     public Object get(Object key) {
-        if (INSTANCE_NAME_KEY.equals(key)) {
-            return instance.getInstanceName();
-        }
-
         Object value = getValue(instance, key);
 
         if (value != null) return value;
@@ -126,13 +123,26 @@ public class EntityMap implements Map<String, Object> {
 
     private Object getValue(Instance instance, Object key) {
         if (key == null) return null;
+
+        String path = String.valueOf(key);
+        if (path.endsWith(INSTANCE_NAME_KEY)) {
+            if (StringUtils.isNotBlank(path.replace(INSTANCE_NAME_KEY, ""))) {
+                Object value = getValue(instance, path.replace("." + INSTANCE_NAME_KEY, ""));
+                if (value instanceof Instance) {
+                    return ((Instance) value).getInstanceName();
+                }
+            } else {
+                return instance.getInstanceName();
+            }
+        }
+
         Object value = null;
         try {
-            value = instance.getValue(String.valueOf(key));
+            value = instance.getValue(path);
         } catch (Exception e) {/*Do nothing*/}
         if (value == null) {
             try {
-                value = instance.getValueEx(String.valueOf(key));
+                value = instance.getValueEx(path);
             } catch (Exception e) {/*Do nothing*/}
         }
         return value;
