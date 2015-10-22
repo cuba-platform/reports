@@ -82,6 +82,7 @@ configure([globalModule, coreModule, guiModule, webModule, desktopModule]) {
         compile(group: 'com.haulmont.cuba', name: 'cuba-global', version: baseVersion)
         testCompile('org.jmockit:jmockit:1.15')
         testCompile('junit:junit:4.12')
+        testCompile('org.hsqldb:hsqldb:2.3.3')
     }
 
     task sourceJar(type: Jar) {
