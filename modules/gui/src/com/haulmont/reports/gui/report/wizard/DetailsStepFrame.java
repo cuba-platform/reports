@@ -42,7 +42,7 @@ import java.util.*;
  * @author degtyarjov
  * @version $Id$
  */
-class DetailsStepFrame extends StepFrame {
+public class DetailsStepFrame extends StepFrame {
     protected ConditionsTree conditionsTree;
     protected Filter filter;
     protected FilterEntity filterEntity;

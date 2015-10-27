@@ -24,7 +24,7 @@ import java.util.*;
  * @author degtyarjov
  * @version $Id$
  */
-class RegionsStepFrame extends StepFrame {
+public class RegionsStepFrame extends StepFrame {
     protected static final String ADD_TABULATED_REGION_ACTION_ID = "tabulatedRegion";
     protected static final String ADD_SIMPLE_REGION_ACTION_ID = "simpleRegion";
     protected AddSimpleRegionAction addSimpleRegionAction;

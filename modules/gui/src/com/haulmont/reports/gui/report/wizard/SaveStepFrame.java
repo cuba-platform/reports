@@ -30,7 +30,7 @@ import java.util.Map;
  * @author degtyarjov
  * @version $Id$
  */
-class SaveStepFrame extends StepFrame {
+public class SaveStepFrame extends StepFrame {
     public SaveStepFrame(ReportWizardCreator wizard) {
         super(wizard, wizard.getMessage("saveReport"), "saveStep");
         isLast = true;
