@@ -7,6 +7,7 @@ package com.haulmont.reports.entity.charts;
 
 import com.haulmont.chile.core.annotations.MetaClass;
 import com.haulmont.chile.core.annotations.MetaProperty;
+import com.haulmont.cuba.core.entity.annotation.SystemLevel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +17,7 @@ import java.util.List;
  * @version $Id$
  */
 @MetaClass(name = "report$SerialChartDescription")
+@SystemLevel
 public class SerialChartDescription extends AbstractChartDescription {
     @MetaProperty(mandatory = true)
     protected String bandName;

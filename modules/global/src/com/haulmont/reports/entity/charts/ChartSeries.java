@@ -8,12 +8,14 @@ package com.haulmont.reports.entity.charts;
 import com.haulmont.chile.core.annotations.MetaClass;
 import com.haulmont.chile.core.annotations.MetaProperty;
 import com.haulmont.cuba.core.entity.AbstractNotPersistentEntity;
+import com.haulmont.cuba.core.entity.annotation.SystemLevel;
 
 /**
  * @author degtyarjov
  * @version $Id$
  */
 @MetaClass(name = "report$ChartSeries")
+@SystemLevel
 public class ChartSeries extends AbstractNotPersistentEntity {
     @MetaProperty
     protected String name;
