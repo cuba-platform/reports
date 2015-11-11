@@ -17,7 +17,6 @@ import com.haulmont.cuba.gui.data.DsBuilder;
 import com.haulmont.cuba.gui.xml.layout.ComponentsFactory;
 import com.haulmont.reports.entity.ParameterType;
 import com.haulmont.reports.entity.ReportInputParameter;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.*;
@@ -233,17 +232,17 @@ public class ParameterFieldCreator {
             tokenList.setInline(true);
             tokenList.setSimple(true);
 
-            if (Boolean.TRUE.equals(parameter.getRequired())) {
-                tokenList.addValidator(new Field.Validator() {
-                    @Override
-                    public void validate(Object value) throws ValidationException {
-                        if (value instanceof Collection && CollectionUtils.isEmpty((Collection) value)) {
-                            throw new ValidationException(
-                                    messages.formatMessage(this.getClass(), "error.paramIsRequiredButEmpty", parameter.getLocName()));
-                        }
-                    }
-                });
-            }
+//            if (Boolean.TRUE.equals(parameter.getRequired())) {
+//                tokenList.addValidator(new Field.Validator() {
+//                    @Override
+//                    public void validate(Object value) throws ValidationException {
+//                        if (value instanceof Collection && CollectionUtils.isEmpty((Collection) value)) {
+//                            throw new ValidationException(
+//                                    messages.formatMessage(this.getClass(), "error.paramIsRequiredButEmpty", parameter.getLocName()));
+//                        }
+//                    }
+//                });
+//            }
 
             return tokenList;
         }
