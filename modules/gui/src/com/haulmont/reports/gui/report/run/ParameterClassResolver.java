@@ -54,7 +54,7 @@ public class ParameterClassResolver {
     public Class resolveClass(ReportInputParameter parameter) {
         Class aClass = primitiveParameterTypeMapping.get(parameter.getType());
         if (aClass == null) {
-            if (parameter.getType() == ParameterType.ENTITY) {
+            if (parameter.getType() == ParameterType.ENTITY || parameter.getType() == ParameterType.ENTITY_LIST) {
                 MetaClass metaClass = metadata.getSession().getClass(parameter.getEntityMetaClass());
                 if (metaClass != null) {
                     return metaClass.getJavaClass();
