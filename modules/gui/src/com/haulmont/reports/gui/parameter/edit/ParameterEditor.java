@@ -83,6 +83,9 @@ public class ParameterEditor extends AbstractEditor {
     public void init(Map<String, Object> params) {
         super.init(params);
 
+        type.setOptionsList(Arrays.asList(ParameterType.TEXT, ParameterType.NUMERIC, ParameterType.BOOLEAN, ParameterType.ENUMERATION,
+                ParameterType.DATE, ParameterType.TIME, ParameterType.DATETIME, ParameterType.ENTITY, ParameterType.ENTITY_LIST));
+
         initMetaClassLookup();
 
         initEnumsLookup();
