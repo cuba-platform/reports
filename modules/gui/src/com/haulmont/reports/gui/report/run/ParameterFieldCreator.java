@@ -9,11 +9,14 @@ import com.google.common.collect.ImmutableMap;
 import com.haulmont.chile.core.datatypes.Datatypes;
 import com.haulmont.cuba.core.global.*;
 import com.haulmont.cuba.gui.AppConfig;
+import com.haulmont.cuba.gui.DialogParams;
 import com.haulmont.cuba.gui.WindowManager;
 import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.components.validators.DoubleValidator;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
 import com.haulmont.cuba.gui.data.DsBuilder;
+import com.haulmont.cuba.gui.theme.ThemeConstants;
+import com.haulmont.cuba.gui.theme.ThemeConstantsManager;
 import com.haulmont.cuba.gui.xml.layout.ComponentsFactory;
 import com.haulmont.reports.entity.ParameterType;
 import com.haulmont.reports.entity.ReportInputParameter;
@@ -165,8 +168,11 @@ public class ParameterFieldCreator {
             PickerField.LookupAction pickerLookupAction = new PickerField.LookupAction(pickerField) {
                 @Override
                 public void actionPerform(Component component) {
-                    window.getDialogParams().setHeight(400);
-                    window.getDialogParams().setResizable(true);
+                    DialogParams dialogParamsFromTheme = getDialogParamsFromTheme();
+                    DialogParams windowDialogParams = window.getDialogParams();
+                    windowDialogParams.setWidth(dialogParamsFromTheme.getWidth());
+                    windowDialogParams.setHeight(dialogParamsFromTheme.getHeight());
+                    windowDialogParams.setResizable(dialogParamsFromTheme.getResizable());
                     super.actionPerform(component);
                 }
             };
@@ -189,6 +195,20 @@ public class ParameterFieldCreator {
 
             return pickerField;
         }
+    }
+
+    protected DialogParams getDialogParamsFromTheme() {
+        ThemeConstantsManager themeConstantsManager = AppBeans.get(ThemeConstantsManager.NAME);
+        ThemeConstants theme = themeConstantsManager.getConstants();
+        int width = theme.getInt("cuba.gui.report.parameters.lookupDialog.width");
+        int height = theme.getInt("cuba.gui.report.parameters.lookupDialog.height");
+
+        DialogParams dialogParams = new DialogParams();
+        dialogParams.setWidth(width);
+        dialogParams.setHeight(height);
+        dialogParams.setResizable(true);
+
+        return dialogParams;
     }
 
     protected class MultiFieldCreator implements FieldCreator {
@@ -218,6 +238,7 @@ public class ParameterFieldCreator {
 
             String screen = parameter.getScreen();
 
+            tokenList.setLookupScreenDialogParams(getDialogParamsFromTheme());
             if (StringUtils.isNotEmpty(screen)) {
                 tokenList.setLookupScreen(screen);
                 tokenList.setLookupScreenParams(Collections.<String, Object>emptyMap());

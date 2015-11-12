@@ -60,7 +60,5 @@ public class CommonLookupController extends AbstractLookup {
         table.refresh();
 
         this.setLookupComponent(table);
-
-        getDialogParams().setHeight(350);
     }
 }
