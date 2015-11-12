@@ -18,40 +18,39 @@
                 datasourceClass="com.haulmont.reports.gui.datasource.NotPersistenceDatasource"/>
     </dsContext>
 
-    <assign name="width" value="300px"/>
+    <assign name="width" value="500px"/>
 
     <layout spacing="true">
         <hbox width="100%" expand="chartPreviewBox">
             <vbox spacing="true" width="AUTO">
                 <grid spacing="true">
                     <columns>
-                        <column flex="1"/>
-                        <column flex="1"/>
+                        <column/>
                         <column flex="1"/>
                     </columns>
                     <rows>
                         <row>
-                            <label value="msg://template.code"/>
+                            <label value="msg://template.code" align="MIDDLE_LEFT"/>
                             <textField id="code" datasource="templateDs" property="code"
                                        width="${width}" required="true"
                                        requiredMessage="msg://template.codeMsg"/>
                         </row>
                         <row>
-                            <label value="msg://template.outputType"/>
+                            <label value="msg://template.outputType" align="MIDDLE_LEFT"/>
                             <lookupField id="outputType" datasource="templateDs"
                                          property="reportOutputType"
                                          width="${width}" required="true"
                                          requiredMessage="msg://template.outputTypeMsg"/>
                         </row>
                         <row>
-                            <label id="templateFileLabel" value="msg://template.file"/>
+                            <label id="templateFileLabel" value="msg://template.file" align="MIDDLE_LEFT"/>
                             <hbox spacing="true" width="${width}" expand="templatePath">
                                 <upload id="uploadTemplate"/>
                                 <button id="templatePath" stylename="link"/>
                             </hbox>
                         </row>
                         <row>
-                            <label id="outputNamePatternLabel" value="msg://template.outputNamePattern"/>
+                            <label id="outputNamePatternLabel" value="msg://template.outputNamePattern" align="MIDDLE_LEFT"/>
                             <textField id="outputNamePattern" datasource="templateDs" property="outputNamePattern"
                                        width="${width}">
                                 <validator
@@ -59,17 +58,17 @@
                             </textField>
                         </row>
                         <row>
-                            <label value="msg://template.isCustom"/>
+                            <label value="msg://template.isCustom" align="MIDDLE_LEFT"/>
                             <checkBox id="custom" datasource="templateDs" property="custom"
                                       width="${width}"/>
                         </row>
                         <row>
-                            <label id="customDefinedByLabel" value="msg://template.customDefinedBy"/>
+                            <label id="customDefinedByLabel" value="msg://template.customDefinedBy" align="MIDDLE_LEFT"/>
                             <lookupField id="customDefinedBy" datasource="templateDs" property="customDefinedBy"
                                          width="${width}"/>
                         </row>
                         <row>
-                            <label id="customDefinitionLabel" value="msg://template.customDefinition"/>
+                            <label id="customDefinitionLabel" value="msg://template.customDefinition" align="MIDDLE_LEFT"/>
                             <textField id="customDefinition" datasource="templateDs" property="customDefinition"
                                        width="${width}"/>
                         </row>
