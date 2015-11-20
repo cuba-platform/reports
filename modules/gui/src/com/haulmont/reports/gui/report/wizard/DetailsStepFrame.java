@@ -10,22 +10,20 @@ import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.MessageTools;
 import com.haulmont.cuba.core.global.Messages;
-import com.haulmont.cuba.gui.FrameContextImpl;
+import com.haulmont.cuba.core.global.filter.ParameterInfo;
+import com.haulmont.cuba.core.global.filter.QueryFilter;
 import com.haulmont.cuba.gui.WindowManager.OpenType;
 import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.components.Action.Status;
 import com.haulmont.cuba.gui.components.Component.ValueChangeListener;
 import com.haulmont.cuba.gui.components.DialogAction.Type;
 import com.haulmont.cuba.gui.components.filter.ConditionsTree;
+import com.haulmont.cuba.gui.components.filter.FakeFilterSupport;
 import com.haulmont.cuba.gui.components.filter.FilterParser;
 import com.haulmont.cuba.gui.components.filter.Param;
 import com.haulmont.cuba.gui.components.filter.edit.FilterEditor;
 import com.haulmont.cuba.gui.config.WindowConfig;
 import com.haulmont.cuba.gui.config.WindowInfo;
-import com.haulmont.cuba.gui.data.impl.CollectionDatasourceImpl;
-import com.haulmont.cuba.gui.data.impl.DsContextImpl;
-import com.haulmont.cuba.gui.filter.QueryFilter;
-import com.haulmont.cuba.gui.xml.ParameterInfo;
 import com.haulmont.cuba.security.entity.FilterEntity;
 import com.haulmont.reports.entity.ParameterType;
 import com.haulmont.reports.entity.wizard.ReportData;
@@ -197,16 +195,19 @@ public class DetailsStepFrame extends StepFrame {
 
         @Override
         public void actionPerform(Component component) {
-            if (wizard.entity.getValue() == null) {
+            MetaClass entityMetaClass = wizard.entity.getValue();
+            if (entityMetaClass == null) {
                 wizard.showNotification(wizard.getMessage("fillEntityMsg"), Frame.NotificationType.TRAY_HTML);
                 return;
             }
 
             WindowInfo windowInfo = wizard.windowConfig.getWindowInfo("filterEditor");
-
-            filter = createFakeFilter();
-            filterEntity = createFakeFilterEntity(filter);
-            conditionsTree = createFakeConditionsTree();
+            FakeFilterSupport fakeFilterSupport = new FakeFilterSupport(wizard, entityMetaClass);
+            if (filter == null) {
+                filter = fakeFilterSupport.createFakeFilter();
+                filterEntity = fakeFilterSupport.createFakeFilterEntity(null);
+                conditionsTree = fakeFilterSupport.createFakeConditionsTree(filter, filterEntity);
+            }
 
             Map<String, Object> params = new HashMap<>();
             params.put("filterEntity", filterEntity);
@@ -328,39 +329,6 @@ public class DetailsStepFrame extends StepFrame {
                         wizard.reportTypeOptionGroup.getValue() == ReportData.ReportType.LIST_OF_ENTITIES_WITH_QUERY);
             }
         }
-    }
-
-    protected Filter createFakeFilter() {
-        if (filter != null) {
-            return filter;
-        }
-
-        final Filter fakeFilter = wizard.componentsFactory.createComponent(Filter.class);
-        fakeFilter.setXmlDescriptor(Dom4j.readDocument("<filter></filter>").getRootElement());
-        MetaClass metaClass = wizard.entity.getValue();
-        CollectionDatasourceImpl fakeDatasource = new CollectionDatasourceImpl();
-        DsContextImpl fakeDsContext = new DsContextImpl(getFrame().getDsContext().getDataSupplier());
-        FrameContextImpl fakeFrameContext = new FrameContextImpl(getFrame(), Collections.<String, Object>emptyMap());
-        fakeDsContext.setFrameContext(fakeFrameContext);
-        fakeDatasource.setDsContext(fakeDsContext);
-        //Attention: this query should match the logic in com.haulmont.reports.wizard.ReportingWizardBean.createJpqlDataSet()
-        fakeDatasource.setQuery("select queryEntity from " + metaClass.getName() + " queryEntity");
-        fakeDatasource.setMetaClass(metaClass);
-        fakeFilter.setDatasource(fakeDatasource);
-        fakeFilter.setFrame(this.frame);
-        return fakeFilter;
-    }
-
-    protected ConditionsTree createFakeConditionsTree() {
-        return conditionsTree != null ? conditionsTree : new ConditionsTree();
-    }
-
-    protected FilterEntity createFakeFilterEntity(Filter fakeFilter) {
-        if (filterEntity != null) return filterEntity;
-
-        FilterEntity fakeFilterEntity = new FilterEntity();
-        fakeFilterEntity.setXml(fakeFilter.getXmlDescriptor().asXML());
-        return fakeFilterEntity;
     }
 
     protected void clearQueryAndFilter() {
