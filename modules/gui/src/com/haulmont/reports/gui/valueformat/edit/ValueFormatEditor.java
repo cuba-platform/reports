@@ -4,8 +4,8 @@
  */
 package com.haulmont.reports.gui.valueformat.edit;
 
-import com.haulmont.chile.core.model.utils.InstanceUtils;
 import com.haulmont.cuba.core.entity.Entity;
+import com.haulmont.cuba.core.global.Metadata;
 import com.haulmont.cuba.gui.components.AbstractEditor;
 import com.haulmont.cuba.gui.components.Component;
 import com.haulmont.cuba.gui.components.FieldGroup;
@@ -48,6 +48,9 @@ public class ValueFormatEditor extends AbstractEditor<ReportValueFormat> {
 
     @Inject
     protected Datasource valuesFormatsDs;
+
+    @Inject
+    protected Metadata metadata;
 
     @Override
     public void init(Map<String, Object> params) {
@@ -104,7 +107,7 @@ public class ValueFormatEditor extends AbstractEditor<ReportValueFormat> {
     @Override
     public void setItem(Entity item) {
         Entity newItem = valuesFormatsDs.getDataSupplier().newInstance(valuesFormatsDs.getMetaClass());
-        InstanceUtils.copy(item, newItem);
+        metadata.getTools().copy(item, newItem);
         ((ReportValueFormat) newItem).setId((UUID) item.getId());
         super.setItem(newItem);
     }

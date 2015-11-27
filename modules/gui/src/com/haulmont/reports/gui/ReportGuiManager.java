@@ -5,7 +5,6 @@
 package com.haulmont.reports.gui;
 
 import com.haulmont.chile.core.model.MetaClass;
-import com.haulmont.chile.core.model.utils.InstanceUtils;
 import com.haulmont.cuba.core.app.DataService;
 import com.haulmont.cuba.core.global.*;
 import com.haulmont.cuba.gui.AppConfig;
@@ -32,8 +31,8 @@ import com.haulmont.yarg.reporting.ReportOutputDocument;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.lang.StringUtils;
-
 import org.springframework.stereotype.Component;
+
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.util.*;
@@ -351,7 +350,7 @@ public class ReportGuiManager {
      * Defensive copy
      */
     protected Report getReportForPrinting(Report report) {
-        Report copy = (Report) InstanceUtils.copy(report);
+        Report copy = (Report) metadata.getTools().copy(report);
         copy.setIsTmp(report.getIsTmp());
         return copy;
     }

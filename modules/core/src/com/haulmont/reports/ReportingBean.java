@@ -6,7 +6,6 @@
 package com.haulmont.reports;
 
 import com.haulmont.chile.core.model.MetaClass;
-import com.haulmont.chile.core.model.utils.InstanceUtils;
 import com.haulmont.cuba.core.EntityManager;
 import com.haulmont.cuba.core.Persistence;
 import com.haulmont.cuba.core.Transaction;
@@ -36,8 +35,8 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.perf4j.StopWatch;
 import org.perf4j.log4j.Log4JStopWatch;
 import org.slf4j.MDC;
-
 import org.springframework.stereotype.Component;
+
 import javax.inject.Inject;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -280,7 +279,7 @@ public class ReportingBean implements ReportingApi {
     @Override
     public Report copyReport(Report source) {
         source = reloadEntity(source, REPORT_EDIT_VIEW_NAME);
-        Report copiedReport = (Report) InstanceUtils.copy(source);
+        Report copiedReport = (Report) metadata.getTools().copy(source);
 
         copiedReport.setId(uuidSource.createUuid());
         copiedReport.setTemplates(null);
@@ -289,7 +288,7 @@ public class ReportingBean implements ReportingApi {
         ReportTemplate defaultCopiedTemplate = null;
 
         for (ReportTemplate reportTemplate : source.getTemplates()) {
-            ReportTemplate copiedTemplate = (ReportTemplate) InstanceUtils.copy(reportTemplate);
+            ReportTemplate copiedTemplate = (ReportTemplate) metadata.getTools().copy(reportTemplate);
             copiedTemplate.setId(uuidSource.createUuid());
             copiedTemplate.setReport(copiedReport);
             copiedTemplates.add(copiedTemplate);

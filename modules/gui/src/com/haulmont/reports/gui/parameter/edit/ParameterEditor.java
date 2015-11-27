@@ -5,7 +5,6 @@
 package com.haulmont.reports.gui.parameter.edit;
 
 import com.haulmont.chile.core.model.MetaClass;
-import com.haulmont.chile.core.model.utils.InstanceUtils;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.global.Metadata;
 import com.haulmont.cuba.gui.ScreensHelper;
@@ -66,7 +65,7 @@ public class ParameterEditor extends AbstractEditor {
     @Override
     public void setItem(Entity item) {
         ReportInputParameter newItem = parameterDs.getDataSupplier().newInstance(parameterDs.getMetaClass());
-        InstanceUtils.copy(item, newItem);
+        metadata.getTools().copy(item, newItem);
         newItem.setId((UUID) item.getId());
         if (newItem.getParameterClass() == null) {
             newItem.setParameterClass(parameterClassResolver.resolveClass(newItem));
