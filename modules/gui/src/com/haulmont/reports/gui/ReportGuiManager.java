@@ -250,9 +250,13 @@ public class ReportGuiManager {
     }
 
     public List<Report> getAvailableReports(@Nullable String screenId, @Nullable User user, @Nullable MetaClass inputValueMetaClass) {
-
-        LoadContext<Report> lContext = new LoadContext<>(Report.class);
-        lContext.setView(new View(Report.class).addProperty("name").addProperty("localeNames").addProperty("xml"));
+        LoadContext lContext = new LoadContext<>(Report.class);
+        lContext.setView(new View(Report.class)
+                .addProperty("name")
+                .addProperty("localeNames")
+                .addProperty("xml")
+                .addProperty("code")
+                .addProperty("group", metadata.getViewRepository().getView(ReportGroup.class, View.LOCAL)));
         if (inputValueMetaClass != null) {//select only reports having entity parameter
             lContext.setQueryString("select r from report$Report r where r.xml like :paramMask");
             lContext.getQuery().setParameter("paramMask", "%entityMetaClass%");

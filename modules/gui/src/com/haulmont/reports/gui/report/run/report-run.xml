@@ -12,23 +12,27 @@
         >
 
     <dsContext>
-        <collectionDatasource
+        <groupDatasource
                 id="reportDs"
                 class="com.haulmont.reports.entity.Report"
-                view="report.edit"
                 datasourceClass="com.haulmont.reports.gui.report.run.RunReportDatasource">
-        </collectionDatasource>
+        </groupDatasource>
     </dsContext>
 
-    <layout>
-        <table id="reportsTable" editable="false" width="100%" height="100%">
+    <layout expand="reportsTable" spacing="true">
+        <filter id="genericFilter" datasource="reportDs" applyTo="reportsTable">
+            <properties include=".*"/>
+        </filter>
+        <groupTable id="reportsTable" editable="false" width="100%" height="100%">
             <buttonsPanel>
                 <button id="runReport" action="reportsTable.runReport" icon="icons/run.png"/>
             </buttonsPanel>
             <columns>
+                <column id="group" caption="msg://report.group"/>
                 <column id="locName" caption="msg://report.name"/>
+                <column id="code" caption="msg://report.code"/>
             </columns>
             <rows datasource="reportDs"/>
-        </table>
+        </groupTable>
     </layout>
 </window>

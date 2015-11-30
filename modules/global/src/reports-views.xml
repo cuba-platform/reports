@@ -17,7 +17,7 @@
     <view entity="report$Report" name="report.edit" extends="_local">
         <property name="templates" view="template.edit"/>
         <property name="defaultTemplate" view="template.edit"/>
-        <property name="group" view="_minimal"/>
+        <property name="group" view="_local"/>
     </view>
 
     <view entity="report$Report" name="report.view">
