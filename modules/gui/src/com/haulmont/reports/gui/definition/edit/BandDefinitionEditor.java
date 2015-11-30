@@ -221,6 +221,11 @@ public class BandDefinitionEditor extends AbstractFrame implements Suggester {
             updateRequiredIndicators(e.getItem());
             selectFirstDataSet();
         });
+        bandDefinitionDs.addItemPropertyChangeListener(e -> {
+            if ("name".equals(e.getProperty()) && StringUtils.isBlank((String) e.getValue())) {
+                e.getItem().setName("*");
+            }
+        });
     }
 
     protected void initDataSetListeners() {
