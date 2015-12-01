@@ -389,7 +389,7 @@ public class ReportingBean implements ReportingApi {
     }
 
     protected FileDescriptor saveReport(byte[] reportData, String fileName, String ext) {
-        FileDescriptor file = new FileDescriptor();
+        FileDescriptor file = metadata.create(FileDescriptor.class);
         file.setCreateDate(timeSource.currentTimestamp());
         file.setName(fileName + "." + ext);
         file.setExtension(ext);

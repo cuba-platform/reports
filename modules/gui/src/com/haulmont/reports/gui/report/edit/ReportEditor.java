@@ -158,6 +158,9 @@ public class ReportEditor extends AbstractEditor<Report> {
     @Inject
     protected ScreensHelper screensHelper;
 
+    @Inject
+    private Metadata metadata;
+
     @Override
     protected void initNewItem(Report report) {
         report.setReportType(ReportType.SIMPLE);
@@ -551,7 +554,7 @@ public class ReportEditor extends AbstractEditor<Report> {
 
                     @Override
                     public void actionPerform(Component component) {
-                        ReportTemplate template = new ReportTemplate();
+                        ReportTemplate template = metadata.create(ReportTemplate.class);
                         template.setReport(getItem());
                         Editor editor = openEditor("report$ReportTemplate.edit", template, OpenType.DIALOG, templatesDs);
                         editor.addCloseListener(actionId -> {
