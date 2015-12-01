@@ -20,9 +20,6 @@
     </dsContext>
 
     <layout expand="reportsTable" spacing="true">
-        <filter id="genericFilter" datasource="reportDs" applyTo="reportsTable">
-            <properties include=".*"/>
-        </filter>
         <groupTable id="reportsTable" editable="false" width="100%" height="100%">
             <buttonsPanel>
                 <button id="runReport" action="reportsTable.runReport" icon="icons/run.png"/>
