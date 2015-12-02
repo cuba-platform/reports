@@ -58,9 +58,6 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
     protected Label customDefinedByLabel;
 
     @Inject
-    protected CheckBox custom;
-
-    @Inject
     protected FileUploadingAPI fileUploading;
 
     @Inject
@@ -143,7 +140,7 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
         setupVisibility(reportTemplate.getCustom(), reportTemplate.getReportOutputType());
     }
 
-    private void setupVisibility(boolean customEnabled, ReportOutputType reportOutputType) {
+    protected void setupVisibility(boolean customEnabled, ReportOutputType reportOutputType) {
         uploadTemplate.setVisible(!customEnabled);
         customDefinedBy.setVisible(customEnabled);
         customDefinition.setVisible(customEnabled);
