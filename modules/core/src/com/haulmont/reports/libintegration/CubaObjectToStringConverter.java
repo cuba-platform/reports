@@ -16,6 +16,7 @@ import com.haulmont.yarg.util.converter.AbstractObjectToStringConverter;
 
 import javax.inject.Inject;
 import java.text.ParseException;
+import java.util.UUID;
 
 /**
  * @author degtyarjov
@@ -53,6 +54,9 @@ public class CubaObjectToStringConverter extends AbstractObjectToStringConverter
             EntityLoadInfo entityLoadInfo = EntityLoadInfo.parse(paramValueStr);
             if (entityLoadInfo != null) {
                 return dataManager.load(new LoadContext(entityLoadInfo.getMetaClass()).setId(entityLoadInfo.getId()));
+            } else {
+                UUID id = UUID.fromString(paramValueStr);
+                return dataManager.load(new LoadContext(parameterClass).setId(id));
             }
         } else {
             Datatype datatype = Datatypes.get(parameterClass);
@@ -68,7 +72,5 @@ public class CubaObjectToStringConverter extends AbstractObjectToStringConverter
                 return convertFromStringUnresolved(parameterClass, paramValueStr);
             }
         }
-
-        return paramValueStr;
     }
 }
