@@ -120,6 +120,7 @@ public class ReportingWizardBean implements ReportingWizardApi {
                 parameter.setName(StringUtils.capitalize(queryParameter.name));
                 parameter.setType(queryParameter.parameterType);
                 parameter.setParameterClass(queryParameter.javaClass);
+                parameter.setDefaultValue(queryParameter.defaultValue);
 
                 if (queryParameter.parameterType == ParameterType.ENTITY
                         || queryParameter.parameterType == ParameterType.ENTITY_LIST) {

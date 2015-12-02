@@ -267,7 +267,8 @@ public class DetailsStepFrame extends StepFrame {
                         newParametersList.add(new ReportData.Parameter(
                                 parameterName,
                                 parameterClass,
-                                parameterType));
+                                parameterType,
+                                parameterInfo.getValue()));
 
                         wizard.query = wizard.query.replace(":" + parameterInfo.getName(), "${" + parameterName + "}");
                     }

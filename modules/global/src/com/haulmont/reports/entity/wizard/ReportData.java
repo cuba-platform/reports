@@ -33,11 +33,13 @@ public class ReportData extends AbstractNotPersistentEntity {
         public final String name;
         public final Class javaClass;
         public final ParameterType parameterType;
+        public final String defaultValue;
 
-        public Parameter(String name, Class javaClass, ParameterType parameterType) {
+        public Parameter(String name, Class javaClass, ParameterType parameterType, String defaultValue) {
             this.name = name;
             this.javaClass = javaClass;
             this.parameterType = parameterType;
+            this.defaultValue = defaultValue;
         }
     }
 
