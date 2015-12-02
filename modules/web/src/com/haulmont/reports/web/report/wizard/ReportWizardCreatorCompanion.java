@@ -7,7 +7,7 @@ package com.haulmont.reports.web.report.wizard;
 
 import com.haulmont.cuba.gui.components.Window;
 import com.haulmont.reports.gui.report.wizard.ReportWizardCreator;
-import com.haulmont.reports.web.CompanionHelper;
+import com.haulmont.reports.web.WindowCompanionHelper;
 
 /**
  * @author degtyarjov
@@ -16,11 +16,11 @@ import com.haulmont.reports.web.CompanionHelper;
 public class ReportWizardCreatorCompanion implements ReportWizardCreator.Companion {
     @Override
     public void setWindowHeight(Window window, int height) {
-        CompanionHelper.setWindowHeight(window, height);
+        WindowCompanionHelper.setWindowHeight(window, height);
     }
 
     @Override
     public void center(Window window) {
-        CompanionHelper.center(window);
+        WindowCompanionHelper.center(window);
     }
 }

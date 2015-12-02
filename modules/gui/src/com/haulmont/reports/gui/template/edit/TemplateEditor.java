@@ -175,7 +175,9 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
     public void init(Map<String, Object> params) {
         super.init(params);
 
-        getDialogParams().setWidth(themeConstants.getInt("cuba.gui.report.TemplateEditor.width")).setResizable(true);
+        getDialogParams()
+                .setWidthAuto()
+                .setResizable(true);
 
         uploadTemplate.addFileUploadErrorListener(e ->
                 showNotification(getMessage("templateEditor.uploadUnsuccess"), NotificationType.WARNING));

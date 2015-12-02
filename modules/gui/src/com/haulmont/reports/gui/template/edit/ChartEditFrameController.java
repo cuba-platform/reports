@@ -43,7 +43,11 @@ public class ChartEditFrameController extends AbstractFrame {
     public interface Companion {
         void setWindowWidth(Window window, int width);
 
+        void setWindowHeight(Window window, int height);
+
         void center(Window window);
+
+        void setWindowResizable(Window window, boolean resizable);
     }
 
     @Override
@@ -128,6 +132,7 @@ public class ChartEditFrameController extends AbstractFrame {
         Companion companion = getCompanion();
         if (companion != null) {
             companion.setWindowWidth(parent, 1280);
+            companion.setWindowResizable(parent, true);
         }
         previewChart(previewBox);
         return previewBox;
@@ -140,7 +145,9 @@ public class ChartEditFrameController extends AbstractFrame {
         previewBox.removeAll();
         Companion companion = getCompanion();
         if (companion != null) {
-            companion.setWindowWidth(parent, 700);
+            companion.setWindowWidth(parent, -1);
+            companion.setWindowHeight(parent, -1);
+            companion.setWindowResizable(parent, false);
         }
     }
 

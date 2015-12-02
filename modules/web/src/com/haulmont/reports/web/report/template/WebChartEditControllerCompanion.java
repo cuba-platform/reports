@@ -6,11 +6,8 @@
 package com.haulmont.reports.web.report.template;
 
 import com.haulmont.cuba.gui.components.Window;
-import com.haulmont.cuba.web.gui.components.WebComponentsHelper;
 import com.haulmont.reports.gui.template.edit.ChartEditFrameController;
-import com.haulmont.reports.web.CompanionHelper;
-import com.vaadin.server.Sizeable;
-import com.vaadin.ui.Component;
+import com.haulmont.reports.web.WindowCompanionHelper;
 
 /**
  * @author degtyarjov
@@ -19,11 +16,21 @@ import com.vaadin.ui.Component;
 public class WebChartEditControllerCompanion implements ChartEditFrameController.Companion {
     @Override
     public void setWindowWidth(Window window, int width) {
-        CompanionHelper.setWindowWidth(window, width);
+        WindowCompanionHelper.setWindowWidth(window, width);
+    }
+
+    @Override
+    public void setWindowHeight(Window window, int height) {
+        WindowCompanionHelper.setWindowHeight(window, height);
     }
 
     @Override
     public void center(Window window) {
-        CompanionHelper.center(window);
+        WindowCompanionHelper.center(window);
+    }
+
+    @Override
+    public void setWindowResizable(Window window, boolean resizable) {
+        WindowCompanionHelper.setWindowResizable(window, resizable);
     }
 }
