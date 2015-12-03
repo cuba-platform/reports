@@ -186,12 +186,18 @@ public class ReportBrowser extends AbstractLookup {
                 public String getCaption() {
                     return getMessage("report.new");
                 }
+
+                @Override
+                protected void afterCommit(Entity entity) {
+                    reportsTable.expandPath(entity);
+                }
             });
 
             popupCreateBtn.addAction(new AbstractAction("wizard") {
                 @Override
                 public void actionPerform(Component component) {
-                    AbstractEditor<ReportData> editor = openEditor("report$Report.wizard", metadata.create(ReportData.class),
+                    AbstractEditor<ReportData> editor = openEditor("report$Report.wizard",
+                            metadata.create(ReportData.class),
                             OpenType.DIALOG, reportsTable.getDatasource());
                     editor.addCloseListener(actionId -> {
                         if (COMMIT_ACTION_ID.equals(actionId)) {
@@ -212,6 +218,8 @@ public class ReportBrowser extends AbstractLookup {
                                             reportDs.updateItem(item1);
                                         }
                                     }
+                                    UUID newReportId = reportEditor.getItem().getId();
+                                    reportsTable.expandPath(reportDs.getItem(newReportId));
                                     reportsTable.requestFocus();
                                 });
                             }
