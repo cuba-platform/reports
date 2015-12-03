@@ -32,7 +32,7 @@ import java.util.*;
 public class Report extends BaseReportEntity implements com.haulmont.yarg.structure.Report {
     private static final long serialVersionUID = -2817764915661205093L;
 
-    @Column(name = "NAME", length = 255)
+    @Column(name = "NAME", length = 255, nullable = false, unique = true)
     protected String name;
 
     @Column(name = "LOCALE_NAMES")
@@ -41,7 +41,7 @@ public class Report extends BaseReportEntity implements com.haulmont.yarg.struct
     @Column(name = "CODE", length = 255)
     protected String code;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(name = "GROUP_ID")
     protected ReportGroup group;
 
@@ -106,6 +106,7 @@ public class Report extends BaseReportEntity implements com.haulmont.yarg.struct
         return rootBandDefinition;
     }
 
+    @Override
     public String getName() {
         return name;
     }

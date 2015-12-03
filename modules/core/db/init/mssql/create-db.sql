@@ -14,6 +14,8 @@ create table REPORT_GROUP (
   primary key (ID)
 )^
 
+create unique index IDX_REPORT_GROUP_UNIQ_TITLE on REPORT_GROUP (TITLE)^
+
 --------------------------------------------------------------------------------------------------------------
 
 create table REPORT_REPORT
@@ -38,31 +40,7 @@ create table REPORT_REPORT
       references REPORT_GROUP (ID)
 )^
 
---create unique index UK_REPORT_REPORT_CODE on REPORT_REPORT (CODE)^
-
---------------------------------------------------------------------------------------------------------------
---
---create table REPORT_BAND_DEFINITION
---(
---  ID uniqueidentifier not null,
---  CREATE_TS datetime,
---  CREATED_BY varchar(50),
---  VERSION integer,
---  UPDATE_TS datetime,
---  UPDATED_BY varchar(50),
---  --
---  PARENT_DEFINITION_ID uniqueidentifier,
---  REPORT_ID uniqueidentifier not null,
---  NAME varchar(255) not null,
---  ORIENTATION integer default 0 not null,
---  POSITION_ integer default 0 not null,
---  --
---  primary key (ID),
---  constraint FK_REPORT_BAND_DEFINITION_TO_REPORT_REPORT foreign key (REPORT_ID)
---      references REPORT_REPORT (ID) on delete cascade,
---  constraint FK_REPORT_BAND_DEFINITION_TO_REPORT_BAND_DEFINITION foreign key (PARENT_DEFINITION_ID)
---      references REPORT_BAND_DEFINITION (ID)
---)^
+create unique index IDX_REPORT_REPORT_UNIQ_NAME on REPORT_REPORT (NAME)^
 
 --------------------------------------------------------------------------------------------------------------
 

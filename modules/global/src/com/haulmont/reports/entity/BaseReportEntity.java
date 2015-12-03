@@ -14,16 +14,13 @@ import javax.persistence.Version;
 import java.util.Date;
 
 /**
- * Optimistically locked, implements Updatable
+ * Optimistically locked, implements Updatable.
  *
  * @author krivopustov
  * @version $Id$
  */
 @MappedSuperclass
-public class BaseReportEntity
-        extends BaseUuidEntity
-        implements Versioned, Updatable
-{
+public class BaseReportEntity extends BaseUuidEntity implements Versioned, Updatable {
     private static final long serialVersionUID = -7868980589172607336L;
 
     @Version
@@ -41,6 +38,7 @@ public class BaseReportEntity
         return version;
     }
 
+    @Override
     public void setVersion(Integer version) {
         this.version = version;
     }

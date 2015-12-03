@@ -35,8 +35,8 @@ public class ReportTemplate extends BaseReportEntity implements com.haulmont.yar
 
     public static final String NAME_FORMAT = "(%s) %s";
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "REPORT_ID", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "REPORT_ID")
     protected Report report;
 
     @Column(name = "OUTPUT_TYPE")

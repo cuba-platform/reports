@@ -14,6 +14,8 @@ create table REPORT_GROUP (
   primary key (ID)
 )^
 
+alter table REPORT_GROUP add constraint REPORT_GROUP_UNIQ_TITLE unique (TITLE)^
+
 ----------------------------------------------------------------------------------------------------------------
 
 create table REPORT_REPORT
@@ -37,6 +39,8 @@ create table REPORT_REPORT
   constraint FK_REPORT_REPORT_TO_REPORT_GROUP foreign key (GROUP_ID)
       references REPORT_GROUP (ID)
 )^
+
+alter table REPORT_REPORT add constraint REPORT_REPORT_UNIQ_NAME unique (NAME)^
 
 --------------------------------------------------------------------------------------------------------------
 
