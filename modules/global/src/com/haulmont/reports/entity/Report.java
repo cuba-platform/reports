@@ -41,11 +41,11 @@ public class Report extends BaseReportEntity implements com.haulmont.yarg.struct
     @Column(name = "CODE", length = 255)
     protected String code;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "GROUP_ID")
     protected ReportGroup group;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "DEFAULT_TEMPLATE_ID")
     protected ReportTemplate defaultTemplate;
 
