@@ -279,42 +279,14 @@ public class ReportingBean implements ReportingApi {
     @Override
     public Report copyReport(Report source) {
         source = reloadEntity(source, REPORT_EDIT_VIEW_NAME);
-        Report copiedReport = (Report) metadata.getTools().copy(source);
-
+        Report copiedReport = metadata.getTools().deepCopy(source);
         copiedReport.setId(uuidSource.createUuid());
-        copiedReport.setTemplates(null);
-
-        List<ReportTemplate> copiedTemplates = new ArrayList<>();
-        ReportTemplate defaultCopiedTemplate = null;
-
-        for (ReportTemplate reportTemplate : source.getTemplates()) {
-            ReportTemplate copiedTemplate = (ReportTemplate) metadata.getTools().copy(reportTemplate);
+        copiedReport.setName(generateReportName(source.getName()));
+        for (ReportTemplate copiedTemplate : copiedReport.getTemplates()) {
             copiedTemplate.setId(uuidSource.createUuid());
-            copiedTemplate.setReport(copiedReport);
-            copiedTemplates.add(copiedTemplate);
-            if (getDefaultTemplate(source).equals(reportTemplate)) {
-                defaultCopiedTemplate = copiedTemplate;
-            }
         }
 
-
-        Transaction tx = persistence.createTransaction();
-        try {
-            copiedReport.setName(generateReportName(source.getName(), 2));
-            EntityManager em = persistence.getEntityManager();
-            em.persist(copiedReport);
-            for (ReportTemplate copiedTemplate : copiedTemplates) {
-                em.persist(copiedTemplate);
-            }
-            copiedReport.setTemplates(copiedTemplates);
-            copiedReport.setDefaultTemplate(defaultCopiedTemplate);
-
-            copiedReport.setXml(convertToString(copiedReport));
-            tx.commit();
-        } finally {
-            tx.end();
-        }
-
+        storeReportEntity(copiedReport);
         return copiedReport;
     }
 
