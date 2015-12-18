@@ -7,6 +7,8 @@ package com.haulmont.reports.gui;
 
 import com.haulmont.cuba.core.config.Config;
 import com.haulmont.cuba.core.config.Property;
+import com.haulmont.cuba.core.config.Source;
+import com.haulmont.cuba.core.config.SourceType;
 import com.haulmont.cuba.core.config.defaults.DefaultBoolean;
 import com.haulmont.cuba.core.config.defaults.DefaultLong;
 
@@ -14,6 +16,7 @@ import com.haulmont.cuba.core.config.defaults.DefaultLong;
  * @author artamonov
  * @version $Id$
  */
+@Source(type = SourceType.APP)
 public interface ReportingClientConfig extends Config {
 
     @Property("cuba.reporting.useBackgroundReportProcessing")
