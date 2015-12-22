@@ -1,10 +1,10 @@
 
 create table REPORT_GROUP (
   ID varchar(36) not null,
-  CREATE_TS datetime null,
+  CREATE_TS datetime,
   CREATED_BY varchar(50),
   VERSION integer,
-  UPDATE_TS datetime null,
+  UPDATE_TS datetime,
   UPDATED_BY varchar(50),
   --
   TITLE varchar(255) not null,
@@ -21,10 +21,10 @@ create unique index IDX_REPORT_GROUP_UNIQ_TITLE on REPORT_GROUP (TITLE)^
 create table REPORT_REPORT
 (
   ID varchar(36) not null,
-  CREATE_TS datetime null,
+  CREATE_TS datetime,
   CREATED_BY varchar(50),
   VERSION integer,
-  UPDATE_TS datetime null,
+  UPDATE_TS datetime,
   UPDATED_BY varchar(50),
   --
   NAME varchar(255) not null,
@@ -47,10 +47,10 @@ create unique index IDX_REPORT_REPORT_UNIQ_NAME on REPORT_REPORT (NAME)^
 create table REPORT_TEMPLATE
 (
   ID varchar(36) not null,
-  CREATE_TS datetime null,
+  CREATE_TS datetime,
   CREATED_BY varchar(50),
   VERSION integer,
-  UPDATE_TS datetime null,
+  UPDATE_TS datetime,
   UPDATED_BY varchar(50),
   --
   REPORT_ID varchar(36) not null,
