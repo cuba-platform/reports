@@ -1,6 +1,6 @@
 
 create table REPORT_GROUP (
-  ID varchar(36) not null,
+  ID varchar(32),
   CREATE_TS datetime,
   CREATED_BY varchar(50),
   VERSION integer,
@@ -20,7 +20,7 @@ create unique index IDX_REPORT_GROUP_UNIQ_TITLE on REPORT_GROUP (TITLE)^
 
 create table REPORT_REPORT
 (
-  ID varchar(36) not null,
+  ID varchar(32),
   CREATE_TS datetime,
   CREATED_BY varchar(50),
   VERSION integer,
@@ -30,9 +30,9 @@ create table REPORT_REPORT
   NAME varchar(255) not null,
   CODE varchar(255),
   LOCALE_NAMES text,
-  GROUP_ID varchar(36) not null,
+  GROUP_ID varchar(32) not null,
   REPORT_TYPE integer,
-  DEFAULT_TEMPLATE_ID varchar(36),
+  DEFAULT_TEMPLATE_ID varchar(32),
   XML text,
   --
   primary key (ID),
@@ -46,14 +46,14 @@ create unique index IDX_REPORT_REPORT_UNIQ_NAME on REPORT_REPORT (NAME)^
 
 create table REPORT_TEMPLATE
 (
-  ID varchar(36) not null,
+  ID varchar(32),
   CREATE_TS datetime,
   CREATED_BY varchar(50),
   VERSION integer,
   UPDATE_TS datetime,
   UPDATED_BY varchar(50),
   --
-  REPORT_ID varchar(36) not null,
+  REPORT_ID varchar(32) not null,
   CODE varchar(50),
   OUTPUT_TYPE integer default 0 not null,
   IS_DEFAULT boolean default false,
@@ -75,5 +75,5 @@ alter table REPORT_REPORT add constraint FK_REPORT_REPORT_TO_DEF_TEMPLATE foreig
 references REPORT_TEMPLATE (ID)^
 
 insert into REPORT_GROUP (ID, CREATE_TS, CREATED_BY, VERSION, TITLE, CODE, LOCALE_NAMES)
-values ('4e083530-0b9c-11e1-9b41-6bdaa41bff94', current_timestamp, 'admin', 0, 'General', 'ReportGroup.default',
+values ('4e0835300b9c11e19b416bdaa41bff94', current_timestamp, 'admin', 0, 'General', 'ReportGroup.default',
 concat('en=General','\n','ru=Общие'))^
