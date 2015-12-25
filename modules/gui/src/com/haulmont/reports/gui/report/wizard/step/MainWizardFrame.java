@@ -5,20 +5,20 @@
 
 package com.haulmont.reports.gui.report.wizard.step;
 
-import com.haulmont.cuba.gui.components.AbstractEditor;
+import com.haulmont.cuba.gui.components.AbstractWindow;
 import com.haulmont.cuba.gui.components.Button;
 
 /**
  * @author fedorchenko
  * @version $Id$
  */
-public interface MainWizardFrame<T extends AbstractEditor> {
+public interface MainWizardFrame<T extends AbstractWindow> {
 
     String getMessage(String key);
 
     String formatMessage(String key, Object... params);
 
-    T getMainEditorFrame();
+    T getMainWizardFrame();
 
     Button getBackwardBtn();
 

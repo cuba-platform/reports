@@ -24,9 +24,9 @@ import com.haulmont.cuba.gui.upload.FileUploadingAPI;
 import com.haulmont.cuba.security.entity.EntityOp;
 import com.haulmont.reports.app.service.ReportService;
 import com.haulmont.reports.entity.Report;
-import com.haulmont.reports.entity.wizard.ReportData;
 import com.haulmont.reports.gui.ReportGuiManager;
 import com.haulmont.reports.gui.report.edit.ReportEditor;
+import com.haulmont.reports.gui.report.wizard.ReportWizardCreator;
 import org.apache.commons.io.FileUtils;
 
 import javax.inject.Inject;
@@ -196,13 +196,12 @@ public class ReportBrowser extends AbstractLookup {
             popupCreateBtn.addAction(new AbstractAction("wizard") {
                 @Override
                 public void actionPerform(Component component) {
-                    AbstractEditor<ReportData> editor = openEditor("report$Report.wizard",
-                            metadata.create(ReportData.class),
-                            OpenType.DIALOG, reportsTable.getDatasource());
-                    editor.addCloseListener(actionId -> {
+                    ReportWizardCreator wizard = (ReportWizardCreator) openWindow("report$Report.wizard",
+                            OpenType.DIALOG);
+                    wizard.addCloseListener(actionId -> {
                         if (COMMIT_ACTION_ID.equals(actionId)) {
-                            if (editor.getItem() != null && editor.getItem().getGeneratedReport() != null) {
-                                Report item = editor.getItem().getGeneratedReport();
+                            if (wizard.getItem() != null && wizard.getItem().getGeneratedReport() != null) {
+                                Report item = wizard.getItem().getGeneratedReport();
                                 CollectionDatasource datasource = reportsTable.getDatasource();
                                 boolean modified = datasource.isModified();
                                 datasource.addItem(item);

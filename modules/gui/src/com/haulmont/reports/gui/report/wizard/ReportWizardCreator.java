@@ -42,7 +42,7 @@ import java.util.*;
  * @author fedorchenko
  * @version $Id$
  */
-public class ReportWizardCreator extends AbstractEditor<ReportData> implements MainWizardFrame<AbstractEditor> {
+public class ReportWizardCreator extends AbstractWindow implements MainWizardFrame<AbstractWindow> {
     //main wizard window
     @Inject
     protected Datasource reportDataDs;
@@ -159,6 +159,8 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
     @SuppressWarnings("unchecked")
     public void init(Map<String, Object> params) {
         super.init(params);
+
+        reportDataDs.setItem(metadata.create(ReportData.class));
 
         wizardWidth = themeConstants.getInt("cuba.gui.report.ReportWizard.width");
         wizardHeight = themeConstants.getInt("cuba.gui.report.ReportWizard.height");
@@ -327,7 +329,7 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
     }
 
     @Override
-    public AbstractEditor getMainEditorFrame() {
+    public AbstractWindow getMainWizardFrame() {
         return this;
     }
 
@@ -373,15 +375,15 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
 
     protected Report buildReport(boolean temporary) {
         ReportData reportData = getItem();
-        reportData.setName((String) reportName.getValue());
+        reportData.setName(reportName.getValue());
         reportData.setTemplateFileName(generateTemplateFileName(templateFileFormat.getValue().toString().toLowerCase()));
         if (outputFileFormat.getValue() == null) {
             reportData.setOutputFileType(ReportOutputType.fromId(((TemplateFileType) templateFileFormat.getValue()).getId()));
         } else {
             //lets generate output report in same format as the template
-            reportData.setOutputFileType((ReportOutputType) outputFileFormat.getValue());
+            reportData.setOutputFileType(outputFileFormat.getValue());
         }
-        reportData.setReportType((ReportData.ReportType) reportTypeOptionGroup.getValue());
+        reportData.setReportType(reportTypeOptionGroup.getValue());
         groupsDs.refresh();
         if (groupsDs.getItemIds() != null) {
             UUID id = groupsDs.getItemIds().iterator().next();
@@ -391,13 +393,13 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
         //be sure that reportData.name and reportData.outputFileFormat is not null before generation of template
         byte[] templateByteArray;
         try {
-            templateByteArray = reportWizardService.generateTemplate(reportData, (TemplateFileType) templateFileFormat.getValue());
+            templateByteArray = reportWizardService.generateTemplate(reportData, templateFileFormat.getValue());
             reportData.setTemplateContent(templateByteArray);
         } catch (TemplateGenerationException e) {
             showNotification(getMessage("templateGenerationException"), NotificationType.WARNING);
             return null;
         }
-        reportData.setTemplateFileType((TemplateFileType) templateFileFormat.getValue());
+        reportData.setTemplateFileType(templateFileFormat.getValue());
         reportData.setOutputNamePattern(outputFileName.<String>getValue());
 
         if (query != null) {
@@ -446,7 +448,7 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
     protected void setCorrectReportOutputType() {
         ReportOutputType outputFileFormatPrevValue = outputFileFormat.getValue();
         outputFileFormat.setValue(null);
-        Map<String, Object> optionsMap = refreshOutputAvailableFormats((TemplateFileType) templateFileFormat.getValue());
+        Map<String, Object> optionsMap = refreshOutputAvailableFormats(templateFileFormat.getValue());
         outputFileFormat.setOptionsMap(optionsMap);
 
         if (outputFileFormatPrevValue != null) {
@@ -488,5 +490,9 @@ public class ReportWizardCreator extends AbstractEditor<ReportData> implements M
                         .put(messages.getMessage(ReportOutputType.CHART), ReportOutputType.CHART)
                         .build())
                 .build();
+    }
+
+    public ReportData getItem() {
+        return (ReportData) reportDataDs.getItem();
     }
 }

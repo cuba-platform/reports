@@ -34,7 +34,7 @@ public class ReportRegion extends AbstractNotPersistentEntity implements Orderab
     @MetaProperty
     @Composition
     @Transient
-    protected List<RegionProperty> regionProperties = new ArrayList<RegionProperty>();
+    protected List<RegionProperty> regionProperties = new ArrayList<>();
     @MetaProperty
     @Transient
     protected EntityTreeNode regionPropertiesRootNode;
