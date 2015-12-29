@@ -37,10 +37,9 @@
             </vbox>
             <groupBox id="selectedTreeItemsPanel" width="500px" height="500px">
                 <table id="propertiesTable" multiselect="true" sortable="false" reorderingAllowed="false"
-                       columnControlVisible="false"
-                       width="100%" height="100%">
+                       columnControlVisible="false" width="100%" height="100%">
                     <columns>
-                        <column id="hierarchicalLocalizedName" caption="msg://properties" width="900px"/>
+                        <column id="hierarchicalLocalizedName" caption="msg://properties"/>
                     </columns>
                     <rows datasource="reportRegionPropertiesTableDs"/>
                 </table>
