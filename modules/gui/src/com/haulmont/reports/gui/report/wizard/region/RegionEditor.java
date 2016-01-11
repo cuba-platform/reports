@@ -11,6 +11,7 @@ import com.haulmont.cuba.core.global.Configuration;
 import com.haulmont.cuba.core.global.Metadata;
 import com.haulmont.cuba.gui.WindowParams;
 import com.haulmont.cuba.gui.components.*;
+import com.haulmont.cuba.gui.components.actions.ItemTrackingAction;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
 import com.haulmont.cuba.gui.data.Datasource;
 import com.haulmont.cuba.gui.data.impl.AbstractTreeDatasource;
@@ -163,7 +164,7 @@ public class RegionEditor extends AbstractEditor<ReportRegion> {
     }
 
     protected void initControlBtnsActions() {
-        addItem.setAction(new AbstractAction("addItem") {
+        Action addAction = new ItemTrackingAction(entityTree, "addItem") {
             @Override
             public void actionPerform(Component component) {
                 @SuppressWarnings("unchecked")
@@ -205,8 +206,11 @@ public class RegionEditor extends AbstractEditor<ReportRegion> {
             public String getCaption() {
                 return "";
             }
-        });
-        removeItem.setAction(new AbstractAction("removeItem") {
+        };
+        entityTree.addAction(addAction);
+        addItem.setAction(addAction);
+
+        Action removeAction = new ItemTrackingAction(propertiesTable, "removeItem") {
             @Override
             public void actionPerform(Component component) {
                 for (Entity item : propertiesTable.getSelected()) {
@@ -219,7 +223,10 @@ public class RegionEditor extends AbstractEditor<ReportRegion> {
             public String getCaption() {
                 return "";
             }
-        });
+        };
+        propertiesTable.addAction(removeAction);
+        removeItem.setAction(removeAction);
+
         upItem.setAction(new OrderableItemMoveAction<>("upItem", OrderableItemMoveAction.Direction.UP, propertiesTable));
         downItem.setAction(new OrderableItemMoveAction<>("downItem", OrderableItemMoveAction.Direction.DOWN, propertiesTable));
     }
