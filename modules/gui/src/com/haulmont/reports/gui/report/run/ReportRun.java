@@ -6,21 +6,20 @@
 package com.haulmont.reports.gui.report.run;
 
 import com.haulmont.cuba.core.global.UserSessionSource;
-import com.haulmont.cuba.gui.components.AbstractLookup;
-import com.haulmont.cuba.gui.components.Action;
-import com.haulmont.cuba.gui.components.Component;
-import com.haulmont.cuba.gui.components.Table;
+import com.haulmont.cuba.gui.WindowParam;
+import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.components.actions.ItemTrackingAction;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
 import com.haulmont.reports.app.service.ReportService;
 import com.haulmont.reports.entity.Report;
+import com.haulmont.reports.entity.ReportGroup;
 import com.haulmont.reports.gui.ReportGuiManager;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang.StringUtils;
 
 import javax.inject.Inject;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * @author artamonov
@@ -44,18 +43,42 @@ public class ReportRun extends AbstractLookup {
     @Inject
     protected UserSessionSource userSessionSource;
 
+    @Inject
+    protected TextField nameFilter;
+
+    @Inject
+    protected TextField codeFilter;
+
+    @Inject
+    protected LookupField groupFilter;
+
+    @Inject
+    protected DateField updatedDateFilter;
+
+    @Inject
+    protected GridLayout gridFilter;
+
+    @WindowParam(name = REPORTS_PARAMETER)
+    protected List<Report> reportsParameter;
+
+    @WindowParam(name = SCREEN_PARAMETER)
+    protected String screenParameter;
+
     @Override
     public void init(Map<String, Object> params) {
         super.init(params);
-        List<Report> reports = (List<Report>) params.get(REPORTS_PARAMETER);
+
+        List<Report> reports = reportsParameter;
         if (reports == null) {
-            reports = reportGuiManager.getAvailableReports((String) params.get(SCREEN_PARAMETER), userSessionSource.getUserSession().getUser(), null);
+            reports = reportGuiManager.getAvailableReports(screenParameter, userSessionSource.getUserSession().getUser(), null);
         }
 
-        if (CollectionUtils.isNotEmpty(reports)) {
-            for (Report report : reports) {
-                reportDs.includeItem(report);
-            }
+        if (reportsParameter != null) {
+            gridFilter.setVisible(false);
+        }
+
+        for (Report report : reports) {
+            reportDs.includeItem(report);
         }
 
         Action runAction = new ItemTrackingAction(RUN_ACTION_ID) {
@@ -73,5 +96,60 @@ public class ReportRun extends AbstractLookup {
 
         // Dialog mode queryParameters
         getDialogParams().setWidth(640).setHeight(480);
+    }
+
+    public void filterReports() {
+        String nameFilterValue = StringUtils.lowerCase(nameFilter.getValue());
+        String codeFilterValue = StringUtils.lowerCase(codeFilter.getValue());
+        ReportGroup groupFilterValue = groupFilter.getValue();
+        Date dateFilterValue = updatedDateFilter.getValue();
+
+        List<Report> reports = new ArrayList<>(
+                reportGuiManager.getAvailableReports(screenParameter, userSessionSource.getUserSession().getUser(), null)
+        );
+
+        CollectionUtils.filter(reports, new org.apache.commons.collections.Predicate() {
+            @Override
+            public boolean evaluate(Object object) {
+                Report report = (Report) object;
+
+                if (nameFilterValue != null
+                        && !report.getName().toLowerCase().contains(nameFilterValue)) {
+                    return false;
+                }
+
+                if (codeFilterValue != null) {
+                    if (report.getCode() == null
+                            || (report.getCode() != null
+                            && !report.getCode().toLowerCase().contains(codeFilterValue))) {
+                        return false;
+                    }
+                }
+
+                if (groupFilterValue != null && !ObjectUtils.equals(report.getGroup(), groupFilterValue)) {
+                    return false;
+                }
+
+                if (dateFilterValue != null
+                        && report.getUpdateTs() != null
+                        && !report.getUpdateTs().after(dateFilterValue)) {
+                    return false;
+                }
+
+                return true;
+            }
+        });
+
+        reportDs.clear();
+        for (Report report : reports) {
+            reportDs.includeItem(report);
+        }
+    }
+
+    public void clearFilter() {
+        nameFilter.setValue(null);
+        codeFilter.setValue(null);
+        updatedDateFilter.setValue(null);
+        groupFilter.setValue(null);
     }
 }

@@ -3,13 +3,11 @@
   ~ Use is subject to license terms, see http://www.cuba-platform.com/license for details.
   -->
 
-<window
-        xmlns="http://schemas.haulmont.com/cuba/window.xsd"
+<window xmlns="http://schemas.haulmont.com/cuba/window.xsd"
         class="com.haulmont.reports.gui.report.run.ReportRun"
         messagesPack="com.haulmont.reports.gui.report.run"
         lookupComponent="reportsTable"
-        caption="msg://reportBrowser"
-        >
+        caption="msg://reportBrowser">
 
     <dsContext>
         <groupDatasource
@@ -17,10 +15,48 @@
                 class="com.haulmont.reports.entity.Report"
                 datasourceClass="com.haulmont.reports.gui.report.run.RunReportDatasource">
         </groupDatasource>
+        <collectionDatasource
+                id="reportGroupsDs"
+                class="com.haulmont.reports.entity.ReportGroup"
+                view="_local">
+            <query>select r from report$ReportGroup r</query>
+        </collectionDatasource>
     </dsContext>
 
     <layout expand="reportsTable" spacing="true">
-        <groupTable id="reportsTable" editable="false" width="100%" height="100%">
+        <grid id="gridFilter" spacing="true">
+            <columns count="5"/>
+            <rows>
+                <row>
+                    <label value="msg://report.reportRunFilterName" align="MIDDLE_RIGHT"/>
+                    <textField id="nameFilter" datatype="string" width="250px"/>
+
+                    <label value="msg://report.reportRunFilterUpdatedDate" align="MIDDLE_RIGHT"/>
+                    <dateField id="updatedDateFilter" resolution="DAY" width="250px"/>
+
+                    <button id="setFilterButton"
+                            caption="msg://report.reportFilterButton"
+                            align="BOTTOM_LEFT"
+                            invoke="filterReports"
+                            width="100px"/>
+                </row>
+                <row>
+                    <label value="msg://report.reportRunFilterCode" align="MIDDLE_RIGHT"/>
+                    <textField id="codeFilter" width="250px"/>
+
+                    <label value="msg://report.reportRunFilterGroup" align="MIDDLE_RIGHT"/>
+                    <lookupField id="groupFilter" optionsDatasource="reportGroupsDs" width="250px"/>
+
+                    <button id="clearFilterButton"
+                            caption="msg://report.reportClearButton"
+                            align="BOTTOM_LEFT"
+                            invoke="clearFilter"
+                            width="100px"/>
+                </row>
+            </rows>
+        </grid>
+
+        <groupTable id="reportsTable" editable="false" width="100%">
             <buttonsPanel>
                 <button id="runReport" action="reportsTable.runReport" icon="icons/run.png"/>
             </buttonsPanel>
