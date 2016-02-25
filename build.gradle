@@ -17,11 +17,7 @@ buildscript {
     
     println("CUBA Platform - Reports Version ${ext.cubaVersion}")
     println("")
-    
-    def docPluginVersion = '1.2.6'
-    def DOC_PLUGIN_VERSION = 'docPluginVersion'
-    docPluginVersion = rootProject.hasProperty(DOC_PLUGIN_VERSION) ? rootProject[DOC_PLUGIN_VERSION] : docPluginVersion
-		
+
     repositories {
         mavenLocal()
         maven {
@@ -34,14 +30,12 @@ buildscript {
     }
     dependencies {
         classpath group: 'com.haulmont.gradle', name: 'cuba-plugin', version: cubaVersion
-		classpath group: 'com.haulmont.gradle', name: 'doc-plugin', version: docPluginVersion
     }
 }
 
 apply(plugin: 'maven')
 apply(plugin: 'idea')
 apply(plugin: 'cuba')
-apply(plugin: 'doc')
 
 cuba {
     artifact {
@@ -196,22 +190,15 @@ configure(guiModule) {
 }
 
 configure(webModule) {
-    configurations {
-        webcontent
-    }
-
     dependencies {
         compile(globalModule)
         compile(guiModule)
         compile(group: 'com.haulmont.cuba', name: 'cuba-web', version: baseVersion)
-        webcontent(group: 'com.haulmont.cuba', name: 'cuba-web', version: baseVersion, classifier: 'web', ext: 'zip')
     }
 
     task deploy(dependsOn: assemble, type: CubaDeployment) {
         appName = 'app'
         appJars('cuba-global', 'cuba-client', 'cuba-gui', 'cuba-web',
-                'vaadin-server', 'vaadin-shared-deps', 'vaadin-shared', 'vaadin-theme-compiler',
-                'aceeditor', 'popupbutton',
                 'reports-global', 'reports-gui', 'reports-web')
     }
 }
@@ -232,137 +219,4 @@ task restart(dependsOn: ['stop', ':reports-core:deploy', ':reports-web:deploy'],
         }
     }
     start.execute()
-}
-
-/***************************** Documentation  *****************************/
-
-// These variables must be the project properties
-ext.docSrcDir = file('doc/content')
-ext.docToolsDir = file('doc/tools')
-ext.docCssDir = new File(docToolsDir, 'css')
-ext.docDstDir = new File("$buildDir/doc")
-ext.docTmpDir = new File("$buildDir/tmp/doc")
-
-task transformReporting(type: TransformDocbook) {
-    sourceDir = new File(docSrcDir, 'reporting/ru')
-    sourceFile = new File(sourceDir, 'reporting.xml')
-    destFile = new File(docTmpDir, 'reporting/ru/reporting.xml')
-    classpath = configurations.buildDoc
-}
-
-task transformReportingEng(type: TransformDocbook) {
-	sourceDir = new File(docSrcDir, 'reporting/eng')
-    sourceFile = new File(sourceDir, 'reporting.xml')
-    destFile = new File(docTmpDir, 'reporting/eng/reporting.xml')
-    classpath = configurations.buildDoc
-}
-
-def commonXslParameters = [
-        'toc.section.depth': '5',
-        'chunk.section.depth': '5',
-        'section.autolabel': '1',
-        'chapter.autolabel': '1',
-        'appendix.autolabel': 'A'
-    ]
-
-task buildReportingWebHelp(type: DocBook2WebHelp, dependsOn: transformReporting) {
-    sourceFile = transformReporting.destFile
-    imagesDir = new File(transformReporting.sourceDir, "img")
-    destDir = new File(docDstDir, "reporting/ru/webhelp")
-    templateDir = new File(docToolsDir, "webhelp/template")
-    searchDir = new File(docToolsDir, "webhelp/search")
-    brand = "Reporting Library"
-    language = "ru"
-    xslParameters = commonXslParameters
-}
-
-task buildReportingWebHelpEng(type: DocBook2WebHelp, dependsOn: transformReportingEng) {
-    sourceFile = transformReportingEng.destFile
-    imagesDir = new File(transformReportingEng.sourceDir, "img")
-    destDir = new File(docDstDir, "reporting/eng/webhelp")
-    templateDir = new File(docToolsDir, "webhelp/template")
-    searchDir = new File(docToolsDir, "webhelp/search")
-    brand = "Reporting Library"
-    language = "en"
-    xslParameters = commonXslParameters
-}
-
-task buildReportingXhtml(type: Docbook2Xhtml, dependsOn: transformReporting) {
-    source transformReporting.destFile
-    destFile = new File(docTmpDir, 'reporting-pdf/reporting-pdf.html')
-    stylesheetName = 'pdf.xsl'
-    resources = fileTree(new File(docSrcDir, 'reporting/ru')) {
-        include 'img/*.png'
-        include 'img/*.jpg'
-    }
-    resources += fileTree(docCssDir) {
-        include '*.css'
-    }
-}
-
-task buildReportingXhtmlEng(type: Docbook2Xhtml, dependsOn: transformReportingEng) {
-    source transformReportingEng.destFile
-    destFile = new File(docTmpDir, 'reporting-pdf/reporting-pdf.html')
-    stylesheetName = 'pdf.xsl'
-    resources = fileTree(new File(docSrcDir, 'reporting/eng')) {
-        include 'img/*.png'
-        include 'img/*.jpg'
-    }
-    resources += fileTree(docCssDir) {
-        include '*.css'
-    }
-}
-task buildReportingPdf(type: Xhtml2Pdf, dependsOn: buildReportingXhtml) {
-    inputs.dir docCssDir
-    sourceFile = buildReportingXhtml.destFile
-    destFile = new File(docDstDir, 'reporting/ru/pdf/reporting.pdf')
-    classpath = configurations.buildDoc
-    fonts = zipTree(configurations.docFonts.singleFile)
-}
-
-task buildReportingPdfEng(type: Xhtml2Pdf, dependsOn: buildReportingXhtmlEng) {
-    inputs.dir docCssDir
-    sourceFile = buildReportingXhtmlEng.destFile
-    destFile = new File(docDstDir, 'reporting/eng/pdf/reporting.pdf')
-    classpath = configurations.buildDoc
-    fonts = zipTree(configurations.docFonts.singleFile)
-}
-
-task buildReportingSingleHtml(type: Docbook2Xhtml, dependsOn: transformReporting) {
-    source transformReporting.destFile
-    destFile = new File(docDstDir, 'reporting/ru/html-single/reporting.html')
-    stylesheetName = 'html-single.xsl'
-    resources = fileTree(new File(docSrcDir, 'reporting/ru')) {
-        include 'img/**/*.png'
-        include 'img/**/*.jpg'
-    }
-    resources += fileTree(docCssDir) {
-        include '*.css'
-    }
-}
-
-task buildReportingSingleHtmlEng(type: Docbook2Xhtml, dependsOn: transformReportingEng) {
-    source transformReportingEng.destFile
-    destFile = new File(docDstDir, 'reporting/eng/html-single/reporting.html')
-    stylesheetName = 'html-single.xsl'
-    resources = fileTree(new File(docSrcDir, 'reporting/eng')) {
-        include 'img/**/*.png'
-        include 'img/**/*.jpg'
-    }
-    resources += fileTree(docCssDir) {
-        include '*.css'
-    }
-}
-
-task buildDoc(type: Zip, description: 'Build documentation',
-        dependsOn: [buildReportingSingleHtml, /*buildReportingSingleHtmlEng,*/ buildReportingPdf/*, buildReportingPdfEng*/, buildReportingWebHelp]) {
-    from 'build/doc'
-    destinationDir = file('build/distributions')
-    baseName = 'reports-doc'
-    version = baseVersion
-}
-
-artifacts {
-    if (Boolean.valueOf(System.getProperty("buildDoc")))
-        archives buildDoc
 }
