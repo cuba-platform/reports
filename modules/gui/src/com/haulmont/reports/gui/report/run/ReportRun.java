@@ -5,6 +5,9 @@
 
 package com.haulmont.reports.gui.report.run;
 
+import com.haulmont.cuba.client.ClientConfig;
+import com.haulmont.cuba.core.config.Property;
+import com.haulmont.cuba.core.config.defaults.DefaultString;
 import com.haulmont.cuba.core.global.UserSessionSource;
 import com.haulmont.cuba.gui.WindowParam;
 import com.haulmont.cuba.gui.components.*;
@@ -58,6 +61,9 @@ public class ReportRun extends AbstractLookup {
     @Inject
     protected GridLayout gridFilter;
 
+    @Inject
+    protected ClientConfig clientConfig;
+
     @WindowParam(name = REPORTS_PARAMETER)
     protected List<Report> reportsParameter;
 
@@ -96,6 +102,13 @@ public class ReportRun extends AbstractLookup {
 
         // Dialog mode queryParameters
         getDialogParams().setWidth(640).setHeight(480);
+
+        addAction(new AbstractAction("applyFilter", clientConfig.getFilterApplyShortcut()) {
+            @Override
+            public void actionPerform(Component component) {
+                filterReports();
+            }
+        });
     }
 
     public void filterReports() {

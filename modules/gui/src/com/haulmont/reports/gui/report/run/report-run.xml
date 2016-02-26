@@ -25,11 +25,18 @@
 
     <layout expand="reportsTable" spacing="true">
         <grid id="gridFilter" spacing="true">
-            <columns count="5"/>
+            <columns count="6"/>
             <rows>
                 <row>
                     <label value="msg://report.reportRunFilterName" align="MIDDLE_RIGHT"/>
                     <textField id="nameFilter" datatype="string" width="250px"/>
+
+                    <label value="msg://report.reportRunFilterCode" align="MIDDLE_RIGHT"/>
+                    <textField id="codeFilter" width="250px"/>
+                </row>
+                <row>
+                    <label value="msg://report.reportRunFilterGroup" align="MIDDLE_RIGHT"/>
+                    <lookupField id="groupFilter" optionsDatasource="reportGroupsDs" width="250px"/>
 
                     <label value="msg://report.reportRunFilterUpdatedDate" align="MIDDLE_RIGHT"/>
                     <dateField id="updatedDateFilter" resolution="DAY" width="250px"/>
@@ -39,13 +46,6 @@
                             align="BOTTOM_LEFT"
                             invoke="filterReports"
                             width="100px"/>
-                </row>
-                <row>
-                    <label value="msg://report.reportRunFilterCode" align="MIDDLE_RIGHT"/>
-                    <textField id="codeFilter" width="250px"/>
-
-                    <label value="msg://report.reportRunFilterGroup" align="MIDDLE_RIGHT"/>
-                    <lookupField id="groupFilter" optionsDatasource="reportGroupsDs" width="250px"/>
 
                     <button id="clearFilterButton"
                             caption="msg://report.reportClearButton"
