@@ -25,7 +25,6 @@ import java.util.Set;
 @Component(EntityTreeModelBuilderApi.NAME)
 @Scope("prototype")
 public class EntityTreeModelBuilder implements EntityTreeModelBuilderApi {
-    public static String[] IGNORED_ENTITIES_PREFIXES = new String[]{"sys$", "sec$"};
     protected MessageTools messageTools = AppBeans.get(MessageTools.NAME);
     protected ReportingWizardApi reportingWizardApi = AppBeans.get(ReportingWizardApi.NAME);
     protected int entityTreeModelMaxDeep = AppBeans.get(Configuration.class).getConfig(ReportingConfig.class).getEntityTreeModelMaxDeep();
