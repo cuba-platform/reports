@@ -6,10 +6,7 @@
 package com.haulmont.reports.wizard;
 
 import com.haulmont.chile.core.model.MetaClass;
-import com.haulmont.cuba.core.global.AppBeans;
-import com.haulmont.cuba.core.global.Configuration;
-import com.haulmont.cuba.core.global.MessageTools;
-import com.haulmont.cuba.core.global.Metadata;
+import com.haulmont.cuba.core.global.*;
 import com.haulmont.reports.ReportingConfig;
 import com.haulmont.reports.app.EntityTree;
 import com.haulmont.reports.app.EntityTreeStructureInfo;
@@ -69,8 +66,10 @@ public class EntityTreeModelBuilder implements EntityTreeModelBuilderApi {
                 MetaClass metaClass = metaProperty.getRange().asClass();
                 MetaClass effectiveMetaClass = metadata.getExtendedEntities().getEffectiveMetaClass(metaClass);
                 //does we need to do security checks here? no
-                if (!StringUtils.startsWithAny(effectiveMetaClass.getName(), IGNORED_ENTITIES_PREFIXES)
-                            /*userSession.isEntityOpPermitted(metaClass, EntityOp.READ)*/) {
+
+                MetadataTools metadataTools = metadata.getTools();
+
+                if (!metadataTools.isSystemLevel(metaClass) && !metadataTools.isSystemLevel(metaProperty)) {
                     int newDepth = depth + 1;
                     EntityTreeNode newParentModelNode = metadata.create(EntityTreeNode.class);
                     newParentModelNode.setName(metaProperty.getName());

@@ -424,10 +424,11 @@ public class ReportingWizardBean implements ReportingWizardApi {
 
     @Override
     public boolean isEntityAllowedForReportWizard(final MetaClass effectiveMetaClass) {
-        if (StringUtils.startsWithAny(effectiveMetaClass.getName(), EntityTreeModelBuilder.IGNORED_ENTITIES_PREFIXES) ||
-                effectiveMetaClass.getJavaClass().isAnnotationPresent(Embeddable.class) ||
-                effectiveMetaClass.getJavaClass().isAnnotationPresent(SystemLevel.class) ||
-                effectiveMetaClass.getProperties().isEmpty()) {
+        MetadataTools metadataTools = metadata.getTools();
+
+        if (metadataTools.isSystemLevel(effectiveMetaClass)
+                && metadataTools.isEmbeddable(effectiveMetaClass)
+                && effectiveMetaClass.getProperties().isEmpty()) {
             return false;
         }
         List<String> whiteListedEntities = getWizardWhiteListedEntities();
