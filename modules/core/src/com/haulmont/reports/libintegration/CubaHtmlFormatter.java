@@ -124,7 +124,11 @@ public class CubaHtmlFormatter extends HtmlFormatter {
                         // Usage of some fonts may be not permitted
                         renderer.getFontResolver().addFont(file.getAbsolutePath(), BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
                     } catch (IOException | DocumentException e) {
-                        log.warn(e.getMessage());
+                        if (StringUtils.contains(e.getMessage(), "cannot be embedded due to licensing restrictions")) {
+                            log.debug(e.getMessage());
+                        } else {
+                            log.warn(e.getMessage());
+                        }
                     }
                 }
             } else
