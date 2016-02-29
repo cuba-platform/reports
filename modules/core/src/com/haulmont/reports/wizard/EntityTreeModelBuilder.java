@@ -68,7 +68,7 @@ public class EntityTreeModelBuilder implements EntityTreeModelBuilderApi {
 
                 MetadataTools metadataTools = metadata.getTools();
 
-                if (!metadataTools.isSystemLevel(metaClass) && !metadataTools.isSystemLevel(metaProperty)) {
+                if (!metadataTools.isSystemLevel(effectiveMetaClass) && !metadataTools.isSystemLevel(metaProperty)) {
                     int newDepth = depth + 1;
                     EntityTreeNode newParentModelNode = metadata.create(EntityTreeNode.class);
                     newParentModelNode.setName(metaProperty.getName());

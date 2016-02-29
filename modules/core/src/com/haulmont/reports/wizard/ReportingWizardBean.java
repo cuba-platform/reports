@@ -425,8 +425,8 @@ public class ReportingWizardBean implements ReportingWizardApi {
         MetadataTools metadataTools = metadata.getTools();
 
         if (metadataTools.isSystemLevel(effectiveMetaClass)
-                && metadataTools.isEmbeddable(effectiveMetaClass)
-                && effectiveMetaClass.getProperties().isEmpty()) {
+                || metadataTools.isEmbeddable(effectiveMetaClass)
+                || effectiveMetaClass.getProperties().isEmpty()) {
             return false;
         }
         List<String> whiteListedEntities = getWizardWhiteListedEntities();
