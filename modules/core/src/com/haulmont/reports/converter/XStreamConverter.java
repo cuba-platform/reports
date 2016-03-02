@@ -6,6 +6,7 @@
 package com.haulmont.reports.converter;
 
 import com.haulmont.cuba.core.global.ViewProperty;
+import com.haulmont.cuba.security.entity.Role;
 import com.haulmont.reports.entity.*;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.basic.DateConverter;
@@ -13,6 +14,8 @@ import com.thoughtworks.xstream.converters.collections.CollectionConverter;
 import com.thoughtworks.xstream.converters.reflection.ExternalizableConverter;
 import com.thoughtworks.xstream.converters.reflection.SerializableConverter;
 import com.thoughtworks.xstream.mapper.MapperWrapper;
+import org.perf4j.StopWatch;
+import org.perf4j.log4j.Log4JStopWatch;
 
 import java.util.*;
 
@@ -81,6 +84,8 @@ public class XStreamConverter {
         xStream.omitField(ReportInputParameter.class, "localeName");
         xStream.omitField(ReportGroup.class, "detached");
         xStream.omitField(ViewProperty.class, "lazy");
+        xStream.omitField(Role.class, "detached");
+        xStream.omitField(ReportScreen.class, "detached");
 
         xStream.aliasField("customFlag", ReportTemplate.class, "custom");
         xStream.aliasField("customClass", ReportTemplate.class, "customDefinition");
