@@ -13,7 +13,7 @@
         <groupDatasource
                 id="reportDs"
                 class="com.haulmont.reports.entity.Report"
-                datasourceClass="com.haulmont.cuba.gui.data.GroupDatasource">
+                refreshMode="NEVER">
         </groupDatasource>
         <collectionDatasource
                 id="reportGroupsDs"
