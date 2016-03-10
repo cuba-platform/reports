@@ -16,15 +16,15 @@ import com.haulmont.cuba.core.config.defaults.DefaultLong;
  * @author artamonov
  * @version $Id$
  */
-@Source(type = SourceType.APP)
+@Source(type = SourceType.DATABASE)
 public interface ReportingClientConfig extends Config {
 
-    @Property("cuba.reporting.useBackgroundReportProcessing")
+    @Property("reporting.useBackgroundReportProcessing")
     @DefaultBoolean(false)
     boolean getUseBackgroundReportProcessing();
     void setUseBackgroundReportProcessing(boolean useBackgroundReportProcessing);
 
-    @Property("cuba.reporting.backgroundReportProcessingTimeoutMs")
+    @Property("reporting.backgroundReportProcessingTimeoutMs")
     @DefaultLong(10000)
     long getBackgroundReportProcessingTimeoutMs();
     void setBackgroundReportProcessingTimeoutMs(long backgroundReportProcessingTimeoutMs);
