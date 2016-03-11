@@ -19,11 +19,13 @@ import java.util.Set;
 
 /**
  * @author artamonov
- * @version $Id$
  */
-public class TablePrintFormAction extends AbstractPrintFormAction {
+public class TablePrintFormAction extends AbstractPrintFormAction implements Action.HasBeforeAfterHandlers {
     protected final Window window;
     protected final Table table;
+
+    protected Runnable beforeActionPerformedHandler;
+    protected Runnable afterActionPerformedHandler;
 
     public TablePrintFormAction(Window window, Table table) {
         this("tableReport", window, table);
@@ -40,6 +42,10 @@ public class TablePrintFormAction extends AbstractPrintFormAction {
 
     @Override
     public void actionPerform(Component component) {
+        if (beforeActionPerformedHandler != null) {
+            beforeActionPerformedHandler.run();
+        }
+
         final Set selected = table.getSelected();
 
         DialogAction cancelAction = new DialogAction(Type.CANCEL);
@@ -101,6 +107,10 @@ public class TablePrintFormAction extends AbstractPrintFormAction {
                         Frame.NotificationType.HUMANIZED);
             }
         }
+
+        if (afterActionPerformedHandler != null) {
+            afterActionPerformedHandler.run();
+        }
     }
 
     protected void printSelected(Set selected) {
@@ -127,5 +137,25 @@ public class TablePrintFormAction extends AbstractPrintFormAction {
         parameterPrototype.setMaxResults(query.getMaxResults());
 
         openRunReportScreen(window, parameterPrototype, metaClass);
+    }
+
+    @Override
+    public Runnable getBeforeActionPerformedHandler() {
+        return beforeActionPerformedHandler;
+    }
+
+    @Override
+    public void setBeforeActionPerformedHandler(Runnable handler) {
+        this.beforeActionPerformedHandler = handler;
+    }
+
+    @Override
+    public Runnable getAfterActionPerformedHandler() {
+        return afterActionPerformedHandler;
+    }
+
+    @Override
+    public void setAfterActionPerformedHandler(Runnable handler) {
+        this.afterActionPerformedHandler = handler;
     }
 }
