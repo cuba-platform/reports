@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2008-2016 Haulmont. All rights reserved.
+ * Use is subject to license terms, see http://www.cuba-platform.com/commercial-software-license for details.
+ */
+
 package com.haulmont.reports.core;/*
  * Copyright (c) 2008-2015 Haulmont. All rights reserved.
  * Use is subject to license terms, see http://www.cuba-platform.com/license for details.
@@ -12,8 +17,6 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * @author degtyarjov
- * @version $Id$
  */
 public class ReportSerializationTest extends ReportsTestCase {
     public void testGsonConverter() throws Exception {

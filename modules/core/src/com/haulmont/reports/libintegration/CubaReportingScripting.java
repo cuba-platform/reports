@@ -1,12 +1,10 @@
 /*
- * Copyright (c) 2008-2013 Haulmont. All rights reserved.
- * Use is subject to license terms, see http://www.cuba-platform.com/license for details.
+ * Copyright (c) 2008-2016 Haulmont. All rights reserved.
+ * Use is subject to license terms, see http://www.cuba-platform.com/commercial-software-license for details.
  */
 
 /**
  *
- * @author degtyarjov
- * @version $Id$
  */
 package com.haulmont.reports.libintegration;
 
@@ -17,8 +15,6 @@ import javax.inject.Inject;
 import java.util.Map;
 
 /**
- * @author degtyarjov
- * @version $Id$
  */
 public class CubaReportingScripting implements Scripting {
 

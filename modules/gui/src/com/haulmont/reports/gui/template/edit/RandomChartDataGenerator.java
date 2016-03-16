@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2008-2015 Haulmont. All rights reserved.
- * Use is subject to license terms, see http://www.cuba-platform.com/license for details.
+ * Copyright (c) 2008-2016 Haulmont. All rights reserved.
+ * Use is subject to license terms, see http://www.cuba-platform.com/commercial-software-license for details.
  */
 
 package com.haulmont.reports.gui.template.edit;
@@ -14,8 +14,6 @@ import javax.annotation.Nullable;
 import java.util.*;
 
 /**
- * @author degtyarjov
- * @version $Id$
  */
 public class RandomChartDataGenerator {
     public static final List<String> COLORS = Arrays.asList("red", "green", "blue", "yellow", "orange", "black", "magenta");

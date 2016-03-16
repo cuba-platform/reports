@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2008-2014 Haulmont. All rights reserved.
- * Use is subject to license terms, see http://www.cuba-platform.com/license for details.
+ * Copyright (c) 2008-2016 Haulmont. All rights reserved.
+ * Use is subject to license terms, see http://www.cuba-platform.com/commercial-software-license for details.
  */
 
 package com.haulmont.reports.web.report.wizard.region;
@@ -24,8 +24,6 @@ import org.springframework.cglib.core.Transformer;
 import java.util.UUID;
 
 /**
- * @author fedorchenko
- * @version $Id$
  */
 public class WebRegionEditorCompanion implements RegionEditor.Companion {
     @Override

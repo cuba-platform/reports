@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2008-2015 Haulmont. All rights reserved.
- * Use is subject to license terms, see http://www.cuba-platform.com/license for details.
+ * Copyright (c) 2008-2016 Haulmont. All rights reserved.
+ * Use is subject to license terms, see http://www.cuba-platform.com/commercial-software-license for details.
  */
 
 package com.haulmont.reports.gui.report.wizard;
@@ -21,8 +21,6 @@ import org.apache.commons.lang.StringUtils;
 import java.util.*;
 
 /**
- * @author degtyarjov
- * @version $Id$
  */
 public class RegionsStepFrame extends StepFrame {
     protected static final String ADD_TABULATED_REGION_ACTION_ID = "tabulatedRegion";

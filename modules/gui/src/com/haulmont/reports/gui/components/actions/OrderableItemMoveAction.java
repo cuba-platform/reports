@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2008-2014 Haulmont. All rights reserved.
- * Use is subject to license terms, see http://www.cuba-platform.com/license for details.
+ * Copyright (c) 2008-2016 Haulmont. All rights reserved.
+ * Use is subject to license terms, see http://www.cuba-platform.com/commercial-software-license for details.
  */
 
 package com.haulmont.reports.gui.components.actions;
@@ -20,8 +20,6 @@ import java.util.*;
  * Move algorithm is differ from selected items count:
  * <ul><li>swap items algorithm if one item is selected </li><li>index recalculating algorithm if more than one item selected)</li><ul/>
  *
- * @author fedorchenko
- * @version $Id$
  */
 public class OrderableItemMoveAction<T extends ListComponent<E>, E  extends OrderableEntity> extends AbstractAction {
 

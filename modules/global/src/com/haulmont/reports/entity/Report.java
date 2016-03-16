@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2008-2013 Haulmont. All rights reserved.
- * Use is subject to license terms, see http://www.cuba-platform.com/license for details.
+ * Copyright (c) 2008-2016 Haulmont. All rights reserved.
+ * Use is subject to license terms, see http://www.cuba-platform.com/commercial-software-license for details.
  */
 package com.haulmont.reports.entity;
 
@@ -21,8 +21,6 @@ import java.util.*;
 /**
  * <Attention>This entity should be detached for correct work. If you do not detach it please use logic as in com.haulmont.reports.listener.ReportDetachListener#onBeforeDetach(com.haulmont.reports.entity.Report, com.haulmont.cuba.core.EntityManager)</Attention>
  *
- * @author degtyarjov
- * @version $Id$
  */
 @Entity(name = "report$Report")
 @Table(name = "REPORT_REPORT")

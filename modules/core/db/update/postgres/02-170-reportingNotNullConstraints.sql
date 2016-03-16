@@ -1,4 +1,3 @@
--- $Id$
 -- Description: Add not null for fields in reporting tables
 
 -- REPORT_REPORT

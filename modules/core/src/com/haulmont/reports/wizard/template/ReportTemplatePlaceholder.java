@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2008-2014 Haulmont. All rights reserved.
- * Use is subject to license terms, see http://www.cuba-platform.com/license for details.
+ * Copyright (c) 2008-2016 Haulmont. All rights reserved.
+ * Use is subject to license terms, see http://www.cuba-platform.com/commercial-software-license for details.
  */
 
 package com.haulmont.reports.wizard.template;
@@ -18,8 +18,6 @@ import javax.persistence.Temporal;
 import java.util.Date;
 
 /**
- * @author fedorchenko
- * @version $Id$
  */
 public class ReportTemplatePlaceholder {
     protected static final String HAS_CONTENT = "?has_content";

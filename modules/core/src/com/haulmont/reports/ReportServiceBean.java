@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2008-2013 Haulmont. All rights reserved.
- * Use is subject to license terms, see http://www.cuba-platform.com/license for details.
+ * Copyright (c) 2008-2016 Haulmont. All rights reserved.
+ * Use is subject to license terms, see http://www.cuba-platform.com/commercial-software-license for details.
  */
 package com.haulmont.reports;
 
@@ -22,8 +22,6 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author degtyarjov
- * @version $Id$
  */
 @Service(ReportService.NAME)
 public class ReportServiceBean implements ReportService {

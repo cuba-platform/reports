@@ -1,7 +1,10 @@
+/*
+ * Copyright (c) 2008-2016 Haulmont. All rights reserved.
+ * Use is subject to license terms, see http://www.cuba-platform.com/commercial-software-license for details.
+ */
+
 /**
  *
- * @author degtyarjov
- * @version $Id$
  */
 package com.haulmont.reports;
 
@@ -10,8 +13,6 @@ import com.haulmont.cuba.core.global.FileStorageException;
 import java.io.IOException;
 
 /**
- * @author degtyarjov
- * @version $Id$
  */
 public interface ReportImportExportMBean {
 

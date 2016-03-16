@@ -1,4 +1,3 @@
---$Id$--
 alter table REPORT_REPORT add column DEFAULT_TEMPLATE_ID uuid;
 
 alter table REPORT_REPORT add constraint FK_REPORT_REPORT_TO_DEF_TEMPLATE foreign key (DEFAULT_TEMPLATE_ID)
