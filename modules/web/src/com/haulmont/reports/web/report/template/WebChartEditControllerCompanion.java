@@ -14,12 +14,12 @@ import com.haulmont.reports.web.WindowCompanionHelper;
 public class WebChartEditControllerCompanion implements ChartEditFrameController.Companion {
     @Override
     public void setWindowWidth(Window window, int width) {
-        WindowCompanionHelper.setWindowWidth(window, width);
+        window.getDialogOptions().setWidth(width);
     }
 
     @Override
     public void setWindowHeight(Window window, int height) {
-        WindowCompanionHelper.setWindowHeight(window, height);
+        window.getDialogOptions().setHeight(height);
     }
 
     @Override
@@ -29,6 +29,6 @@ public class WebChartEditControllerCompanion implements ChartEditFrameController
 
     @Override
     public void setWindowResizable(Window window, boolean resizable) {
-        WindowCompanionHelper.setWindowResizable(window, resizable);
+        window.getDialogOptions().setResizable(resizable);
     }
 }

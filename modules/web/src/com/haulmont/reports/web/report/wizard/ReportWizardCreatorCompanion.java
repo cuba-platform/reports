@@ -14,7 +14,7 @@ import com.haulmont.reports.web.WindowCompanionHelper;
 public class ReportWizardCreatorCompanion implements ReportWizardCreator.Companion {
     @Override
     public void setWindowHeight(Window window, int height) {
-        WindowCompanionHelper.setWindowHeight(window, height);
+        window.getDialogOptions().setHeight(height);
     }
 
     @Override
