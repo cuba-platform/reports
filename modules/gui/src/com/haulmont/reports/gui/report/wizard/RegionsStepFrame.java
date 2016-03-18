@@ -15,10 +15,12 @@ import com.haulmont.reports.entity.wizard.ReportRegion;
 import com.haulmont.reports.gui.components.actions.OrderableItemMoveAction;
 import com.haulmont.reports.gui.report.wizard.step.StepFrame;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang.StringUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  */
@@ -67,20 +69,17 @@ public class RegionsStepFrame extends StepFrame {
             lookupParams.put("rootEntity", wizard.getItem().getEntityTreeRootNode());
             lookupParams.put("collectionsOnly", Boolean.TRUE);
             lookupParams.put("persistentOnly", ReportData.ReportType.LIST_OF_ENTITIES_WITH_QUERY == wizard.reportTypeOptionGroup.getValue());
-            wizard.openLookup("report$ReportEntityTree.lookup", new Window.Lookup.Handler() {
-                @Override
-                public void handleLookup(Collection items) {
-                    if (items.size() == 1) {
-                        EntityTreeNode regionPropertiesRootNode = (EntityTreeNode) CollectionUtils.get(items, 0);
+            wizard.openLookup("report$ReportEntityTree.lookup", items -> {
+                if (items.size() == 1) {
+                    EntityTreeNode regionPropertiesRootNode = (EntityTreeNode) CollectionUtils.get(items, 0);
 
-                        Map<String, Object> editorParams = new HashMap<>();
-                        editorParams.put("scalarOnly", Boolean.TRUE);
-                        editorParams.put("persistentOnly", ReportData.ReportType.LIST_OF_ENTITIES_WITH_QUERY == wizard.reportTypeOptionGroup.getValue());
-                        editorParams.put("rootEntity", regionPropertiesRootNode);
-                        item.setRegionPropertiesRootNode(regionPropertiesRootNode);
-                        Window.Editor regionEditor = wizard.openEditor("report$Report.regionEditor", item, WindowManager.OpenType.DIALOG, editorParams, wizard.reportRegionsDs);
-                        regionEditor.addCloseListener(new RegionEditorCloseListener());
-                    }
+                    Map<String, Object> editorParams = new HashMap<>();
+                    editorParams.put("scalarOnly", Boolean.TRUE);
+                    editorParams.put("persistentOnly", ReportData.ReportType.LIST_OF_ENTITIES_WITH_QUERY == wizard.reportTypeOptionGroup.getValue());
+                    editorParams.put("rootEntity", regionPropertiesRootNode);
+                    item.setRegionPropertiesRootNode(regionPropertiesRootNode);
+                    Window.Editor regionEditor = wizard.openEditor("report$Report.regionEditor", item, WindowManager.OpenType.DIALOG, editorParams, wizard.reportRegionsDs);
+                    regionEditor.addCloseListener(new RegionEditorCloseListener());
                 }
             }, WindowManager.OpenType.DIALOG, lookupParams);
         }
@@ -217,11 +216,8 @@ public class RegionsStepFrame extends StepFrame {
 
         private String generateAttrsBtnCaption() {
 
-            return StringUtils.abbreviate(StringUtils.join(CollectionUtils.collect(currentReportRegionGeneratedColumn.getRegionProperties(), new Transformer() {
-                @Override
-                public Object transform(Object input) {
-                    return ((RegionProperty) input).getHierarchicalLocalizedNameExceptRoot();
-                }
+            return StringUtils.abbreviate(StringUtils.join(CollectionUtils.collect(currentReportRegionGeneratedColumn.getRegionProperties(), input -> {
+                return ((RegionProperty) input).getHierarchicalLocalizedNameExceptRoot();
             }), ", "), MAX_ATTRS_BTN_CAPTION_WIDTH);
         }
     }
@@ -279,7 +275,7 @@ public class RegionsStepFrame extends StepFrame {
                 editorParams.put("scalarOnly", Boolean.TRUE);
                 editorParams.put("persistentOnly", ReportData.ReportType.LIST_OF_ENTITIES_WITH_QUERY == wizard.reportTypeOptionGroup.getValue());
                 Window.Editor regionEditor = wizard.openEditor("report$Report.regionEditor",
-                        ((ReportRegion) wizard.regionsTable.getSingleSelected()),
+                        wizard.regionsTable.getSingleSelected(),
                         WindowManager.OpenType.DIALOG,
                         editorParams,
                         wizard.reportRegionsDs);
@@ -332,11 +328,9 @@ public class RegionsStepFrame extends StepFrame {
             });
             showAddRegion();
             wizard.setCorrectReportOutputType();
-            ReportWizardCreator.Companion companion = wizard.getCompanion();
-            if (companion != null) {
-                companion.setWindowHeight(wizard, wizard.wizardHeight);
-                companion.center(wizard);
-            }
+            wizard.getDialogOptions()
+                    .setHeight(wizard.wizardHeight)
+                    .setCentered(true);
         }
 
         private void showAddRegion() {

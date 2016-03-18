@@ -93,7 +93,7 @@ public class ReportWizardCreator extends AbstractWindow implements MainWizardFra
     @Named("regionsStep.removeBtn")
     protected Button removeBtn;
     @Named("regionsStep.regionsTable")
-    protected Table regionsTable;
+    protected Table<ReportRegion> regionsTable;
     @Named("regionsStep.buttonsBox")
     protected BoxLayout buttonsBox;
 
@@ -147,12 +147,6 @@ public class ReportWizardCreator extends AbstractWindow implements MainWizardFra
     protected int wizardWidth;
     protected int wizardHeight;
 
-    public interface Companion {
-        void setWindowHeight(Window window, int height);
-
-        void center(Window window);
-    }
-
     @Override
     @SuppressWarnings("unchecked")
     public void init(Map<String, Object> params) {
@@ -162,7 +156,7 @@ public class ReportWizardCreator extends AbstractWindow implements MainWizardFra
 
         wizardWidth = themeConstants.getInt("cuba.gui.report.ReportWizard.width");
         wizardHeight = themeConstants.getInt("cuba.gui.report.ReportWizard.height");
-        getDialogParams()
+        getDialogOptions()
                 .setWidth(wizardWidth)
                 .setHeight(wizardHeight);
 

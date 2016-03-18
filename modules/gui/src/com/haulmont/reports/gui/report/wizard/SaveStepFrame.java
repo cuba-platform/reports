@@ -14,7 +14,6 @@ import com.haulmont.cuba.gui.export.ExportFormat;
 import com.haulmont.reports.entity.Report;
 import com.haulmont.reports.entity.ReportOutputType;
 import com.haulmont.reports.entity.charts.*;
-import com.haulmont.reports.entity.wizard.TemplateFileType;
 import com.haulmont.reports.exception.TemplateGenerationException;
 import com.haulmont.reports.gui.report.run.ShowChartController;
 import com.haulmont.reports.gui.report.wizard.step.StepFrame;
@@ -59,11 +58,9 @@ public class SaveStepFrame extends StepFrame {
 
                 showChart();
 
-                ReportWizardCreator.Companion companion = wizard.getCompanion();
-                if (companion != null) {
-                    companion.setWindowHeight(wizard, wizard.wizardHeight + 400);
-                    companion.center(wizard);
-                }
+                wizard.getDialogOptions()
+                        .setHeight(wizard.wizardHeight + 400)
+                        .setCentered(true);
 
                 wizard.diagramType.setRequired(true);
                 wizard.diagramType.setOptionsList(Arrays.asList(ChartType.values()));
@@ -89,7 +86,7 @@ public class SaveStepFrame extends StepFrame {
                     byte[] newTemplate = null;
                     try {
                         wizard.getItem().setName(wizard.reportName.getValue().toString());
-                        newTemplate = wizard.reportWizardService.generateTemplate(wizard.getItem(), (TemplateFileType) wizard.templateFileFormat.getValue());
+                        newTemplate = wizard.reportWizardService.generateTemplate(wizard.getItem(), wizard.templateFileFormat.getValue());
                         ExportDisplay exportDisplay = AppConfig.createExportDisplay((Frame) wizard.getComponent("saveStep"));
                         exportDisplay.show(new ByteArrayDataProvider(newTemplate),
                                 wizard.downloadTemplateFile.getCaption(), ExportFormat.getByExtension(wizard.templateFileFormat.getValue().toString().toLowerCase()));

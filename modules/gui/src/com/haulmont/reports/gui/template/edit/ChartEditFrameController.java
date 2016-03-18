@@ -17,6 +17,7 @@ import com.haulmont.reports.gui.report.run.ShowChartController;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  */
@@ -32,21 +33,11 @@ public class ChartEditFrameController extends AbstractFrame {
     @Inject
     protected LookupField type;
     @Inject
-    protected Table seriesTable;
+    protected Table<ChartSeries> seriesTable;
     @Inject
     protected FieldGroup pieChartFieldGroup;
     @Inject
     protected FieldGroup serialChartFieldGroup;
-
-    public interface Companion {
-        void setWindowWidth(Window window, int width);
-
-        void setWindowHeight(Window window, int height);
-
-        void center(Window window);
-
-        void setWindowResizable(Window window, boolean resizable);
-    }
 
     @Override
     public void init(Map<String, Object> params) {
@@ -59,10 +50,8 @@ public class ChartEditFrameController extends AbstractFrame {
             pieChartFieldGroup.setVisible(ChartType.PIE == e.getValue());
             serialChartFieldGroup.setVisible(ChartType.SERIAL == e.getValue());
             seriesTable.setVisible(ChartType.SERIAL == e.getValue());
-            Companion companion = getCompanion();
-            if (companion != null) {
-                companion.center((Window) getFrame());
-            }
+
+            ((Window) getFrame()).getDialogOptions().setCentered(true);
 
             showChartPreviewBox();
         });
@@ -87,13 +76,10 @@ public class ChartEditFrameController extends AbstractFrame {
         seriesDs.addItemPropertyChangeListener(e -> showChartPreviewBox());
         seriesDs.addCollectionChangeListener(e -> showChartPreviewBox());
 
-        FieldGroup.CustomFieldGenerator bandSelectorGenerator = new FieldGroup.CustomFieldGenerator() {
-            @Override
-            public Component generateField(Datasource datasource, String propertyId) {
-                LookupField lookupField = componentsFactory.createComponent(LookupField.class);
-                lookupField.setDatasource(datasource, propertyId);
-                return lookupField;
-            }
+        FieldGroup.CustomFieldGenerator bandSelectorGenerator = (datasource, propertyId) -> {
+            LookupField lookupField = componentsFactory.createComponent(LookupField.class);
+            lookupField.setDatasource(datasource, propertyId);
+            return lookupField;
         };
         pieChartFieldGroup.addCustomField("bandName", bandSelectorGenerator);
         serialChartFieldGroup.addCustomField("bandName", bandSelectorGenerator);
@@ -127,11 +113,9 @@ public class ChartEditFrameController extends AbstractFrame {
         previewBox.setHeight("100%");
         previewBox.setWidth("100%");
         previewBox.removeAll();
-        Companion companion = getCompanion();
-        if (companion != null) {
-            companion.setWindowWidth(parent, 1280);
-            companion.setWindowResizable(parent, true);
-        }
+        parent.getDialogOptions()
+                .setWidth(1280)
+                .setResizable(true);
         previewChart(previewBox);
         return previewBox;
     }
@@ -141,12 +125,10 @@ public class ChartEditFrameController extends AbstractFrame {
         BoxLayout previewBox = (BoxLayout) parent.getComponentNN("chartPreviewBox");
         previewBox.setVisible(false);
         previewBox.removeAll();
-        Companion companion = getCompanion();
-        if (companion != null) {
-            companion.setWindowWidth(parent, -1);
-            companion.setWindowHeight(parent, -1);
-            companion.setWindowResizable(parent, false);
-        }
+        parent.getDialogOptions()
+                .setWidthAuto()
+                .setHeightAuto()
+                .setResizable(false);
     }
 
     @Nullable
@@ -172,10 +154,7 @@ public class ChartEditFrameController extends AbstractFrame {
     }
 
     public void setBands(Collection<BandDefinition> bands) {
-        List<String> bandNames = new ArrayList<>();
-        for (BandDefinition bandDefinition : bands) {
-            bandNames.add(bandDefinition.getName());
-        }
+        List<String> bandNames = bands.stream().map(BandDefinition::getName).collect(Collectors.toList());
 
         LookupField pieChartBandName = (LookupField) pieChartFieldGroup.getFieldComponent("bandName");
         LookupField serialChartBandName = (LookupField) serialChartFieldGroup.getFieldComponent("bandName");

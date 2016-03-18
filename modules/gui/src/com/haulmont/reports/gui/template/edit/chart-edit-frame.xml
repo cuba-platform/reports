@@ -7,10 +7,6 @@
         class="com.haulmont.reports.gui.template.edit.ChartEditFrameController"
         messagesPack="com.haulmont.reports.gui">
 
-    <companions>
-        <web class="com.haulmont.reports.web.report.template.WebChartEditControllerCompanion"/>
-    </companions>
-
     <dsContext>
         <datasource id="pieChartDs" class="com.haulmont.reports.entity.charts.PieChartDescription" view="_local"
                     allowCommit="false"/>

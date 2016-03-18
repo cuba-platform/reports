@@ -119,12 +119,7 @@ public class DetailsStepFrame extends StepFrame {
         }
 
         protected Map<String, Object> getAvailableEntities() {
-            Map<String, Object> result = new TreeMap<>(new Comparator<String>() {
-                @Override
-                public int compare(String o1, String o2) {
-                    return o1.compareTo(o2);
-                }
-            });
+            Map<String, Object> result = new TreeMap<>(String::compareTo);
             Collection<MetaClass> classes = wizard.metadataTools.getAllPersistentMetaClasses();
             for (MetaClass metaClass : classes) {
                 MetaClass effectiveMetaClass = wizard.metadata.getExtendedEntities().getEffectiveMetaClass(metaClass);
@@ -343,11 +338,9 @@ public class DetailsStepFrame extends StepFrame {
     protected class BeforeShowDetailsStepFrameHandler implements BeforeShowStepFrameHandler {
         @Override
         public void beforeShowFrame() {
-            ReportWizardCreator.Companion companion = wizard.getCompanion();
-            if (companion != null) {
-                companion.setWindowHeight(wizard, wizard.wizardHeight);
-                companion.center(wizard);
-            }
+            wizard.getDialogOptions()
+                    .setHeight(wizard.wizardHeight)
+                    .setCentered(true);
         }
     }
 }
