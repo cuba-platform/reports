@@ -340,7 +340,7 @@ public class DetailsStepFrame extends StepFrame {
         public void beforeShowFrame() {
             wizard.getDialogOptions()
                     .setHeight(wizard.wizardHeight)
-                    .setCentered(true);
+                    .center();
         }
     }
 }

@@ -60,7 +60,7 @@ public class SaveStepFrame extends StepFrame {
 
                 wizard.getDialogOptions()
                         .setHeight(wizard.wizardHeight + 400)
-                        .setCentered(true);
+                        .center();
 
                 wizard.diagramType.setRequired(true);
                 wizard.diagramType.setOptionsList(Arrays.asList(ChartType.values()));

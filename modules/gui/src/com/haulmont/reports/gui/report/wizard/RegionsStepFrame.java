@@ -330,7 +330,7 @@ public class RegionsStepFrame extends StepFrame {
             wizard.setCorrectReportOutputType();
             wizard.getDialogOptions()
                     .setHeight(wizard.wizardHeight)
-                    .setCentered(true);
+                    .center();
         }
 
         private void showAddRegion() {

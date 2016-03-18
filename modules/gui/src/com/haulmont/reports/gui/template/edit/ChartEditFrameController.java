@@ -51,7 +51,7 @@ public class ChartEditFrameController extends AbstractFrame {
             serialChartFieldGroup.setVisible(ChartType.SERIAL == e.getValue());
             seriesTable.setVisible(ChartType.SERIAL == e.getValue());
 
-            ((Window) getFrame()).getDialogOptions().setCentered(true);
+            ((Window) getFrame()).getDialogOptions().center();
 
             showChartPreviewBox();
         });
