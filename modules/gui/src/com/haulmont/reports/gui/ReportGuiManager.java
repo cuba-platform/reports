@@ -61,6 +61,12 @@ public class ReportGuiManager {
     @Inject
     protected WindowConfig windowConfig;
 
+    /**
+     * Open input parameters dialog if report has parameters otherwise print report
+     *
+     * @param report - target report
+     * @param window - caller window
+     */
     public void runReport(Report report, Frame window) {
         if (report == null) {
             throw new IllegalArgumentException("Can not run null report");
@@ -73,6 +79,17 @@ public class ReportGuiManager {
         }
     }
 
+    /**
+     * Open input parameters dialog if report has parameters otherwise print report.
+     * The method allows to select target template code, pass single parameter to report, and set output file name.
+     *
+     * @param report         - target report
+     * @param window         - caller window
+     * @param parameter      - input parameter linked with passed parameter value
+     * @param parameterValue -
+     * @param templateCode   - target template code
+     * @param outputFileName - name for output file
+     */
     public void runReport(Report report, Frame window, final ReportInputParameter parameter, final Object parameterValue,
                           @Nullable String templateCode, @Nullable String outputFileName) {
         if (report == null) {
@@ -100,67 +117,49 @@ public class ReportGuiManager {
         }
     }
 
-
-    @Nullable
-    protected Object convertParameterIfNecessary(ReportInputParameter parameter, @Nullable Object paramValue,
-                                                 boolean reportHasMoreThanOneParameter) {
-        Object resultingParamValue = paramValue;
-        if (ParameterType.ENTITY == parameter.getType()) {
-            if (paramValue instanceof Collection || paramValue instanceof ParameterPrototype) {
-                resultingParamValue = handleCollectionParameter(paramValue, reportHasMoreThanOneParameter);
-            }
-        } else if (ParameterType.ENTITY_LIST == parameter.getType()) {
-            if (!(paramValue instanceof Collection) && !(paramValue instanceof ParameterPrototype)) {
-                resultingParamValue = Collections.singletonList(paramValue);
-            }
-        }
-
-        return resultingParamValue;
-    }
-
-
-    @Nullable
-    protected Object handleCollectionParameter(@Nullable Object paramValue, boolean reportHasMoreThanOneParameter) {
-        Collection paramValueWithCollection = null;
-        if (paramValue instanceof Collection) {
-            paramValueWithCollection = (Collection) paramValue;
-        } else if (paramValue instanceof ParameterPrototype) {
-            ParameterPrototype prototype = (ParameterPrototype) paramValue;
-            if (reportHasMoreThanOneParameter) {
-                //if the case of several params we can not do bulk print, because the params should be filled, so we don't need to load more than 1 entity
-                prototype.setMaxResults(1);
-            }
-            paramValueWithCollection = reportService.loadDataForParameterPrototype(prototype);
-        }
-
-        if (CollectionUtils.isEmpty(paramValueWithCollection)) {
-            return null;
-        }
-
-        if (reportHasMoreThanOneParameter) {
-            //if the case of several params we can not do bulk print, because the params should be filled, so we get only first object from the list
-            return paramValueWithCollection.iterator().next();
-        }
-
-        return paramValueWithCollection;
-    }
-
     /**
      * Print report synchronously
+     *
+     * @param report         - target report
+     * @param params         - report parameters (map keys should match with parameter aliases)
+     * @param templateCode   - target template code
+     * @param outputFileName - name for output file
      */
     public void printReport(Report report, Map<String, Object> params, @Nullable String templateCode, @Nullable String outputFileName) {
         printReportSync(report, params, templateCode, outputFileName, null);
     }
 
+    /**
+     * Print report synchronously
+     *
+     * @param report - target report
+     * @param params - report parameters (map keys should match with parameter aliases)
+     */
     public void printReport(Report report, Map<String, Object> params) {
         printReportSync(report, params, null, null, null);
     }
 
+    /**
+     * Print report synchronously or asynchronously, depending on configurations
+     *
+     * @param report - target report
+     * @param params - report parameters (map keys should match with parameter aliases)
+     * @param window - caller window
+     */
     public void printReport(Report report, Map<String, Object> params, Frame window) {
         printReport(report, params, null, null, window);
     }
 
-    public void printReport(Report report, Map<String, Object> params, @Nullable String templateCode, @Nullable String outputFileName,@Nullable Frame window) {
+    /**
+     * Print report synchronously or asynchronously, depending on configurations
+     *
+     * @param report         - target report
+     * @param params         - report parameters (map keys should match with parameter aliases)
+     * @param templateCode   - target template code
+     * @param outputFileName - name for output file
+     * @param window         - caller window
+     */
+    public void printReport(Report report, Map<String, Object> params, @Nullable String templateCode, @Nullable String outputFileName, @Nullable Frame window) {
 
         Configuration configuration = AppBeans.get(Configuration.NAME);
         ReportingClientConfig reportingClientConfig = configuration.getConfig(ReportingClientConfig.class);
@@ -174,6 +173,12 @@ public class ReportGuiManager {
 
     /**
      * Print report synchronously
+     *
+     * @param report         - target report
+     * @param params         - report parameters (map keys should match with parameter aliases)
+     * @param templateCode   - target template code
+     * @param outputFileName - name for output file
+     * @param window         - caller window
      */
     public void printReportSync(Report report, Map<String, Object> params, @Nullable String templateCode, @Nullable String outputFileName, @Nullable Frame window) {
         ReportOutputDocument document = getReportResult(report, params, templateCode);
@@ -181,6 +186,14 @@ public class ReportGuiManager {
         showReportResult(document, params, templateCode, outputFileName, window);
     }
 
+    /**
+     * Generate ReportOutputDocument
+     *
+     * @param report       - target report
+     * @param params       - report parameters (map keys should match with parameter aliases)
+     * @param templateCode - target template code
+     * @return resulting ReportOutputDocument
+     */
     public ReportOutputDocument getReportResult(Report report, Map<String, Object> params, @Nullable String templateCode) {
         ReportOutputDocument document;
         if (StringUtils.isBlank(templateCode)) {
@@ -192,7 +205,7 @@ public class ReportGuiManager {
     }
 
     protected void showReportResult(ReportOutputDocument document, Map<String, Object> params,
-                                    @Nullable String templateCode,  @Nullable String outputFileName, @Nullable Frame window) {
+                                    @Nullable String templateCode, @Nullable String outputFileName, @Nullable Frame window) {
         if (document.getReportOutputType().getId().equals(CubaReportOutputType.chart.getId())) {
             HashMap<String, Object> screenParams = new HashMap<>();
             screenParams.put(ShowChartController.CHART_JSON_PARAMETER, new String(document.getContent()));
@@ -217,6 +230,12 @@ public class ReportGuiManager {
 
     /**
      * Print report in background task with window, supports cancel
+     *
+     * @param report         - target report
+     * @param params         - report parameters (map keys should match with parameter aliases)
+     * @param templateCode   - target template code
+     * @param outputFileName - name for output file
+     * @param window         - caller window
      */
     public void printReportBackground(Report report, final Map<String, Object> params,
                                       final @Nullable String templateCode, final @Nullable String outputFileName, final Frame window) {
@@ -247,6 +266,13 @@ public class ReportGuiManager {
         BackgroundWorkWindow.show(task, caption, description, true);
     }
 
+    /**
+     * Return list of reports, available for certain screen, user and input parameter
+     *
+     * @param screenId            - id of the screen
+     * @param user                - caller user
+     * @param inputValueMetaClass - meta class of report input parameter
+     */
     public List<Report> getAvailableReports(@Nullable String screenId, @Nullable User user, @Nullable MetaClass inputValueMetaClass) {
         LoadContext lContext = new LoadContext<>(Report.class);
         lContext.setView(new View(Report.class)
@@ -268,6 +294,16 @@ public class ReportGuiManager {
         return reports;
     }
 
+    /**
+     * Print certain reports for list of entities and pack result files into ZIP.
+     * Each entity is passed  to report as parameter with certain alias.
+     * Synchronously or asynchronously, depending on configurations
+     *
+     * @param report           - target report
+     * @param alias            - parameter alias
+     * @param selectedEntities - list of selected entities
+     * @param window           - caller window
+     */
     public void bulkPrint(Report report, String alias, Collection selectedEntities, @Nullable Frame window) {
         Configuration configuration = AppBeans.get(Configuration.NAME);
         ReportingClientConfig reportingClientConfig = configuration.getConfig(ReportingClientConfig.class);
@@ -279,14 +315,27 @@ public class ReportGuiManager {
     }
 
     /**
-     * Print report synchronously for all selected entities
+     * Print certain reports for list of entities and pack result files into ZIP.
+     * Each entity is passed  to report as parameter with certain alias.
+     * Synchronously.
+     *
+     * @param report           - target report
+     * @param alias            - parameter alias
+     * @param selectedEntities - list of selected entities
      */
     public void bulkPrint(Report report, String alias, Collection selectedEntities) {
         bulkPrintSync(report, alias, selectedEntities, null);
     }
 
     /**
-     * Print report synchronously for all selected entities
+     * Print certain reports for list of entities and pack result files into ZIP.
+     * Each entity is passed  to report as parameter with certain alias.
+     * Synchronously.
+     *
+     * @param report           - target report
+     * @param alias            - parameter alias
+     * @param selectedEntities - list of selected entities
+     * @param window           - caller window
      */
     public void bulkPrintSync(Report report, String alias, Collection selectedEntities, @Nullable Frame window) {
         List<Map<String, Object>> paramsList = new ArrayList<>();
@@ -301,7 +350,14 @@ public class ReportGuiManager {
     }
 
     /**
-     * Print report in background task for all selected entities
+     * Print certain reports for list of entities and pack result files into ZIP.
+     * Each entity is passed  to report as parameter with certain alias.
+     * Asynchronously.
+     *
+     * @param report           - target report
+     * @param alias            - parameter alias
+     * @param selectedEntities - list of selected entities
+     * @param window           - caller window
      */
     public void bulkPrintBackground(Report report, String alias, Collection selectedEntities, final Frame window) {
         Configuration configuration = AppBeans.get(Configuration.NAME);
@@ -338,6 +394,12 @@ public class ReportGuiManager {
         BackgroundWorkWindow.show(task, caption, description, true);
     }
 
+    /**
+     * Check if the meta class is applicable for the input parameter
+     *
+     * @param parameter -
+     * @param metaClass -
+     */
     public boolean parameterMatchesMetaClass(ReportInputParameter parameter, MetaClass metaClass) {
         if (isNotBlank(parameter.getEntityMetaClass())) {
             MetaClass parameterMetaClass = metadata.getClassNN(parameter.getEntityMetaClass());
@@ -357,6 +419,9 @@ public class ReportGuiManager {
         return copy;
     }
 
+    /**
+     * Return reports which have input parameter with class matching inputValueMetaClass
+     */
     protected List<Report> filterReportsByEntityParameters(@Nullable MetaClass inputValueMetaClass, List<Report> reports) {
         if (inputValueMetaClass == null) {
             return reports;
@@ -375,6 +440,9 @@ public class ReportGuiManager {
         return reportsForEntity;
     }
 
+    /**
+     * Return reports available by roles and screen restrictions
+     */
     protected List<Report> applySecurityPolicies(@Nullable String screen, @Nullable User user, List<Report> reports) {
         List<Report> filter = checkRoles(user, reports);
         filter = checkScreens(screen, filter);
@@ -442,5 +510,49 @@ public class ReportGuiManager {
         } else {
             return reports;
         }
+    }
+
+    @Nullable
+    protected Object convertParameterIfNecessary(ReportInputParameter parameter, @Nullable Object paramValue,
+                                                 boolean reportHasMoreThanOneParameter) {
+        Object resultingParamValue = paramValue;
+        if (ParameterType.ENTITY == parameter.getType()) {
+            if (paramValue instanceof Collection || paramValue instanceof ParameterPrototype) {
+                resultingParamValue = handleCollectionParameter(paramValue, reportHasMoreThanOneParameter);
+            }
+        } else if (ParameterType.ENTITY_LIST == parameter.getType()) {
+            if (!(paramValue instanceof Collection) && !(paramValue instanceof ParameterPrototype)) {
+                resultingParamValue = Collections.singletonList(paramValue);
+            }
+        }
+
+        return resultingParamValue;
+    }
+
+
+    @Nullable
+    protected Object handleCollectionParameter(@Nullable Object paramValue, boolean reportHasMoreThanOneParameter) {
+        Collection paramValueWithCollection = null;
+        if (paramValue instanceof Collection) {
+            paramValueWithCollection = (Collection) paramValue;
+        } else if (paramValue instanceof ParameterPrototype) {
+            ParameterPrototype prototype = (ParameterPrototype) paramValue;
+            if (reportHasMoreThanOneParameter) {
+                //if the case of several params we can not do bulk print, because the params should be filled, so we don't need to load more than 1 entity
+                prototype.setMaxResults(1);
+            }
+            paramValueWithCollection = reportService.loadDataForParameterPrototype(prototype);
+        }
+
+        if (CollectionUtils.isEmpty(paramValueWithCollection)) {
+            return null;
+        }
+
+        if (reportHasMoreThanOneParameter) {
+            //if the case of several params we can not do bulk print, because the params should be filled, so we get only first object from the list
+            return paramValueWithCollection.iterator().next();
+        }
+
+        return paramValueWithCollection;
     }
 }
