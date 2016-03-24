@@ -5,6 +5,7 @@
 
 package com.haulmont.reports.converter;
 
+import com.haulmont.cuba.core.global.View;
 import com.haulmont.cuba.core.global.ViewProperty;
 import com.haulmont.cuba.security.entity.Role;
 import com.haulmont.reports.entity.*;
@@ -81,6 +82,7 @@ public class XStreamConverter {
         xStream.omitField(ReportTemplate.class, "detached");
         xStream.omitField(ReportInputParameter.class, "localeName");
         xStream.omitField(ReportGroup.class, "detached");
+        xStream.omitField(View.class, "includeSystemProperties");
         xStream.omitField(ViewProperty.class, "lazy");
         xStream.omitField(Role.class, "detached");
         xStream.omitField(ReportScreen.class, "detached");
