@@ -258,11 +258,14 @@ public class DetailsStepFrame extends StepFrame {
                             parameterType = ParameterType.TEXT;
                         }
 
+                        String parameterValue = parameterInfo.getValue();
+                        parameterValue = !"NULL".equals(parameterValue) ? parameterValue : null;
+
                         newParametersList.add(new ReportData.Parameter(
                                 parameterName,
                                 parameterClass,
                                 parameterType,
-                                parameterInfo.getValue()));
+                                parameterValue));
 
                         wizard.query = wizard.query.replace(":" + parameterInfo.getName(), "${" + parameterName + "}");
                     }
