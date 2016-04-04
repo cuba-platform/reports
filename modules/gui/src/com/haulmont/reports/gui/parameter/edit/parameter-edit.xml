@@ -14,7 +14,7 @@
         <datasource id="parameterDs" class="com.haulmont.reports.entity.ReportInputParameter"/>
     </dsContext>
 
-    <assign name="width" value="250px"/>
+    <assign name="width" value="400px"/>
 
     <layout spacing="true">
         <tabSheet id="tabsheet">
