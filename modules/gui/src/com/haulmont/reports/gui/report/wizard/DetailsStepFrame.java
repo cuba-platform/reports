@@ -80,6 +80,7 @@ public class DetailsStepFrame extends StepFrame {
 
         protected void initTemplateFormatLookupField() {
             wizard.templateFileFormat.setOptionsMap(getAvailableTemplateFormats());
+            wizard.templateFileFormat.setTextInputAllowed(false);
             wizard.templateFileFormat.setValue(TemplateFileType.DOCX);//select docx as default value
         }
 
