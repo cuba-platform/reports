@@ -83,6 +83,10 @@ public class EntityTreeNodeDs extends AbstractTreeDatasource<EntityTreeNode, UUI
                 continue;
             }
 
+            if (metadata.getTools().isSystemLevel(child.getWrappedMetaProperty())) {
+                continue;
+            }
+
             if (scalarOnly && child.getWrappedMetaProperty().getRange().getCardinality().isMany()) {
                 continue;
             }
