@@ -12,9 +12,6 @@
     <screen id="report$inputParameters"
             template="/com/haulmont/reports/gui/report/run/input-parameters.xml"/>
 
-    <screen id="report$commonLookup"
-            template="/com/haulmont/reports/gui/report/run/common-lookup.xml"/>
-
     <screen id="report$Report.browse"
             template="/com/haulmont/reports/gui/report/browse/report-browse.xml"/>
 
