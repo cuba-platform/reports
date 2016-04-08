@@ -146,6 +146,10 @@ public class ParameterFieldCreator {
 
                     lookupField.setOptionsList(optionsList);
                     lookupField.setCaptionMode(CaptionMode.ITEM);
+
+                    if (optionsList.size() < 10) {
+                        lookupField.setTextInputAllowed(false);
+                    }
                 }
             }
             return lookupField;
