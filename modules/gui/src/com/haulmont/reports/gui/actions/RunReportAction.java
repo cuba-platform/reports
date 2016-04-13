@@ -10,10 +10,7 @@ import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.gui.ComponentsHelper;
 import com.haulmont.cuba.gui.WindowManager.OpenType;
-import com.haulmont.cuba.gui.components.AbstractAction;
-import com.haulmont.cuba.gui.components.Action;
-import com.haulmont.cuba.gui.components.Component;
-import com.haulmont.cuba.gui.components.Frame;
+import com.haulmont.cuba.gui.components.*;
 import com.haulmont.reports.entity.Report;
 import com.haulmont.reports.gui.ReportGuiManager;
 import com.haulmont.reports.gui.report.run.ReportRun;
@@ -77,7 +74,8 @@ public class RunReportAction extends AbstractAction implements Action.HasBeforeA
         if (window != null) {
             openLookup(window);
         } else if (component != null && component instanceof Component.BelongToFrame) {
-            openLookup(ComponentsHelper.getWindow((Component.BelongToFrame) component));
+            Window window = ComponentsHelper.getWindow((Component.BelongToFrame) component);
+            openLookup(window);
         } else {
             throw new IllegalStateException("Please set window or specified component for performAction call");
         }

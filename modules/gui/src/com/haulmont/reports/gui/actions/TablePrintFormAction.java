@@ -101,6 +101,7 @@ public class TablePrintFormAction extends AbstractPrintFormAction implements Act
         } else {
             CollectionDatasource ds = table.getDatasource();
 
+            Frame frame = table.getFrame();
             if ((ds.getState() == Datasource.State.VALID) && (ds.size() > 0)) {
                 Action yesAction = new DialogAction(Type.OK) {
                     @Override
@@ -111,11 +112,11 @@ public class TablePrintFormAction extends AbstractPrintFormAction implements Act
 
                 cancelAction.setPrimary(true);
 
-                table.getFrame().showOptionDialog(messages.getMessage(getClass(), "notifications.confirmPrintAllheader"),
+                frame.showOptionDialog(messages.getMessage(getClass(), "notifications.confirmPrintAllheader"),
                         messages.getMessage(getClass(), "notifications.confirmPrintAll"),
                         Frame.MessageType.CONFIRMATION, new Action[]{yesAction, cancelAction});
             } else {
-                table.getFrame().showNotification(messages.getMessage(ReportGuiManager.class, "notifications.noSelectedEntity"),
+                frame.showNotification(messages.getMessage(ReportGuiManager.class, "notifications.noSelectedEntity"),
                         Frame.NotificationType.HUMANIZED);
             }
         }
@@ -123,6 +124,13 @@ public class TablePrintFormAction extends AbstractPrintFormAction implements Act
         if (afterActionPerformedHandler != null) {
             afterActionPerformedHandler.run();
         }
+    }
+
+    protected void showOptionDialog(Window window, Action[] actions) {
+        window.showOptionDialog(messages.getMessage(ReportGuiManager.class, "notifications.confirmPrintSelectedheader"),
+                messages.getMessage(ReportGuiManager.class, "notifications.confirmPrintSelected"),
+                Frame.MessageType.CONFIRMATION,
+                actions);
     }
 
     protected void printSelected(Set selected) {
