@@ -7,6 +7,7 @@ package com.haulmont.reports.gui.actions;
 
 import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.cuba.core.global.LoadContext;
+import com.haulmont.cuba.gui.ComponentsHelper;
 import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.components.DialogAction.Type;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
@@ -20,20 +21,40 @@ import java.util.Set;
 /**
  */
 public class TablePrintFormAction extends AbstractPrintFormAction implements Action.HasBeforeAfterHandlers {
-    protected final Window window;
+    protected Window window;
     protected final Table table;
 
     protected Runnable beforeActionPerformedHandler;
     protected Runnable afterActionPerformedHandler;
 
+    /**
+     * @deprecated Use {@link TablePrintFormAction#TablePrintFormAction(Table)} instead.
+     * */
+    @Deprecated
     public TablePrintFormAction(Window window, Table table) {
         this("tableReport", window, table);
     }
 
+    /**
+     * @deprecated Use {@link TablePrintFormAction#TablePrintFormAction(String, Table)} instead.
+     * */
+    @Deprecated
     public TablePrintFormAction(String id, Window window, Table table) {
         super(id);
 
         this.window = window;
+        this.table = table;
+        this.caption = messages.getMessage(getClass(), "actions.Report");
+        this.icon = "icons/reports-print.png";
+    }
+
+    public TablePrintFormAction(Table table) {
+        this("tableReport", table);
+    }
+
+    public TablePrintFormAction(String id, Table table) {
+        super(id);
+
         this.table = table;
         this.caption = messages.getMessage(getClass(), "actions.Report");
         this.icon = "icons/reports-print.png";
@@ -50,35 +71,27 @@ public class TablePrintFormAction extends AbstractPrintFormAction implements Act
         DialogAction cancelAction = new DialogAction(Type.CANCEL);
 
         if (CollectionUtils.isNotEmpty(selected)) {
-            Action printSelectedAction = new AbstractAction("actions.printSelected", Status.PRIMARY) {
-                @Override
-                public void actionPerform(Component component) {
-                    printSelected(selected);
-                }
-
-                @Override
-                public String getIcon() {
-                    return "icons/reports-print-row.png";
-                }
-            };
-
-            Action printAllAction = new AbstractAction("actions.printAll") {
-                @Override
-                public void actionPerform(Component component) {
-                    printAll();
-                }
-
-                @Override
-                public String getIcon() {
-                    return "icons/reports-print-all.png";
-                }
-            };
-
             Action[] actions;
             if (selected.size() > 1) {
+                Action printSelectedAction = new AbstractAction("actions.printSelected", Status.PRIMARY) {
+                    @Override
+                    public void actionPerform(Component component) {
+                        printSelected(selected);
+                    }
+                };
+                printSelectedAction.setIcon("icons/reports-print-row.png");
+
+                Action printAllAction = new AbstractAction("actions.printAll") {
+                    @Override
+                    public void actionPerform(Component component) {
+                        printAll();
+                    }
+                };
+                printAllAction.setIcon("icons/reports-print-all.png");
+
                 actions = new Action[]{printAllAction, printSelectedAction, cancelAction};
 
-                window.showOptionDialog(messages.getMessage(ReportGuiManager.class, "notifications.confirmPrintSelectedheader"),
+                ComponentsHelper.getWindow(table).showOptionDialog(messages.getMessage(ReportGuiManager.class, "notifications.confirmPrintSelectedheader"),
                         messages.getMessage(ReportGuiManager.class, "notifications.confirmPrintSelected"),
                         Frame.MessageType.CONFIRMATION,
                         actions);
@@ -98,11 +111,11 @@ public class TablePrintFormAction extends AbstractPrintFormAction implements Act
 
                 cancelAction.setPrimary(true);
 
-                window.showOptionDialog(messages.getMessage(getClass(), "notifications.confirmPrintAllheader"),
+                table.getFrame().showOptionDialog(messages.getMessage(getClass(), "notifications.confirmPrintAllheader"),
                         messages.getMessage(getClass(), "notifications.confirmPrintAll"),
                         Frame.MessageType.CONFIRMATION, new Action[]{yesAction, cancelAction});
             } else {
-                window.showNotification(messages.getMessage(ReportGuiManager.class, "notifications.noSelectedEntity"),
+                table.getFrame().showNotification(messages.getMessage(ReportGuiManager.class, "notifications.noSelectedEntity"),
                         Frame.NotificationType.HUMANIZED);
             }
         }
@@ -115,8 +128,7 @@ public class TablePrintFormAction extends AbstractPrintFormAction implements Act
     protected void printSelected(Set selected) {
         CollectionDatasource datasource = table.getDatasource();
         MetaClass metaClass = datasource.getMetaClass();
-
-        openRunReportScreen(window, selected, metaClass);
+        openRunReportScreen(ComponentsHelper.getWindow(table), selected, metaClass);
     }
 
     protected void printAll() {
@@ -135,7 +147,7 @@ public class TablePrintFormAction extends AbstractPrintFormAction implements Act
         parameterPrototype.setFirstResult(query.getFirstResult());
         parameterPrototype.setMaxResults(query.getMaxResults());
 
-        openRunReportScreen(window, parameterPrototype, metaClass);
+        openRunReportScreen(ComponentsHelper.getWindow(table), parameterPrototype, metaClass);
     }
 
     @Override
