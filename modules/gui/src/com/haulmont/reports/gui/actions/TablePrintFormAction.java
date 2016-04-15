@@ -29,7 +29,7 @@ public class TablePrintFormAction extends AbstractPrintFormAction implements Act
 
     /**
      * @deprecated Use {@link TablePrintFormAction#TablePrintFormAction(Table)} instead.
-     * */
+     */
     @Deprecated
     public TablePrintFormAction(Window window, Table table) {
         this("tableReport", window, table);
@@ -37,14 +37,14 @@ public class TablePrintFormAction extends AbstractPrintFormAction implements Act
 
     /**
      * @deprecated Use {@link TablePrintFormAction#TablePrintFormAction(String, Table)} instead.
-     * */
+     */
     @Deprecated
     public TablePrintFormAction(String id, Window window, Table table) {
         super(id);
 
         this.window = window;
         this.table = table;
-        this.caption = messages.getMessage(getClass(), "actions.Report");
+        this.caption = getMessage("actions.Report");
         this.icon = "icons/reports-print.png";
     }
 
@@ -56,7 +56,7 @@ public class TablePrintFormAction extends AbstractPrintFormAction implements Act
         super(id);
 
         this.table = table;
-        this.caption = messages.getMessage(getClass(), "actions.Report");
+        this.caption = getMessage("actions.Report");
         this.icon = "icons/reports-print.png";
     }
 
@@ -66,12 +66,12 @@ public class TablePrintFormAction extends AbstractPrintFormAction implements Act
             beforeActionPerformedHandler.run();
         }
 
-        final Set selected = table.getSelected();
-
         DialogAction cancelAction = new DialogAction(Type.CANCEL);
 
+        Window window = ComponentsHelper.getWindow(table);
+
+        final Set selected = table.getSelected();
         if (CollectionUtils.isNotEmpty(selected)) {
-            Action[] actions;
             if (selected.size() > 1) {
                 Action printSelectedAction = new AbstractAction("actions.printSelected", Status.PRIMARY) {
                     @Override
@@ -89,19 +89,16 @@ public class TablePrintFormAction extends AbstractPrintFormAction implements Act
                 };
                 printAllAction.setIcon("icons/reports-print-all.png");
 
-                actions = new Action[]{printAllAction, printSelectedAction, cancelAction};
-
-                ComponentsHelper.getWindow(table).showOptionDialog(messages.getMessage(ReportGuiManager.class, "notifications.confirmPrintSelectedheader"),
+                window.showOptionDialog(messages.getMessage(ReportGuiManager.class, "notifications.confirmPrintSelectedheader"),
                         messages.getMessage(ReportGuiManager.class, "notifications.confirmPrintSelected"),
                         Frame.MessageType.CONFIRMATION,
-                        actions);
+                        new Action[]{printAllAction, printSelectedAction, cancelAction});
             } else {
                 printSelected(selected);
             }
         } else {
             CollectionDatasource ds = table.getDatasource();
 
-            Frame frame = table.getFrame();
             if ((ds.getState() == Datasource.State.VALID) && (ds.size() > 0)) {
                 Action yesAction = new DialogAction(Type.OK) {
                     @Override
@@ -112,11 +109,11 @@ public class TablePrintFormAction extends AbstractPrintFormAction implements Act
 
                 cancelAction.setPrimary(true);
 
-                frame.showOptionDialog(messages.getMessage(getClass(), "notifications.confirmPrintAllheader"),
-                        messages.getMessage(getClass(), "notifications.confirmPrintAll"),
+                window.showOptionDialog(getMessage("notifications.confirmPrintAllheader"),
+                        getMessage("notifications.confirmPrintAll"),
                         Frame.MessageType.CONFIRMATION, new Action[]{yesAction, cancelAction});
             } else {
-                frame.showNotification(messages.getMessage(ReportGuiManager.class, "notifications.noSelectedEntity"),
+                window.showNotification(messages.getMessage(ReportGuiManager.class, "notifications.noSelectedEntity"),
                         Frame.NotificationType.HUMANIZED);
             }
         }
@@ -126,11 +123,8 @@ public class TablePrintFormAction extends AbstractPrintFormAction implements Act
         }
     }
 
-    protected void showOptionDialog(Window window, Action[] actions) {
-        window.showOptionDialog(messages.getMessage(ReportGuiManager.class, "notifications.confirmPrintSelectedheader"),
-                messages.getMessage(ReportGuiManager.class, "notifications.confirmPrintSelected"),
-                Frame.MessageType.CONFIRMATION,
-                actions);
+    protected String getMessage(String key) {
+        return messages.getMessage(getClass(), key);
     }
 
     protected void printSelected(Set selected) {
