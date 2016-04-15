@@ -5,6 +5,7 @@
 
 package com.haulmont.reports.gui.actions;
 
+import com.google.common.base.Preconditions;
 import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.cuba.core.global.LoadContext;
 import com.haulmont.cuba.gui.ComponentsHelper;
@@ -44,7 +45,7 @@ public class TablePrintFormAction extends AbstractPrintFormAction implements Act
 
         this.window = window;
         this.table = table;
-        this.caption = getMessage("actions.Report");
+        this.caption = messages.getMessage(TablePrintFormAction.class, "actions.Report");
         this.icon = "icons/reports-print.png";
     }
 
@@ -56,7 +57,7 @@ public class TablePrintFormAction extends AbstractPrintFormAction implements Act
         super(id);
 
         this.table = table;
-        this.caption = getMessage("actions.Report");
+        this.caption = messages.getMessage(TablePrintFormAction.class, "actions.Report");
         this.icon = "icons/reports-print.png";
     }
 
@@ -69,6 +70,7 @@ public class TablePrintFormAction extends AbstractPrintFormAction implements Act
         DialogAction cancelAction = new DialogAction(Type.CANCEL);
 
         Window window = ComponentsHelper.getWindow(table);
+        Preconditions.checkState(window != null, "Table is not attached to window");
 
         final Set selected = table.getSelected();
         if (CollectionUtils.isNotEmpty(selected)) {
@@ -109,8 +111,8 @@ public class TablePrintFormAction extends AbstractPrintFormAction implements Act
 
                 cancelAction.setPrimary(true);
 
-                window.showOptionDialog(getMessage("notifications.confirmPrintAllheader"),
-                        getMessage("notifications.confirmPrintAll"),
+                window.showOptionDialog(messages.getMessage(TablePrintFormAction.class, "notifications.confirmPrintAllheader"),
+                        messages.getMessage(TablePrintFormAction.class, "notifications.confirmPrintAll"),
                         Frame.MessageType.CONFIRMATION, new Action[]{yesAction, cancelAction});
             } else {
                 window.showNotification(messages.getMessage(ReportGuiManager.class, "notifications.noSelectedEntity"),
@@ -121,10 +123,6 @@ public class TablePrintFormAction extends AbstractPrintFormAction implements Act
         if (afterActionPerformedHandler != null) {
             afterActionPerformedHandler.run();
         }
-    }
-
-    protected String getMessage(String key) {
-        return messages.getMessage(getClass(), key);
     }
 
     protected void printSelected(Set selected) {
