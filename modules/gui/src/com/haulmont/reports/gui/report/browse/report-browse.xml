@@ -44,9 +44,9 @@
                 <popupButton id="popupCreateBtn" icon="theme://actions.Create.icon" caption="msg://actions.Create"/>
                 <button action="table.edit"/>
                 <button action="table.remove"/>
-                <button id="copy"/>
-                <button id="import" caption="msg://button.import"/>
-                <button id="export"/>
+                <button id="copy" icon="icons/copy.png"/>
+                <button id="import" icon="icons/wf-design-import.png" caption=""/>
+                <button id="export" icon="icons/wf-design-export.png" caption=""/>
                 <button id="runReport" icon="icons/run.png"/>
             </buttonsPanel>
             <rowsCount/>
