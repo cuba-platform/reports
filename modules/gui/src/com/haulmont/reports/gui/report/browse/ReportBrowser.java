@@ -28,6 +28,7 @@ import com.haulmont.reports.gui.ReportGuiManager;
 import com.haulmont.reports.gui.report.edit.ReportEditor;
 import com.haulmont.reports.gui.report.wizard.ReportWizardCreator;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -100,18 +101,16 @@ public class ReportBrowser extends AbstractLookup {
                     report = getDsContext().getDataSupplier().reload(report, "report.edit");
                     if (report.getInputParameters() != null && report.getInputParameters().size() > 0) {
                         Window paramsWindow = openWindow("report$inputParameters", OpenType.DIALOG,
-                                Collections.<String, Object>singletonMap("report", report));
-                        paramsWindow.addCloseListener(actionId -> {
-                            target.requestFocus();
-                        });
+                                Collections.singletonMap("report", report));
+                        paramsWindow.addCloseListener(actionId -> target.requestFocus());
                     } else {
-                        reportGuiManager.printReport(report, Collections.<String, Object>emptyMap(), ReportBrowser.this);
+                        reportGuiManager.printReport(report, Collections.emptyMap(), ReportBrowser.this);
                     }
                 }
             }
         });
 
-        importReport.setAction(new BaseAction("import") {
+        BaseAction importAction = new BaseAction("import") {
             @Override
             public void actionPerform(Component component) {
                 final FileUploadDialog dialog = (FileUploadDialog) openWindow("fileUploadDialog", OpenType.DIALOG);
@@ -149,9 +148,11 @@ public class ReportBrowser extends AbstractLookup {
             protected boolean isPermitted() {
                 return hasPermissionsToCreateReports;
             }
-        });
+        };
+        importAction.setCaption(StringUtils.EMPTY);
+        importReport.setAction(importAction);
 
-        exportReport.setAction(new ItemTrackingAction("export") {
+        ItemTrackingAction exportAction = new ItemTrackingAction("export") {
             @Override
             public void actionPerform(Component component) {
                 Set<Report> reports = target.getSelected();
@@ -165,7 +166,9 @@ public class ReportBrowser extends AbstractLookup {
                     }
                 }
             }
-        });
+        };
+        exportAction.setCaption(StringUtils.EMPTY);
+        exportReport.setAction(exportAction);
         reportsTable.addAction(copyReport.getAction());
         reportsTable.addAction(exportReport.getAction());
         reportsTable.addAction(runReport.getAction());

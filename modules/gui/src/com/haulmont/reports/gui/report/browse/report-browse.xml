@@ -41,12 +41,12 @@
             </actions>
             <buttonsPanel>
                 <button id="createBtn" action="table.create"/>
-                <popupButton id="popupCreateBtn" icon="theme://actions.Create.icon" caption="msg://actions.Create"/>
+                <popupButton id="popupCreateBtn" icon="theme://actions.Create.icon" caption="mainMsg://actions.Create"/>
                 <button action="table.edit"/>
                 <button action="table.remove"/>
                 <button id="copy" icon="icons/copy.png"/>
-                <button id="import" icon="icons/wf-design-import.png" caption=""/>
-                <button id="export" icon="icons/wf-design-export.png" caption=""/>
+                <button id="import" icon="icons/upload.png" description="msg://button.import"/>
+                <button id="export" icon="icons/download.png" description="msg://export"/>
                 <button id="runReport" icon="icons/run.png"/>
             </buttonsPanel>
             <rowsCount/>
