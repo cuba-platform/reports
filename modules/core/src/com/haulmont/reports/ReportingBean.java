@@ -68,6 +68,8 @@ public class ReportingBean implements ReportingApi {
     protected UserSessionSource userSessionSource;
     @Inject
     protected GlobalConfig globalConfig;
+    @Inject
+    protected DataManager dataManager;
 
     protected PrototypesLoader prototypesLoader = new PrototypesLoader();
 
@@ -496,16 +498,8 @@ public class ReportingBean implements ReportingApi {
         if (entity instanceof Report && ((Report) entity).getIsTmp()) {
             return entity;
         }
-        Transaction tx = persistence.createTransaction();
-        try {
-            EntityManager em = persistence.getEntityManager();
-            View targetView = metadata.getViewRepository().getView(entity.getClass(), viewName);
-            entity = (T) em.find(entity.getClass(), entity.getId(), targetView);
-            tx.commit();
-            return entity;
-        } finally {
-            tx.end();
-        }
+
+        return dataManager.reload(entity, viewName);
     }
 
     protected ReportTemplate getDefaultTemplate(Report report) {
