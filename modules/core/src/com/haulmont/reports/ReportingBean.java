@@ -409,15 +409,7 @@ public class ReportingBean implements ReportingApi {
         if (entity instanceof Report && ((Report) entity).getIsTmp()) {
             return entity;
         }
-        Transaction tx = persistence.createTransaction();
-        try {
-            EntityManager em = persistence.getEntityManager();
-            entity = (T) em.find(entity.getClass(), entity.getId(), view);
-            tx.commit();
-            return entity;
-        } finally {
-            tx.end();
-        }
+        return dataManager.reload(entity, view);
     }
 
     @Override

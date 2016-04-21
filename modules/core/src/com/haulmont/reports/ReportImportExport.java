@@ -4,11 +4,7 @@
  */
 package com.haulmont.reports;
 
-import com.haulmont.cuba.core.EntityManager;
-import com.haulmont.cuba.core.Persistence;
-import com.haulmont.cuba.core.Transaction;
-import com.haulmont.cuba.core.global.View;
-import com.haulmont.cuba.core.global.ViewRepository;
+import com.haulmont.cuba.core.global.DataManager;
 import com.haulmont.cuba.security.app.Authenticated;
 import com.haulmont.reports.converter.XStreamConverter;
 import com.haulmont.reports.entity.Report;
@@ -21,8 +17,8 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-
 import org.springframework.stereotype.Component;
+
 import javax.inject.Inject;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -44,10 +40,7 @@ public class ReportImportExport implements ReportImportExportAPI, ReportImportEx
     protected ReportingApi reportingApi;
 
     @Inject
-    protected ViewRepository viewRepository;
-
-    @Inject
-    protected Persistence persistence;
+    protected DataManager dataManager;
 
     public byte[] exportReports(Collection<Report> reports) {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -312,16 +305,7 @@ public class ReportImportExport implements ReportImportExportAPI, ReportImportEx
     }
 
     protected Report reloadReport(Report report) {
-        Transaction tx = persistence.createTransaction();
-        try {
-            EntityManager em = persistence.getEntityManager();
-            View exportView = viewRepository.getView(report.getClass(), ReportingBean.REPORT_EDIT_VIEW_NAME);
-            report = em.find(Report.class, report.getId(), exportView);
-            tx.commit();
-            return report;
-        } finally {
-            tx.end();
-        }
+        return dataManager.reload(report, ReportingBean.REPORT_EDIT_VIEW_NAME);
     }
 
     protected boolean isReportsStructureFile(String name) {
