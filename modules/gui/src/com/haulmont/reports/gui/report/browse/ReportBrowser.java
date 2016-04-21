@@ -4,6 +4,7 @@
  */
 package com.haulmont.reports.gui.report.browse;
 
+import com.haulmont.bali.util.ParamsMap;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.global.ClientType;
 import com.haulmont.cuba.core.global.Metadata;
@@ -101,8 +102,10 @@ public class ReportBrowser extends AbstractLookup {
                     report = getDsContext().getDataSupplier().reload(report, "report.edit");
                     if (report.getInputParameters() != null && report.getInputParameters().size() > 0) {
                         Window paramsWindow = openWindow("report$inputParameters", OpenType.DIALOG,
-                                Collections.singletonMap("report", report));
-                        paramsWindow.addCloseListener(actionId -> target.requestFocus());
+                                ParamsMap.of("report", report));
+                        paramsWindow.addCloseListener(actionId ->
+                                target.requestFocus()
+                        );
                     } else {
                         reportGuiManager.printReport(report, Collections.emptyMap(), ReportBrowser.this);
                     }
