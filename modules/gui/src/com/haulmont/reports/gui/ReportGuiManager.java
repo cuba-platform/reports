@@ -275,6 +275,7 @@ public class ReportGuiManager {
      */
     public List<Report> getAvailableReports(@Nullable String screenId, @Nullable User user, @Nullable MetaClass inputValueMetaClass) {
         LoadContext lContext = new LoadContext<>(Report.class);
+        lContext.setLoadDynamicAttributes(true);
         lContext.setView(new View(Report.class)
                 .addProperty("name")
                 .addProperty("localeNames")
