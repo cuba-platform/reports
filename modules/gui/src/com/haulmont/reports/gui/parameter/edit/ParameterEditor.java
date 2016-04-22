@@ -156,6 +156,8 @@ public class ParameterEditor extends AbstractEditor {
             field.addValueChangeListener(e -> {
                 if (e.getValue() != null) {
                     parameter.setDefaultValue(reportService.convertToString(e.getValue().getClass(), e.getValue()));
+                } else {
+                    parameter.setDefaultValue(null);
                 }
             });
 
