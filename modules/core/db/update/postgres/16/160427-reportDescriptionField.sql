@@ -1,0 +1,2 @@
+
+alter table REPORT_REPORT add column DESCRIPTION VARCHAR(500);

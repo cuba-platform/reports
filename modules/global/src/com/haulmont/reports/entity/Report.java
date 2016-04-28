@@ -50,6 +50,9 @@ public class Report extends BaseReportEntity implements com.haulmont.yarg.struct
     @Column(name = "REPORT_TYPE")
     protected Integer reportType;
 
+    @Column(name = "DESCRIPTION", length = 500)
+    protected String description;
+
     @Column(name = "XML")
     @Lob
     protected String xml;
@@ -167,6 +170,14 @@ public class Report extends BaseReportEntity implements com.haulmont.yarg.struct
 
     public ReportTemplate getDefaultTemplate() {
         return defaultTemplate;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public void setDefaultTemplate(ReportTemplate defaultTemplate) {

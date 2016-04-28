@@ -29,6 +29,7 @@ create table REPORT_REPORT
 
   NAME varchar(255) not null,
   CODE varchar(255),
+  DESCRIPTION varchar(500),
   LOCALE_NAMES varchar(7000),
   GROUP_ID varchar(36) not null,
   REPORT_TYPE integer,

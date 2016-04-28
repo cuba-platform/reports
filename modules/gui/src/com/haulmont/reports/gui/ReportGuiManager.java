@@ -280,6 +280,7 @@ public class ReportGuiManager {
                 .addProperty("name")
                 .addProperty("localeNames")
                 .addProperty("xml")
+                .addProperty("description")
                 .addProperty("code")
                 .addProperty("group", metadata.getViewRepository().getView(ReportGroup.class, View.LOCAL)));
         if (inputValueMetaClass != null) {//select only reports having entity parameter

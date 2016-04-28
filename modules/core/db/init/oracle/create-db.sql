@@ -23,6 +23,7 @@ create table REPORT_REPORT (
     UPDATED_BY varchar2(50),
     NAME varchar2(255) not null,
     CODE varchar2(255),
+    DESCRIPTION varchar2(500),
     LOCALE_NAMES clob,
     GROUP_ID varchar2(32) not null,
     DEFAULT_TEMPLATE_ID varchar2(32),

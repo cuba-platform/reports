@@ -54,8 +54,9 @@
                 <group>
                     <column id="group" width="200px"/>
                 </group>
-                <column id="locName" caption="msg://report.name"/>
-                <column id="code" caption="msg://report.code"/>
+                <column id="locName"/>
+                <column id="description"/>
+                <column id="code"/>
             </columns>
             <rows datasource="reportDs"/>
         </groupTable>

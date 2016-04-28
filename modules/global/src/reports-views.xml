@@ -24,6 +24,7 @@
         <property name="name"/>
         <property name="localeNames"/>
         <property name="code"/>
+        <property name="description"/>
         <property name="reportType"/>
         <property name="group" view="_minimal"/>
     </view>

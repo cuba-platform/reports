@@ -61,9 +61,10 @@
                 <button id="runReport" action="reportsTable.runReport" icon="icons/run.png"/>
             </buttonsPanel>
             <columns>
-                <column id="group" caption="msg://report.group"/>
-                <column id="locName" caption="msg://report.name"/>
-                <column id="code" caption="msg://report.code"/>
+                <column id="group"/>
+                <column id="locName"/>
+                <column id="description"/>
+                <column id="code"/>
             </columns>
             <rows datasource="reportDs"/>
         </groupTable>
