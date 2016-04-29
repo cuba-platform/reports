@@ -10,6 +10,7 @@ import com.haulmont.cuba.core.EntityManager;
 import com.haulmont.cuba.core.Persistence;
 import com.haulmont.cuba.core.Transaction;
 import com.haulmont.cuba.core.app.FileStorageAPI;
+import com.haulmont.cuba.core.app.dynamicattributes.DynamicAttributesManagerAPI;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.entity.FileDescriptor;
 import com.haulmont.cuba.core.global.*;
@@ -70,6 +71,10 @@ public class ReportingBean implements ReportingApi {
     protected GlobalConfig globalConfig;
     @Inject
     protected DataManager dataManager;
+    @Inject
+    protected DynamicAttributesManagerAPI dynamicAttributesManagerAPI;
+    @Inject
+    protected ViewRepository viewRepository;
 
     protected PrototypesLoader prototypesLoader = new PrototypesLoader();
 
@@ -105,6 +110,9 @@ public class ReportingBean implements ReportingApi {
             } else {
                 report.setVersion(0);
             }
+
+            dynamicAttributesManagerAPI.storeDynamicAttributes(report);
+
             report = em.merge(report);
 
             if (loadedTemplates != null) {
@@ -137,7 +145,8 @@ public class ReportingBean implements ReportingApi {
             tx.end();
         }
 
-        return savedReport;
+        View reportEditView = viewRepository.findView(savedReport.getMetaClass(), "report.edit");
+        return dataManager.reload(savedReport, reportEditView, savedReport.getMetaClass(), true);
     }
 
     @Override
