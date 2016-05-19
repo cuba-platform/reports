@@ -26,9 +26,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @version $id$
- */
 public interface ReportWizardService {
     String NAME = "report_ReportWizardService";
 

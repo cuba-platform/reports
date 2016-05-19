@@ -11,10 +11,6 @@ import freemarker.template.TemplateException;
 
 import java.io.IOException;
 
-/**
-* @author fedorchenko
-* @version $Id$
-*/
 public interface Generator {
     byte[] generate(ReportData reportData) throws TemplateGenerationException, TemplateException, IOException;
 }

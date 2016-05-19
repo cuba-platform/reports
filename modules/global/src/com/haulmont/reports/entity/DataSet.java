@@ -14,9 +14,6 @@ import com.haulmont.yarg.structure.ReportQuery;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * @version $id$
- */
 @MetaClass(name = "report$DataSet")
 @SystemLevel
 public class DataSet extends AbstractNotPersistentEntity implements ReportQuery {
