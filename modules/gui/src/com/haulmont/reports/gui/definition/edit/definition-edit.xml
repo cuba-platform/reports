@@ -25,7 +25,9 @@
     <layout expand="split" spacing="true">
         <hbox spacing="true" id="propertiesBox">
             <label value="msg://definition.name" align="MIDDLE_LEFT"/>
-            <textField id="name" datasource="bandDefinitionDs" property="name" width="${width}"/>
+            <textField id="name" datasource="bandDefinitionDs" property="name" width="${width}">
+                <validator class="com.haulmont.reports.gui.report.validators.ReportBandNameValidator"/>
+            </textField>
             <label value="msg://definition.orientation" align="MIDDLE_LEFT"/>
             <lookupField id="orientation" datasource="bandDefinitionDs" property="orientation" width="${width}"/>
             <label value="msg://definition.parentBand" align="MIDDLE_LEFT"/>

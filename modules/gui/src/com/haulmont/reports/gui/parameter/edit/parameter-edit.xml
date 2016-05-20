@@ -28,7 +28,9 @@
                         <row>
                             <label value="msg://parameters.name" align="MIDDLE_LEFT"/>
                             <textField id="name" datasource="parameterDs" property="name" required="true"
-                                       width="${width}" requiredMessage="msg://parameters.nameMsg"/>
+                                        width="${width}" requiredMessage="msg://parameters.nameMsg">
+                                <validator class="com.haulmont.reports.gui.report.validators.ReportParamNameValidator"/>
+                            </textField>
                         </row>
                         <row>
                             <label value="msg://parameters.alias" align="MIDDLE_LEFT"/>
@@ -46,12 +48,14 @@
                         </row>
                         <row>
                             <label value="msg://parameters.metaClass" align="MIDDLE_LEFT"/>
-                            <lookupField id="metaClass" width="${width}" datasource="parameterDs" property="entityMetaClass"
+                            <lookupField id="metaClass" width="${width}" datasource="parameterDs"
+                                         property="entityMetaClass"
                                          requiredMessage="msg://parameters.requiredMetaClass" required="true"/>
                         </row>
                         <row>
                             <label value="msg://parameters.enum" align="MIDDLE_LEFT"/>
-                            <lookupField id="enumeration" width="${width}" datasource="parameterDs" property="enumerationClass"
+                            <lookupField id="enumeration" width="${width}" datasource="parameterDs"
+                                         property="enumerationClass"
                                          requiredMessage="msg://parameters.requiredEnumClass" required="true"/>
                         </row>
                         <row>
@@ -67,7 +71,7 @@
             </tab>
             <tab id="localesTab" caption="msg://parameters.localesTab" margin="true">
                 <textArea id="localeTextField" datasource="parameterDs" property="localeNames"
-                           width="410" height="240px"/>
+                          width="410" height="240px"/>
             </tab>
         </tabSheet>
         <frame id="windowActions" screen="editWindowActions"/>
