@@ -65,8 +65,8 @@ public class InputParametersController extends AbstractWindow {
         super.init(params);
 
         //if there is no strong external requirements for width - set auto width, so long parameter names will fit well
-        if (getDialogParams().getWidth() == null) {
-            getDialogParams().setWidthAuto();
+        if (getDialogOptions().getWidth() == null) {
+            getDialogOptions().setWidthAuto();
         }
 
         report = (Report) params.get(REPORT_PARAMETER);

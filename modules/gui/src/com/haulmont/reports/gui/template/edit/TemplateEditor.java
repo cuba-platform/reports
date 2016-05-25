@@ -173,7 +173,7 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
     public void init(Map<String, Object> params) {
         super.init(params);
 
-        getDialogParams()
+        getDialogOptions()
                 .setWidthAuto()
                 .setResizable(true);
 

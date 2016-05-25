@@ -58,7 +58,8 @@ public class ShowChartController extends AbstractWindow {
     @Override
     public void init(final Map<String, Object> params) {
         super.init(params);
-        getDialogParams().setWidth(themeConstants.getInt("cuba.gui.report.ShowChartController.width"))
+        getDialogOptions()
+                .setWidth(themeConstants.getInt("cuba.gui.report.ShowChartController.width"))
                 .setHeight(themeConstants.getInt("cuba.gui.report.ShowChartController.height"))
                 .setResizable(true);
         String chartJson = (String) params.get(CHART_JSON_PARAMETER);

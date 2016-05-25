@@ -99,7 +99,7 @@ public class RegionEditor extends AbstractEditor<ReportRegion> {
         initControlBtnsActions();
         addRegionPropertiesDsListener();
 
-        getWindowManager().getDialogParams().setWidth(regionEditorWindowWidth);
+        getDialogOptions().setWidth(regionEditorWindowWidth);
         if (asViewEditor) {
             initAsViewEditor();
         }

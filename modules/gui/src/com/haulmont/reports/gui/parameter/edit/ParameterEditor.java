@@ -89,7 +89,7 @@ public class ParameterEditor extends AbstractEditor {
 
         initListeners();
 
-        getDialogParams().setWidthAuto();
+        getDialogOptions().setWidthAuto();
     }
 
     protected void initListeners() {

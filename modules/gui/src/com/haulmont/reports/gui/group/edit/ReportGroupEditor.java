@@ -17,7 +17,8 @@ public class ReportGroupEditor extends AbstractEditor {
     public void init(Map<String, Object> params) {
         super.init(params);
 
-        getDialogParams().setResizable(false);
-        getDialogParams().setWidth(400);
+        getDialogOptions()
+                .setResizable(false)
+                .setWidth(400);
     }
 }

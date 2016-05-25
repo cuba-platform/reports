@@ -54,7 +54,7 @@ public class ValueFormatEditor extends AbstractEditor<ReportValueFormat> {
     public void init(Map<String, Object> params) {
         super.init(params);
 
-        getDialogParams().setWidthAuto();
+        getDialogOptions().setWidthAuto();
 
         // Add default format strings to combobox
         formatFields.addCustomField("formatString", new FieldGroup.CustomFieldGenerator() {
