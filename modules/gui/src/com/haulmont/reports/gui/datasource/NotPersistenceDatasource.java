@@ -8,8 +8,6 @@ package com.haulmont.reports.gui.datasource;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.gui.data.impl.DatasourceImpl;
 
-/**
- */
 public class NotPersistenceDatasource<T extends Entity> extends DatasourceImpl<T>{
 
     @Override
@@ -17,5 +15,4 @@ public class NotPersistenceDatasource<T extends Entity> extends DatasourceImpl<T
         super.setItem(item);
         modified = false;
     }
-
 }
