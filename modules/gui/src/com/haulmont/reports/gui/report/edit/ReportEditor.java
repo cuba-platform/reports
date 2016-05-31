@@ -626,6 +626,9 @@ public class ReportEditor extends AbstractEditor<Report> {
                 // Use root band as parent if no items selected
                 if (parentDefinition == null) {
                     parentDefinition = report.getRootBandDefinition();
+                } else {
+                    //find item by id, because item from getItem is not same after report commit
+                    parentDefinition = treeDs.getItem(parentDefinition.getId());
                 }
                 if (parentDefinition.getChildrenBandDefinitions() == null) {
                     parentDefinition.setChildrenBandDefinitions(new ArrayList<BandDefinition>());
