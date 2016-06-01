@@ -24,7 +24,8 @@
             <collectionDatasource id="reportScreensDs" property="reportScreens"/>
             <collectionDatasource id="templatesDs" property="templates"/>
             <collectionDatasource id="bandsDs" property="bands"/>
-            <hierarchicalDatasource id="treeDs" property="bands" hierarchyProperty="parentBandDefinition">
+            <hierarchicalDatasource id="treeDs" property="bands" hierarchyProperty="parentBandDefinition"
+                                    datasourceClass="com.haulmont.reports.gui.datasource.BandsHierarchicalPropertyDatasourse">
                 <collectionDatasource id="dataSetsDs" property="dataSets"
                     datasourceClass="com.haulmont.reports.gui.datasource.DatasetsDatasource"/>
             </hierarchicalDatasource>
