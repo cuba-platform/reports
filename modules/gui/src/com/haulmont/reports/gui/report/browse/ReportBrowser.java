@@ -38,8 +38,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-/**
- */
 public class ReportBrowser extends AbstractLookup {
 
     @Inject
@@ -73,10 +71,10 @@ public class ReportBrowser extends AbstractLookup {
     public void init(Map<String, Object> params) {
         super.init(params);
 
-        final boolean hasPermissionsToCreateReports =
-                security.isEntityOpPermitted(metadata.getClassNN(Report.class), EntityOp.CREATE);
+        boolean hasPermissionsToCreateReports = security.isEntityOpPermitted(
+                metadata.getClassNN(Report.class), EntityOp.CREATE);
 
-        copyReport.setAction(new ItemTrackingAction("copy") {
+        ItemTrackingAction copyAction = new ItemTrackingAction("copy") {
             @Override
             public void actionPerform(Component component) {
                 Report report = (Report) target.getSingleSelected();
@@ -87,12 +85,9 @@ public class ReportBrowser extends AbstractLookup {
                     showNotification(getMessage("notification.selectReport"), NotificationType.HUMANIZED);
                 }
             }
-
-            @Override
-            protected boolean isPermitted() {
-                return hasPermissionsToCreateReports;
-            }
-        });
+        };
+        copyAction.setEnabled(hasPermissionsToCreateReports);
+        copyReport.setAction(copyAction);
 
         runReport.setAction(new ItemTrackingAction("runReport") {
             @Override
@@ -146,12 +141,8 @@ public class ReportBrowser extends AbstractLookup {
                     }
                 });
             }
-
-            @Override
-            protected boolean isPermitted() {
-                return hasPermissionsToCreateReports;
-            }
         };
+        importAction.setEnabled(hasPermissionsToCreateReports);
         importAction.setCaption(StringUtils.EMPTY);
         importReport.setAction(importAction);
 
