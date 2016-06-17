@@ -4,7 +4,9 @@
  */
 package com.haulmont.reports.gui.report.run;
 
+import com.haulmont.cuba.client.ClientConfig;
 import com.haulmont.cuba.core.entity.Entity;
+import com.haulmont.cuba.core.global.Configuration;
 import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.core.global.Metadata;
 import com.haulmont.cuba.gui.components.*;
@@ -52,6 +54,15 @@ public class InputParametersController extends AbstractWindow {
     @Inject
     protected ReportService reportService;
 
+    @Inject
+    protected Configuration configuration;
+
+    @Inject
+    protected ClientConfig clientConfig;
+
+    @Inject
+    protected Button printReportBtn;
+
     protected HashMap<String, Field> parameterComponents = new HashMap<>();
 
     protected ParameterFieldCreator parameterFieldCreator = new ParameterFieldCreator(this);
@@ -77,6 +88,11 @@ public class InputParametersController extends AbstractWindow {
         if (parameters == null) {
             parameters = Collections.emptyMap();
         }
+
+        Action printReportAction = printReportBtn.getAction();
+        String commitShortcut = clientConfig.getCommitShortcut();
+        printReportAction.setShortcut(commitShortcut);
+        this.addAction(printReportAction);
 
         if (report != null) {
             if (!report.getIsTmp()) {
