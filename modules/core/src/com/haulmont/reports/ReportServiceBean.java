@@ -8,16 +8,14 @@ import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.cuba.core.entity.FileDescriptor;
 import com.haulmont.reports.app.ParameterPrototype;
 import com.haulmont.reports.app.service.ReportService;
-import com.haulmont.reports.entity.DataSetType;
-import com.haulmont.reports.entity.Report;
-import com.haulmont.reports.entity.ReportInputParameter;
-import com.haulmont.reports.entity.ReportTemplate;
+import com.haulmont.reports.entity.*;
 import com.haulmont.yarg.reporting.ReportOutputDocument;
 import com.haulmont.yarg.util.converter.ObjectToStringConverter;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 
@@ -77,6 +75,11 @@ public class ReportServiceBean implements ReportService {
     @Override
     public Collection<Report> importReports(byte[] zipBytes) {
         return reportingApi.importReports(zipBytes);
+    }
+
+    @Override
+    public Collection<Report> importReports(byte[] zipBytes, EnumSet<ReportImportOption> importOptions) {
+        return reportingApi.importReports(zipBytes, importOptions);
     }
 
     public String convertToString(Report report) {

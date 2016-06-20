@@ -21,6 +21,9 @@
     <screen id="report$Report.wizard"
             template="/com/haulmont/reports/gui/report/wizard/report-wizard.xml"/>
 
+    <screen id="report$Report.importDialog"
+            template="com/haulmont/reports/gui/report/importdialog/report-import-dialog.xml"/>
+
     <screen id="report$Report.regionEditor"
             template="/com/haulmont/reports/gui/report/wizard/region/region-editor.xml"/>
 

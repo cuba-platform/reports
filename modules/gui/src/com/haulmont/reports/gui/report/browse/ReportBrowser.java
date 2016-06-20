@@ -43,8 +43,6 @@ public class ReportBrowser extends AbstractLookup {
     @Inject
     protected ReportGuiManager reportGuiManager;
     @Inject
-    protected FileUploadingAPI fileUpload;
-    @Inject
     protected ReportService reportService;
     @Inject
     protected Button runReport;
@@ -111,35 +109,13 @@ public class ReportBrowser extends AbstractLookup {
         BaseAction importAction = new BaseAction("import") {
             @Override
             public void actionPerform(Component component) {
-                final FileUploadDialog dialog = (FileUploadDialog) openWindow("fileUploadDialog", OpenType.DIALOG);
-                dialog.addCloseListener(new CloseListener() {
-                    @Override
-                    public void windowClosed(String actionId) {
-                        if (Window.COMMIT_ACTION_ID.equals(actionId)) {
-                            String fileName = dialog.getFileName();
-                            int extensionIndex = fileName.lastIndexOf('.');
-                            String fileExtension = fileName.substring(extensionIndex + 1).toUpperCase();
-
-                            if (!fileExtension.equals("ZIP")) {
-                                String msg = messages.formatMessage(getClass(), "reportException.wrongFileType", fileExtension);
-                                showNotification(msg, NotificationType.ERROR);
-
-                            } else {
-                                try {
-                                    byte[] report = FileUtils.readFileToByteArray(fileUpload.getFile(dialog.getFileId()));
-                                    fileUpload.deleteFile(dialog.getFileId());
-                                    reportService.importReports(report);
-                                } catch (Exception e) {
-                                    String msg = getMessage("reportException.unableToImportReport");
-                                    showNotification(msg, e.toString(), NotificationType.ERROR);
-                                }
+                openWindow("report$Report.importDialog", OpenType.DIALOG)
+                        .addCloseListener(actionId -> {
+                            if (COMMIT_ACTION_ID.equals(actionId)) {
                                 reportsTable.getDatasource().refresh();
                             }
-                        }
-
-                        reportsTable.requestFocus();
-                    }
-                });
+                            reportsTable.requestFocus();
+                        });
             }
         };
         importAction.setEnabled(hasPermissionsToCreateReports);

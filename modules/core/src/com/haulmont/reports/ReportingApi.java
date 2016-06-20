@@ -10,13 +10,11 @@ import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.entity.FileDescriptor;
 import com.haulmont.cuba.core.global.View;
 import com.haulmont.reports.app.ParameterPrototype;
-import com.haulmont.reports.entity.DataSetType;
-import com.haulmont.reports.entity.Report;
-import com.haulmont.reports.entity.ReportInputParameter;
-import com.haulmont.reports.entity.ReportTemplate;
+import com.haulmont.reports.entity.*;
 import com.haulmont.yarg.reporting.ReportOutputDocument;
 
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 
@@ -47,6 +45,8 @@ public interface ReportingApi {
     byte[] exportReports(Collection<Report> reports);
 
     Collection<Report> importReports(byte[] zipBytes);
+
+    Collection<Report> importReports(byte[] zipBytes, EnumSet<ReportImportOption> importOptions);
 
     String convertToString(Report report);
 

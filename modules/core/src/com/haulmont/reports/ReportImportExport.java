@@ -8,6 +8,7 @@ import com.haulmont.cuba.core.global.DataManager;
 import com.haulmont.cuba.security.app.Authenticated;
 import com.haulmont.reports.converter.XStreamConverter;
 import com.haulmont.reports.entity.Report;
+import com.haulmont.reports.entity.ReportImportOption;
 import com.haulmont.reports.entity.ReportTemplate;
 import com.haulmont.reports.exception.ReportingException;
 import org.apache.commons.compress.archivers.ArchiveEntry;
@@ -24,10 +25,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
 import java.util.zip.CRC32;
 
 /**
@@ -68,6 +66,11 @@ public class ReportImportExport implements ReportImportExportAPI, ReportImportEx
     }
 
     public Collection<Report> importReports(byte[] zipBytes) {
+        return importReports(zipBytes, null);
+    }
+
+    @Override
+    public Collection<Report> importReports(byte[] zipBytes, EnumSet<ReportImportOption> importOptions) {
         LinkedList<Report> reports = null;
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(zipBytes);
         ZipArchiveInputStream archiveReader = new ZipArchiveInputStream(byteArrayInputStream);
@@ -78,7 +81,7 @@ public class ReportImportExport implements ReportImportExportAPI, ReportImportEx
                         reports = new LinkedList<>();
                     }
                     final byte[] buffer = readBytesFromEntry(archiveReader);
-                    Report report = importReport(buffer);
+                    Report report = importReport(buffer, importOptions);
                     reports.add(report);
                 }
             } catch (IOException e) {
@@ -184,7 +187,7 @@ public class ReportImportExport implements ReportImportExportAPI, ReportImportEx
     }
 
 
-    protected Report importReport(byte[] zipBytes) throws IOException {
+    protected Report importReport(byte[] zipBytes, EnumSet<ReportImportOption> importOptions) throws IOException {
         Report report = null;
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(zipBytes);
         ZipArchiveInputStream archiveReader;
@@ -239,6 +242,16 @@ public class ReportImportExport implements ReportImportExportAPI, ReportImportEx
             }
         }
         byteArrayInputStream.close();
+
+        if (importOptions != null) {
+            for (ReportImportOption option : importOptions) {
+                if (ReportImportOption.DO_NOT_IMPORT_ROLES == option) {
+                    Report dbReport = reloadReport(report);
+                    report.setRoles(dbReport.getRoles());
+                    report.setXml(reportingApi.convertToString(report));
+                }
+            }
+        }
 
         report = saveReport(report);
         return report;

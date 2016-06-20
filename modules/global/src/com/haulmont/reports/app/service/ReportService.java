@@ -7,13 +7,11 @@ package com.haulmont.reports.app.service;
 import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.cuba.core.entity.FileDescriptor;
 import com.haulmont.reports.app.ParameterPrototype;
-import com.haulmont.reports.entity.DataSetType;
-import com.haulmont.reports.entity.Report;
-import com.haulmont.reports.entity.ReportInputParameter;
-import com.haulmont.reports.entity.ReportTemplate;
+import com.haulmont.reports.entity.*;
 import com.haulmont.yarg.reporting.ReportOutputDocument;
 
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 
@@ -62,6 +60,8 @@ public interface ReportService {
      * @return Collection of imported reports.
      */
     Collection<Report> importReports(byte[] zipBytes);
+
+    Collection<Report> importReports(byte[] zipBytes, EnumSet<ReportImportOption> importOptions);
 
     String convertToString(Report report);
 
