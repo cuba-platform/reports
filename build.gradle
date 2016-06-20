@@ -121,6 +121,14 @@ configure(globalModule) {
             exclude group: 'org.codehaus.groovy', module: 'groovy-all'
         }
     }
+
+    jar {
+        manifest {
+            attributes('App-Component-Descriptor': 'reports-app-component.xml')
+            attributes('App-Component-Artifact-Group': cuba.artifact.group)
+            attributes('App-Component-Version': cubaVersion)
+        }
+    }
 }
 
 configure(coreModule) {
