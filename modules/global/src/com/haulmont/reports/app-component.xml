@@ -4,8 +4,7 @@
   -->
 
 <app-component xmlns="http://schemas.haulmont.com/cuba/app-component.xsd"
-               id="reports"
-               dependsOn="cuba">
+               dependsOn="com.haulmont.cuba">
 
     <module name="global" blocks="*">
         <artifact name="reports-global" appJar="true"/>
