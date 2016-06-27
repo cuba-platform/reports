@@ -11,7 +11,7 @@ import com.haulmont.cuba.gui.data.impl.HierarchicalPropertyDatasourceImpl;
 import java.util.Collection;
 import java.util.Set;
 
-public class BandsHierarchicalPropertyDatasourse<T extends Entity<K>, K> extends HierarchicalPropertyDatasourceImpl<T, K> {
+public class BandsHierarchicalPropertyDatasource<T extends Entity<K>, K> extends HierarchicalPropertyDatasourceImpl<T, K> {
     @Override
     public void committed(Set<Entity> entities) {
         super.committed(entities);
