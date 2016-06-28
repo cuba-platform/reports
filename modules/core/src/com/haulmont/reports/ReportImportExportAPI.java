@@ -14,8 +14,6 @@ import com.haulmont.reports.entity.ReportImportOption;
 import java.util.Collection;
 import java.util.EnumSet;
 
-/**
- */
 public interface ReportImportExportAPI {
     String NAME = "reporting_ReportImportExport";
 

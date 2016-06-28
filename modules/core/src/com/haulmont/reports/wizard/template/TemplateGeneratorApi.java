@@ -7,8 +7,6 @@ package com.haulmont.reports.wizard.template;
 
 import com.haulmont.reports.exception.TemplateGenerationException;
 
-/**
- */
 public interface TemplateGeneratorApi {
     String NAME = "report_TemplateGenerator";
     byte[] generateTemplate() throws TemplateGenerationException;

@@ -12,8 +12,6 @@ import com.haulmont.cuba.testsupport.TestDataSource;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- */
 public abstract class ReportsTestCase extends CubaTestCase {
 
     @Override

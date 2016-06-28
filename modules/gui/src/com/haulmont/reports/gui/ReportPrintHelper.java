@@ -12,8 +12,6 @@ import java.util.*;
 
 import static com.haulmont.reports.entity.ReportOutputType.*;
 
-/**
- */
 public class ReportPrintHelper {
 
     private static HashMap<ReportOutputType, ExportFormat> exportFormats = new HashMap<>();

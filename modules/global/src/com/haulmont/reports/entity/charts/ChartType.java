@@ -7,8 +7,6 @@ package com.haulmont.reports.entity.charts;
 import com.haulmont.chile.core.datatypes.impl.EnumClass;
 import org.apache.commons.lang.ObjectUtils;
 
-/**
- */
 public enum ChartType implements EnumClass<String> {
     PIE("pie"), SERIAL("serial");
 

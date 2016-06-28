@@ -19,8 +19,6 @@ import com.haulmont.reports.gui.definition.edit.BandDefinitionEditor;
 import java.util.Map;
 import java.util.TreeMap;
 
-/**
- */
 public class BandDefinitionEditorCompanion implements BandDefinitionEditor.Companion {
     @Override
     public void initDatasetsTable(Table table) {

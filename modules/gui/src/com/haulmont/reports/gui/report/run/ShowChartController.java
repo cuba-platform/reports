@@ -18,8 +18,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- */
 public class ShowChartController extends AbstractWindow {
     public static final String JSON_CHART_SCREEN_ID = "chart$jsonChart";
 

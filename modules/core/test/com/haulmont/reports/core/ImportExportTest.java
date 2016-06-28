@@ -9,8 +9,6 @@ import com.haulmont.reports.testsupport.ReportsTestContainer;
 import org.junit.ClassRule;
 import org.junit.Ignore;
 
-/**
- */
 @Ignore
 public class ImportExportTest {
 

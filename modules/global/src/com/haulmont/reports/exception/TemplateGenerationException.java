@@ -7,8 +7,6 @@ package com.haulmont.reports.exception;
 
 import com.haulmont.cuba.core.global.SupportedByClient;
 
-/**
- */
 @SupportedByClient
 public class TemplateGenerationException extends Exception {
     public TemplateGenerationException(String message) {

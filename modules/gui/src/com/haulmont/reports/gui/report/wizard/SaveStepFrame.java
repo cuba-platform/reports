@@ -25,8 +25,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-/**
- */
 public class SaveStepFrame extends StepFrame {
     public SaveStepFrame(ReportWizardCreator wizard) {
         super(wizard, wizard.getMessage("saveReport"), "saveStep");

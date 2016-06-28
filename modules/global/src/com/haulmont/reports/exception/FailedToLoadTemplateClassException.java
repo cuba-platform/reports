@@ -5,8 +5,6 @@
 
 package com.haulmont.reports.exception;
 
-/**
- */
 public class FailedToLoadTemplateClassException extends ReportingException {
 
     protected String className;

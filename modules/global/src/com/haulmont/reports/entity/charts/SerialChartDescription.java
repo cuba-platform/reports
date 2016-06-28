@@ -12,8 +12,6 @@ import com.haulmont.cuba.core.entity.annotation.SystemLevel;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- */
 @MetaClass(name = "report$SerialChartDescription")
 @SystemLevel
 public class SerialChartDescription extends AbstractChartDescription {

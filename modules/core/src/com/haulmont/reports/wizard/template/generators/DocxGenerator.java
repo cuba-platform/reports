@@ -18,10 +18,9 @@ import org.docx4j.wml.Tr;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- */
 public class DocxGenerator extends AbstractOfficeGenerator {
 
+    @Override
     protected OpcPackage generatePackage() throws Docx4JException {
         WordprocessingMLPackage wordMLPackage = WordprocessingMLPackage.createPackage();
         MainDocumentPart mainDocumentPart = wordMLPackage.getMainDocumentPart();
@@ -62,6 +61,4 @@ public class DocxGenerator extends AbstractOfficeGenerator {
         }
         return wordMLPackage;
     }
-
-
 }

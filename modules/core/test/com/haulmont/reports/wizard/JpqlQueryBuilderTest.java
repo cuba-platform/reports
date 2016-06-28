@@ -12,8 +12,6 @@ import com.haulmont.reports.entity.wizard.ReportRegion;
 import junit.framework.Assert;
 import org.junit.Test;
 
-/**
- */
 public class JpqlQueryBuilderTest {
     @Test
     public void testSimpleQuery() throws Exception {

@@ -24,8 +24,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.Map;
 
-/**
- */
 public class ReportGroupBrowser extends AbstractLookup {
 
     @Inject

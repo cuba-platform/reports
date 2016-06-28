@@ -23,13 +23,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 
-/**
- */
 public abstract class AbstractOfficeGenerator implements Generator {
     protected ReportTemplatePlaceholder reportTemplatePlaceholder = new ReportTemplatePlaceholder();
 
     protected ReportData reportData;
 
+    @Override
     public byte[] generate(ReportData reportData) throws TemplateGenerationException {
         this.reportData = reportData;
         byte[] template;

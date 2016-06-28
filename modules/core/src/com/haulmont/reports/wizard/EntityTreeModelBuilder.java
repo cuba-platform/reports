@@ -18,8 +18,6 @@ import org.springframework.stereotype.Component;
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- */
 @Component(EntityTreeModelBuilderApi.NAME)
 @Scope("prototype")
 public class EntityTreeModelBuilder implements EntityTreeModelBuilderApi {

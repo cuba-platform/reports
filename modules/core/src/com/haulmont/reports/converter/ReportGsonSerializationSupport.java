@@ -15,8 +15,6 @@ import com.haulmont.reports.entity.ReportTemplate;
 
 import java.io.IOException;
 
-/**
- */
 public class ReportGsonSerializationSupport extends GsonSerializationSupport {
     public ReportGsonSerializationSupport() {
         exclusionPolicy = (objectClass, propertyName) ->

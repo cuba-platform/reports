@@ -16,8 +16,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.Map;
 
-/**
- */
 public class EntityTreeLookup extends AbstractLookup {
 
     @Named("entityTreeFrame.reportEntityTreeNodeDs")

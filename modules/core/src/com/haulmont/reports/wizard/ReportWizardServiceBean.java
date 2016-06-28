@@ -24,8 +24,6 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import java.util.List;
 
-/**
- */
 @Service(ReportWizardService.NAME)
 public class ReportWizardServiceBean implements ReportWizardService {
     @Inject

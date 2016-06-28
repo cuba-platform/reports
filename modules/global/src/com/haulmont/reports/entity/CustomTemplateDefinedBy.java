@@ -11,8 +11,6 @@ package com.haulmont.reports.entity;
 import com.haulmont.chile.core.datatypes.impl.EnumClass;
 import org.apache.commons.lang.ObjectUtils;
 
-/**
- */
 public enum CustomTemplateDefinedBy implements EnumClass<Integer> {
     CLASS(100),
     SCRIPT(200),

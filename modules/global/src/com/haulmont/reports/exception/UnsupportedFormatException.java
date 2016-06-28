@@ -6,8 +6,6 @@ package com.haulmont.reports.exception;
 
 import com.haulmont.cuba.core.global.SupportedByClient;
 
-/**
- */
 @SupportedByClient
 public class UnsupportedFormatException extends ReportingException {
     public UnsupportedFormatException() {

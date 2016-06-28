@@ -7,8 +7,6 @@ package com.haulmont.reports.entity;
 
 import java.io.ObjectStreamException;
 
-/**
- */
 public class CubaReportOutputType extends com.haulmont.yarg.structure.ReportOutputType {
     public final static CubaReportOutputType chart = new CubaReportOutputType("chart");
 

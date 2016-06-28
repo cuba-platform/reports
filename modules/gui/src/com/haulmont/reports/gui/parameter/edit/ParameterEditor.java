@@ -21,8 +21,6 @@ import org.apache.commons.lang.StringUtils;
 import javax.inject.Inject;
 import java.util.*;
 
-/**
- */
 public class ParameterEditor extends AbstractEditor {
     @Inject
     private Label defaultValueLabel;

@@ -44,8 +44,6 @@ import java.io.IOException;
 import java.util.*;
 import java.util.zip.CRC32;
 
-/**
- */
 @Component(ReportingApi.NAME)
 public class ReportingBean implements ReportingApi {
     public static final String REPORT_EDIT_VIEW_NAME = "report.edit";

@@ -23,8 +23,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- */
 public class InputParametersController extends AbstractWindow {
     public static final String REPORT_PARAMETER = "report";
     public static final String PARAMETERS_PARAMETER = "parameters";

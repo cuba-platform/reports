@@ -14,8 +14,6 @@ import com.haulmont.yarg.formatters.impl.DefaultFormatProvider;
 
 import javax.inject.Inject;
 
-/**
- */
 public class CubaFieldFormatProvider implements DefaultFormatProvider {
 
     @Inject

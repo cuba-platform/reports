@@ -22,12 +22,11 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import java.util.List;
 
-/**
- */
 public class XlsxGenerator extends AbstractOfficeGenerator {
     public static final String CELL_MASK = "$%s$%s";
     protected static final String SHEET = "Sheet1"; //PartName can`t contain non-utf symbols cause it used URI encoding and after it looks like %D0%9B%D0%B8%D1%81%D1%821.xml for Лист1.xml
 
+    @Override
     protected OpcPackage generatePackage() throws Docx4JException, JAXBException {
         SpreadsheetMLPackage pkg = SpreadsheetMLPackage.createPackage();
         //String sheetInternalName = ((Messages) AppBeans.get(Messages.NAME)).getMessage(getClass(), SHEET);
@@ -209,5 +208,4 @@ public class XlsxGenerator extends AbstractOfficeGenerator {
         stylesheet.getFonts().setCount(1L);
         return stylesheet;
     }
-
 }

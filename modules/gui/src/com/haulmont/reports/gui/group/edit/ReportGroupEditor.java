@@ -9,8 +9,6 @@ import com.haulmont.cuba.gui.components.AbstractEditor;
 
 import java.util.Map;
 
-/**
- */
 public class ReportGroupEditor extends AbstractEditor {
 
     @Override

@@ -50,8 +50,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
-/**
- */
 public class ReportEditor extends AbstractEditor<Report> {
 
     @Named("generalFrame.propertiesFieldGroup")

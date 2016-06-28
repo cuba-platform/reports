@@ -16,8 +16,6 @@ import com.haulmont.reports.entity.ReportTemplate;
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- */
 public class ReportDataSupplier extends GenericDataSupplier {
     @Override
     public Set<Entity> commit(CommitContext context) {

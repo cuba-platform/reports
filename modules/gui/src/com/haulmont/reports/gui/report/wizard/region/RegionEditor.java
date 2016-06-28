@@ -26,8 +26,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.*;
 
-/**
- */
 public class RegionEditor extends AbstractEditor<ReportRegion> {
     @Named("entityTreeFrame.reportEntityTreeNodeDs")
     protected AbstractTreeDatasource reportEntityTreeNodeDs;

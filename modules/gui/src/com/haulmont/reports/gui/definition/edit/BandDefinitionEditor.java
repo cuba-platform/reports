@@ -27,8 +27,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.*;
 
-/**
- */
 public class BandDefinitionEditor extends AbstractFrame implements Suggester {
 
     @Inject

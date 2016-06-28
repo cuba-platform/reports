@@ -5,8 +5,6 @@
 
 package com.haulmont.reports.libintegration;
 
-/**
- */
 public interface CubaOfficeIntegrationMBean {
 
     void setTimeoutInSeconds(Integer timeoutInSeconds);

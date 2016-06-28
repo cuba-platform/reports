@@ -14,8 +14,6 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-/**
- */
 @Entity(name = "report$ReportGroup")
 @Table(name = "REPORT_GROUP")
 @NamePattern("#getLocName|title,localeNames")

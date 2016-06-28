@@ -19,8 +19,6 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 
-/**
- */
 @Service(ReportService.NAME)
 public class ReportServiceBean implements ReportService {
     @Inject
@@ -82,10 +80,12 @@ public class ReportServiceBean implements ReportService {
         return reportingApi.importReports(zipBytes, importOptions);
     }
 
+    @Override
     public String convertToString(Report report) {
         return reportingApi.convertToString(report);
     }
 
+    @Override
     public Report convertToReport(String xml) {
         return reportingApi.convertToReport(xml);
     }

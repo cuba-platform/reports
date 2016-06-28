@@ -16,8 +16,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-/**
- */
 public class EntityMap implements Map<String, Object> {
     public static final String INSTANCE_NAME_KEY = "_instanceName";
     private Instance instance;

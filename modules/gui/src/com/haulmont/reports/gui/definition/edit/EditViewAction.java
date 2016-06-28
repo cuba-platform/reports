@@ -24,8 +24,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- */
 public class EditViewAction extends AbstractAction {
     protected BandDefinitionEditor bandDefinitionEditor;
 

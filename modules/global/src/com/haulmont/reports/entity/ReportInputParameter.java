@@ -15,8 +15,6 @@ import org.apache.commons.lang.StringUtils;
 
 import javax.persistence.Transient;
 
-/**
- */
 @MetaClass(name = "report$ReportInputParameter")
 @SystemLevel
 @NamePattern("%s|locName")

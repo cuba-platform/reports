@@ -17,8 +17,6 @@ import org.apache.commons.logging.LogFactory;
 import javax.persistence.Temporal;
 import java.util.Date;
 
-/**
- */
 public class ReportTemplatePlaceholder {
     protected static final String HAS_CONTENT = "?has_content";
     protected static final String AND = " && ";

@@ -12,8 +12,6 @@ import org.junit.Assert;
 import org.junit.ClassRule;
 import org.junit.Test;
 
-/**
- */
 public class EntityMapTest {
 
     @ClassRule

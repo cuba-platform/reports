@@ -24,8 +24,6 @@ import org.apache.commons.collections.CollectionUtils;
 import javax.annotation.Nullable;
 import java.util.*;
 
-/**
- */
 public abstract class AbstractPrintFormAction extends AbstractAction {
     protected ReportGuiManager reportGuiManager = AppBeans.get(ReportGuiManager.class);
 

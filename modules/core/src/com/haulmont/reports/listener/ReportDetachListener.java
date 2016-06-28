@@ -19,8 +19,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-/**
- */
 @Component("report_ReportDetachListener")
 public class ReportDetachListener implements BeforeDetachEntityListener<Report> {
 

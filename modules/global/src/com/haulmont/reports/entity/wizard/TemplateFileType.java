@@ -8,8 +8,6 @@ package com.haulmont.reports.entity.wizard;
 import com.haulmont.chile.core.datatypes.impl.EnumClass;
 import org.apache.commons.lang.ObjectUtils;
 
-/**
- */
 public enum TemplateFileType implements EnumClass<Integer> {
     HTML(30),
     DOCX(40),

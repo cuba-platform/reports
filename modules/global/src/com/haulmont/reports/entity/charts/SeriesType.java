@@ -8,8 +8,6 @@ package com.haulmont.reports.entity.charts;
 import com.haulmont.chile.core.datatypes.impl.EnumClass;
 import org.apache.commons.lang.ObjectUtils;
 
-/**
- */
 public enum SeriesType implements EnumClass<String> {
     LINE("line"), COLUMN("column"), STEP("step"), SMOOTHED_LINE("smoothedLine")/*, CANDLESTICK("candlestick"), OHLC("ohlc")*/;
 

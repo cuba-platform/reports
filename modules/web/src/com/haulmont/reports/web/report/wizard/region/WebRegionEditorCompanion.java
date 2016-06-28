@@ -23,8 +23,6 @@ import org.springframework.cglib.core.Transformer;
 
 import java.util.UUID;
 
-/**
- */
 public class WebRegionEditorCompanion implements RegionEditor.Companion {
     @Override
     public void addTreeTableDblClickListener(final Tree entityTree, final CollectionDatasource<RegionProperty, UUID> reportRegionPropertiesTableDs) {

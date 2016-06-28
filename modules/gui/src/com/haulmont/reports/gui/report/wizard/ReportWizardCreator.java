@@ -38,8 +38,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.*;
 
-/**
- */
 public class ReportWizardCreator extends AbstractWindow implements MainWizardFrame<AbstractWindow> {
     //main wizard window
     @Inject

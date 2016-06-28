@@ -41,8 +41,6 @@ import java.util.concurrent.TimeUnit;
 import static com.haulmont.reports.gui.report.run.InputParametersController.*;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 
-/**
- */
 @Component("cuba_ReportGuiManager")
 public class ReportGuiManager {
 

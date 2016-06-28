@@ -17,8 +17,6 @@ import com.haulmont.reports.entity.ReportOutputType;
 import javax.annotation.Nullable;
 import javax.persistence.MappedSuperclass;
 
-/**
- */
 @MappedSuperclass
 public abstract class AbstractChartDescription extends AbstractNotPersistentEntity {
     @MetaProperty

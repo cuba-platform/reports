@@ -24,8 +24,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- */
 public class HtmlGenerator implements Generator {
     protected ReportTemplatePlaceholder reportTemplatePlaceholder = new ReportTemplatePlaceholder();
     protected static final String HTML_TEMPLATE_NAME = "defaultTemplate";

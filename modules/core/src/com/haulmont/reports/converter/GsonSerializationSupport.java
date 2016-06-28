@@ -30,8 +30,6 @@ import java.util.*;
 
 import static java.lang.String.format;
 
-/**
- */
 @NotThreadSafe
 //todo add dynamic attributes support
 //todo add not meta property objects support

@@ -7,8 +7,6 @@ package com.haulmont.reports.entity;
 import com.haulmont.chile.core.datatypes.impl.EnumClass;
 import org.apache.commons.lang.ObjectUtils;
 
-/**
- */
 public enum Orientation implements EnumClass<Integer> {
     HORIZONTAL(0),
     VERTICAL(1);

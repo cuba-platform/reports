@@ -20,8 +20,6 @@ import org.perf4j.log4j.Log4JStopWatch;
 
 import java.util.*;
 
-/**
- */
 public class XStreamConverter {
     protected XStream createXStream() {
         XStream xStream = new XStream() {

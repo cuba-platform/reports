@@ -14,6 +14,7 @@ import java.util.*;
 
 public class DatasetsDatasource extends CollectionPropertyDatasourceImpl<DataSet, UUID> {
 
+    @Override
     public void committed(Set<Entity> entities) {
         if (!State.VALID.equals(masterDs.getState()))
             return;

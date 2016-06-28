@@ -24,8 +24,6 @@ import java.util.*;
 import static com.haulmont.cuba.gui.commonlookup.CommonLookupController.CLASS_PARAMETER;
 
 
-/**
- */
 public class ParameterFieldCreator {
     protected ComponentsFactory componentsFactory = AppConfig.getFactory();
     protected Messages messages = AppBeans.get(Messages.class);

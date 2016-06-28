@@ -14,8 +14,6 @@ import java.io.StringReader;
 import java.util.Locale;
 import java.util.Properties;
 
-/**
- */
 public final class LocaleHelper {
 
     private LocaleHelper() {

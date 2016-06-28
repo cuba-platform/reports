@@ -19,8 +19,6 @@ import java.util.Collections;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-/**
- */
 public class RunReportAction extends AbstractAction implements Action.HasBeforeAfterHandlers {
 
     protected Frame window;

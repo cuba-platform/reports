@@ -21,8 +21,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-/**
- */
 public class PrototypesLoader {
 
     private Log log = LogFactory.getLog(PrototypesLoader.class);

@@ -10,8 +10,6 @@ import com.haulmont.cuba.gui.components.Window;
 
 import java.util.List;
 
-/**
- */
 public class StepFrameManager {
     protected final List<StepFrame> stepFrames;
     private MainWizardFrame mainWizardFrame;

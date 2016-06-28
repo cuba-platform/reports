@@ -9,8 +9,6 @@ import com.haulmont.chile.core.annotations.MetaClass;
 import com.haulmont.chile.core.annotations.MetaProperty;
 import com.haulmont.cuba.core.entity.annotation.SystemLevel;
 
-/**
- */
 @MetaClass(name = "report$PieChartDescriptor")
 @SystemLevel
 public class PieChartDescription extends AbstractChartDescription {

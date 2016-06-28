@@ -12,8 +12,6 @@ import com.haulmont.cuba.core.config.SourceType;
 import com.haulmont.cuba.core.config.defaults.DefaultBoolean;
 import com.haulmont.cuba.core.config.defaults.DefaultLong;
 
-/**
- */
 @Source(type = SourceType.DATABASE)
 public interface ReportingClientConfig extends Config {
 

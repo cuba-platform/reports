@@ -36,8 +36,6 @@ import org.dom4j.Element;
 
 import java.util.*;
 
-/**
- */
 public class DetailsStepFrame extends StepFrame {
     protected ConditionsTree conditionsTree;
     protected Filter filter;

@@ -22,8 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- */
 public class RegionsStepFrame extends StepFrame {
     protected static final String ADD_TABULATED_REGION_ACTION_ID = "tabulatedRegion";
     protected static final String ADD_SIMPLE_REGION_ACTION_ID = "simpleRegion";

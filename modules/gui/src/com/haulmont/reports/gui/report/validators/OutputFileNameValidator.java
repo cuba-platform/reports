@@ -12,8 +12,6 @@ import com.haulmont.cuba.gui.components.ValidationException;
 import com.haulmont.reports.gui.report.wizard.ReportWizardCreator;
 import org.apache.commons.lang.StringUtils;
 
-/**
- */
 public class OutputFileNameValidator implements Field.Validator {
     protected Messages messages = AppBeans.get(Messages.class);
 

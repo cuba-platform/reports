@@ -18,8 +18,6 @@ import javax.inject.Inject;
 import java.text.ParseException;
 import java.util.UUID;
 
-/**
- */
 public class CubaObjectToStringConverter extends AbstractObjectToStringConverter {
     @Inject
     protected DataManager dataManager;

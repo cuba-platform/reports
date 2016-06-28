@@ -15,8 +15,6 @@ import com.haulmont.yarg.loaders.ReportDataLoader;
 import com.haulmont.yarg.structure.ReportQuery;
 import org.apache.commons.lang.StringUtils;
 
-/**
- */
 public abstract class AbstractEntityDataLoader implements ReportDataLoader {
     protected Entity reloadEntityByDataSetView(ReportQuery reportQuery, Object inputObject) {
         Entity entity = null;

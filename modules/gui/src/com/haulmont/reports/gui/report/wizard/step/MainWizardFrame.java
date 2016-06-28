@@ -8,8 +8,6 @@ package com.haulmont.reports.gui.report.wizard.step;
 import com.haulmont.cuba.gui.components.AbstractWindow;
 import com.haulmont.cuba.gui.components.Button;
 
-/**
- */
 public interface MainWizardFrame<T extends AbstractWindow> {
 
     String getMessage(String key);

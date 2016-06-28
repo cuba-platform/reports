@@ -19,8 +19,6 @@ import org.apache.commons.collections.CollectionUtils;
 
 import java.util.Set;
 
-/**
- */
 public class TablePrintFormAction extends AbstractPrintFormAction implements Action.HasBeforeAfterHandlers {
     protected Window window;
     protected final Table table;

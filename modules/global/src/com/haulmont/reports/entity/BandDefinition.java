@@ -16,8 +16,6 @@ import com.haulmont.yarg.structure.ReportQuery;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- */
 @MetaClass(name = "report$BandDefinition")
 @NamePattern("%s|name")
 @SystemLevel
@@ -61,6 +59,7 @@ public class BandDefinition extends AbstractNotPersistentEntity implements Repor
         this.childrenBandDefinitions = childrenBandDefinitions;
     }
 
+    @Override
     public String getName() {
         return name;
     }

@@ -18,8 +18,6 @@ import javax.persistence.Transient;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- */
 @MetaClass(name = "report$WizardReportRegion")
 @SystemLevel
 public class ReportRegion extends AbstractNotPersistentEntity implements OrderableEntity {

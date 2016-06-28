@@ -7,8 +7,6 @@ package com.haulmont.reports.entity;
 import com.haulmont.chile.core.datatypes.impl.EnumClass;
 import org.apache.commons.lang.ObjectUtils;
 
-/**
- */
 public enum ParameterType implements EnumClass<Integer> {
     DATE(10),
     TEXT(20),

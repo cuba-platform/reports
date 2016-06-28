@@ -15,8 +15,6 @@ import javax.persistence.Transient;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- */
 @MetaClass(name = "report$WizardReportEntityTreeNode")
 @SystemLevel
 public class EntityTreeNode extends AbstractNotPersistentEntity {

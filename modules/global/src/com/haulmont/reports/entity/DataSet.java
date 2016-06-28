@@ -57,6 +57,7 @@ public class DataSet extends AbstractNotPersistentEntity implements ReportQuery 
         this.useExistingView = useExistingView;
     }
 
+    @Override
     public String getName() {
         return name;
     }

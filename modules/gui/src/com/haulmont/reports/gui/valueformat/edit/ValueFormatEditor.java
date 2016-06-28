@@ -20,8 +20,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-/**
- */
 public class ValueFormatEditor extends AbstractEditor<ReportValueFormat> {
 
     protected String[] defaultFormats = new String[]{

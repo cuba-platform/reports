@@ -17,8 +17,6 @@ import org.apache.commons.lang.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- */
 public class StepFrame {
     protected final String name;
     protected final Frame frame;

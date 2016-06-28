@@ -7,8 +7,6 @@ package com.haulmont.reports.entity;
 import com.haulmont.chile.core.datatypes.impl.EnumClass;
 import org.apache.commons.lang.ObjectUtils;
 
-/**
- */
 public enum ReportOutputType implements EnumClass<Integer> {
     XLS(0, CubaReportOutputType.xls),
     DOC(10, CubaReportOutputType.doc),

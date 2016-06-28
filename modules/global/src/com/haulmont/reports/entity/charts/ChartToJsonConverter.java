@@ -10,8 +10,6 @@ import org.apache.commons.lang.StringUtils;
 
 import java.util.*;
 
-/**
- */
 public class ChartToJsonConverter {
     protected String resultFileName;
 

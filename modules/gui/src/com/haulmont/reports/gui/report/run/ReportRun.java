@@ -22,8 +22,6 @@ import org.apache.commons.lang.StringUtils;
 import javax.inject.Inject;
 import java.util.*;
 
-/**
- */
 public class ReportRun extends AbstractLookup {
 
     protected static final String RUN_ACTION_ID = "runReport";

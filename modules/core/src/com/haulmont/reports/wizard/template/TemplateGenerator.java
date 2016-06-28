@@ -13,8 +13,6 @@ import org.springframework.context.annotation.Scope;
 
 import org.springframework.stereotype.Component;
 
-/**
- */
 @Component(TemplateGeneratorApi.NAME)
 @Scope("prototype")
 public class TemplateGenerator implements TemplateGeneratorApi {
@@ -27,6 +25,7 @@ public class TemplateGenerator implements TemplateGeneratorApi {
         this.templateFileType = templateFileType;
     }
 
+    @Override
     public byte[] generateTemplate() throws TemplateGenerationException {
         byte[] template;
         try {
@@ -58,5 +57,4 @@ public class TemplateGenerator implements TemplateGeneratorApi {
         }
         return generator;
     }
-
 }

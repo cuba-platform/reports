@@ -29,8 +29,6 @@ import javax.persistence.Temporal;
 import java.lang.reflect.AnnotatedElement;
 import java.util.*;
 
-/**
- */
 @Component(ReportingWizardApi.NAME)
 public class ReportingWizardBean implements ReportingWizardApi {
     public static final String ROOT_BAND_DEFINITION_NAME = "Root";

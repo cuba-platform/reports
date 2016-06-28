@@ -12,8 +12,6 @@ import com.haulmont.yarg.structure.BandData;
 import junit.framework.Assert;
 import org.junit.Test;
 
-/**
- */
 public class CubaReportingTest {
     @Test
     public void testName() throws Exception {

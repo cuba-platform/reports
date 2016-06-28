@@ -19,8 +19,6 @@ import javax.inject.Inject;
 import java.util.*;
 import java.util.stream.Collectors;
 
-/**
- */
 public class ChartEditFrameController extends AbstractFrame {
     @Inject
     protected ComponentsFactory componentsFactory;

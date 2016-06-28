@@ -22,8 +22,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- */
 @MetaClass(name = "report$WizardReportData")
 @SystemLevel
 public class ReportData extends AbstractNotPersistentEntity {

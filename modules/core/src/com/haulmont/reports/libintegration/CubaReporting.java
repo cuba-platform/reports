@@ -11,8 +11,6 @@ import com.haulmont.yarg.structure.Report;
 import com.haulmont.yarg.structure.ReportTemplate;
 import org.apache.commons.lang.StringUtils;
 
-/**
- */
 public class CubaReporting extends Reporting {
     public static final String REPORT_FILE_NAME_KEY = "__REPORT_FILE_NAME";
 

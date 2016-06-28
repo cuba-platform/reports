@@ -21,8 +21,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
 
-/**
- */
 public class ParameterClassResolver {
     protected Map<ParameterType, Class> primitiveParameterTypeMapping = new ImmutableMap.Builder<ParameterType, Class>()
             .put(ParameterType.BOOLEAN, Boolean.class)

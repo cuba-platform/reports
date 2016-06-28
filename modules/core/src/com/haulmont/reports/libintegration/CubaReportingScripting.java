@@ -14,8 +14,6 @@ import com.haulmont.yarg.util.groovy.Scripting;
 import javax.inject.Inject;
 import java.util.Map;
 
-/**
- */
 public class CubaReportingScripting implements Scripting {
 
     @Inject

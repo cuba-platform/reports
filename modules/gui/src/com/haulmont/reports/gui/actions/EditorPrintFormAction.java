@@ -15,8 +15,6 @@ import com.haulmont.reports.gui.ReportGuiManager;
 
 import javax.annotation.Nullable;
 
-/**
- */
 public class EditorPrintFormAction extends AbstractPrintFormAction implements Action.HasBeforeAfterHandlers {
 
     private final Window.Editor editor;

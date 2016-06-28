@@ -13,8 +13,6 @@ import org.apache.commons.lang.math.RandomUtils;
 import javax.annotation.Nullable;
 import java.util.*;
 
-/**
- */
 public class RandomChartDataGenerator {
     public static final List<String> COLORS = Arrays.asList("red", "green", "blue", "yellow", "orange", "black", "magenta");
 

@@ -17,8 +17,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-/**
- */
 public class MultiEntityDataLoader extends AbstractEntityDataLoader {
 
     public static final String DEFAULT_LIST_ENTITIES_PARAM_NAME = "entities";

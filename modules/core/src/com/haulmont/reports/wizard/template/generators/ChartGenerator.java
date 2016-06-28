@@ -18,8 +18,6 @@ import org.apache.commons.collections.CollectionUtils;
 import java.io.IOException;
 import java.util.List;
 
-/**
- */
 public class ChartGenerator implements Generator {
     @Override
     public byte[] generate(ReportData reportData) throws TemplateGenerationException, TemplateException, IOException {

@@ -10,8 +10,6 @@ import com.haulmont.cuba.core.entity.AbstractNotPersistentEntity;
 import com.haulmont.cuba.core.entity.annotation.SystemLevel;
 import com.haulmont.yarg.structure.ReportFieldFormat;
 
-/**
- */
 @MetaClass(name = "report$ReportValueFormat")
 @SystemLevel
 public class ReportValueFormat extends AbstractNotPersistentEntity implements ReportFieldFormat {
