@@ -10,8 +10,16 @@ package com.haulmont.reports.core;
 
 import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.reports.ReportImportExportMBean;
+import com.haulmont.reports.testsupport.ReportsTestContainer;
+import org.junit.ClassRule;
+import org.junit.Test;
 
-public class DeployTest extends ReportsTestCase {
+public class DeployTest {
+
+    @ClassRule
+    public static ReportsTestContainer cont = ReportsTestContainer.Common.INSTANCE;
+
+    @Test
     public void testDeployReports() throws Exception {
         ReportImportExportMBean reportImportExport = AppBeans.get(ReportImportExportMBean.class);
         reportImportExport.deployAllReportsFromPath("./modules/core/test/com/haulmont/reports/core/reports");

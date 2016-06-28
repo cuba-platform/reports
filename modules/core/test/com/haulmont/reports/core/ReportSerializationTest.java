@@ -12,13 +12,24 @@ import com.haulmont.cuba.core.global.View;
 import com.haulmont.reports.converter.GsonConverter;
 import com.haulmont.reports.converter.XStreamConverter;
 import com.haulmont.reports.entity.*;
+import com.haulmont.reports.testsupport.ReportsTestContainer;
+import org.junit.ClassRule;
+import org.junit.Test;
 
 import java.util.Collections;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 /**
  */
-public class ReportSerializationTest extends ReportsTestCase {
+public class ReportSerializationTest {
+
+    @ClassRule
+    public static ReportsTestContainer cont = ReportsTestContainer.Common.INSTANCE;
+
+    @Test
     public void testGsonConverter() throws Exception {
         GsonConverter gsonConverter = new GsonConverter();
         Report sourceReport = createData();
@@ -46,6 +57,7 @@ public class ReportSerializationTest extends ReportsTestCase {
         assertNotNull(resultReport.getRootBandDefinition().getDataSets().get(0).getView());
     }
 
+    @Test
     public void testXstreamDeserialization() throws Exception {
         String xml = "<report>\n" +
                 "  <detached>false</detached>\n" +

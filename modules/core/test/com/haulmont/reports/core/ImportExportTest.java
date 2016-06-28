@@ -5,9 +5,18 @@
 
 package com.haulmont.reports.core;
 
+import com.haulmont.reports.testsupport.ReportsTestContainer;
+import org.junit.ClassRule;
+import org.junit.Ignore;
+
 /**
  */
-public class ImportExportTest extends ReportsTestCase {
+@Ignore
+public class ImportExportTest {
+
+    @ClassRule
+    public static ReportsTestContainer cont = ReportsTestContainer.Common.INSTANCE;
+
     public void testNothing() throws Exception {
 
     }

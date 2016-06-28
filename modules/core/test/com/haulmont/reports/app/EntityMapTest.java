@@ -7,9 +7,7 @@ package com.haulmont.reports.app;
 
 import com.haulmont.cuba.security.entity.Group;
 import com.haulmont.cuba.security.entity.User;
-import com.haulmont.cuba.testsupport.TestContainer;
-import com.haulmont.reports.entity.Report;
-import com.haulmont.reports.entity.ReportTemplate;
+import com.haulmont.reports.testsupport.ReportsTestContainer;
 import org.junit.Assert;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -19,7 +17,7 @@ import org.junit.Test;
 public class EntityMapTest {
 
     @ClassRule
-    public static TestContainer cont = new TestContainer();
+    public static ReportsTestContainer cont = ReportsTestContainer.Common.INSTANCE;
 
     @Test
     public void testGetValue() throws Exception {

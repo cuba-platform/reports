@@ -10,21 +10,32 @@ import com.haulmont.cuba.security.entity.Group;
 import com.haulmont.cuba.security.entity.User;
 import com.haulmont.reports.core.ReportsTestCase;
 import com.haulmont.reports.entity.DataSet;
+import com.haulmont.reports.testsupport.ReportsTestContainer;
 import com.haulmont.yarg.structure.BandData;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Test;
 
 import java.util.*;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 /**
  */
-public class EntityDataLoaderTest extends ReportsTestCase {
+public class EntityDataLoaderTest {
+
+    @ClassRule
+    public static ReportsTestContainer cont = ReportsTestContainer.Common.INSTANCE;
+
     private User user;
     private Group group;
 
-    @Override
+    @Before
     public void setUp() throws Exception {
-        super.setUp();
-
-        Transaction tx = persistence.createTransaction();
+        Transaction tx = cont.persistence().createTransaction();
         try {
             user = new User();
             user.setLogin("test");
@@ -35,8 +46,8 @@ public class EntityDataLoaderTest extends ReportsTestCase {
             group.setName("test");
             user.setGroup(group);
 
-            persistence.getEntityManager().persist(group);
-            persistence.getEntityManager().persist(user);
+            cont.entityManager().persist(group);
+            cont.entityManager().persist(user);
 
             tx.commit();
         } finally {
@@ -46,15 +57,15 @@ public class EntityDataLoaderTest extends ReportsTestCase {
         user.setGroup(null);
     }
 
-    @Override
+    @After
     public void tearDown() throws Exception {
-        Transaction tx = persistence.createTransaction();
+        Transaction tx = cont.persistence().createTransaction();
         try {
-            persistence.getEntityManager()
+            cont.entityManager()
                     .createNativeQuery("delete from sec_user where id = ?1")
                     .setParameter(1, user.getId())
                     .executeUpdate();
-            persistence.getEntityManager()
+            cont.entityManager()
                     .createNativeQuery("delete from sec_group where id = ?1")
                     .setParameter(1, group.getId())
                     .executeUpdate();
@@ -62,15 +73,15 @@ public class EntityDataLoaderTest extends ReportsTestCase {
         } finally {
             tx.end();
         }
-        super.tearDown();
     }
 
+    @Test
     public void testSingleEntityLoad() throws Exception {
         DataSet dataSet = new DataSet();
         Map<String, Object> params = new HashMap<>();
         params.put(SingleEntityDataLoader.DEFAULT_ENTITY_PARAM_NAME, user);
 
-        Transaction tx = persistence.createTransaction();
+        Transaction tx = cont.persistence().createTransaction();
         try {
             Map<String, Object> entityWrapper = doSingleLoad(dataSet, params);
             Object groupName = entityWrapper.get("group.name");
@@ -83,7 +94,7 @@ public class EntityDataLoaderTest extends ReportsTestCase {
         dataSet.setViewName("user.edit");
         dataSet.setUseExistingView(true);
 
-        tx = persistence.createTransaction();
+        tx = cont.persistence().createTransaction();
         try {
             Map<String, Object> entityWrapper = doSingleLoad(dataSet, params);
             Object groupName = entityWrapper.get("group.name");
@@ -94,12 +105,13 @@ public class EntityDataLoaderTest extends ReportsTestCase {
         }
     }
 
+    @Test
     public void testMultiEntityLoad() throws Exception {
         DataSet dataSet = new DataSet();
         Map<String, Object> params = new HashMap<>();
         params.put(MultiEntityDataLoader.DEFAULT_LIST_ENTITIES_PARAM_NAME, Arrays.asList(user));
 
-        Transaction tx = persistence.createTransaction();
+        Transaction tx = cont.persistence().createTransaction();
         try {
             Map<String, Object> entityWrapper = doMultiLoad(dataSet, params);
             Object groupName = entityWrapper.get("group.name");
@@ -112,7 +124,7 @@ public class EntityDataLoaderTest extends ReportsTestCase {
         dataSet.setViewName("user.edit");
         dataSet.setUseExistingView(true);
 
-        tx = persistence.createTransaction();
+        tx = cont.persistence().createTransaction();
         try {
             Map<String, Object> entityWrapper = doMultiLoad(dataSet, params);
             Object groupName = entityWrapper.get("group.name");
