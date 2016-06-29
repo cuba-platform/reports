@@ -5,6 +5,7 @@
 package com.haulmont.reports.entity;
 
 import com.haulmont.cuba.core.entity.BaseUuidEntity;
+import com.haulmont.cuba.core.entity.Creatable;
 import com.haulmont.cuba.core.entity.Updatable;
 import com.haulmont.cuba.core.entity.Versioned;
 
@@ -18,12 +19,18 @@ import java.util.Date;
  *
  */
 @MappedSuperclass
-public class BaseReportEntity extends BaseUuidEntity implements Versioned, Updatable {
+public class BaseReportEntity extends BaseUuidEntity implements Versioned, Creatable, Updatable {
     private static final long serialVersionUID = -7868980589172607336L;
 
     @Version
     @Column(name = "VERSION")
     protected Integer version;
+
+    @Column(name = "CREATE_TS")
+    protected Date createTs;
+
+    @Column(name = "CREATED_BY", length = LOGIN_FIELD_LEN)
+    protected String createdBy;
 
     @Column(name = "UPDATE_TS")
     protected Date updateTs;
@@ -39,6 +46,26 @@ public class BaseReportEntity extends BaseUuidEntity implements Versioned, Updat
     @Override
     public void setVersion(Integer version) {
         this.version = version;
+    }
+
+    @Override
+    public Date getCreateTs() {
+        return createTs;
+    }
+
+    @Override
+    public void setCreateTs(Date createTs) {
+        this.createTs = createTs;
+    }
+
+    @Override
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    @Override
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
     }
 
     @Override
