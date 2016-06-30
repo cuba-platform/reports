@@ -14,64 +14,65 @@
         <datasource id="parameterDs" class="com.haulmont.reports.entity.ReportInputParameter"/>
     </dsContext>
 
-    <assign name="width" value="400px"/>
+    <dialogMode width="640px"/>
 
     <layout spacing="true">
-        <tabSheet id="tabsheet">
+        <tabSheet id="tabsheet" width="100%">
             <tab id="optionsTab" caption="msg://parameters.optionsTab">
-                <grid spacing="true" margin="true">
+                <grid spacing="true" margin="true;false;false;false" width="100%">
                     <columns>
-                        <column flex="1"/>
+                        <column/>
                         <column flex="1"/>
                     </columns>
                     <rows>
                         <row>
                             <label value="msg://parameters.name" align="MIDDLE_LEFT"/>
                             <textField id="name" datasource="parameterDs" property="name" required="true"
-                                        width="${width}" requiredMessage="msg://parameters.nameMsg">
+                                        width="100%" requiredMessage="msg://parameters.nameMsg">
                                 <validator class="com.haulmont.reports.gui.report.validators.ReportParamNameValidator"/>
                             </textField>
                         </row>
                         <row>
                             <label value="msg://parameters.alias" align="MIDDLE_LEFT"/>
                             <textField id="alias" datasource="parameterDs" property="alias" required="true"
-                                       width="${width}" requiredMessage="msg://parameters.aliasMsg"/>
+                                       width="100%" requiredMessage="msg://parameters.aliasMsg"/>
                         </row>
                         <row>
                             <label value="msg://parameters.type" align="MIDDLE_LEFT"/>
                             <lookupField id="type" datasource="parameterDs" property="type" required="true"
-                                         width="${width}" requiredMessage="msg://parameters.typeMsg"/>
+                                         textInputAllowed="false"
+                                         width="100%" requiredMessage="msg://parameters.typeMsg"/>
                         </row>
                         <row>
                             <label value="msg://parameters.required" align="MIDDLE_LEFT"/>
                             <checkBox id="required" datasource="parameterDs" property="required"/>
                         </row>
                         <row>
-                            <label value="msg://parameters.metaClass" align="MIDDLE_LEFT"/>
-                            <lookupField id="metaClass" width="${width}" datasource="parameterDs"
+                            <label id="metaClassLabel" value="msg://parameters.metaClass" align="MIDDLE_LEFT"/>
+                            <lookupField id="metaClass" width="100%" datasource="parameterDs"
                                          property="entityMetaClass"
                                          requiredMessage="msg://parameters.requiredMetaClass" required="true"/>
                         </row>
                         <row>
-                            <label value="msg://parameters.enum" align="MIDDLE_LEFT"/>
-                            <lookupField id="enumeration" width="${width}" datasource="parameterDs"
+                            <label id="enumerationLabel" value="msg://parameters.enum" align="MIDDLE_LEFT"/>
+                            <lookupField id="enumeration" width="100%" datasource="parameterDs"
                                          property="enumerationClass"
                                          requiredMessage="msg://parameters.requiredEnumClass" required="true"/>
                         </row>
                         <row>
-                            <label value="msg://parameters.screen" align="MIDDLE_LEFT"/>
-                            <lookupField id="screen" width="${width}" datasource="parameterDs" property="screen"/>
+                            <label id="screenLabel" value="msg://parameters.screen" align="MIDDLE_LEFT"/>
+                            <lookupField id="screen" width="100%" datasource="parameterDs" property="screen"/>
                         </row>
                         <row>
                             <label id="defaultValueLabel" value="msg://parameters.defaultValue" align="MIDDLE_LEFT"/>
-                            <hbox id="defaultValueBox" width="${width}"/>
+                            <hbox id="defaultValueBox" width="100%"/>
                         </row>
                     </rows>
                 </grid>
             </tab>
-            <tab id="localesTab" caption="msg://parameters.localesTab" margin="true">
+            <tab id="localesTab" caption="msg://parameters.localesTab" margin="true;false;false;false">
                 <textArea id="localeTextField" datasource="parameterDs" property="localeNames"
-                          width="410" height="240px"/>
+                          width="100%" height="240px"/>
             </tab>
         </tabSheet>
         <frame id="windowActions" screen="editWindowActions"/>

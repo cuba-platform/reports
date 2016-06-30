@@ -41,6 +41,15 @@ public class ParameterEditor extends AbstractEditor {
     protected LookupField metaClass;
 
     @Inject
+    private Label enumerationLabel;
+
+    @Inject
+    private Label screenLabel;
+
+    @Inject
+    private Label metaClassLabel;
+
+    @Inject
     protected Metadata metadata;
 
     @Inject
@@ -86,12 +95,10 @@ public class ParameterEditor extends AbstractEditor {
         initEnumsLookup();
 
         initListeners();
-
-        getDialogOptions().setWidthAuto();
     }
 
     protected void initListeners() {
-        type.addValueChangeListener(e -> enableControlsByParamType(e.getValue()));
+        type.addValueChangeListener(e -> enableControlsByParamType((ParameterType) e.getValue()));
 
         parameterDs.addItemPropertyChangeListener(e -> {
             boolean typeChanged = e.getProperty().equalsIgnoreCase("type");
@@ -145,9 +152,7 @@ public class ParameterEditor extends AbstractEditor {
 
     protected void initDefaultValueField() {
         defaultValueLabel.setVisible(false);
-        for (Component component : new ArrayList<>(defaultValueBox.getComponents())) {
-            defaultValueBox.remove(component);
-        }
+        defaultValueBox.removeAll();
 
         if (canHaveDefaultValue()) {
             Field field = parameterFieldCreator.createField(parameter);
@@ -170,20 +175,29 @@ public class ParameterEditor extends AbstractEditor {
     }
 
     protected boolean canHaveDefaultValue() {
-        if (parameter == null) return false;
+        if (parameter == null) {
+            return false;
+        }
 
         ParameterType type = parameter.getType();
-        return type != null && type != ParameterType.ENTITY_LIST
+        return type != null
+                && type != ParameterType.ENTITY_LIST
                 && (type != ParameterType.ENTITY || StringUtils.isNotBlank(parameter.getEntityMetaClass()))
                 && (type != ParameterType.ENUMERATION || StringUtils.isNotBlank(parameter.getEnumerationClass()));
     }
 
-    protected void enableControlsByParamType(Object value) {
-        boolean isEntity = ParameterType.ENTITY.equals(value) || ParameterType.ENTITY_LIST.equals(value);
-        boolean isEnum = ParameterType.ENUMERATION.equals(value);
-        metaClass.setEnabled(isEntity);
-        screen.setEnabled(isEntity);
-        enumeration.setEnabled(isEnum);
+    protected void enableControlsByParamType(ParameterType type) {
+        boolean isEntity = type == ParameterType.ENTITY || type == ParameterType.ENTITY_LIST;
+        boolean isEnum = type == ParameterType.ENUMERATION;
+
+        metaClass.setVisible(isEntity);
+        metaClassLabel.setVisible(isEntity);
+
+        screen.setVisible(isEntity);
+        screenLabel.setVisible(isEntity);
+
+        enumeration.setVisible(isEnum);
+        enumerationLabel.setVisible(isEnum);
 
         initDefaultValueField();
     }
