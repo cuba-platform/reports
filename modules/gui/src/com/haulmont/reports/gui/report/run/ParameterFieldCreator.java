@@ -6,28 +6,37 @@
 package com.haulmont.reports.gui.report.run;
 
 import com.google.common.collect.ImmutableMap;
+import com.haulmont.bali.util.ParamsMap;
 import com.haulmont.chile.core.datatypes.Datatypes;
+import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.cuba.core.global.*;
 import com.haulmont.cuba.gui.AppConfig;
-import com.haulmont.cuba.gui.WindowManager;
+import com.haulmont.cuba.gui.WindowManager.OpenType;
 import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.components.validators.DoubleValidator;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
+import com.haulmont.cuba.gui.data.CollectionDatasource.RefreshMode;
 import com.haulmont.cuba.gui.data.DsBuilder;
 import com.haulmont.cuba.gui.xml.layout.ComponentsFactory;
 import com.haulmont.reports.entity.ParameterType;
 import com.haulmont.reports.entity.ReportInputParameter;
 import org.apache.commons.lang.StringUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 import static com.haulmont.cuba.gui.commonlookup.CommonLookupController.CLASS_PARAMETER;
 
-
 public class ParameterFieldCreator {
+
+    public static final String COMMON_LOOKUP_SCREEN_ID = "commonLookup";
+
     protected ComponentsFactory componentsFactory = AppConfig.getFactory();
     protected Messages messages = AppBeans.get(Messages.class);
     protected Metadata metadata = AppBeans.get(Metadata.class);
+    protected Scripting scripting = AppBeans.get(Scripting.class);
     protected AbstractWindow window;
 
     protected Map<ParameterType, FieldCreator> fieldCreationMapping = new ImmutableMap.Builder<ParameterType, FieldCreator>()
@@ -135,7 +144,7 @@ public class ParameterFieldCreator {
             LookupField lookupField = componentsFactory.createComponent(LookupField.class);
             String enumClassName = parameter.getEnumerationClass();
             if (StringUtils.isNotBlank(enumClassName)) {
-                Class enumClass = AppBeans.get(Scripting.class).loadClass(enumClassName);
+                Class enumClass = scripting.loadClass(enumClassName);
 
                 if (enumClass != null) {
                     Object[] constants = enumClass.getEnumConstants();
@@ -155,16 +164,13 @@ public class ParameterFieldCreator {
     }
 
     protected class SingleFieldCreator implements FieldCreator {
-
         @Override
         public Field createField(ReportInputParameter parameter) {
             PickerField pickerField = componentsFactory.createComponent(PickerField.class);
-            final com.haulmont.chile.core.model.MetaClass entityMetaClass =
-                    metadata.getSession().getClass(parameter.getEntityMetaClass());
+            MetaClass entityMetaClass = metadata.getClassNN(parameter.getEntityMetaClass());
             pickerField.setMetaClass(entityMetaClass);
 
             PickerField.LookupAction pickerLookupAction = pickerField.addLookupAction();
-            pickerLookupAction.setLookupScreenOpenType(WindowManager.OpenType.DIALOG);
             pickerField.addAction(pickerLookupAction);
             pickerField.addClearAction();
 
@@ -172,13 +178,10 @@ public class ParameterFieldCreator {
 
             if (StringUtils.isNotEmpty(parameterScreen)) {
                 pickerLookupAction.setLookupScreen(parameterScreen);
-                pickerLookupAction.setLookupScreenParams(Collections.<String, Object>emptyMap());
+                pickerLookupAction.setLookupScreenParams(Collections.emptyMap());
             } else {
-                pickerLookupAction.setLookupScreen("commonLookup");
-                Map<String, Object> params = new HashMap<>();
-                params.put(CLASS_PARAMETER, entityMetaClass);
-
-                pickerLookupAction.setLookupScreenParams(params);
+                pickerLookupAction.setLookupScreen(COMMON_LOOKUP_SCREEN_ID);
+                pickerLookupAction.setLookupScreenParams(ParamsMap.of(CLASS_PARAMETER, entityMetaClass));
             }
 
             return pickerField;
@@ -190,12 +193,11 @@ public class ParameterFieldCreator {
         @Override
         public Field createField(final ReportInputParameter parameter) {
             TokenList tokenList = componentsFactory.createComponent(TokenList.class);
-            final com.haulmont.chile.core.model.MetaClass entityMetaClass =
-                    metadata.getSession().getClass(parameter.getEntityMetaClass());
+            MetaClass entityMetaClass = metadata.getClassNN(parameter.getEntityMetaClass());
 
             DsBuilder builder = new DsBuilder(window.getDsContext());
             CollectionDatasource cds = builder
-                    .setRefreshMode(CollectionDatasource.RefreshMode.NEVER)
+                    .setRefreshMode(RefreshMode.NEVER)
                     .setId("entities_" + parameter.getAlias())
                     .setMetaClass(entityMetaClass)
                     .setViewName(View.LOCAL)
@@ -207,36 +209,22 @@ public class ParameterFieldCreator {
             tokenList.setDatasource(cds);
             tokenList.setEditable(true);
             tokenList.setLookup(true);
-            tokenList.setLookupOpenMode(WindowManager.OpenType.DIALOG);
+            tokenList.setLookupOpenMode(OpenType.DIALOG);
             tokenList.setHeight("120px");
 
             String screen = parameter.getScreen();
 
             if (StringUtils.isNotEmpty(screen)) {
                 tokenList.setLookupScreen(screen);
-                tokenList.setLookupScreenParams(Collections.<String, Object>emptyMap());
+                tokenList.setLookupScreenParams(Collections.emptyMap());
             } else {
                 tokenList.setLookupScreen("commonLookup");
-                Map<String, Object> params = new HashMap<>();
-                params.put(CLASS_PARAMETER, entityMetaClass);
-                tokenList.setLookupScreenParams(params);
+                tokenList.setLookupScreenParams(ParamsMap.of(CLASS_PARAMETER, entityMetaClass));
             }
 
             tokenList.setAddButtonCaption(messages.getMessage(TokenList.class, "actions.Select"));
             tokenList.setInline(true);
             tokenList.setSimple(true);
-
-//            if (Boolean.TRUE.equals(parameter.getRequired())) {
-//                tokenList.addValidator(new Field.Validator() {
-//                    @Override
-//                    public void validate(Object value) throws ValidationException {
-//                        if (value instanceof Collection && CollectionUtils.isEmpty((Collection) value)) {
-//                            throw new ValidationException(
-//                                    messages.formatMessage(this.getClass(), "error.paramIsRequiredButEmpty", parameter.getLocName()));
-//                        }
-//                    }
-//                });
-//            }
 
             return tokenList;
         }
