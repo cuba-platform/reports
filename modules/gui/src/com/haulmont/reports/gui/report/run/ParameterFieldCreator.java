@@ -11,7 +11,6 @@ import com.haulmont.chile.core.datatypes.Datatypes;
 import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.cuba.core.global.*;
 import com.haulmont.cuba.gui.AppConfig;
-import com.haulmont.cuba.gui.WindowManager.OpenType;
 import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.components.validators.DoubleValidator;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
@@ -209,7 +208,6 @@ public class ParameterFieldCreator {
             tokenList.setDatasource(cds);
             tokenList.setEditable(true);
             tokenList.setLookup(true);
-            tokenList.setLookupOpenMode(OpenType.DIALOG);
             tokenList.setHeight("120px");
 
             String screen = parameter.getScreen();
