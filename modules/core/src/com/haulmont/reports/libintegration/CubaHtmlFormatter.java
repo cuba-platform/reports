@@ -24,8 +24,8 @@ import com.lowagie.text.pdf.BaseFont;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xhtmlrenderer.pdf.ITextFSImage;
 import org.xhtmlrenderer.pdf.ITextOutputDevice;
 import org.xhtmlrenderer.pdf.ITextRenderer;
@@ -48,7 +48,7 @@ public class CubaHtmlFormatter extends HtmlFormatter {
     public static final String WEB_APP_PREFIX = "web://";
     public static final String CORE_APP_PREFIX = "core://";
 
-    protected Log log = LogFactory.getLog(getClass());
+    private static final Logger log = LoggerFactory.getLogger(CubaHtmlFormatter.class);
 
     protected final ReportingConfig reportingConfig = AppBeans.get(Configuration.class).getConfig(ReportingConfig.class);
     protected int entityMapMaxDeep = reportingConfig.getEntityTreeModelMaxDeep();

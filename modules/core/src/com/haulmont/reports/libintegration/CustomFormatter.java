@@ -23,8 +23,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
@@ -37,8 +37,9 @@ import java.util.concurrent.*;
 import static java.lang.String.format;
 
 public class CustomFormatter implements com.haulmont.yarg.formatters.CustomReport {
+    private static Logger log = LoggerFactory.getLogger(CustomFormatter.class);
+
     protected static ScheduledExecutorService executor = Executors.newScheduledThreadPool(3);
-    protected static Log log = LogFactory.getLog(CustomFormatter.class);
 
     protected Report report;
     protected ReportTemplate template;

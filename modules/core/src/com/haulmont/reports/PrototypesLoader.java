@@ -8,14 +8,15 @@ package com.haulmont.reports;
 import com.haulmont.bali.util.StringHelper;
 import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.cuba.core.*;
-import com.haulmont.cuba.core.app.ServerConfig;
-import com.haulmont.cuba.core.global.*;
+import com.haulmont.cuba.core.global.AppBeans;
+import com.haulmont.cuba.core.global.Configuration;
+import com.haulmont.cuba.core.global.Metadata;
+import com.haulmont.cuba.core.global.View;
+import com.haulmont.cuba.security.entity.EntityOp;
 import com.haulmont.reports.app.ParameterPrototype;
 import com.haulmont.reports.exception.ReportingException;
-import com.haulmont.cuba.security.entity.EntityOp;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.List;
@@ -23,7 +24,7 @@ import java.util.Map;
 
 public class PrototypesLoader {
 
-    private Log log = LogFactory.getLog(PrototypesLoader.class);
+    private final Logger log = LoggerFactory.getLogger(PrototypesLoader.class);
 
     /**
      * Load parameter data

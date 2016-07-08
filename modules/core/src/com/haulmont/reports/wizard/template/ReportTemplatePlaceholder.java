@@ -11,8 +11,8 @@ import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.reports.entity.wizard.RegionProperty;
 import com.haulmont.reports.entity.wizard.ReportRegion;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.persistence.Temporal;
 import java.util.Date;
@@ -25,12 +25,11 @@ public class ReportTemplatePlaceholder {
     protected static final String HTML_VALUE_MASK = "%s.fields('%s')%s";
     protected static final String HTML_COMMON_MASK = "%4$s${(%1$s.fields('%2$s')%3$s)!?string!}%5$s"; //like ${Task[0].fields('id')!?string!}
     protected static final String HTML_DATE_MASK = "<#if %5$s %1$s.fields('%2$s')%4$s?has_content>${%1$s.fields('%2$s')%4$s?string(\"%3$s\")}</#if>";// /like <#if Task[0].fields('updateTs')?has_content>${Task[0].fields('updateTs')?string("dd.MM.yyyy hh:mm")}</#if>
-    protected Log log = LogFactory.getLog(getClass());
+
+    private final Logger log = LoggerFactory.getLogger(ReportTemplatePlaceholder.class);
 
     /**
      * used in doc table fields and sheet reports
-     *
-     * @return
      */
     public String getPlaceholderValue(String value, ReportRegion reportRegion) {
         return String.format(TABLE_MASK, StringUtils.removeStart(value, reportRegion.getRegionPropertiesRootNode().getName() + "."));
@@ -38,9 +37,6 @@ public class ReportTemplatePlaceholder {
 
     /**
      * used in common fields
-     *
-     * @param reportRegion
-     * @return
      */
     public String getPlaceholderValueWithBandName(String value, ReportRegion reportRegion) {
         return String.format(COMMON_MASK, reportRegion.getNameForBand(), StringUtils.removeStart(value,

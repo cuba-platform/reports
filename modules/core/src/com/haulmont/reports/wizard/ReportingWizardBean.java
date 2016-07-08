@@ -19,10 +19,10 @@ import com.haulmont.reports.entity.wizard.*;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.persistence.Temporal;
@@ -31,9 +31,12 @@ import java.util.*;
 
 @Component(ReportingWizardApi.NAME)
 public class ReportingWizardBean implements ReportingWizardApi {
+
     public static final String ROOT_BAND_DEFINITION_NAME = "Root";
     protected static final String DEFAULT_SINGLE_ENTITY_ALIAS = "entity";//cause Thesis used it for running reports from screens without selection input params
     protected static final String DEFAULT_LIST_OF_ENTITIES_ALIAS = "entities";//cause Thesis will use it for running reports from screens without selection input params
+
+    private final Logger log = LoggerFactory.getLogger(ReportingBean.class);
 
     @Inject
     protected Persistence persistence;
@@ -47,8 +50,6 @@ public class ReportingWizardBean implements ReportingWizardApi {
     protected ExtendedEntities extendedEntities;
     @Inject
     protected Messages messages;
-
-    protected Log log = LogFactory.getLog(ReportingBean.class);
 
     @Override
     public Report toReport(ReportData reportData, boolean temporary) {
