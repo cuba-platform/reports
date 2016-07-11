@@ -5,17 +5,16 @@
 
 package com.haulmont.reports.gui.report.run;
 
+import com.haulmont.bali.util.ParamsMap;
 import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.theme.ThemeConstants;
 import com.haulmont.cuba.gui.xml.layout.ComponentsFactory;
 import com.haulmont.reports.entity.Report;
 import com.haulmont.reports.gui.ReportGuiManager;
 import com.haulmont.yarg.reporting.ReportOutputDocument;
-import org.apache.commons.collections.CollectionUtils;
 
 import javax.inject.Inject;
-import java.util.Collections;
-import java.util.HashMap;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 public class ShowChartController extends AbstractWindow {
@@ -42,12 +41,18 @@ public class ShowChartController extends AbstractWindow {
     protected LookupField reportLookup;
 
     @Inject
-    private Label reportLookupLabel;
+    protected Label reportLookupLabel;
 
     @Inject
-    private ComponentsFactory componentsFactory;
+    protected ComponentsFactory componentsFactory;
 
-    protected InputParametersController inputParametersController;
+    @Inject
+    protected Button printReportBtn;
+
+    @Inject
+    protected BoxLayout parametersFrameHolder;
+
+    protected InputParametersFrame inputParametersFrame;
 
     protected Report report;
 
@@ -56,15 +61,17 @@ public class ShowChartController extends AbstractWindow {
     @Override
     public void init(final Map<String, Object> params) {
         super.init(params);
+
         getDialogOptions()
                 .setWidth(themeConstants.getInt("cuba.gui.report.ShowChartController.width"))
                 .setHeight(themeConstants.getInt("cuba.gui.report.ShowChartController.height"))
                 .setResizable(true);
+
         String chartJson = (String) params.get(CHART_JSON_PARAMETER);
         report = (Report) params.get(REPORT_PARAMETER);
         templateCode = (String) params.get(TEMPLATE_CODE_PARAMETER);
         @SuppressWarnings("unchecked")
-        Map<String,Object> reportParameters = (Map<String, Object>) params.get(PARAMS_PARAMETER);
+        Map<String, Object> reportParameters = (Map<String, Object>) params.get(PARAMS_PARAMETER);
 
         if (report != null) {
             reportLookup.setVisible(false);
@@ -86,51 +93,51 @@ public class ShowChartController extends AbstractWindow {
     }
 
     private void openReportParameters(Map<String, Object> reportParameters) {
-        reportParamsBox.removeAll();
+        parametersFrameHolder.removeAll();
+
         if (report != null) {
-            Map<String, Object> params = new HashMap<>();
-            params.put(InputParametersController.REPORT_PARAMETER, report) ;
-            params.put(InputParametersController.PARAMETERS_PARAMETER, reportParameters) ;
+            Map<String, Object> params = ParamsMap.of(
+                    InputParametersFrame.REPORT_PARAMETER, report,
+                    InputParametersFrame.PARAMETERS_PARAMETER, reportParameters
+            );
 
-            inputParametersController = (InputParametersController) openFrame(reportParamsBox, "report$inputParameters", params);
-            inputParametersController.setPrintReportHandler(new InputParametersController.PrintReportHandler() {
-                @Override
-                public void handle() {
-                    try {
-                        inputParametersController.validate();
-                        Map<String, Object> parameters = inputParametersController.collectParameters();
-                        ReportOutputDocument reportResult = reportGuiManager.getReportResult(report, parameters, templateCode);
-                        openChart(new String(reportResult.getContent()));
-                    } catch (ValidationException e) {
-                        showNotification(getMessage("validationFail.caption"), e.getLocalizedMessage(), NotificationType.TRAY);
-                    }
-                }
-            });
+            inputParametersFrame = (InputParametersFrame) openFrame(parametersFrameHolder,
+                    "report$inputParametersFrame", params);
 
-            Component cancel = inputParametersController.getComponent("cancel");
-            if (cancel != null) {
-                cancel.setVisible(false);
-            }
+            reportParamsBox.setVisible(true);
+        } else {
+            reportParamsBox.setVisible(false);
         }
     }
 
     protected void openChart(String chartJson) {
         chartBox.removeAll();
         if (chartJson != null) {
-            openFrame(chartBox, JSON_CHART_SCREEN_ID,
-                    Collections.<String, Object>singletonMap(CHART_JSON_PARAMETER, chartJson));
+            openFrame(chartBox, JSON_CHART_SCREEN_ID, ParamsMap.of(CHART_JSON_PARAMETER, chartJson));
         }
 
         showDiagramStubText();
     }
 
-    private void showDiagramStubText() {
-        if (CollectionUtils.isEmpty(chartBox.getComponents())) {
+    protected void showDiagramStubText() {
+        if (chartBox.getOwnComponents().isEmpty()) {
             Label label = componentsFactory.createComponent(Label.class);
             label.setValue(getMessage("showChart.caption"));
             label.setAlignment(Alignment.MIDDLE_CENTER);
             label.setStyleName("h1");
             chartBox.add(label);
+        }
+    }
+
+    public void printReport() {
+        if (inputParametersFrame != null && inputParametersFrame.getReport() != null) {
+            if (validateAll()) {
+                Map<String, Object> parameters = inputParametersFrame.collectParameters();
+                Report report = inputParametersFrame.getReport();
+
+                ReportOutputDocument reportResult = reportGuiManager.getReportResult(report, parameters, templateCode);
+                openChart(new String(reportResult.getContent(), StandardCharsets.UTF_8));
+            }
         }
     }
 }

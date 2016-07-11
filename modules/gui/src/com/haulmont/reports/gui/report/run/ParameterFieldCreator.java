@@ -12,6 +12,7 @@ import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.cuba.core.global.*;
 import com.haulmont.cuba.gui.AppConfig;
 import com.haulmont.cuba.gui.components.*;
+import com.haulmont.cuba.gui.components.Component.Alignment;
 import com.haulmont.cuba.gui.components.validators.DoubleValidator;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
 import com.haulmont.cuba.gui.data.CollectionDatasource.RefreshMode;
@@ -33,10 +34,12 @@ public class ParameterFieldCreator {
     public static final String COMMON_LOOKUP_SCREEN_ID = "commonLookup";
 
     protected ComponentsFactory componentsFactory = AppConfig.getFactory();
+
     protected Messages messages = AppBeans.get(Messages.class);
     protected Metadata metadata = AppBeans.get(Metadata.class);
     protected Scripting scripting = AppBeans.get(Scripting.class);
-    protected AbstractWindow window;
+
+    protected AbstractFrame frame;
 
     protected Map<ParameterType, FieldCreator> fieldCreationMapping = new ImmutableMap.Builder<ParameterType, FieldCreator>()
             .put(ParameterType.BOOLEAN, new CheckBoxCreator())
@@ -50,13 +53,13 @@ public class ParameterFieldCreator {
             .put(ParameterType.TIME, new TimeFieldCreator())
             .build();
 
-    public ParameterFieldCreator(AbstractWindow window) {
-        this.window = window;
+    public ParameterFieldCreator(AbstractFrame frame) {
+        this.frame = frame;
     }
 
     public Label createLabel(ReportInputParameter parameter, Field field) {
         Label label = componentsFactory.createComponent(Label.class);
-        label.setAlignment(field instanceof TokenList ? Component.Alignment.TOP_LEFT : Component.Alignment.MIDDLE_LEFT);
+        label.setAlignment(field instanceof TokenList ? Alignment.TOP_LEFT : Alignment.MIDDLE_LEFT);
         label.setWidth(Component.AUTO_SIZE);
         label.setValue(parameter.getLocName());
         return label;
@@ -68,7 +71,7 @@ public class ParameterFieldCreator {
 
         field.setId("param_" + parameter.getAlias());
         field.setWidth("100%");
-        field.setFrame(window);
+        field.setFrame(frame);
         field.setEditable(true);
 
         field.setRequired(parameter.getRequired());
@@ -80,23 +83,21 @@ public class ParameterFieldCreator {
     }
 
     protected class DateFieldCreator implements FieldCreator {
-
         @Override
         public Field createField(ReportInputParameter parameter) {
             DateField dateField = componentsFactory.createComponent(DateField.class);
             dateField.setResolution(DateField.Resolution.DAY);
-            dateField.setDateFormat(messages.getMessage(AppConfig.getMessagesPack(), "dateFormat"));
+            dateField.setDateFormat(messages.getMainMessage("dateFormat"));
             return dateField;
         }
     }
 
     protected class DateTimeFieldCreator implements FieldCreator {
-
         @Override
         public Field createField(ReportInputParameter parameter) {
             DateField dateField = componentsFactory.createComponent(DateField.class);
             dateField.setResolution(DateField.Resolution.MIN);
-            dateField.setDateFormat(messages.getMessage(AppConfig.getMessagesPack(), "dateTimeFormat"));
+            dateField.setDateFormat(messages.getMainMessage("dateTimeFormat"));
             return dateField;
         }
     }
@@ -194,7 +195,7 @@ public class ParameterFieldCreator {
             TokenList tokenList = componentsFactory.createComponent(TokenList.class);
             MetaClass entityMetaClass = metadata.getClassNN(parameter.getEntityMetaClass());
 
-            DsBuilder builder = new DsBuilder(window.getDsContext());
+            DsBuilder builder = new DsBuilder(frame.getDsContext());
             CollectionDatasource cds = builder
                     .setRefreshMode(RefreshMode.NEVER)
                     .setId("entities_" + parameter.getAlias())

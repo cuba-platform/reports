@@ -4,11 +4,12 @@
  */
 package com.haulmont.reports.gui;
 
+import com.haulmont.bali.util.ParamsMap;
 import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.cuba.core.app.DataService;
 import com.haulmont.cuba.core.global.*;
 import com.haulmont.cuba.gui.AppConfig;
-import com.haulmont.cuba.gui.WindowManager;
+import com.haulmont.cuba.gui.WindowManager.OpenType;
 import com.haulmont.cuba.gui.WindowManagerProvider;
 import com.haulmont.cuba.gui.backgroundwork.BackgroundWorkWindow;
 import com.haulmont.cuba.gui.components.Frame;
@@ -29,7 +30,6 @@ import com.haulmont.reports.entity.*;
 import com.haulmont.reports.gui.report.run.ShowChartController;
 import com.haulmont.yarg.reporting.ReportOutputDocument;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Predicate;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 
@@ -38,7 +38,10 @@ import javax.inject.Inject;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-import static com.haulmont.reports.gui.report.run.InputParametersController.*;
+import static com.haulmont.reports.gui.report.run.InputParametersFrame.PARAMETERS_PARAMETER;
+import static com.haulmont.reports.gui.report.run.InputParametersFrame.REPORT_PARAMETER;
+import static com.haulmont.reports.gui.report.run.InputParametersWindow.OUTPUT_FILE_NAME_PARAMETER;
+import static com.haulmont.reports.gui.report.run.InputParametersWindow.TEMPLATE_CODE_PARAMETER;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 
 @Component("cuba_ReportGuiManager")
@@ -48,10 +51,16 @@ public class ReportGuiManager {
     protected ReportService reportService;
 
     @Inject
+    protected DataService dataService;
+
+    @Inject
     protected Messages messages;
 
     @Inject
     protected Metadata metadata;
+
+    @Inject
+    protected Configuration configuration;
 
     @Inject
     protected WindowManagerProvider windowManagerProvider;
@@ -73,7 +82,7 @@ public class ReportGuiManager {
         if (report.getInputParameters() != null && report.getInputParameters().size() > 0) {
             openReportParamsDialog(window, report, null, null, null);
         } else {
-            printReport(report, Collections.<String, Object>emptyMap(), window);
+            printReport(report, ParamsMap.empty(), window);
         }
     }
 
@@ -100,17 +109,17 @@ public class ReportGuiManager {
         Object resultingParamValue = convertParameterIfNecessary(parameter, parameterValue, reportHasMoreThanOneParameter);
 
         if (reportHasMoreThanOneParameter) {
-            openReportParamsDialog(window, report, Collections.singletonMap(parameter.getAlias(), resultingParamValue), templateCode, outputFileName);
+            openReportParamsDialog(window, report, ParamsMap.of(parameter.getAlias(), resultingParamValue), templateCode, outputFileName);
         } else {
             if (ParameterType.ENTITY == parameter.getType() && resultingParamValue instanceof Collection) {
                 Collection selectedEntities = (Collection) resultingParamValue;
                 if (selectedEntities.size() > 1) {
                     bulkPrint(report, parameter.getAlias(), selectedEntities, window);
                 } else if (selectedEntities.size() == 1) {
-                    printReport(report, Collections.singletonMap(parameter.getAlias(), selectedEntities.iterator().next()), templateCode, outputFileName, window);
+                    printReport(report, ParamsMap.of(parameter.getAlias(), selectedEntities.iterator().next()), templateCode, outputFileName, window);
                 }
             } else {
-                printReport(report, Collections.singletonMap(parameter.getAlias(), resultingParamValue), templateCode, outputFileName, window);
+                printReport(report, ParamsMap.of(parameter.getAlias(), resultingParamValue), templateCode, outputFileName, window);
             }
         }
     }
@@ -212,10 +221,10 @@ public class ReportGuiManager {
             screenParams.put(ShowChartController.PARAMS_PARAMETER, params);
 
             if (window != null) {
-                window.openWindow("report$showChart", WindowManager.OpenType.DIALOG, screenParams);
+                window.openWindow("report$showChart", OpenType.DIALOG, screenParams);
             } else {
                 WindowInfo windowInfo = windowConfig.getWindowInfo("report$showChart");
-                windowManagerProvider.get().openWindow(windowInfo, WindowManager.OpenType.DIALOG, screenParams);
+                windowManagerProvider.get().openWindow(windowInfo, OpenType.DIALOG, screenParams);
             }
         } else {
             byte[] byteArr = document.getContent();
@@ -237,15 +246,14 @@ public class ReportGuiManager {
      */
     public void printReportBackground(Report report, final Map<String, Object> params,
                                       final @Nullable String templateCode, final @Nullable String outputFileName, final Frame window) {
-
-        Configuration configuration = AppBeans.get(Configuration.NAME);
         ReportingClientConfig reportingClientConfig = configuration.getConfig(ReportingClientConfig.class);
 
-        final Report targetReport = getReportForPrinting(report);
+        Report targetReport = getReportForPrinting(report);
 
         long timeout = reportingClientConfig.getBackgroundReportProcessingTimeoutMs();
         BackgroundTask<Void, ReportOutputDocument> task = new BackgroundTask<Void, ReportOutputDocument>(timeout, TimeUnit.MILLISECONDS, window) {
 
+            @SuppressWarnings("UnnecessaryLocalVariable")
             @Override
             public ReportOutputDocument run(TaskLifeCycle<Void> taskLifeCycle) throws Exception {
                 ReportOutputDocument result = getReportResult(targetReport, params, templateCode);
@@ -258,8 +266,8 @@ public class ReportGuiManager {
             }
         };
 
-        String caption = messages.getMessage(getClass(), "runReportBackgroundTitle");
-        String description = messages.getMessage(getClass(), "runReportBackgroundMessage");
+        String caption = messages.getMessage(ReportGuiManager.class, "runReportBackgroundTitle");
+        String description = messages.getMessage(ReportGuiManager.class, "runReportBackgroundMessage");
 
         BackgroundWorkWindow.show(task, caption, description, true);
     }
@@ -272,7 +280,7 @@ public class ReportGuiManager {
      * @param inputValueMetaClass - meta class of report input parameter
      */
     public List<Report> getAvailableReports(@Nullable String screenId, @Nullable User user, @Nullable MetaClass inputValueMetaClass) {
-        LoadContext lContext = new LoadContext<>(Report.class);
+        LoadContext<Report> lContext = new LoadContext<>(Report.class);
         lContext.setLoadDynamicAttributes(true);
         lContext.setView(new View(Report.class)
                 .addProperty("name")
@@ -288,7 +296,7 @@ public class ReportGuiManager {
             lContext.setQueryString("select r from report$Report r");
         }
 
-        List<Report> reports = AppBeans.get(DataService.class).loadList(lContext);
+        List<Report> reports = dataService.loadList(lContext);
         reports = filterReportsByEntityParameters(inputValueMetaClass, reports);
         reports = applySecurityPolicies(screenId, user, reports);
         return reports;
@@ -305,7 +313,6 @@ public class ReportGuiManager {
      * @param window           - caller window
      */
     public void bulkPrint(Report report, String alias, Collection selectedEntities, @Nullable Frame window) {
-        Configuration configuration = AppBeans.get(Configuration.NAME);
         ReportingClientConfig reportingClientConfig = configuration.getConfig(ReportingClientConfig.class);
         if (window != null && reportingClientConfig.getUseBackgroundReportProcessing()) {
             bulkPrintBackground(report, alias, selectedEntities, window);
@@ -340,7 +347,7 @@ public class ReportGuiManager {
     public void bulkPrintSync(Report report, String alias, Collection selectedEntities, @Nullable Frame window) {
         List<Map<String, Object>> paramsList = new ArrayList<>();
         for (Object selectedEntity : selectedEntities) {
-            paramsList.add(Collections.singletonMap(alias, selectedEntity));
+            paramsList.add(ParamsMap.of(alias, selectedEntity));
         }
 
         ReportOutputDocument reportOutputDocument = reportService.bulkPrint(report, paramsList);
@@ -360,20 +367,19 @@ public class ReportGuiManager {
      * @param window           - caller window
      */
     public void bulkPrintBackground(Report report, String alias, Collection selectedEntities, final Frame window) {
-        Configuration configuration = AppBeans.get(Configuration.NAME);
         ReportingClientConfig reportingClientConfig = configuration.getConfig(ReportingClientConfig.class);
 
         final Report targetReport = getReportForPrinting(report);
 
         long timeout = reportingClientConfig.getBackgroundReportProcessingTimeoutMs();
 
-        final List<Map<String, Object>> paramsList = new ArrayList<>();
+        List<Map<String, Object>> paramsList = new ArrayList<>();
         for (Object selectedEntity : selectedEntities) {
-            paramsList.add(Collections.singletonMap(alias, selectedEntity));
+            paramsList.add(ParamsMap.of(alias, selectedEntity));
         }
 
         BackgroundTask<Void, ReportOutputDocument> task = new BackgroundTask<Void, ReportOutputDocument>(timeout, TimeUnit.MILLISECONDS, window) {
-
+            @SuppressWarnings("UnnecessaryLocalVariable")
             @Override
             public ReportOutputDocument run(TaskLifeCycle<Void> taskLifeCycle) throws Exception {
                 ReportOutputDocument result = reportService.bulkPrint(targetReport, paramsList);
@@ -396,9 +402,6 @@ public class ReportGuiManager {
 
     /**
      * Check if the meta class is applicable for the input parameter
-     *
-     * @param parameter -
-     * @param metaClass -
      */
     public boolean parameterMatchesMetaClass(ReportInputParameter parameter, MetaClass metaClass) {
         if (isNotBlank(parameter.getEntityMetaClass())) {
@@ -409,12 +412,11 @@ public class ReportGuiManager {
         }
     }
 
-
     /**
      * Defensive copy
      */
     protected Report getReportForPrinting(Report report) {
-        Report copy = (Report) metadata.getTools().copy(report);
+        Report copy = metadata.getTools().copy(report);
         copy.setIsTmp(report.getIsTmp());
         return copy;
     }
@@ -449,36 +451,35 @@ public class ReportGuiManager {
         return filter;
     }
 
-    protected void openReportParamsDialog(Frame window, Report report, @Nullable Map<String, Object> parameters, @Nullable String templateCode, @Nullable String outputFileName) {
-
-        Map<String, Object> params = new HashMap<>();
-        params.put(REPORT_PARAMETER, report);
-        params.put(PARAMETERS_PARAMETER, parameters);
-        params.put(TEMPLATE_CODE_PARAMETER, templateCode);
-        params.put(OUTPUT_FILE_NAME_PARAMETER, outputFileName);
-
-        window.openWindow("report$inputParameters", WindowManager.OpenType.DIALOG, params);
+    protected void openReportParamsDialog(Frame window, Report report, @Nullable Map<String, Object> parameters,
+                                          @Nullable String templateCode, @Nullable String outputFileName) {
+        Map<String, Object> params = ParamsMap.of(
+                REPORT_PARAMETER, report,
+                PARAMETERS_PARAMETER, parameters,
+                TEMPLATE_CODE_PARAMETER, templateCode,
+                OUTPUT_FILE_NAME_PARAMETER, outputFileName
+        );
+        window.openWindow("report$inputParameters", OpenType.DIALOG, params);
     }
 
     protected List<Report> checkRoles(@Nullable User user, List<Report> reports) {
         if (user != null) {
             List<Report> filter = new ArrayList<>();
             for (Report report : reports) {
-                final Set<Role> reportRoles = report.getRoles();
+                Set<Role> reportRoles = report.getRoles();
                 if (reportRoles == null || reportRoles.size() == 0) {
                     filter.add(report);
                 } else {
                     List<UserRole> userRoles = user.getUserRoles();
-                    Object requiredUserRole = CollectionUtils.find(userRoles, new Predicate() {
-                        @Override
-                        public boolean evaluate(Object object) {
-                            UserRole userRole = (UserRole) object;
-                            return reportRoles.contains(userRole.getRole()) || RoleType.SUPER.equals(userRole.getRole().getType());
-                        }
-                    });
-                    if (requiredUserRole != null) {
+                    userRoles.stream().filter(userRole -> {
+                        //noinspection CodeBlock2Expr
+                        return reportRoles.contains(userRole.getRole())
+                                || userRole.getRole().getType() == RoleType.SUPER;
+
+                    }).findFirst().ifPresent(userRole -> {
+                        //noinspection CodeBlock2Expr
                         filter.add(report);
-                    }
+                    });
                 }
             }
             return filter;
@@ -495,15 +496,14 @@ public class ReportGuiManager {
                 if (reportScreens == null || reportScreens.size() == 0) {
                     filter.add(report);
                 } else {
-                    Object reportScreen = CollectionUtils.find(reportScreens, new Predicate() {
-                        @Override
-                        public boolean evaluate(Object item) {
-                            return StringUtils.equals(screen, ((ReportScreen) item).getScreenId());
-                        }
-                    });
-                    if (reportScreen != null) {
+                    reportScreens.stream().filter(reportScreen -> {
+                        //noinspection CodeBlock2Expr
+                        return StringUtils.equals(screen, reportScreen.getScreenId());
+
+                    }).findFirst().ifPresent(reportScreen -> {
+                        //noinspection CodeBlock2Expr
                         filter.add(report);
-                    }
+                    });
                 }
             }
             return filter;
@@ -528,7 +528,6 @@ public class ReportGuiManager {
 
         return resultingParamValue;
     }
-
 
     @Nullable
     protected Object handleCollectionParameter(@Nullable Object paramValue, boolean reportHasMoreThanOneParameter) {

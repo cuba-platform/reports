@@ -1,0 +1,23 @@
+<!--
+  ~ Copyright (c) 2008-2016 Haulmont. All rights reserved.
+  ~ Use is subject to license terms, see http://www.cuba-platform.com/commercial-software-license for details.
+  -->
+
+<window xmlns="http://schemas.haulmont.com/cuba/window.xsd"
+        class="com.haulmont.reports.gui.report.run.InputParametersFrame"
+        messagesPack="com.haulmont.reports.gui.report.run"
+        caption="msg://inputParameters">
+
+    <layout spacing="true">
+        <grid id="parametersGrid" spacing="true" width="100%">
+            <columns>
+                <column/>
+                <column flex="1"/>
+            </columns>
+            <rows>
+                <row>
+                </row>
+            </rows>
+        </grid>
+    </layout>
+</window>

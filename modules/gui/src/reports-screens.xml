@@ -27,7 +27,8 @@
     <screen id="report$Report.regionEditor"
             template="/com/haulmont/reports/gui/report/wizard/region/region-editor.xml"/>
 
-    <screen id="report$ReportEntityTree.lookup" template="/com/haulmont/reports/gui/report/wizard/region/entity-tree-lookup.xml"/>
+    <screen id="report$ReportEntityTree.lookup"
+            template="/com/haulmont/reports/gui/report/wizard/region/entity-tree-lookup.xml"/>
 
     <screen id="report$BandDefinition.edit"
             template="/com/haulmont/reports/gui/definition/edit/definition-edit.xml"/>
@@ -48,8 +49,11 @@
             template="/com/haulmont/reports/gui/group/edit/group-edit.xml"/>
 
     <screen id="chartEdit"
-            template="com/haulmont/reports/gui/template/edit/chart-edit-frame.xml"/>
+            template="/com/haulmont/reports/gui/template/edit/chart-edit-frame.xml"/>
 
     <screen id="report$showChart"
-            template="com/haulmont/reports/gui/report/run/show-chart.xml"/>
+            template="/com/haulmont/reports/gui/report/run/show-chart.xml"/>
+
+    <screen id="report$inputParametersFrame"
+            template="/com/haulmont/reports/gui/report/run/input-parameters-frame.xml"/>
 </screen-config>

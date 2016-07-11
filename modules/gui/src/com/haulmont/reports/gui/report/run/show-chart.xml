@@ -7,22 +7,30 @@
 <window xmlns="http://schemas.haulmont.com/cuba/window.xsd"
         caption="msg://showChart.caption"
         class="com.haulmont.reports.gui.report.run.ShowChartController"
-        messagesPack="com.haulmont.reports.gui.report.run"
-        >
+        messagesPack="com.haulmont.reports.gui.report.run">
+
     <dsContext>
         <collectionDatasource id="reportsDs" class="com.haulmont.reports.entity.Report">
             <query>select r from report$Report r, in (r.templates) t where t.reportOutputType = 70</query>
         </collectionDatasource>
     </dsContext>
+
     <layout expand="chartBox">
         <hbox spacing="true">
             <label id="reportLookupLabel" align="MIDDLE_CENTER" value="msg://caption.reportForChart"/>
             <lookupField id="reportLookup" optionsDatasource="reportsDs" width="400px"/>
         </hbox>
-        <groupBox id="reportParamsBox" collapsable="true" collapsed="false" caption="msg://caption.reportParameters">
+
+        <groupBox id="reportParamsBox" collapsable="true" collapsed="false" visible="false" caption="msg://caption.reportParameters">
+            <vbox id="parametersFrameHolder">
+
+            </vbox>
+            <button id="printReportBtn" invoke="printReport"
+                    caption="msg://input.printReport" icon="icons/run.png"/>
         </groupBox>
+
         <groupBox id="chartBox" width="100%">
-            <!--<label value="msg://showChart.caption" align="MIDDLE_CENTER" stylename="h1"/>-->
+
         </groupBox>
     </layout>
 </window>
