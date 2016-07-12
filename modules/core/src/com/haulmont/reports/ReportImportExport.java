@@ -5,6 +5,7 @@
 package com.haulmont.reports;
 
 import com.haulmont.cuba.core.global.DataManager;
+import com.haulmont.cuba.core.global.EntityAccessException;
 import com.haulmont.cuba.security.app.Authenticated;
 import com.haulmont.reports.converter.XStreamConverter;
 import com.haulmont.reports.entity.Report;
@@ -247,9 +248,16 @@ public class ReportImportExport implements ReportImportExportAPI, ReportImportEx
         if (importOptions != null) {
             for (ReportImportOption option : importOptions) {
                 if (ReportImportOption.DO_NOT_IMPORT_ROLES == option) {
-                    Report dbReport = reloadReport(report);
-                    report.setRoles(dbReport.getRoles());
-                    report.setXml(reportingApi.convertToString(report));
+                    Report dbReport = null;
+                    try {
+                        dbReport = reloadReport(report);
+                    } catch (EntityAccessException e) {
+                        //Do nothing
+                    }
+                    if (dbReport != null) {
+                        report.setRoles(dbReport.getRoles());
+                        report.setXml(reportingApi.convertToString(report));
+                    }
                 }
             }
         }
