@@ -21,7 +21,7 @@
     <assign name="width" value="500px"/>
 
     <layout spacing="true">
-        <hbox width="100%" expand="chartPreviewBox">
+        <hbox id="createTemplateFields" width="100%" expand="chartPreviewBox">
             <vbox spacing="true" width="AUTO">
                 <grid spacing="true">
                     <columns>
@@ -45,7 +45,7 @@
                         <row>
                             <label id="templateFileLabel" value="msg://template.file" align="MIDDLE_LEFT"/>
                             <hbox spacing="true" width="${width}" expand="templatePath">
-                                <upload id="uploadTemplate"/>
+                                <upload id="uploadTemplate" dropZone="createTemplateFields"/>
                                 <linkButton id="templatePath" align="MIDDLE_LEFT"/>
                             </hbox>
                         </row>

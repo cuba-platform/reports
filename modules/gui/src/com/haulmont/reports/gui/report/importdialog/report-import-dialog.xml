@@ -8,10 +8,13 @@
         messagesPack="com.haulmont.reports.gui.report.importdialog"
         caption="msg://reportImportDialog.caption"
         focusComponent="fileUpload">
-
-    <layout spacing="true">
+    <dialogMode width="400px"/>
+    <layout spacing="true" stylename="cuba-report-upload">
+        <hbox id="dropZone" width="100%" height="100px" stylename="cuba-static-drop-zone">
+            <label stylename="cuba-upload-dropzone-description" value="msg://uploadDescription" align="MIDDLE_CENTER"/>
+        </hbox>
         <hbox spacing="true">
-            <upload id="fileUpload"/>
+            <upload id="fileUpload" dropZone="dropZone"/>
             <linkButton id="fileName"/>
         </hbox>
         <hbox spacing="true">

@@ -155,6 +155,9 @@ public class ReportEditor extends AbstractEditor<Report> {
     protected ScreensHelper screensHelper;
 
     @Inject
+    protected FileUploadField invisibleFileUpload;
+
+    @Inject
     private Metadata metadata;
 
     @Override
@@ -410,6 +413,25 @@ public class ReportEditor extends AbstractEditor<Report> {
     }
 
     protected void initGeneral() {
+        invisibleFileUpload.addFileUploadSucceedListener(invisibleUpload -> {
+            final ReportTemplate defaultTemplate = getItem().getDefaultTemplate();
+            if (defaultTemplate != null) {
+                File file = fileUpload.getFile(invisibleFileUpload.getFileId());
+                try {
+                    byte[] data = FileUtils.readFileToByteArray(file);
+                    defaultTemplate.setContent(data);
+                    defaultTemplate.setName(invisibleFileUpload.getFileName());
+                    templatesDs.modifyItem(defaultTemplate);
+                } catch (IOException e) {
+                    throw new RuntimeException(String.format(
+                            "An error occurred while uploading file for template [%s]",
+                            defaultTemplate.getCode()));
+                }
+            } else {
+                showNotification(getMessage("notification.defaultTemplateIsEmpty"), NotificationType.HUMANIZED);
+            }
+        });
+
         treeDs.addItemChangeListener(e -> {
             bandEditor.setBandDefinition(e.getItem());
             bandEditor.setEnabled(e.getItem() != null);
