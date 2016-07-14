@@ -160,6 +160,9 @@ public class ReportEditor extends AbstractEditor<Report> {
     @Inject
     private Metadata metadata;
 
+    @Inject
+    protected HBoxLayout reportFields;
+
     @Override
     protected void initNewItem(Report report) {
         report.setReportType(ReportType.SIMPLE);
@@ -196,6 +199,8 @@ public class ReportEditor extends AbstractEditor<Report> {
         if (bandTree.getSingleSelected() == null) {
             bandEditor.setEnabled(false);
         }
+
+        setupDropZoneForTemplate();
     }
 
     @Override
@@ -621,6 +626,10 @@ public class ReportEditor extends AbstractEditor<Report> {
                     }
                 });
 
+                lookupPickerField.addValueChangeListener(event -> {
+                    setupDropZoneForTemplate();
+                });
+
                 return lookupPickerField;
             }
         });
@@ -845,6 +854,15 @@ public class ReportEditor extends AbstractEditor<Report> {
                 }
             }
         });
+    }
+
+    protected void setupDropZoneForTemplate() {
+        final ReportTemplate defaultTemplate = getItem().getDefaultTemplate();
+        if (defaultTemplate != null) {
+            invisibleFileUpload.setDropZone(new UploadField.DropZone(reportFields));
+        } else {
+            invisibleFileUpload.setDropZone(null);
+        }
     }
 
     @Override
