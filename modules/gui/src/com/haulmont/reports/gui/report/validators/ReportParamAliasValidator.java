@@ -11,7 +11,7 @@ import com.haulmont.cuba.gui.components.Field;
 import com.haulmont.cuba.gui.components.ValidationException;
 import org.apache.commons.lang.StringUtils;
 
-public class ReportParamNameValidator implements Field.Validator {
+public class ReportParamAliasValidator implements Field.Validator {
     protected Messages messages = AppBeans.get(Messages.class);
 
     @Override
@@ -19,7 +19,7 @@ public class ReportParamNameValidator implements Field.Validator {
         String stringValue = (String) value;
 
         if (StringUtils.isNotEmpty(stringValue) && !stringValue.matches("[\\w]*")) {
-            String incorrectParamName = messages.getMessage(ReportParamNameValidator.class, "incorrectParamName");
+            String incorrectParamName = messages.getMessage(ReportParamAliasValidator.class, "incorrectParamName");
             throw new ValidationException(incorrectParamName);
         }
     }

@@ -28,14 +28,14 @@
                         <row>
                             <label value="msg://parameters.name" align="MIDDLE_LEFT"/>
                             <textField id="name" datasource="parameterDs" property="name" required="true"
-                                        width="100%" requiredMessage="msg://parameters.nameMsg">
-                                <validator class="com.haulmont.reports.gui.report.validators.ReportParamNameValidator"/>
-                            </textField>
+                                       width="100%" requiredMessage="msg://parameters.nameMsg"/>
                         </row>
                         <row>
                             <label value="msg://parameters.alias" align="MIDDLE_LEFT"/>
                             <textField id="alias" datasource="parameterDs" property="alias" required="true"
-                                       width="100%" requiredMessage="msg://parameters.aliasMsg"/>
+                                       width="100%" requiredMessage="msg://parameters.aliasMsg">
+                                <validator class="com.haulmont.reports.gui.report.validators.ReportParamAliasValidator"/>
+                            </textField>
                         </row>
                         <row>
                             <label value="msg://parameters.type" align="MIDDLE_LEFT"/>
