@@ -6,6 +6,9 @@ package com.haulmont.reports.entity;
 
 import com.haulmont.chile.core.datatypes.impl.EnumClass;
 import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang.StringUtils;
+
+import javax.annotation.Nullable;
 
 public enum ReportOutputType implements EnumClass<Integer> {
     XLS(0, CubaReportOutputType.xls),
@@ -39,6 +42,16 @@ public enum ReportOutputType implements EnumClass<Integer> {
         for (ReportOutputType type : ReportOutputType.values()) {
             if (ObjectUtils.equals(type.getId(), id)) {
                 return type;
+            }
+        }
+        return null;
+    }
+
+    @Nullable
+    public static ReportOutputType getTypeFromExtension(String extension) {
+        for (ReportOutputType outputType : ReportOutputType.values()) {
+            if (StringUtils.equals(outputType.toString(), extension)) {
+                return outputType;
             }
         }
         return null;

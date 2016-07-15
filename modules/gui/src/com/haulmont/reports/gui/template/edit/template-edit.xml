@@ -36,18 +36,20 @@
                                        requiredMessage="msg://template.codeMsg"/>
                         </row>
                         <row>
-                            <label value="msg://template.outputType" align="MIDDLE_LEFT"/>
-                            <lookupField id="outputType" datasource="templateDs"
-                                         property="reportOutputType"
-                                         width="${width}" required="true"
-                                         requiredMessage="msg://template.outputTypeMsg"/>
-                        </row>
-                        <row>
                             <label id="templateFileLabel" value="msg://template.file" align="MIDDLE_LEFT"/>
                             <hbox spacing="true" width="${width}" expand="templatePath">
                                 <upload id="uploadTemplate" dropZone="createTemplateFields"/>
                                 <linkButton id="templatePath" align="MIDDLE_LEFT"/>
                             </hbox>
+                        </row>
+                        <row>
+                            <label value="msg://template.outputType" align="MIDDLE_LEFT"/>
+                            <lookupField id="outputType" datasource="templateDs"
+                                         textInputAllowed="false"
+                                         nullOptionVisible="true"
+                                         property="reportOutputType"
+                                         width="${width}" required="true"
+                                         requiredMessage="msg://template.outputTypeMsg"/>
                         </row>
                         <row>
                             <label id="outputNamePatternLabel" value="msg://template.outputNamePattern" align="MIDDLE_LEFT"/>

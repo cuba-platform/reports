@@ -22,6 +22,7 @@ import com.haulmont.reports.gui.ReportPrintHelper;
 import com.haulmont.reports.gui.datasource.NotPersistenceDatasource;
 import com.haulmont.reports.gui.report.run.ShowChartController;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 
 import javax.inject.Inject;
@@ -179,7 +180,9 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
                 showNotification(getMessage("templateEditor.uploadUnsuccess"), NotificationType.WARNING));
 
         uploadTemplate.addFileUploadSucceedListener(e -> {
-            getItem().setName(uploadTemplate.getFileName());
+            String fileName = uploadTemplate.getFileName();
+            getItem().setName(fileName);
+
             File file = fileUploading.getFile(uploadTemplate.getFileId());
             try {
                 byte[] data = FileUtils.readFileToByteArray(file);
@@ -188,8 +191,19 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
                 throw new RuntimeException(
                         String.format("An error occurred while uploading file for template [%s]", getItem().getCode()), ex);
             }
-            templatePath.setCaption(uploadTemplate.getFileName());
+
+            templatePath.setCaption(fileName);
+
             setupVisibility(getItem().isCustom(), getItem().getReportOutputType());
+
+            if (outputType.getValue() == null) {
+                String extension = FilenameUtils.getExtension(uploadTemplate.getFileDescriptor().getName()).toUpperCase();
+                ReportOutputType reportOutputType = ReportOutputType.getTypeFromExtension(extension);
+                if (reportOutputType != null) {
+                    outputType.setValue(reportOutputType);
+                }
+            }
+
             showNotification(getMessage("templateEditor.uploadSuccess"), NotificationType.TRAY);
         });
 
