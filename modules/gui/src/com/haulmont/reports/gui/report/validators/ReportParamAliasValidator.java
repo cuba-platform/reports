@@ -19,7 +19,7 @@ public class ReportParamAliasValidator implements Field.Validator {
         String stringValue = (String) value;
 
         if (StringUtils.isNotEmpty(stringValue) && !stringValue.matches("[\\w]*")) {
-            String incorrectParamName = messages.getMessage(ReportParamAliasValidator.class, "incorrectParamName");
+            String incorrectParamName = messages.getMessage(ReportParamAliasValidator.class, "incorrectParamAlias");
             throw new ValidationException(incorrectParamName);
         }
     }
