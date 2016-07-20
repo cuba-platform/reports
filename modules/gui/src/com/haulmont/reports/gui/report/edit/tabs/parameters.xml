@@ -16,7 +16,7 @@
                 <button id="down" icon="icons/down.png"/>
             </buttonsPanel>
             <columns>
-                <column id="locName" caption="msg://parameters.name"/>
+                <column id="locName" caption="msg://parameters.caption"/>
                 <column id="alias" caption="msg://parameters.alias"/>
                 <column id="type" caption="msg://parameters.type"/>
                 <column id="required" caption="msg://parameters.required"/>

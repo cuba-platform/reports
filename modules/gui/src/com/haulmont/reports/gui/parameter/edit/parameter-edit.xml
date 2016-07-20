@@ -26,7 +26,7 @@
                     </columns>
                     <rows>
                         <row>
-                            <label value="msg://parameters.name" align="MIDDLE_LEFT"/>
+                            <label value="msg://parameters.caption" align="MIDDLE_LEFT"/>
                             <textField id="name" datasource="parameterDs" property="name" required="true"
                                        width="100%" requiredMessage="msg://parameters.nameMsg"/>
                         </row>
