@@ -84,8 +84,9 @@ public class ValueFormatEditor extends AbstractEditor<ReportValueFormat> {
     }
 
     protected void addFormatItem(String caption) {
-        Map<String, Object> optionsMap = formatField.getOptionsMap();
+        Map<String, Object> optionsMap = new HashMap<>(formatField.getOptionsMap());
         optionsMap.put(caption, caption);
+
         formatField.setOptionsMap(optionsMap);
     }
 
