@@ -9,17 +9,17 @@
     <module name="global" blocks="*">
         <artifact name="reports-global" appJar="true"/>
 
-        <property name="cuba.persistenceConfig" value="reports-persistence.xml"/>
-        <property name="cuba.metadataConfig" value="reports-metadata.xml"/>
-        <property name="cuba.viewsConfig" value="reports-views.xml"/>
-        <property name="cuba.creditsConfig" value="reports-credits.xml"/>
+        <property name="cuba.persistenceConfig" value="+reports-persistence.xml"/>
+        <property name="cuba.metadataConfig" value="+reports-metadata.xml"/>
+        <property name="cuba.viewsConfig" value="+reports-views.xml"/>
+        <property name="cuba.creditsConfig" value="+reports-credits.xml"/>
     </module>
 
     <module name="core" dependsOn="global" blocks="core">
         <artifact name="reports-core" appJar="true"/>
         <artifact name="reports-core" classifier="db" ext="zip" configuration="dbscripts"/>
 
-        <property name="cuba.springContextConfig" value="reports-spring.xml"/>
+        <property name="cuba.springContextConfig" value="+reports-spring.xml"/>
     </module>
 
     <module name="gui" dependsOn="global" blocks="web,desktop">
@@ -29,19 +29,18 @@
     <module name="web" dependsOn="gui" blocks="web">
         <artifact name="reports-web" appJar="true"/>
 
-        <property name="cuba.springContextConfig" value="reports-web-spring.xml"/>
-        <property name="cuba.mainMessagePack" value="com.haulmont.reports.web"/>
-        <property name="cuba.windowConfig" value="reports-web-screens.xml"/>
-        <property name="cuba.menuConfig" value="reports-web-menu.xml"/>
+        <property name="cuba.springContextConfig" value="+reports-web-spring.xml"/>
+        <property name="cuba.mainMessagePack" value="+com.haulmont.reports.web"/>
+        <property name="cuba.windowConfig" value="+reports-web-screens.xml"/>
+        <property name="cuba.menuConfig" value="+reports-web-menu.xml"/>
     </module>
 
     <module name="desktop" dependsOn="gui" blocks="desktop">
         <artifact name="reports-desktop"/>
 
-        <property name="cuba.springContextConfig" value="reports-desktop-spring.xml"/>
-        <property name="cuba.mainMessagePack" value="com.haulmont.reports.desktop"/>
-        <property name="cuba.windowConfig" value="reports-desktop-screens.xml"/>
-        <property name="cuba.menuConfig" value="reports-desktop-menu.xml"/>
+        <property name="cuba.springContextConfig" value="+reports-desktop-spring.xml"/>
+        <property name="cuba.mainMessagePack" value="+com.haulmont.reports.desktop"/>
+        <property name="cuba.windowConfig" value="+reports-desktop-screens.xml"/>
+        <property name="cuba.menuConfig" value="+reports-desktop-menu.xml"/>
     </module>
-
 </app-component>
