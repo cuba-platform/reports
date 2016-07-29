@@ -9,9 +9,9 @@
         <table id="inputParametersTable" sortable="false" width="100%"
                reorderingAllowed="false" columnControlVisible="false">
             <buttonsPanel>
-                <button action="inputParametersTable.create" icon="icons/create.png"/>
-                <button action="inputParametersTable.edit" icon="icons/edit.png"/>
-                <button action="inputParametersTable.remove" icon="icons/remove.png"/>
+                <button action="inputParametersTable.create"/>
+                <button action="inputParametersTable.edit"/>
+                <button action="inputParametersTable.remove"/>
                 <button id="up" icon="icons/up.png"/>
                 <button id="down" icon="icons/down.png"/>
             </buttonsPanel>

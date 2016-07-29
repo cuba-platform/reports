@@ -37,7 +37,7 @@
                               caption="msg://report.bands">
                         <buttonsPanel>
                             <button id="createBandDefinition" icon="icons/plus-btn.png"/>
-                            <button id="removeBandDefinition" icon="icons/remove.png"/>
+                            <button id="removeBandDefinition"/>
                             <button id="up" icon="icons/up.png"/>
                             <button id="down" icon="icons/down.png"/>
                         </buttonsPanel>
