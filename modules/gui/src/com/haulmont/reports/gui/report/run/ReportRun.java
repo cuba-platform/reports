@@ -94,11 +94,6 @@ public class ReportRun extends AbstractLookup {
         reportsTable.addAction(runAction);
         reportsTable.setItemClickAction(runAction);
 
-        // Dialog mode queryParameters
-        getDialogOptions()
-                .setWidth(640)
-                .setHeight(480);
-
         addAction(new AbstractAction("applyFilter", clientConfig.getFilterApplyShortcut()) {
             @Override
             public void actionPerform(Component component) {

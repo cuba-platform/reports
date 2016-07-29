@@ -23,6 +23,8 @@
         </collectionDatasource>
     </dsContext>
 
+    <dialogMode width="800px" height="480px" resizable="true"/>
+
     <layout expand="reportsTable" spacing="true">
         <grid id="gridFilter" spacing="true">
             <columns count="6"/>
@@ -32,20 +34,20 @@
                     <textField id="nameFilter" datatype="string" width="250px"/>
 
                     <label value="msg://report.reportRunFilterCode" align="MIDDLE_RIGHT"/>
-                    <textField id="codeFilter" width="250px"/>
-                </row>
-                <row>
-                    <label value="msg://report.reportRunFilterGroup" align="MIDDLE_RIGHT"/>
-                    <lookupField id="groupFilter" optionsDatasource="reportGroupsDs" width="250px"/>
-
-                    <label value="msg://report.reportRunFilterUpdatedDate" align="MIDDLE_RIGHT"/>
-                    <dateField id="updatedDateFilter" resolution="DAY" width="250px"/>
+                    <textField id="codeFilter" width="150px"/>
 
                     <button id="setFilterButton"
                             caption="msg://report.reportFilterButton"
                             align="BOTTOM_LEFT"
                             invoke="filterReports"
                             width="100px"/>
+                </row>
+                <row>
+                    <label value="msg://report.reportRunFilterGroup" align="MIDDLE_RIGHT"/>
+                    <lookupField id="groupFilter" optionsDatasource="reportGroupsDs" width="250px"/>
+
+                    <label value="msg://report.reportRunFilterUpdatedDate" align="MIDDLE_RIGHT"/>
+                    <dateField id="updatedDateFilter" resolution="DAY" width="150px"/>
 
                     <button id="clearFilterButton"
                             caption="msg://report.reportClearButton"
