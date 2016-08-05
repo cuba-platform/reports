@@ -8,9 +8,7 @@
  */
 package com.haulmont.reports.libintegration;
 
-import com.haulmont.chile.core.model.MetaProperty;
 import com.haulmont.cuba.core.app.FileStorageAPI;
-import com.haulmont.cuba.core.entity.BaseUuidEntity;
 import com.haulmont.cuba.core.entity.FileDescriptor;
 import com.haulmont.cuba.core.global.*;
 import com.haulmont.reports.ReportingConfig;
@@ -21,6 +19,8 @@ import com.haulmont.yarg.structure.BandData;
 import com.lowagie.text.DocumentException;
 import com.lowagie.text.Image;
 import com.lowagie.text.pdf.BaseFont;
+import freemarker.ext.util.WrapperTemplateModel;
+import freemarker.template.TemplateMethodModelEx;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -50,6 +50,7 @@ public class CubaHtmlFormatter extends HtmlFormatter {
 
     private static final Logger log = LoggerFactory.getLogger(CubaHtmlFormatter.class);
 
+    protected Messages messages = AppBeans.get(Messages.class);
     protected final ReportingConfig reportingConfig = AppBeans.get(Configuration.class).getConfig(ReportingConfig.class);
     protected int entityMapMaxDeep = reportingConfig.getEntityTreeModelMaxDeep();
     protected int externalImagesTimeoutSec = reportingConfig.getHtmlExternalResourcesTimeoutSec();
@@ -263,6 +264,22 @@ public class CubaHtmlFormatter extends HtmlFormatter {
         return uri.replace(WEB_APP_PREFIX, webUrl).replace(CORE_APP_PREFIX, coreUrl);
     }
 
+    @SuppressWarnings("unchecked")
+    protected Map getTemplateModel(BandData rootBand) {
+        Map model = super.getTemplateModel(rootBand);
+        model.put("getMessage", (TemplateMethodModelEx) arguments -> {
+            if (arguments != null && arguments.size() == 1) {
+                Object arg = arguments.get(0);
+                if (arg instanceof WrapperTemplateModel && ((WrapperTemplateModel) arg).getWrappedObject() instanceof Enum) {
+                    return messages.getMessage((Enum)((WrapperTemplateModel) arg).getWrappedObject());
+                }
+            }
+            return null;
+
+        });
+        return model;
+    }
+
     @Override
     protected Map getBandModel(BandData band) {
         Map<String, Object> model = new HashMap<>();
@@ -281,35 +298,11 @@ public class CubaHtmlFormatter extends HtmlFormatter {
         for (String key : band.getData().keySet()) {
             if (band.getData().get(key) instanceof Enum)
                 data.put(key, defaultFormat(band.getData().get(key)));
-            else if (band.getData().get(key) instanceof BaseUuidEntity) {
-                data.put(key, transformEntityToMap((BaseUuidEntity) band.getData().get(key), 0));
-            } else {
+            else
                 data.put(key, band.getData().get(key));
-            }
         }
         model.put("fields", data);
 
         return model;
-    }
-
-    protected Map<String, Object> transformEntityToMap(BaseUuidEntity entity, int deep) {
-        Map<String, Object> resultMap = new HashMap<>();
-        for (MetaProperty property : entity.getMetaClass().getProperties()) {
-            Object value = null;
-            try {
-                if (property.getRange().isEnum())
-                    value = defaultFormat(entity.getValue(property.getName()));
-                else if (property.getRange().isClass() && entity.getValue(property.getName()) instanceof BaseUuidEntity)
-                    if (entityMapMaxDeep < deep)
-                        value = entity.getValue(property.getName());
-                    else value = transformEntityToMap(entity.<BaseUuidEntity>getValue(property.getName()), deep + 1);
-                else
-                    value = entity.getValue(property.getName());
-            } catch (RuntimeException ex) {
-                log.debug(ex.getMessage(), ex);
-            }
-            resultMap.put(property.getName(), value);
-        }
-        return resultMap;
     }
 }
