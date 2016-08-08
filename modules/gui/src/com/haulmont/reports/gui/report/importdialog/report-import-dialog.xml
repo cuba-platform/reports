@@ -15,7 +15,7 @@
         </hbox>
         <hbox spacing="true">
             <upload id="fileUpload" dropZone="dropZone"/>
-            <linkButton id="fileName"/>
+            <label id="fileName" align="MIDDLE_LEFT"/>
         </hbox>
         <hbox spacing="true">
             <label value="msg://importRoles"/>

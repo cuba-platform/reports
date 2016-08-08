@@ -23,7 +23,7 @@ public class ReportImportDialog extends AbstractWindow {
     @Inject
     protected FileUploadField fileUpload;
     @Inject
-    protected LinkButton fileName;
+    protected Label fileName;
     @Inject
     protected CheckBox importRoles;
     @Inject
@@ -36,7 +36,7 @@ public class ReportImportDialog extends AbstractWindow {
         super.init(params);
         initWindowActions();
         fileUpload.addFileUploadSucceedListener(e -> {
-            fileName.setCaption(fileUpload.getFileName());
+            fileName.setValue(fileUpload.getFileName());
         });
         importRoles.setValue(Boolean.TRUE);
     }
