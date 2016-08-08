@@ -9,7 +9,6 @@ import com.haulmont.chile.core.datatypes.Datatypes;
 import com.haulmont.chile.core.model.Instance;
 import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.core.global.UserSessionSource;
-import com.haulmont.cuba.core.sys.jpql.model.Entity;
 import com.haulmont.yarg.formatters.impl.DefaultFormatProvider;
 
 import javax.inject.Inject;
