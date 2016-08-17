@@ -19,12 +19,10 @@ import org.apache.commons.collections.CollectionUtils;
 
 import java.util.Set;
 
-public class TablePrintFormAction extends AbstractPrintFormAction implements Action.HasBeforeAfterHandlers {
+public class TablePrintFormAction extends AbstractPrintFormAction {
+
     protected Window window;
     protected final Table table;
-
-    protected Runnable beforeActionPerformedHandler;
-    protected Runnable afterActionPerformedHandler;
 
     /**
      * @deprecated Use {@link TablePrintFormAction#TablePrintFormAction(Table)} instead.
@@ -61,14 +59,15 @@ public class TablePrintFormAction extends AbstractPrintFormAction implements Act
 
     @Override
     public void actionPerform(Component component) {
-        if (beforeActionPerformedHandler != null) {
-            beforeActionPerformedHandler.run();
-        }
-
         DialogAction cancelAction = new DialogAction(Type.CANCEL);
 
         Window window = ComponentsHelper.getWindow(table);
         Preconditions.checkState(window != null, "Table is not attached to window");
+
+        if (beforeActionPerformedHandler != null) {
+            if (!beforeActionPerformedHandler.beforeActionPerformed())
+                return;
+        }
 
         final Set selected = table.getSelected();
         if (CollectionUtils.isNotEmpty(selected)) {
@@ -117,10 +116,6 @@ public class TablePrintFormAction extends AbstractPrintFormAction implements Act
                         Frame.NotificationType.HUMANIZED);
             }
         }
-
-        if (afterActionPerformedHandler != null) {
-            afterActionPerformedHandler.run();
-        }
     }
 
     protected void printSelected(Set selected) {
@@ -146,25 +141,5 @@ public class TablePrintFormAction extends AbstractPrintFormAction implements Act
         parameterPrototype.setMaxResults(query.getMaxResults());
 
         openRunReportScreen(ComponentsHelper.getWindow(table), parameterPrototype, metaClass);
-    }
-
-    @Override
-    public Runnable getBeforeActionPerformedHandler() {
-        return beforeActionPerformedHandler;
-    }
-
-    @Override
-    public void setBeforeActionPerformedHandler(Runnable handler) {
-        this.beforeActionPerformedHandler = handler;
-    }
-
-    @Override
-    public Runnable getAfterActionPerformedHandler() {
-        return afterActionPerformedHandler;
-    }
-
-    @Override
-    public void setAfterActionPerformedHandler(Runnable handler) {
-        this.afterActionPerformedHandler = handler;
     }
 }

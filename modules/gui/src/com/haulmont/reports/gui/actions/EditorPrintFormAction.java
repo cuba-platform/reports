@@ -7,7 +7,6 @@ package com.haulmont.reports.gui.actions;
 
 import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.cuba.core.entity.Entity;
-import com.haulmont.cuba.gui.components.Action;
 import com.haulmont.cuba.gui.components.Component;
 import com.haulmont.cuba.gui.components.Frame;
 import com.haulmont.cuba.gui.components.Window;
@@ -15,13 +14,10 @@ import com.haulmont.reports.gui.ReportGuiManager;
 
 import javax.annotation.Nullable;
 
-public class EditorPrintFormAction extends AbstractPrintFormAction implements Action.HasBeforeAfterHandlers {
+public class EditorPrintFormAction extends AbstractPrintFormAction {
 
     private final Window.Editor editor;
     private final String reportOutputName;
-
-    protected Runnable beforeActionPerformedHandler;
-    protected Runnable afterActionPerformedHandler;
 
     public EditorPrintFormAction(Window.Editor editor, @Nullable String reportOutputName) {
         this("editorReport", editor, reportOutputName);
@@ -39,9 +35,9 @@ public class EditorPrintFormAction extends AbstractPrintFormAction implements Ac
     @Override
     public void actionPerform(Component component) {
         if (beforeActionPerformedHandler != null) {
-            beforeActionPerformedHandler.run();
+            if (!beforeActionPerformedHandler.beforeActionPerformed())
+                return;
         }
-
         final Entity entity = editor.getItem();
         if (entity != null) {
             MetaClass metaClass = entity.getMetaClass();
@@ -50,29 +46,5 @@ public class EditorPrintFormAction extends AbstractPrintFormAction implements Ac
             editor.showNotification(messages.getMessage(ReportGuiManager.class, "notifications.noSelectedEntity"),
                     Frame.NotificationType.HUMANIZED);
         }
-
-        if (afterActionPerformedHandler != null) {
-            afterActionPerformedHandler.run();
-        }
-    }
-
-    @Override
-    public Runnable getBeforeActionPerformedHandler() {
-        return beforeActionPerformedHandler;
-    }
-
-    @Override
-    public void setBeforeActionPerformedHandler(Runnable handler) {
-        this.beforeActionPerformedHandler = handler;
-    }
-
-    @Override
-    public Runnable getAfterActionPerformedHandler() {
-        return afterActionPerformedHandler;
-    }
-
-    @Override
-    public void setAfterActionPerformedHandler(Runnable handler) {
-        this.afterActionPerformedHandler = handler;
     }
 }

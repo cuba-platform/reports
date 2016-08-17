@@ -19,7 +19,7 @@ import java.util.Collections;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-public class RunReportAction extends AbstractAction implements Action.HasBeforeAfterHandlers {
+public class RunReportAction extends AbstractAction implements Action.HasBeforeActionPerformedHandler {
 
     protected Frame window;
 
@@ -27,8 +27,7 @@ public class RunReportAction extends AbstractAction implements Action.HasBeforeA
 
     protected ReportGuiManager reportGuiManager = AppBeans.get(ReportGuiManager.class);
 
-    protected Runnable beforeActionPerformedHandler;
-    protected Runnable afterActionPerformedHandler;
+    protected BeforeActionPerformedHandler beforeActionPerformedHandler;
 
     /**
      * @deprecated Use {@link RunReportAction#RunReportAction()} instead
@@ -66,9 +65,9 @@ public class RunReportAction extends AbstractAction implements Action.HasBeforeA
     @Override
     public void actionPerform(Component component) {
         if (beforeActionPerformedHandler != null) {
-            beforeActionPerformedHandler.run();
+            if (!beforeActionPerformedHandler.beforeActionPerformed())
+                return;
         }
-
         if (window != null) {
             openLookup(window);
         } else if (component != null && component instanceof Component.BelongToFrame) {
@@ -76,10 +75,6 @@ public class RunReportAction extends AbstractAction implements Action.HasBeforeA
             openLookup(window);
         } else {
             throw new IllegalStateException("Please set window or specified component for performAction call");
-        }
-
-        if (afterActionPerformedHandler != null) {
-            afterActionPerformedHandler.run();
         }
     }
 
@@ -101,27 +96,17 @@ public class RunReportAction extends AbstractAction implements Action.HasBeforeA
         window.openWindow("report$inputParameters", OpenType.DIALOG, ParamsMap.of("report", report));
     }
 
+    public void setWindow(Frame window) {
+        this.window = window;
+    }
+
     @Override
-    public Runnable getBeforeActionPerformedHandler() {
+    public BeforeActionPerformedHandler getBeforeActionPerformedHandler() {
         return beforeActionPerformedHandler;
     }
 
     @Override
-    public void setBeforeActionPerformedHandler(Runnable handler) {
-        this.beforeActionPerformedHandler = handler;
-    }
-
-    @Override
-    public Runnable getAfterActionPerformedHandler() {
-        return afterActionPerformedHandler;
-    }
-
-    @Override
-    public void setAfterActionPerformedHandler(Runnable handler) {
-        this.afterActionPerformedHandler = handler;
-    }
-
-    public void setWindow(Frame window) {
-        this.window = window;
+    public void setBeforeActionPerformedHandler(BeforeActionPerformedHandler handler) {
+        beforeActionPerformedHandler = handler;
     }
 }

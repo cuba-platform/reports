@@ -10,6 +10,7 @@ import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.UserSessionSource;
 import com.haulmont.cuba.gui.WindowManager;
 import com.haulmont.cuba.gui.components.AbstractAction;
+import com.haulmont.cuba.gui.components.Action;
 import com.haulmont.cuba.gui.components.Frame;
 import com.haulmont.cuba.gui.components.Window;
 import com.haulmont.cuba.security.entity.User;
@@ -24,8 +25,11 @@ import org.apache.commons.collections.CollectionUtils;
 import javax.annotation.Nullable;
 import java.util.*;
 
-public abstract class AbstractPrintFormAction extends AbstractAction {
+public abstract class AbstractPrintFormAction extends AbstractAction implements Action.HasBeforeActionPerformedHandler {
+
     protected ReportGuiManager reportGuiManager = AppBeans.get(ReportGuiManager.class);
+
+    protected BeforeActionPerformedHandler beforeActionPerformedHandler;
 
     protected AbstractPrintFormAction(String id) {
         super(id);
@@ -79,5 +83,15 @@ public abstract class AbstractPrintFormAction extends AbstractAction {
 
         throw new ReportingException(String.format("Selected report [%s] doesn't have parameter with class [%s].",
                 report.getName(), inputValueMetaClass));
+    }
+
+    @Override
+    public BeforeActionPerformedHandler getBeforeActionPerformedHandler() {
+        return beforeActionPerformedHandler;
+    }
+
+    @Override
+    public void setBeforeActionPerformedHandler(BeforeActionPerformedHandler handler) {
+        beforeActionPerformedHandler = handler;
     }
 }
