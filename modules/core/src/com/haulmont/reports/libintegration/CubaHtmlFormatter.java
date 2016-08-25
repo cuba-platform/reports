@@ -21,6 +21,8 @@ import com.lowagie.text.Image;
 import com.lowagie.text.pdf.BaseFont;
 import freemarker.ext.util.WrapperTemplateModel;
 import freemarker.template.TemplateMethodModelEx;
+import freemarker.template.TemplateModelException;
+import freemarker.template.TemplateScalarModel;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -268,15 +270,39 @@ public class CubaHtmlFormatter extends HtmlFormatter {
     protected Map getTemplateModel(BandData rootBand) {
         Map model = super.getTemplateModel(rootBand);
         model.put("getMessage", (TemplateMethodModelEx) arguments -> {
-            if (arguments != null && arguments.size() == 1) {
+            checkArgsCount("getMessage", arguments, 1, 2);
+            if (arguments.size() == 1) {
                 Object arg = arguments.get(0);
                 if (arg instanceof WrapperTemplateModel && ((WrapperTemplateModel) arg).getWrappedObject() instanceof Enum) {
-                    return messages.getMessage((Enum)((WrapperTemplateModel) arg).getWrappedObject());
+                    return messages.getMessage((Enum) ((WrapperTemplateModel) arg).getWrappedObject());
+                } else {
+                    throwIncorrectArgType("getMessage", 1, "Enum");
                 }
             }
+            if (arguments.size() == 2) {
+                Object arg1 = arguments.get(0);
+                Object arg2 = arguments.get(1);
+                if (!(arg1 instanceof TemplateScalarModel)) {
+                    throwIncorrectArgType("getMessage", 1, "String");
+                }
+                if (!(arg2 instanceof TemplateScalarModel)) {
+                    throwIncorrectArgType("getMessage", 2, "String");
+                }
+                return messages.getMessage(((TemplateScalarModel) arg1).getAsString(), ((TemplateScalarModel) arg2).getAsString());
+            }
             return null;
-
         });
+        model.put("getMainMessage", (TemplateMethodModelEx) arguments -> {
+            checkArgsCount("getMainMessage", arguments, 1);
+            Object arg = arguments.get(0);
+            if (arg instanceof TemplateScalarModel) {
+                return messages.getMainMessage(((TemplateScalarModel) arg).getAsString());
+            } else {
+                throwIncorrectArgType("getMainMessage", 1, "String");
+            }
+            return null;
+        });
+
         return model;
     }
 
@@ -305,4 +331,17 @@ public class CubaHtmlFormatter extends HtmlFormatter {
 
         return model;
     }
+
+    protected void checkArgsCount(String methodName, List arguments, int... count) throws TemplateModelException {
+        if ((arguments == null || arguments.size() == 0) && Arrays.binarySearch(count, 0) == -1)
+            throw new TemplateModelException(String.format("Arguments not specified for method: %s", methodName));
+        if (arguments != null && Arrays.binarySearch(count, arguments.size()) == -1) {
+            throw new TemplateModelException(String.format("Incorrect arguments count: %s. Expected count: %s", arguments.size(), Arrays.toString(count)));
+        }
+    }
+
+    protected void throwIncorrectArgType(String methodName, int argIdx, String type) throws TemplateModelException {
+        throw new TemplateModelException(String.format("Incorrect argument[%s] type for method %s. Expected type %s", argIdx, methodName, type));
+    }
+
 }
