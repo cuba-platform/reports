@@ -10,14 +10,10 @@ package com.haulmont.reports.libintegration;
 
 import com.haulmont.cuba.core.app.FileStorageAPI;
 import com.haulmont.cuba.core.entity.FileDescriptor;
-import com.haulmont.cuba.core.global.AppBeans;
-import com.haulmont.cuba.core.global.DataManager;
-import com.haulmont.cuba.core.global.FileStorageException;
-import com.haulmont.cuba.core.global.LoadContext;
+import com.haulmont.cuba.core.global.*;
 import com.haulmont.yarg.exception.ReportFormattingException;
 import com.haulmont.yarg.formatters.impl.inline.AbstractInliner;
 
-import java.util.UUID;
 import java.util.regex.Pattern;
 
 public class FileStorageContentInliner extends AbstractInliner {
@@ -38,7 +34,7 @@ public class FileStorageContentInliner extends AbstractInliner {
             DataManager dataManager = AppBeans.get(DataManager.class);
             FileStorageAPI fileStorageAPI = AppBeans.get(FileStorageAPI.class);
 
-            FileDescriptor file = dataManager.load(new LoadContext<>(FileDescriptor.class).setId(UUID.fromString(paramValue.toString())));
+            FileDescriptor file = dataManager.load(new LoadContext<>(FileDescriptor.class).setId(UuidProvider.fromString(paramValue.toString())));
             byte[] bytes = fileStorageAPI.loadFile(file);
             return bytes;
         } catch (FileStorageException e) {
