@@ -33,6 +33,8 @@ public class ChartEditFrameController extends AbstractFrame {
     @Inject
     protected Table<ChartSeries> seriesTable;
     @Inject
+    protected GroupBoxLayout seriesBox;
+    @Inject
     protected FieldGroup pieChartFieldGroup;
     @Inject
     protected FieldGroup serialChartFieldGroup;
@@ -47,7 +49,7 @@ public class ChartEditFrameController extends AbstractFrame {
         type.addValueChangeListener(e -> {
             pieChartFieldGroup.setVisible(ChartType.PIE == e.getValue());
             serialChartFieldGroup.setVisible(ChartType.SERIAL == e.getValue());
-            seriesTable.setVisible(ChartType.SERIAL == e.getValue());
+            seriesBox.setVisible(ChartType.SERIAL == e.getValue());
 
             ((Window) getFrame()).getDialogOptions().center();
 
@@ -56,7 +58,7 @@ public class ChartEditFrameController extends AbstractFrame {
 
         pieChartFieldGroup.setVisible(false);
         serialChartFieldGroup.setVisible(false);
-        seriesTable.setVisible(false);
+        seriesBox.setVisible(false);
 
         seriesTable.addAction(new CreateAction(seriesTable) {
             @Override
@@ -152,7 +154,10 @@ public class ChartEditFrameController extends AbstractFrame {
     }
 
     public void setBands(Collection<BandDefinition> bands) {
-        List<String> bandNames = bands.stream().map(BandDefinition::getName).collect(Collectors.toList());
+        List<String> bandNames = bands.stream()
+                .filter(bandDefinition -> bandDefinition.getParentBandDefinition() != null)
+                .map(BandDefinition::getName)
+                .collect(Collectors.toList());
 
         LookupField pieChartBandName = (LookupField) pieChartFieldGroup.getFieldComponent("bandName");
         LookupField serialChartBandName = (LookupField) serialChartFieldGroup.getFieldComponent("bandName");

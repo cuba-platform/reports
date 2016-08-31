@@ -18,6 +18,9 @@ import com.haulmont.reports.entity.Report;
 import com.haulmont.reports.entity.ReportOutputType;
 import com.haulmont.reports.entity.ReportTemplate;
 import com.haulmont.reports.entity.charts.AbstractChartDescription;
+import com.haulmont.reports.entity.charts.ChartSeries;
+import com.haulmont.reports.entity.charts.ChartType;
+import com.haulmont.reports.entity.charts.SerialChartDescription;
 import com.haulmont.reports.gui.ReportPrintHelper;
 import com.haulmont.reports.gui.datasource.NotPersistenceDatasource;
 import com.haulmont.reports.gui.report.run.ShowChartController;
@@ -30,6 +33,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 public class TemplateEditor extends AbstractEditor<ReportTemplate> {
@@ -225,6 +229,7 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
 
         ReportTemplate reportTemplate = getItem();
         if (reportTemplate.getReportOutputType() == ReportOutputType.CHART) {
+            if (!validateChart()) return false;
             AbstractChartDescription chartDescription = chartEdit.getChartDescription();
             reportTemplate.setChartDescription(chartDescription);
         }
@@ -269,6 +274,31 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
                     notification.toString(), NotificationType.TRAY);
 
             return false;
+        }
+        return true;
+    }
+
+    protected boolean validateChart() {
+        AbstractChartDescription chartDescription = chartEdit.getChartDescription();
+        if (chartDescription.getType() == ChartType.SERIAL) {
+            List<ChartSeries> series = ((SerialChartDescription) chartDescription).getSeries();
+            if (series == null || series.size() == 0) {
+                showNotification(getMessage("validationFail.caption"),
+                        getMessage("chartEdit.seriesEmptyMsg"), NotificationType.TRAY);
+                return false;
+            }
+            for (ChartSeries it : series) {
+                if (it.getType() == null) {
+                    showNotification(getMessage("validationFail.caption"),
+                            getMessage("chartEdit.seriesTypeNullMsg"), NotificationType.TRAY);
+                    return false;
+                }
+                if (it.getValueField() == null) {
+                    showNotification(getMessage("validationFail.caption"),
+                            getMessage("chartEdit.seriesValueFieldNullMsg"), NotificationType.TRAY);
+                    return false;
+                }
+            }
         }
         return true;
     }

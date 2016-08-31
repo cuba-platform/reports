@@ -19,50 +19,62 @@
     <assign name="width" value="400px"/>
 
     <layout spacing="true">
-        <hbox spacing="true">
-            <label value="msg://com.haulmont.reports.entity.charts/AbstractChartDescription.type"
-                   align="MIDDLE_CENTER"/>
-            <lookupField id="type" width="${width}" required="true"/>
-        </hbox>
-
-        <fieldGroup id="pieChartFieldGroup" datasource="pieChartDs">
-            <column width="${width}">
-                <field id="bandName" custom="true"/>
-                <field id="titleField"/>
-                <field id="valueField"/>
-                <field id="colorField"/>
-                <field id="units"/>
-                <field id="showLegend"/>
-            </column>
-        </fieldGroup>
-        <fieldGroup id="serialChartFieldGroup" datasource="serialChartDs">
-            <column width="${width}">
-                <field id="bandName" custom="true"/>
-                <field id="categoryField"/>
-                <field id="categoryAxisCaption"/>
-                <field id="categoryAxisLabelRotation"/>
-                <field id="valueAxisCaption"/>
-                <field id="valueAxisUnits"/>
-                <field id="valueStackType"/>
-                <field id="showLegend"/>
-            </column>
-        </fieldGroup>
-        <table id="seriesTable" editable="true" width="600px" height="200px">
-            <actions>
-                <action id="create"/>
-                <action id="remove"/>
-            </actions>
-            <buttonsPanel>
-                <button action="seriesTable.create"/>
-                <button action="seriesTable.remove"/>
-            </buttonsPanel>
-            <columns>
-                <column id="name" editable="true"/>
-                <column id="valueField" editable="true"/>
-                <column id="type" editable="true"/>
-                <column id="colorField" editable="true"/>
-            </columns>
-            <rows datasource="seriesDs"/>
-        </table>
+        <grid width="AUTO" spacing="true">
+            <columns count="2"/>
+            <rows>
+                <row>
+                    <label value="msg://com.haulmont.reports.entity.charts/AbstractChartDescription.type"
+                           align="MIDDLE_LEFT"/>
+                    <lookupField id="type" width="${width}" required="true"/>
+                </row>
+                <row>
+                    <fieldGroup id="pieChartFieldGroup" datasource="pieChartDs" colspan="2">
+                        <column width="${width}">
+                            <field id="bandName" custom="true"/>
+                            <field id="titleField"/>
+                            <field id="valueField"/>
+                            <field id="colorField"/>
+                            <field id="units"/>
+                            <field id="showLegend"/>
+                        </column>
+                    </fieldGroup>
+                </row>
+                <row>
+                    <fieldGroup id="serialChartFieldGroup" datasource="serialChartDs" colspan="2">
+                        <column width="${width}">
+                            <field id="bandName" custom="true"/>
+                            <field id="categoryField"/>
+                            <field id="categoryAxisCaption"/>
+                            <field id="categoryAxisLabelRotation"/>
+                            <field id="valueAxisCaption"/>
+                            <field id="valueAxisUnits"/>
+                            <field id="valueStackType"/>
+                            <field id="showLegend"/>
+                        </column>
+                    </fieldGroup>
+                </row>
+                <row>
+                    <groupBox id="seriesBox" caption="msg://chartEdit.series" colspan="2">
+                        <table id="seriesTable" editable="true" height="200px" width="100%">
+                            <actions>
+                                <action id="create"/>
+                                <action id="remove"/>
+                            </actions>
+                            <buttonsPanel>
+                                <button action="seriesTable.create"/>
+                                <button action="seriesTable.remove"/>
+                            </buttonsPanel>
+                            <columns>
+                                <column id="name" editable="true"/>
+                                <column id="valueField" editable="true"/>
+                                <column id="type" editable="true"/>
+                                <column id="colorField" editable="true"/>
+                            </columns>
+                            <rows datasource="seriesDs"/>
+                        </table>
+                    </groupBox>
+                </row>
+            </rows>
+        </grid>
     </layout>
 </window>
