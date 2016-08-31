@@ -256,8 +256,10 @@ public class ReportImportExport implements ReportImportExportAPI, ReportImportEx
                     }
                     if (dbReport != null) {
                         report.setRoles(dbReport.getRoles());
-                        report.setXml(reportingApi.convertToString(report));
+                    } else {
+                        report.setRoles(Collections.emptySet());
                     }
+                    report.setXml(reportingApi.convertToString(report));
                 }
             }
         }
