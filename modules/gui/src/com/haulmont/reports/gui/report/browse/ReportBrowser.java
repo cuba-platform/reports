@@ -8,14 +8,17 @@ import com.haulmont.bali.util.ParamsMap;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.global.ClientType;
 import com.haulmont.cuba.core.global.Metadata;
+import com.haulmont.cuba.core.global.PersistenceHelper;
 import com.haulmont.cuba.core.global.Security;
 import com.haulmont.cuba.gui.AppConfig;
 import com.haulmont.cuba.gui.WindowManager.OpenType;
 import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.components.actions.BaseAction;
 import com.haulmont.cuba.gui.components.actions.CreateAction;
+import com.haulmont.cuba.gui.components.actions.EditAction;
 import com.haulmont.cuba.gui.components.actions.ItemTrackingAction;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
+import com.haulmont.cuba.gui.data.DataSupplier;
 import com.haulmont.cuba.gui.data.impl.DatasourceImplementation;
 import com.haulmont.cuba.gui.export.ByteArrayDataProvider;
 import com.haulmont.cuba.gui.export.ExportDisplay;
@@ -51,6 +54,8 @@ public class ReportBrowser extends AbstractLookup {
     protected Button copyReport;
     @Named("table")
     protected GroupTable<Report> reportsTable;
+    @Named("table.edit")
+    protected EditAction tableEdit;
     @Inject
     protected Security security;
     @Inject
@@ -140,16 +145,20 @@ public class ReportBrowser extends AbstractLookup {
         reportsTable.addAction(exportReport.getAction());
         reportsTable.addAction(runReport.getAction());
 
-        reportsTable.addAction(new CreateAction(reportsTable) {
+        CreateAction createReportAction = new CreateAction(reportsTable) {
             @Override
             protected void afterCommit(Entity entity) {
                 reportsTable.expandPath(entity);
             }
-        });
+        };
+
+        reportsTable.addAction(createReportAction);
+        subscribeCreateActionCloseHandler(createReportAction);
 
         if (AppConfig.getClientType() == ClientType.WEB) {
             reportsTable.getButtonsPanel().remove(createBtn);
-            popupCreateBtn.addAction(new CreateAction(reportsTable) {
+
+            CreateAction popupCreateReportAction = new CreateAction(reportsTable) {
                 @Override
                 public String getCaption() {
                     return getMessage("report.new");
@@ -159,7 +168,9 @@ public class ReportBrowser extends AbstractLookup {
                 protected void afterCommit(Entity entity) {
                     reportsTable.expandPath(entity);
                 }
-            });
+            };
+            popupCreateBtn.addAction(popupCreateReportAction);
+            subscribeCreateActionCloseHandler(popupCreateReportAction);
 
             popupCreateBtn.addAction(new AbstractAction("wizard") {
                 @Override
@@ -204,5 +215,35 @@ public class ReportBrowser extends AbstractLookup {
         } else {
             reportsTable.getButtonsPanel().remove(popupCreateBtn);
         }
+
+        tableEdit.setAfterWindowClosedHandler((window, closeActionId) -> {
+            if (!COMMIT_ACTION_ID.equals(closeActionId)) {
+                Report editedReport = (Report) ((Editor) window).getItem();
+                Report currentItem = reportDs.getItem(editedReport.getId());
+
+                if (currentItem != null && !editedReport.getVersion().equals(currentItem.getVersion())) {
+                    DataSupplier dataSupplier = getDsContext().getDataSupplier();
+                    Report reloadedReport = dataSupplier.reload(currentItem, reportDs.getView());
+                    reportDs.updateItem(reloadedReport);
+                }
+            }
+        });
+    }
+
+    protected void subscribeCreateActionCloseHandler(CreateAction createAction) {
+        createAction.setAfterWindowClosedHandler(((window, closeActionId) -> {
+            if (!COMMIT_ACTION_ID.equals(closeActionId)) {
+                Report newReport = (Report) ((Editor) window).getItem();
+
+                if (!PersistenceHelper.isNew(newReport)) {
+                    DataSupplier dataSupplier = getDsContext().getDataSupplier();
+                    Report reloadedReport = dataSupplier.reload(newReport, reportDs.getView());
+
+                    boolean modified = reportDs.isModified();
+                    reportDs.addItem(reloadedReport);
+                    ((DatasourceImplementation) reportDs).setModified(modified);
+                }
+            }
+        }));
     }
 }
