@@ -225,11 +225,14 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
 
     @Override
     public boolean commit(boolean validate) {
-        if (!validateTemplateFile() || !validateInputOutputFormats()) return false;
-
+        if (!validateTemplateFile() || !validateInputOutputFormats()) {
+            return false;
+        }
         ReportTemplate reportTemplate = getItem();
         if (reportTemplate.getReportOutputType() == ReportOutputType.CHART) {
-            if (!validateChart()) return false;
+            if (!validateChart()) {
+                return false;
+            }
             AbstractChartDescription chartDescription = chartEdit.getChartDescription();
             reportTemplate.setChartDescription(chartDescription);
         }
