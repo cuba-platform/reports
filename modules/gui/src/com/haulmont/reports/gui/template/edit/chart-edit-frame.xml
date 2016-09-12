@@ -25,7 +25,7 @@
                 <row>
                     <label value="msg://com.haulmont.reports.entity.charts/AbstractChartDescription.type"
                            align="MIDDLE_LEFT"/>
-                    <lookupField id="type" width="${width}" required="true"/>
+                    <lookupField id="type" width="${width}" required="true" align="MIDDLE_RIGHT"/>
                 </row>
                 <row>
                     <fieldGroup id="pieChartFieldGroup" datasource="pieChartDs" colspan="2">
