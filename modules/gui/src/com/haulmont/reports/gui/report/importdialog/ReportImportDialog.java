@@ -5,6 +5,8 @@
 
 package com.haulmont.reports.gui.report.importdialog;
 
+import com.haulmont.cuba.core.global.ClientType;
+import com.haulmont.cuba.gui.AppConfig;
 import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.export.ExportFormat;
 import com.haulmont.cuba.gui.upload.FileUploadingAPI;
@@ -30,6 +32,8 @@ public class ReportImportDialog extends AbstractWindow {
     protected FileUploadingAPI fileUploadingApi;
     @Inject
     protected ReportService reportService;
+    @Inject
+    protected HBoxLayout dropZone;
 
     @Override
     public void init(Map<String, Object> params) {
@@ -39,6 +43,10 @@ public class ReportImportDialog extends AbstractWindow {
             fileName.setValue(fileUpload.getFileName());
         });
         importRoles.setValue(Boolean.TRUE);
+
+        if (AppConfig.getClientType() != ClientType.WEB) {
+            dropZone.setVisible(false);
+        }
     }
 
     protected void initWindowActions() {
