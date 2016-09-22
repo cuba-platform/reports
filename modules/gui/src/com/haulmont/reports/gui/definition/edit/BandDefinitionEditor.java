@@ -50,6 +50,8 @@ public class BandDefinitionEditor extends AbstractFrame implements Suggester {
     @Inject
     protected GridLayout commonEntityGrid;
     @Inject
+    protected HBoxLayout textParamsBox;
+    @Inject
     protected Label viewNameLabel;
     @Inject
     protected LookupField orientation;
@@ -63,6 +65,8 @@ public class BandDefinitionEditor extends AbstractFrame implements Suggester {
     protected LookupField entitiesParamLookup;
     @Inject
     protected LookupField entityParamLookup;
+    @Inject
+    protected TextField dataStore;
     @Inject
     protected CheckBox useExistingViewCheckbox;
     @Inject
@@ -307,7 +311,9 @@ public class BandDefinitionEditor extends AbstractFrame implements Suggester {
         if (dsType != null) {
             switch (dsType) {
                 case SQL:
+                    textParamsBox.add(dataStore);
                 case JPQL:
+                    textParamsBox.add(dataStore);
                 case GROOVY:
                     editPane.add(textBox);
                     break;
@@ -371,6 +377,7 @@ public class BandDefinitionEditor extends AbstractFrame implements Suggester {
 
     protected void hideAllDataSetEditComponents() {
         // do not use setVisible(false) due to web legacy (Vaadin 6) layout problems #PL-3916
+        textParamsBox.remove(dataStore);
         editPane.remove(textBox);
         editPane.remove(entityGrid);
         editPane.remove(entitiesGrid);

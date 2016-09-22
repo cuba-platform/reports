@@ -20,7 +20,7 @@
     <bean id="reporting_lib_GroovyDataLoader" class="com.haulmont.reports.libintegration.CubaGroovyDataLoader">
         <constructor-arg ref="reporting_lib_Scripting"/>
     </bean>
-    <bean id="reporting_lib_SqlDataLoader" class="com.haulmont.yarg.loaders.impl.SqlDataLoader">
+    <bean id="reporting_lib_SqlDataLoader" class="com.haulmont.reports.libintegration.CubaSqlDataLoader">
         <constructor-arg ref="cubaDataSource"/>
         <property name="parametersConverter" ref="reporting_lib_SqlParametersConverter"/>
     </bean>

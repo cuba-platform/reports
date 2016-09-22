@@ -10,7 +10,9 @@ import com.haulmont.cuba.core.Persistence;
 import com.haulmont.cuba.core.Query;
 import com.haulmont.cuba.core.Transaction;
 import com.haulmont.cuba.core.entity.Entity;
+import com.haulmont.cuba.core.global.Stores;
 import com.haulmont.reports.app.EntityMap;
+import com.haulmont.reports.entity.DataSet;
 import com.haulmont.yarg.exception.DataLoadingException;
 import com.haulmont.yarg.loaders.ReportDataLoader;
 import com.haulmont.yarg.loaders.impl.AbstractDbDataLoader;
@@ -55,7 +57,8 @@ public class JpqlDataDataLoader extends AbstractDbDataLoader implements ReportDa
     public List<Map<String, Object>> loadData(ReportQuery reportQuery, BandData parentBand, Map<String, Object> params) {
         List<OutputValue> outputParameters = null;
         List queryResult = null;
-        Transaction tx = persistence.createTransaction();
+        String storeName = StoreUtils.getStoreName(reportQuery);
+        Transaction tx = persistence.createTransaction(storeName);
         try {
             String query = reportQuery.getScript();
             if (StringUtils.isBlank(query)) return Collections.emptyList();
@@ -65,7 +68,7 @@ public class JpqlDataDataLoader extends AbstractDbDataLoader implements ReportDa
             query = query.replaceAll("(?i)" + ALIAS_PATTERN + ",", ",");//replaces [as alias_name], entries except last
             query = query.replaceAll("(?i)" + ALIAS_PATTERN, " ");//replaces last [as alias_name] entry
 
-            Query select = insertParameters(query, parentBand, params);
+            Query select = insertParameters(query, storeName, parentBand, params);
             queryResult = select.getResultList();
             tx.commit();
         } catch (Throwable e) {
@@ -85,11 +88,11 @@ public class JpqlDataDataLoader extends AbstractDbDataLoader implements ReportDa
         }
     }
 
-    protected Query insertParameters(String query, BandData parentBand, Map<String, Object> params) {
+    protected Query insertParameters(String query, String storeName, BandData parentBand, Map<String, Object> params) {
         QueryPack pack = prepareQuery(query, parentBand, params);
 
         boolean inserted = pack.getParams().length > 0;
-        EntityManager em = persistence.getEntityManager();
+        EntityManager em = persistence.getEntityManager(storeName);
         Query select = em.createQuery(pack.getQuery());
         if (inserted) {
             //insert parameters to their position

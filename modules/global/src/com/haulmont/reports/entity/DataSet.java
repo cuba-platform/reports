@@ -19,6 +19,7 @@ import java.util.Map;
 public class DataSet extends AbstractNotPersistentEntity implements ReportQuery {
     public static final String ENTITY_PARAM_NAME = "entityParamName";
     public static final String LIST_ENTITIES_PARAM_NAME = "listEntitiesParamName";
+    public static final String DATA_STORE_PARAM_NAME = "dataStore";
     private static final long serialVersionUID = -3706206933129963303L;
 
     protected View view;
@@ -40,6 +41,8 @@ public class DataSet extends AbstractNotPersistentEntity implements ReportQuery 
     protected BandDefinition bandDefinition;
     @MetaProperty
     protected String linkParameterName;
+    @MetaProperty
+    protected String dataStore;
 
     public View getView() {
         return view;
@@ -114,6 +117,14 @@ public class DataSet extends AbstractNotPersistentEntity implements ReportQuery 
         this.bandDefinition = bandDefinition;
     }
 
+    public String getDataStore() {
+        return dataStore;
+    }
+
+    public void setDataStore(String dataStore) {
+        this.dataStore = dataStore;
+    }
+
     @Override
     public String getLinkParameterName() {
         return linkParameterName;
@@ -138,6 +149,7 @@ public class DataSet extends AbstractNotPersistentEntity implements ReportQuery 
         Map<String, Object> params = new HashMap<>();
         params.put(ENTITY_PARAM_NAME, entityParamName);
         params.put(LIST_ENTITIES_PARAM_NAME, listEntitiesParamName);
+        params.put(DATA_STORE_PARAM_NAME, dataStore);
         return params;
     }
 }

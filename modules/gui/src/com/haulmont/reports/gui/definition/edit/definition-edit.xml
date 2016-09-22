@@ -56,9 +56,16 @@
                     <label id="dataSetTextLabel" value="msg://dataSet.text"/>
                     <sourceCodeEditor id="text" datasource="dataSetsDs" property="text"
                                       mode="Text" width="100%"/>
-                    <label value="msg://dataSet.linkParameterName"/>
-                    <textField id="linkParameterName" width="${width}"
-                               datasource="dataSetsDs" property="linkParameterName"/>
+                    <hbox id="textParamsBox" spacing="true">
+                        <textField id="linkParameterName" width="${width}"
+                                   datasource="dataSetsDs"
+                                   property="linkParameterName"
+                                   caption="msg://dataSet.linkParameterName"/>
+                        <textField id="dataStore" width="${width}"
+                                   datasource="dataSetsDs"
+                                   property="dataStore"
+                                   caption="msg://dataSet.dataStore"/>
+                    </hbox>
                 </vbox>
                 <grid id="entitiesGrid" spacing="true" margin="true;false;false;false">
                     <columns>
