@@ -887,7 +887,16 @@ public class ReportEditor extends AbstractEditor<Report> {
         templatesTable.addAction(new CreateAction(templatesTable, OpenType.DIALOG) {
             @Override
             public Map<String, Object> getInitialValues() {
-                return Collections.<String, Object>singletonMap("report", getItem());
+                return Collections.singletonMap("report", getItem());
+            }
+
+            @Override
+            protected void afterCommit(Entity entity) {
+                ReportTemplate reportTemplate = (ReportTemplate) entity;
+                ReportTemplate defaultTemplate = getItem().getDefaultTemplate();
+                if (defaultTemplate == null) {
+                    getItem().setDefaultTemplate(reportTemplate);
+                }
             }
         });
 
