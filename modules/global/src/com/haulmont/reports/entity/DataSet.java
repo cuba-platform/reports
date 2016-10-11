@@ -43,6 +43,8 @@ public class DataSet extends AbstractNotPersistentEntity implements ReportQuery 
     protected String linkParameterName;
     @MetaProperty
     protected String dataStore;
+    @MetaProperty
+    protected Boolean processTemplate;
 
     public View getView() {
         return view;
@@ -132,6 +134,15 @@ public class DataSet extends AbstractNotPersistentEntity implements ReportQuery 
 
     public void setLinkParameterName(String linkParameterName) {
         this.linkParameterName = linkParameterName;
+    }
+
+    @Override
+    public Boolean getProcessTemplate() {
+        return processTemplate;
+    }
+
+    public void setProcessTemplate(Boolean processTemplate) {
+        this.processTemplate = processTemplate;
     }
 
     @Override

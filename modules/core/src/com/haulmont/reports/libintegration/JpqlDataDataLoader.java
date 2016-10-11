@@ -61,7 +61,13 @@ public class JpqlDataDataLoader extends AbstractDbDataLoader implements ReportDa
         Transaction tx = persistence.createTransaction(storeName);
         try {
             String query = reportQuery.getScript();
-            if (StringUtils.isBlank(query)) return Collections.emptyList();
+            if (StringUtils.isBlank(query)) {
+                return Collections.emptyList();
+            }
+
+            if (Boolean.TRUE.equals(reportQuery.getProcessTemplate())) {
+                query = processQueryTemplate(query, parentBand, params);
+            }
 
             outputParameters = parseQueryOutputParametersNames(query);
 

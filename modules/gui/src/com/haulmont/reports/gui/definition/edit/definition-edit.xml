@@ -52,7 +52,7 @@
             </vbox>
             <!-- Split -->
             <vbox id="editPane" margin="false;false;false;true" height="100%" spacing="true">
-                <vbox id="textBox" expand="text" height="100%">
+                <vbox id="textBox" expand="text" height="100%" spacing="true">
                     <label id="dataSetTextLabel" value="msg://dataSet.text"/>
                     <sourceCodeEditor id="text" datasource="dataSetsDs" property="text"
                                       mode="Text" width="100%"/>
@@ -66,6 +66,10 @@
                                    property="dataStore"
                                    caption="msg://dataSet.dataStore"/>
                     </hbox>
+                    <checkBox id="processTemplate"
+                              datasource="dataSetsDs"
+                              property="processTemplate"
+                              caption="msg://dataSet.processTemplate"/>
                 </vbox>
                 <grid id="entitiesGrid" spacing="true" margin="true;false;false;false">
                     <columns>

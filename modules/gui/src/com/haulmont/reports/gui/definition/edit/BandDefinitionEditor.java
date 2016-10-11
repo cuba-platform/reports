@@ -68,6 +68,8 @@ public class BandDefinitionEditor extends AbstractFrame implements Suggester {
     @Inject
     protected TextField dataStore;
     @Inject
+    protected CheckBox processTemplate;
+    @Inject
     protected CheckBox useExistingViewCheckbox;
     @Inject
     protected Button viewEditButton;
@@ -312,8 +314,10 @@ public class BandDefinitionEditor extends AbstractFrame implements Suggester {
             switch (dsType) {
                 case SQL:
                     textParamsBox.add(dataStore);
+                    textBox.add(processTemplate);
                 case JPQL:
                     textParamsBox.add(dataStore);
+                    textBox.add(processTemplate);
                 case GROOVY:
                     editPane.add(textBox);
                     break;
@@ -378,6 +382,7 @@ public class BandDefinitionEditor extends AbstractFrame implements Suggester {
     protected void hideAllDataSetEditComponents() {
         // do not use setVisible(false) due to web legacy (Vaadin 6) layout problems #PL-3916
         textParamsBox.remove(dataStore);
+        textBox.remove(processTemplate);
         editPane.remove(textBox);
         editPane.remove(entityGrid);
         editPane.remove(entitiesGrid);
