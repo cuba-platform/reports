@@ -105,7 +105,7 @@ public class InputParametersFrame extends AbstractFrame {
         }
 
         Label label = parameterFieldCreator.createLabel(parameter, field);
-        label.setStyleName("cuba-report-parameter-caption");
+        label.setStyleName("c-report-parameter-caption");
 
         if (currentGridRow == 0) {
             field.requestFocus();

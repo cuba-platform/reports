@@ -26,7 +26,7 @@
                     <field id="description" optionsDatasource="groupsDs" width="${widthBig}" rows="3"/>
                 </column>
             </fieldGroup>
-            <upload id="invisibleFileUpload" dropZone="reportFields" stylename="cuba-report-upload-invisible"/>
+            <upload id="invisibleFileUpload" dropZone="reportFields" stylename="c-report-upload-invisible"/>
             <label id="spacer"/>
         </hbox>
 
