@@ -5,12 +5,10 @@
 
 package com.haulmont.reports.gui.template.edit;
 
-import com.haulmont.cuba.gui.AppConfig;
+import com.haulmont.cuba.core.entity.FileDescriptor;
+import com.haulmont.cuba.core.global.Metadata;
 import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.config.WindowConfig;
-import com.haulmont.cuba.gui.export.ByteArrayDataProvider;
-import com.haulmont.cuba.gui.export.ExportDisplay;
-import com.haulmont.cuba.gui.export.ExportFormat;
 import com.haulmont.cuba.gui.theme.ThemeConstants;
 import com.haulmont.cuba.gui.upload.FileUploadingAPI;
 import com.haulmont.reports.app.service.ReportService;
@@ -29,6 +27,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 
 import javax.inject.Inject;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -41,10 +40,7 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
     protected Label templateFileLabel;
 
     @Inject
-    protected LinkButton templatePath;
-
-    @Inject
-    protected FileUploadField uploadTemplate;
+    protected FileUploadField templateUploadField;
 
     @Inject
     protected TextField customDefinition;
@@ -87,6 +83,8 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
 
     @Inject
     protected WindowConfig windowConfig;
+    @Inject
+    private Metadata metadata;
 
     public TemplateEditor() {
         showSaveNotification = false;
@@ -109,8 +107,9 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
     protected void postInit() {
         super.postInit();
 
+        initUploadField();
+
         ReportTemplate reportTemplate = getItem();
-        templatePath.setCaption(reportTemplate.getName());
         templateDs.addItemPropertyChangeListener(e -> {
             if ("reportOutputType".equals(e.getProperty())) {
                 setupVisibility(reportTemplate.getCustom(), (ReportOutputType) e.getValue());
@@ -133,6 +132,16 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
         outputType.setOptionsList(outputTypes);
     }
 
+    protected void initUploadField() {
+        ReportTemplate reportTemplate = getItem();
+        byte[] templateFile = reportTemplate.getContent();
+        templateUploadField.setContentProvider(() ->
+                new ByteArrayInputStream(templateFile));
+        FileDescriptor fileDescriptor = metadata.create(FileDescriptor.class);
+        fileDescriptor.setName(reportTemplate.getName());
+        templateUploadField.setValue(fileDescriptor);
+    }
+
     @Override
     public void ready() {
         super.ready();
@@ -142,7 +151,7 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
     }
 
     protected void setupVisibility(boolean customEnabled, ReportOutputType reportOutputType) {
-        uploadTemplate.setVisible(!customEnabled);
+        templateUploadField.setVisible(!customEnabled);
         customDefinedBy.setVisible(customEnabled);
         customDefinition.setVisible(customEnabled);
         customDefinedByLabel.setVisible(customEnabled);
@@ -162,13 +171,10 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
             chartEdit.hideChartPreviewBox();
         }
 
-        uploadTemplate.setVisible(!chartOutputType);
-        templatePath.setVisible(!chartOutputType);
+        templateUploadField.setVisible(!chartOutputType);
         templateFileLabel.setVisible(!chartOutputType);
         outputNamePattern.setVisible(!chartOutputType);
         outputNamePatternLabel.setVisible(!chartOutputType);
-
-        templatePath.setVisible(!customEnabled && !chartOutputType && StringUtils.isNotEmpty(getItem().getName()));
     }
 
     @Override
@@ -180,14 +186,14 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
                 .setWidthAuto()
                 .setResizable(true);
 
-        uploadTemplate.addFileUploadErrorListener(e ->
+        templateUploadField.addFileUploadErrorListener(e ->
                 showNotification(getMessage("templateEditor.uploadUnsuccess"), NotificationType.WARNING));
 
-        uploadTemplate.addFileUploadSucceedListener(e -> {
-            String fileName = uploadTemplate.getFileName();
+        templateUploadField.addFileUploadSucceedListener(e -> {
+            String fileName = templateUploadField.getFileName();
             getItem().setName(fileName);
 
-            File file = fileUploading.getFile(uploadTemplate.getFileId());
+            File file = fileUploading.getFile(templateUploadField.getFileId());
             try {
                 byte[] data = FileUtils.readFileToByteArray(file);
                 getItem().setContent(data);
@@ -196,12 +202,10 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
                         String.format("An error occurred while uploading file for template [%s]", getItem().getCode()), ex);
             }
 
-            templatePath.setCaption(fileName);
-
             setupVisibility(getItem().isCustom(), getItem().getReportOutputType());
 
             if (outputType.getValue() == null) {
-                String extension = FilenameUtils.getExtension(uploadTemplate.getFileDescriptor().getName()).toUpperCase();
+                String extension = FilenameUtils.getExtension(templateUploadField.getFileDescriptor().getName()).toUpperCase();
                 ReportOutputType reportOutputType = ReportOutputType.getTypeFromExtension(extension);
                 if (reportOutputType != null) {
                     outputType.setValue(reportOutputType);
@@ -209,17 +213,6 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
             }
 
             showNotification(getMessage("templateEditor.uploadSuccess"), NotificationType.TRAY);
-        });
-
-        templatePath.setAction(new AbstractAction("report.template") {
-            @Override
-            public void actionPerform(Component component) {
-                if (getItem().getContent() != null) {
-                    ExportDisplay display = AppConfig.createExportDisplay(TemplateEditor.this);
-                    display.show(new ByteArrayDataProvider(getItem().getContent()), getItem().getName(),
-                            ExportFormat.getByExtension(getItem().getExt()));
-                }
-            }
         });
     }
 

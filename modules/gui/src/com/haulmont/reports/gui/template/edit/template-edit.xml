@@ -37,10 +37,7 @@
                         </row>
                         <row>
                             <label id="templateFileLabel" value="msg://template.file" align="MIDDLE_LEFT"/>
-                            <hbox spacing="true" width="${width}" expand="templatePath">
-                                <upload id="uploadTemplate" dropZone="createTemplateFields"/>
-                                <linkButton id="templatePath" align="MIDDLE_LEFT"/>
-                            </hbox>
+                            <upload id="templateUploadField" dropZone="createTemplateFields" width="${width}" showFileName="true"/>
                         </row>
                         <row>
                             <label value="msg://template.outputType" align="MIDDLE_LEFT"/>
