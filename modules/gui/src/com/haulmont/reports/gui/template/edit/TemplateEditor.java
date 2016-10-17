@@ -135,11 +135,13 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
     protected void initUploadField() {
         ReportTemplate reportTemplate = getItem();
         byte[] templateFile = reportTemplate.getContent();
-        templateUploadField.setContentProvider(() ->
-                new ByteArrayInputStream(templateFile));
-        FileDescriptor fileDescriptor = metadata.create(FileDescriptor.class);
-        fileDescriptor.setName(reportTemplate.getName());
-        templateUploadField.setValue(fileDescriptor);
+        if (templateFile != null) {
+            templateUploadField.setContentProvider(() ->
+                    new ByteArrayInputStream(templateFile));
+            FileDescriptor fileDescriptor = metadata.create(FileDescriptor.class);
+            fileDescriptor.setName(reportTemplate.getName());
+            templateUploadField.setValue(fileDescriptor);
+        }
     }
 
     @Override
