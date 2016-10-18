@@ -256,6 +256,10 @@ public class BandDefinitionEditor extends AbstractFrame implements Suggester {
                 refreshViewNames(linkedParameter);
             }
 
+            if ("processTemplate".equals(e.getProperty()) && e.getItem() != null) {
+                applyVisibilityRulesForType(e.getItem().getType());
+            }
+
             @SuppressWarnings("unchecked")
             DatasourceImplementation<DataSet> implementation = (DatasourceImplementation<DataSet>) dataSetsDs;
             implementation.modified(e.getItem());
@@ -347,7 +351,11 @@ public class BandDefinitionEditor extends AbstractFrame implements Suggester {
                     break;
 
                 case JPQL:
-                    dataSetScriptField.setSuggester(this);
+                    if (processTemplate.isChecked()) {
+                        dataSetScriptField.setSuggester(null);
+                    } else {
+                        dataSetScriptField.setSuggester(this);
+                    }
                     dataSetScriptField.setMode(SourceCodeEditor.Mode.Text);
                     break;
 
