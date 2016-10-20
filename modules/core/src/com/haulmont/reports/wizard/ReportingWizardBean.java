@@ -151,6 +151,7 @@ public class ReportingWizardBean implements ReportingWizardApi {
         JpqlQueryBuilder jpqlQueryBuilder = new JpqlQueryBuilder(reportData, reportRegion);
         String query = jpqlQueryBuilder.buildQuery();
         dataSet.setText(query);
+        dataSet.setDataStore(reportData.getDataStore());
     }
 
     protected void createEntityDataSet(ReportData reportData, ReportRegion reportRegion, BandDefinition dataBand,

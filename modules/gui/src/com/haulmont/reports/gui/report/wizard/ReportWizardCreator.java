@@ -6,10 +6,7 @@ package com.haulmont.reports.gui.report.wizard;
 
 import com.google.common.collect.ImmutableMap;
 import com.haulmont.chile.core.model.MetaClass;
-import com.haulmont.cuba.core.global.AppBeans;
-import com.haulmont.cuba.core.global.MessageTools;
-import com.haulmont.cuba.core.global.Metadata;
-import com.haulmont.cuba.core.global.MetadataTools;
+import com.haulmont.cuba.core.global.*;
 import com.haulmont.cuba.gui.WindowManagerProvider;
 import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.components.Action.Status;
@@ -141,6 +138,7 @@ public class ReportWizardCreator extends AbstractWindow implements MainWizardFra
     protected boolean needUpdateEntityModel = false;
 
     protected String query;
+    protected String dataStore;
     protected List<ReportData.Parameter> queryParameters;
     protected int wizardWidth;
     protected int wizardHeight;
@@ -395,6 +393,11 @@ public class ReportWizardCreator extends AbstractWindow implements MainWizardFra
         if (query != null) {
             reportData.setQuery(query);
             reportData.setQueryParameters(queryParameters);
+            MetaClass entityMetaClass = entity.getValue();
+            String storeName = metadataTools.getStoreName(entityMetaClass);
+            if (!Stores.isMain(storeName)) {
+                reportData.setDataStore(storeName);
+            }
         }
 
         Report report = reportWizardService.toReport(reportData, temporary);

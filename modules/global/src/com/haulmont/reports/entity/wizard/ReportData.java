@@ -106,6 +106,9 @@ public class ReportData extends AbstractNotPersistentEntity {
     protected List<Parameter> queryParameters;
 
     @Transient
+    protected String dataStore;
+
+    @Transient
     protected TemplateFileType templateFileType;
 
     @Transient
@@ -214,6 +217,14 @@ public class ReportData extends AbstractNotPersistentEntity {
 
     public void setQuery(String query) {
         this.query = query;
+    }
+
+    public String getDataStore() {
+        return dataStore;
+    }
+
+    public void setDataStore(String dataStore) {
+        this.dataStore = dataStore;
     }
 
     public List<Parameter> getQueryParameters() {
