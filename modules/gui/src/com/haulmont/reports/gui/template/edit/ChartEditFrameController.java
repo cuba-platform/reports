@@ -115,7 +115,8 @@ public class ChartEditFrameController extends AbstractFrame {
         previewBox.removeAll();
         parent.getDialogOptions()
                 .setWidth(1280)
-                .setResizable(true);
+                .setResizable(true)
+                .center();
         previewChart(previewBox);
         return previewBox;
     }
@@ -128,7 +129,8 @@ public class ChartEditFrameController extends AbstractFrame {
         parent.getDialogOptions()
                 .setWidthAuto()
                 .setHeightAuto()
-                .setResizable(false);
+                .setResizable(false)
+                .center();
     }
 
     @Nullable
