@@ -102,9 +102,13 @@ public class ReportingBean implements ReportingApi {
                 }
             }
 
-            Report existingReport = em.find(Report.class, report.getId(), View.MINIMAL);
+            Report existingReport = em.find(Report.class, report.getId(), "report.withTemplates");
+            List<ReportTemplate> existingTemplates = null;
             if (existingReport != null) {
                 report.setVersion(existingReport.getVersion());
+                if (existingReport.getTemplates() != null) {
+                    existingTemplates = existingReport.getTemplates();
+                }
             } else {
                 report.setVersion(0);
             }
@@ -114,6 +118,14 @@ public class ReportingBean implements ReportingApi {
             report = em.merge(report);
 
             if (loadedTemplates != null) {
+                if (existingTemplates != null) {
+                    for (ReportTemplate template : existingTemplates) {
+                        if (!loadedTemplates.contains(template)) {
+                            em.remove(template);
+                        }
+                    }
+                }
+
                 for (ReportTemplate loadedTemplate : loadedTemplates) {
                     ReportTemplate existingTemplate = em.find(ReportTemplate.class, loadedTemplate.getId());
                     if (existingTemplate != null) {

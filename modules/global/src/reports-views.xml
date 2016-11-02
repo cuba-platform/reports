@@ -29,4 +29,7 @@
         <property name="group" view="_minimal"/>
     </view>
 
+    <view entity="report$Report" name="report.withTemplates" extends="_minimal">
+        <property name="templates" view="_minimal"/>
+    </view>
 </views>
