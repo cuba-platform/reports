@@ -3,13 +3,6 @@
  * Use is subject to license terms, see http://www.cuba-platform.com/commercial-software-license for details.
  */
 
-allprojects {
-    configurations.all {
-        resolutionStrategy.cacheDynamicVersionsFor 1, 'minutes'
-        resolutionStrategy.cacheChangingModulesFor 1, 'minutes'
-    }
-}
-
 buildscript {
     ext.cubaVersion = '6.4-SNAPSHOT'
     ext.cubaVersion = rootProject.hasProperty('buildVersion') ? rootProject['buildVersion'] : cubaVersion
@@ -56,14 +49,6 @@ def guiModule = project(':reports-gui')
 def webModule = project(':reports-web')
 def desktopModule = project(':reports-desktop')
 
-apply from: "$rootProject.projectDir/lib.gradle"
-
-def servletApi = 'org.apache.tomcat:tomcat-servlet-api:8.0.26'
-def postgres = 'org.postgresql:postgresql:9.4-1201-jdbc41'
-
-def groovyArtifact = 'org.codehaus.groovy:groovy-all:2.4.4'
-def asm = [group: 'asm', name: 'asm', version: '3.2']
-
 def baseVersion = cuba.artifact.version + (cuba.artifact.isSnapshot ? '-SNAPSHOT' : '')
 
 configure([globalModule, coreModule, guiModule, webModule, desktopModule]) {
@@ -75,9 +60,9 @@ configure([globalModule, coreModule, guiModule, webModule, desktopModule]) {
 
     dependencies {
         compile(group: 'com.haulmont.cuba', name: 'cuba-global', version: baseVersion)
-        testCompile('org.jmockit:jmockit:1.15')
-        testCompile('junit:junit:4.12')
-        testCompile('org.hsqldb:hsqldb:2.3.3')
+        testCompile(bom['org.jmockit:jmockit'])
+        testCompile(bom['junit:junit'])
+        testCompile(bom['org.hsqldb:hsqldb'])
     }
 
     task sourceJar(type: Jar) {
@@ -116,8 +101,8 @@ configure(globalModule) {
     task enhance(type: CubaEnhancing)
 
     dependencies {
-		compile(group: 'com.google.code.gson', name: 'gson', version: '2.2.4')
-		compile(yargApi) {
+		compile(bom['com.google.code.gson:gson'])
+		compile(bom['com.haulmont.yarg:yarg-api']) {
             exclude group: 'org.codehaus.groovy', module: 'groovy-all'
         }
     }
@@ -149,7 +134,7 @@ configure(coreModule) {
     dependencies {
         compile(globalModule)
         compile(group: 'com.haulmont.cuba', name: 'cuba-core', version: baseVersion)
-		compile(yarg) {
+		compile(bom['com.haulmont.yarg:yarg']) {
             exclude group: 'org.codehaus.groovy', module: 'groovy-all'
             exclude group: 'org.slf4j', module: 'slf4j-log4j12'
             exclude group: 'log4j', module: 'log4j'
@@ -157,17 +142,17 @@ configure(coreModule) {
         }
 		
         testCompile(group: 'com.haulmont.cuba', name: 'cuba-core-tests', version: baseVersion)
-        testCompile('org.apache.commons:commons-dbcp2:2.1.1')
-        provided(servletApi)
-        jdbc(postgres)
+        testCompile(bom['org.apache.commons:commons-dbcp2'])
+        provided(bom['org.apache.tomcat:tomcat-servlet-api'])
+        jdbc(bom['org.postgresql:postgresql'])
 
         dbscripts(group: 'com.haulmont.cuba', name: 'cuba-core', version: baseVersion, classifier: 'db', ext: 'zip')
 
-        testRuntime postgres
-        testRuntime servletApi
+        testRuntime(bom['org.postgresql:postgresql'])
+        testRuntime(bom['org.apache.tomcat:tomcat-servlet-api'])
 
-        compile groovyArtifact
-        compile asm
+        compile(bom['org.codehaus.groovy:groovy-all'])
+        compile(bom['asm:asm'])
     }
     
     test {
@@ -175,7 +160,9 @@ configure(coreModule) {
         includes = ['**/*Test.class']
     }
 
-    assembleDbScripts { moduleAlias = '20-reports' }
+    assembleDbScripts {
+        moduleAlias = '20-reports'
+    }
 
     dbScriptsArchive {
         exclude '10-cuba/**'
@@ -193,7 +180,7 @@ configure(guiModule) {
     dependencies {
         compile(globalModule)
         compile(group: 'com.haulmont.cuba', name: 'cuba-gui', version: baseVersion)
-        provided(servletApi)
+        provided(bom['org.apache.tomcat:tomcat-servlet-api'])
     }
 }
 
@@ -217,14 +204,4 @@ configure(desktopModule) {
         compile(guiModule)
         compile(group: 'com.haulmont.cuba', name: 'cuba-desktop', version: baseVersion)
     }
-}
-
-task restart(dependsOn: ['stop', ':reports-core:deploy', ':reports-web:deploy'],
-        description: 'Redeploys applications and restarts local Tomcat') << {
-    ant.waitfor(maxwait: 6, maxwaitunit: 'second', checkevery: 2, checkeveryunit: 'second') {
-        not {
-            socket(server: 'localhost', port: '8787')
-        }
-    }
-    start.execute()
 }
