@@ -225,7 +225,7 @@ public class DetailsStepFrame extends StepFrame {
                     filterEntity.setXml(filterParser.getXml(filterEditor.getConditions(), Param.ValueProperty.DEFAULT_VALUE));
                     if (filterEntity.getXml() != null) {
                         Element element = Dom4j.readDocument(filterEntity.getXml()).getRootElement();
-                        QueryFilter queryFilter = new QueryFilter(element, filter.getDatasource().getMetaClass().getName());
+                        QueryFilter queryFilter = new QueryFilter(element);
                         conditionsTree = filterEditor.getConditionsTree();
                         filter = filterEditor.getFilter();
                         wizard.query = collectQuery(queryFilter);
