@@ -195,7 +195,7 @@ public class ParameterFieldCreator {
             TokenList tokenList = componentsFactory.createComponent(TokenList.class);
             MetaClass entityMetaClass = metadata.getClassNN(parameter.getEntityMetaClass());
 
-            DsBuilder builder = new DsBuilder(frame.getDsContext());
+            DsBuilder builder = DsBuilder.create(frame.getDsContext());
             CollectionDatasource cds = builder
                     .setRefreshMode(RefreshMode.NEVER)
                     .setId("entities_" + parameter.getAlias())
