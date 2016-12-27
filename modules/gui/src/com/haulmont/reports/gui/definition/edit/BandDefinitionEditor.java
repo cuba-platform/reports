@@ -265,6 +265,8 @@ public class BandDefinitionEditor extends AbstractFrame implements Suggester {
             implementation.modified(e.getItem());
         });
 
+        dataSetScriptField.resetEditHistory();
+
         hideAllDataSetEditComponents();
     }
 
