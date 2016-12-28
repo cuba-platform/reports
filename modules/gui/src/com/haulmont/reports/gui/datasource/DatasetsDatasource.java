@@ -18,7 +18,7 @@ public class DatasetsDatasource extends CollectionPropertyDatasourceImpl<DataSet
     public void committed(Set<Entity> entities) {
         if (!State.VALID.equals(masterDs.getState()))
             return;
-        Collection<DataSet> collection = __getCollection();
+        Collection<DataSet> collection = getCollection();
         if (collection != null) {
             for (Entity entity : entities) {
                 if (entity instanceof Report) {

@@ -16,7 +16,7 @@ public class BandsHierarchicalPropertyDatasource<T extends Entity<K>, K> extends
     public void committed(Set<Entity> entities) {
         super.committed(entities);
         if (State.VALID.equals(masterDs.getState())) {
-            Collection<T> collection = __getCollection();
+            Collection<T> collection = getCollection();
             if (item != null && collection != null) {
                 for (T entity : collection) {
                     if (entity.equals(item)) {
