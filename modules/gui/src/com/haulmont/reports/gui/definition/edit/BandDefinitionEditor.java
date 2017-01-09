@@ -244,6 +244,8 @@ public class BandDefinitionEditor extends AbstractFrame implements Suggester {
                     linkedParameter = findParameterByAlias(e.getItem().getListEntitiesParamName());
                     refreshViewNames(linkedParameter);
                 }
+
+                dataSetScriptField.resetEditHistory();
             } else {
                 hideAllDataSetEditComponents();
             }
