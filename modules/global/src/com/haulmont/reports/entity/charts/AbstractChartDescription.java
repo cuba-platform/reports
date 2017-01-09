@@ -12,12 +12,12 @@ import com.haulmont.bali.util.Preconditions;
 import com.haulmont.chile.core.annotations.MetaClass;
 import com.haulmont.chile.core.annotations.MetaProperty;
 import com.haulmont.cuba.core.entity.AbstractNotPersistentEntity;
-import com.haulmont.reports.entity.ReportOutputType;
+import com.haulmont.cuba.core.entity.annotation.SystemLevel;
 
 import javax.annotation.Nullable;
-import javax.persistence.MappedSuperclass;
 
-@MappedSuperclass
+@MetaClass(name = "report$AbstractChartDescription")
+@SystemLevel
 public abstract class AbstractChartDescription extends AbstractNotPersistentEntity {
     @MetaProperty
     protected final String type;

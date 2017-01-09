@@ -4,6 +4,7 @@
  */
 package com.haulmont.reports.entity;
 
+import com.haulmont.chile.core.annotations.MetaClass;
 import com.haulmont.cuba.core.entity.BaseUuidEntity;
 import com.haulmont.cuba.core.entity.Creatable;
 import com.haulmont.cuba.core.entity.Updatable;
@@ -18,6 +19,7 @@ import java.util.Date;
  * Optimistically locked, implements Updatable.
  */
 @MappedSuperclass
+@MetaClass(name = "report$BaseReportEntity")
 public class BaseReportEntity extends BaseUuidEntity implements Versioned, Creatable, Updatable {
     private static final long serialVersionUID = -7868980589172607336L;
 
