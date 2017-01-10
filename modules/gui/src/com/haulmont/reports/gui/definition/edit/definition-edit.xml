@@ -61,7 +61,7 @@
                                    datasource="dataSetsDs"
                                    property="linkParameterName"
                                    caption="msg://dataSet.linkParameterName"/>
-                        <textField id="dataStore" width="${width}"
+                        <lookupField id="dataStore" width="${width}"
                                    datasource="dataSetsDs"
                                    property="dataStore"
                                    caption="msg://dataSet.dataStore"/>

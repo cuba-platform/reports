@@ -6,6 +6,7 @@ package com.haulmont.reports.gui.definition.edit;
 
 import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.cuba.core.global.Metadata;
+import com.haulmont.cuba.core.global.Stores;
 import com.haulmont.cuba.core.global.View;
 import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.components.actions.RemoveAction;
@@ -66,7 +67,7 @@ public class BandDefinitionEditor extends AbstractFrame implements Suggester {
     @Inject
     protected LookupField entityParamLookup;
     @Inject
-    protected TextField dataStore;
+    protected LookupField dataStore;
     @Inject
     protected CheckBox processTemplate;
     @Inject
@@ -136,6 +137,18 @@ public class BandDefinitionEditor extends AbstractFrame implements Suggester {
         initCompanion();
 
         initActions();
+
+        initDataStoreField();
+
+    }
+
+    protected void initDataStoreField() {
+        Map<String, Object> all = new HashMap<>();
+        all.put(getMessage("dataSet.dataStoreMain"), Stores.MAIN);
+        for (String additional : Stores.getAdditional()) {
+            all.put(additional, additional);
+        }
+        dataStore.setOptionsMap(all);
     }
 
     protected void initCompanion() {
