@@ -80,7 +80,7 @@ public class ReportBrowser extends AbstractLookup {
                 Report report = (Report) target.getSingleSelected();
                 if (report != null) {
                     reportService.copyReport(report);
-                    target.refresh();
+                    target.getDatasource().refresh();
                 } else {
                     showNotification(getMessage("notification.selectReport"), NotificationType.HUMANIZED);
                 }
