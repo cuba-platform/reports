@@ -58,6 +58,12 @@ public class ReportInputParameter extends AbstractNotPersistentEntity implements
     @MetaProperty
     protected String parameterClassName;
 
+    @MetaProperty
+    protected String transformationScript;
+
+    @MetaProperty
+    protected Integer predefinedTransformation;
+
     @Transient
     protected String localeName;
 
@@ -194,5 +200,21 @@ public class ReportInputParameter extends AbstractNotPersistentEntity implements
 
     public void setDefaultValue(String defaultValue) {
         this.defaultValue = defaultValue;
+    }
+
+    public String getTransformationScript() {
+        return transformationScript;
+    }
+
+    public void setTransformationScript(String transformationScript) {
+        this.transformationScript = transformationScript;
+    }
+
+    public PredefinedTransformation getPredefinedTransformation() {
+        return predefinedTransformation != null ? PredefinedTransformation.fromId(predefinedTransformation) : null;
+    }
+
+    public void setPredefinedTransformation(PredefinedTransformation predefinedTransformation) {
+        this.predefinedTransformation = predefinedTransformation != null ? predefinedTransformation.getId() : null;
     }
 }

@@ -10,10 +10,7 @@ import com.haulmont.chile.core.annotations.MetaClass;
 import com.haulmont.chile.core.annotations.MetaProperty;
 import com.haulmont.cuba.core.entity.AbstractNotPersistentEntity;
 import com.haulmont.cuba.core.entity.annotation.SystemLevel;
-import com.haulmont.reports.entity.ParameterType;
-import com.haulmont.reports.entity.Report;
-import com.haulmont.reports.entity.ReportGroup;
-import com.haulmont.reports.entity.ReportOutputType;
+import com.haulmont.reports.entity.*;
 import com.haulmont.reports.entity.charts.ChartType;
 
 import javax.persistence.OneToMany;
@@ -30,12 +27,18 @@ public class ReportData extends AbstractNotPersistentEntity {
         public final Class javaClass;
         public final ParameterType parameterType;
         public final String defaultValue;
+        public final PredefinedTransformation predefinedTransformation;
 
         public Parameter(String name, Class javaClass, ParameterType parameterType, String defaultValue) {
+            this(name, javaClass, parameterType, defaultValue, null);
+        }
+
+        public Parameter(String name, Class javaClass, ParameterType parameterType, String defaultValue, PredefinedTransformation transformation) {
             this.name = name;
             this.javaClass = javaClass;
             this.parameterType = parameterType;
             this.defaultValue = defaultValue;
+            this.predefinedTransformation = transformation;
         }
     }
 

@@ -16,6 +16,7 @@ import com.haulmont.reports.entity.ParameterType;
 import com.haulmont.reports.entity.ReportInputParameter;
 import com.haulmont.reports.gui.report.run.ParameterClassResolver;
 import com.haulmont.reports.gui.report.run.ParameterFieldCreator;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.apache.commons.lang.StringUtils;
 
 import javax.inject.Inject;
@@ -23,7 +24,7 @@ import java.util.*;
 
 public class ParameterEditor extends AbstractEditor {
     @Inject
-    private Label defaultValueLabel;
+    protected Label defaultValueLabel;
 
     @Inject
     protected BoxLayout defaultValueBox;
@@ -35,19 +36,37 @@ public class ParameterEditor extends AbstractEditor {
     protected LookupField enumeration;
 
     @Inject
-    private LookupField type;
+    protected LookupField type;
 
     @Inject
     protected LookupField metaClass;
 
     @Inject
-    private Label enumerationLabel;
+    protected Label enumerationLabel;
 
     @Inject
-    private Label screenLabel;
+    protected Label screenLabel;
 
     @Inject
-    private Label metaClassLabel;
+    protected Label metaClassLabel;
+
+    @Inject
+    protected GridLayout predefinedTransformationBox;
+
+    @Inject
+    protected CheckBox predefinedTransformation;
+
+    @Inject
+    protected SourceCodeEditor transformationScript;
+
+    @Inject
+    protected Label transformationScriptLabel;
+
+    @Inject
+    protected LookupField wildcards;
+
+    @Inject
+    protected Label wildcardsLabel;
 
     @Inject
     protected Metadata metadata;
@@ -80,6 +99,7 @@ public class ParameterEditor extends AbstractEditor {
         parameter = (ReportInputParameter) getItem();
         enableControlsByParamType(parameter.getType());
         initScreensLookup();
+        initTransformations();
     }
 
     @Override
@@ -189,6 +209,7 @@ public class ParameterEditor extends AbstractEditor {
     protected void enableControlsByParamType(ParameterType type) {
         boolean isEntity = type == ParameterType.ENTITY || type == ParameterType.ENTITY_LIST;
         boolean isEnum = type == ParameterType.ENUMERATION;
+        boolean isText = type == ParameterType.TEXT;
 
         metaClass.setVisible(isEntity);
         metaClassLabel.setVisible(isEntity);
@@ -199,6 +220,29 @@ public class ParameterEditor extends AbstractEditor {
         enumeration.setVisible(isEnum);
         enumerationLabel.setVisible(isEnum);
 
+        predefinedTransformationBox.setVisible(isText);
+
         initDefaultValueField();
+    }
+
+    protected void initTransformations() {
+        predefinedTransformation.setValue(parameter.getPredefinedTransformation() != null);
+        enableControlsByTransformationType(parameter.getPredefinedTransformation() != null);
+        predefinedTransformation.addValueChangeListener(e -> {
+            boolean hasPredefinedTransformation = e.getValue() != null && (Boolean)e.getValue() ;
+            enableControlsByTransformationType(hasPredefinedTransformation);
+            if (hasPredefinedTransformation) {
+                parameter.setTransformationScript(null);
+            } else {
+                parameter.setPredefinedTransformation(null);
+            }
+        });
+    }
+
+    protected void enableControlsByTransformationType(boolean hasPredefinedTransformation) {
+        transformationScript.setVisible(!hasPredefinedTransformation);
+        transformationScriptLabel.setVisible(!hasPredefinedTransformation);
+        wildcards.setVisible(hasPredefinedTransformation);
+        wildcardsLabel.setVisible(hasPredefinedTransformation);
     }
 }

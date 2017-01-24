@@ -10,8 +10,7 @@ import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.MessageTools;
 import com.haulmont.cuba.core.global.Messages;
-import com.haulmont.cuba.core.global.filter.ParameterInfo;
-import com.haulmont.cuba.core.global.filter.QueryFilter;
+import com.haulmont.cuba.core.global.filter.*;
 import com.haulmont.cuba.gui.WindowManager.OpenType;
 import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.components.Action.Status;
@@ -26,6 +25,7 @@ import com.haulmont.cuba.gui.config.WindowConfig;
 import com.haulmont.cuba.gui.config.WindowInfo;
 import com.haulmont.cuba.security.entity.FilterEntity;
 import com.haulmont.reports.entity.ParameterType;
+import com.haulmont.reports.entity.PredefinedTransformation;
 import com.haulmont.reports.entity.wizard.ReportData;
 import com.haulmont.reports.entity.wizard.TemplateFileType;
 import com.haulmont.reports.gui.report.run.ParameterClassResolver;
@@ -243,6 +243,7 @@ public class DetailsStepFrame extends StepFrame {
                     List<ReportData.Parameter> newParametersList = new ArrayList<>();
                     int i = 1;
                     for (ParameterInfo parameterInfo : queryFilter.getParameters()) {
+                        Condition condition = findConditionByParameter(queryFilter.getRoot(), parameterInfo);
                         String conditionName = parameterInfo.getConditionName();
                         if (conditionName == null) {
                             conditionName = "parameter";
@@ -264,7 +265,8 @@ public class DetailsStepFrame extends StepFrame {
                                 parameterName,
                                 parameterClass,
                                 parameterType,
-                                parameterValue));
+                                parameterValue,
+                                resolveParameterTransformation(condition)));
 
                         wizard.query = wizard.query.replace(":" + parameterInfo.getName(), "${" + parameterName + "}");
                     }
@@ -278,6 +280,36 @@ public class DetailsStepFrame extends StepFrame {
                         params.put(parameter.getName(), "___");
                     }
                     return queryFilter.processQuery(filter.getDatasource().getQuery(), params);
+                }
+
+                protected Condition findConditionByParameter(Condition condition, ParameterInfo parameterInfo) {
+                    if (!(condition instanceof LogicalCondition)) {
+                        Set<ParameterInfo> parameters = condition.getParameters();
+                        if (parameters != null && parameters.contains(parameterInfo)) {
+                            return condition;
+                        }
+                    }
+                    if (condition.getConditions() != null) {
+                        for (Condition it: condition.getConditions()) {
+                            return findConditionByParameter(it, parameterInfo);
+                        }
+                    }
+                    return null;
+                }
+
+                protected PredefinedTransformation resolveParameterTransformation(Condition condition) {
+                    if (condition instanceof Clause) {
+                        Clause clause = (Clause) condition;
+                        switch (clause.getOperator()) {
+                            case STARTS_WITH:
+                                return PredefinedTransformation.STARTS_WITH;
+                            case ENDS_WITH:
+                                return PredefinedTransformation.ENDS_WITH;
+                            case CONTAINS:
+                                return PredefinedTransformation.CONTAINS;
+                        }
+                    }
+                    return null;
                 }
             });
         }

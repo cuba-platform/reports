@@ -116,6 +116,7 @@ public class ReportingWizardBean implements ReportingWizardApi {
                 parameter.setType(queryParameter.parameterType);
                 parameter.setParameterClass(queryParameter.javaClass);
                 parameter.setDefaultValue(queryParameter.defaultValue);
+                parameter.setPredefinedTransformation(queryParameter.predefinedTransformation);
 
                 if (queryParameter.parameterType == ParameterType.ENTITY
                         || queryParameter.parameterType == ParameterType.ENTITY_LIST) {
@@ -139,8 +140,8 @@ public class ReportingWizardBean implements ReportingWizardApi {
         report.setIsTmp(isTmp);
         report.setReportType(ReportType.SIMPLE);
         report.setGroup(reportData.getGroup());
-        report.setBands(new LinkedHashSet<BandDefinition>(reportData.getReportRegions().size() + 1)); //plus rootBand);
-        report.setValuesFormats(new ArrayList<ReportValueFormat>());
+        report.setBands(new LinkedHashSet<>(reportData.getReportRegions().size() + 1)); //plus rootBand);
+        report.setValuesFormats(new ArrayList<>());
         return report;
     }
 

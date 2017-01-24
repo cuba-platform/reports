@@ -74,6 +74,24 @@
                 <textArea id="localeTextField" datasource="parameterDs" property="localeNames"
                           width="100%" height="240px"/>
             </tab>
+            <tab id="processParamTab" caption="msg://parameters.transformationTab" margin="true;false;false;false" spacing="true">
+                <grid id="predefinedTransformationBox" spacing="true">
+                    <columns count="2"/>
+                    <rows>
+                        <row>
+                            <label value="msg://parameters.predefinedTransformation" align="MIDDLE_LEFT"/>
+                            <checkBox id="predefinedTransformation"/>
+                        </row>
+                        <row>
+                            <label id="wildcardsLabel" value="msg://parameters.wildcards" align="MIDDLE_LEFT"/>
+                            <lookupField id="wildcards" datasource="parameterDs" property="predefinedTransformation" width="200px"/>
+                        </row>
+                    </rows>
+                </grid>
+                <label id="transformationScriptLabel" value="msg://parameters.groovyScript"/>
+                <sourceCodeEditor id="transformationScript" datasource="parameterDs" property="transformationScript"
+                                  mode="Groovy" width="100%" height="240px"/>
+            </tab>
         </tabSheet>
         <frame id="windowActions" screen="editWindowActions"/>
     </layout>
