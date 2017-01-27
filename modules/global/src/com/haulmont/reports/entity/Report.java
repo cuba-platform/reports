@@ -19,8 +19,8 @@ import javax.persistence.*;
 import java.util.*;
 
 /**
- * <Attention>This entity should be detached for correct work. If you do not detach it please use logic as in com.haulmont.reports.listener.ReportDetachListener#onBeforeDetach(com.haulmont.reports.entity.Report, com.haulmont.cuba.core.EntityManager)</Attention>
- *
+ * Attention! This entity should be detached for correct work. If you do not detach it please use logic as in
+ * com.haulmont.reports.listener.ReportDetachListener#onBeforeDetach(com.haulmont.reports.entity.Report, com.haulmont.cuba.core.EntityManager)
  */
 @Entity(name = "report$Report")
 @Table(name = "REPORT_REPORT")

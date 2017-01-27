@@ -147,7 +147,7 @@ public class ReportImportExport implements ReportImportExportAPI, ReportImportEx
     }
 
     /**
-     * Exports single report to ZIP archive with name <report name>.zip.
+     * Exports single report to ZIP archive with name {@code <report name>.zip}.
      * There are 2 files in archive: report.structure and a template file (odt, xls or other..)
      *
      * @param report Report object that must be exported.

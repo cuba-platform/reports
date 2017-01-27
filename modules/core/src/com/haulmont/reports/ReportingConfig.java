@@ -78,7 +78,7 @@ public interface ReportingConfig extends Config {
 
     /**
      * Return entities that will not be available for report wizard.
-     * Note that if <code>reporting.wizardEntitiesWhiteList</code> is not empty, this list will be ignored
+     * Note that if {@code reporting.wizardEntitiesWhiteList} is not empty, this list will be ignored
      *
      * @return list of ignored entities
      */
@@ -91,7 +91,7 @@ public interface ReportingConfig extends Config {
 
     /**
      * Entities that will be available for report wizard. All others entities will be ignored.
-     * Note that even if <code>cuba.reporting.wizardEntitiesBlackList</code> is not empty, this list will be used anyway.
+     * Note that even if {@code cuba.reporting.wizardEntitiesBlackList} is not empty, this list will be used anyway.
      *
      * @return list of entities that available for reportWizard
      */
@@ -103,10 +103,10 @@ public interface ReportingConfig extends Config {
     void setWizardEntitiesWhiteList(String wizardEntitiesWhiteList);
 
     /**
-     * Entity properties that will not be available for report creation wizard. Format is like <code>BaseUuidEntity.id,BaseUuidEntity.createTs,ref$Car.id,...</code><br/>
-     * Properties support inheritance, i.e. <code>BaseUuidEntity.id</code> will filter that field for all descendants, e.g. <code>ref$Car</code>.
-     * To allow selection of a field for a concrete descendant (e.g. <code>ref$Car</code>), use
-     * <code>reporting.wizardPropertiesExcludedBlackList</code> setting with value <code>ref$Car.id</code>.
+     * Entity properties that will not be available for report creation wizard. Format is like {@code BaseUuidEntity.id,BaseUuidEntity.createTs,ref$Car.id,...}<br>
+     * Properties support inheritance, i.e. {@code BaseUuidEntity.id} will filter that field for all descendants, e.g. {@code ref$Car}.
+     * To allow selection of a field for a concrete descendant (e.g. {@code ref$Car}), use
+     * {@code reporting.wizardPropertiesExcludedBlackList} setting with value {@code ref$Car.id}.
      *
      * @return blacklisted properties that is not available
      */
@@ -119,7 +119,7 @@ public interface ReportingConfig extends Config {
     void setWizardPropertiesBlackList(List<String> wizardPropertiesBlackList);
 
     /**
-     * Entity properties that will not to be excluded by <code>reporting.wizardPropertiesBlackList</code> setting
+     * Entity properties that will not to be excluded by {@code reporting.wizardPropertiesBlackList} setting
      * @see com.haulmont.reports.ReportingConfig#getWizardPropertiesBlackList()
      */
     @Property("reporting.wizardPropertiesExcludedBlackList")

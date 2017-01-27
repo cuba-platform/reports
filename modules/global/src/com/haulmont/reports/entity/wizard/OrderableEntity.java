@@ -11,11 +11,8 @@ import java.util.UUID;
 
 /**
  * Interface to be implemented by some entities that order display can be changed in UI.
- * That order might to be set by {@link  com.haulmont.reports.gui.components.actions.OrderableItemMoveAction}
- *
+ * That order might to be set by com.haulmont.reports.gui.components.actions.OrderableItemMoveAction
  */
-
-
 public interface OrderableEntity extends Entity<UUID> {
     Long getOrderNum();
 
