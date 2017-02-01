@@ -35,6 +35,9 @@ create table REPORT_REPORT
   REPORT_TYPE integer,
   DEFAULT_TEMPLATE_ID varchar(36),
   XML longvarchar,
+  ROLES_IDX varchar(1000),
+  SCREENS_IDX varchar(1000),
+  INPUT_ENTITY_TYPES_IDX varchar(1000),
 
   primary key (ID),
   constraint FK_REPORT_REPORT_TO_REPORT_GROUP foreign key (GROUP_ID)

@@ -20,7 +20,6 @@ import com.haulmont.cuba.gui.executors.TaskLifeCycle;
 import com.haulmont.cuba.gui.export.ByteArrayDataProvider;
 import com.haulmont.cuba.gui.export.ExportDisplay;
 import com.haulmont.cuba.gui.export.ExportFormat;
-import com.haulmont.cuba.security.entity.Role;
 import com.haulmont.cuba.security.entity.RoleType;
 import com.haulmont.cuba.security.entity.User;
 import com.haulmont.cuba.security.entity.UserRole;
@@ -67,6 +66,9 @@ public class ReportGuiManager {
 
     @Inject
     protected WindowConfig windowConfig;
+
+    @Inject
+    protected QueryTransformerFactory queryTransformerFactory;
 
     /**
      * Open input parameters dialog if report has parameters otherwise print report
@@ -280,26 +282,18 @@ public class ReportGuiManager {
      * @param inputValueMetaClass - meta class of report input parameter
      */
     public List<Report> getAvailableReports(@Nullable String screenId, @Nullable User user, @Nullable MetaClass inputValueMetaClass) {
-        LoadContext<Report> lContext = new LoadContext<>(Report.class);
-        lContext.setLoadDynamicAttributes(true);
-        lContext.setView(new View(Report.class)
+        LoadContext<Report> lc = new LoadContext<>(Report.class);
+        lc.setLoadDynamicAttributes(true);
+        lc.setView(new View(Report.class)
                 .addProperty("name")
                 .addProperty("localeNames")
-                .addProperty("xml")
                 .addProperty("description")
                 .addProperty("code")
                 .addProperty("group", metadata.getViewRepository().getView(ReportGroup.class, View.LOCAL)));
-        if (inputValueMetaClass != null) {//select only reports having entity parameter
-            lContext.setQueryString("select r from report$Report r where r.xml like :paramMask");
-            lContext.getQuery().setParameter("paramMask", "%entityMetaClass%");
-        } else {
-            lContext.setQueryString("select r from report$Report r");
-        }
-
-        List<Report> reports = dataService.loadList(lContext);
-        reports = filterReportsByEntityParameters(inputValueMetaClass, reports);
-        reports = applySecurityPolicies(screenId, user, reports);
-        return reports;
+        lc.setQueryString("select r from report$Report r");
+        applySecurityPolicies(lc, screenId, user);
+        filterReportsByEntityParameters(lc, inputValueMetaClass);
+        return dataService.loadList(lc);
     }
 
     /**
@@ -422,33 +416,49 @@ public class ReportGuiManager {
     }
 
     /**
-     * Return reports which have input parameter with class matching inputValueMetaClass
+     * Apply constraints for query to select reports which have input parameter with class matching inputValueMetaClass
      */
-    protected List<Report> filterReportsByEntityParameters(@Nullable MetaClass inputValueMetaClass, List<Report> reports) {
-        if (inputValueMetaClass == null) {
-            return reports;
-        }
-
-        List<Report> reportsForEntity = new ArrayList<>();
-        for (Report report : reports) {
-            for (ReportInputParameter parameter : report.getInputParameters()) {
-                if (parameterMatchesMetaClass(parameter, inputValueMetaClass)) {
-                    reportsForEntity.add(report);
-                    break;
-                }
+    protected void filterReportsByEntityParameters(LoadContext lc, @Nullable MetaClass inputValueMetaClass) {
+        if (inputValueMetaClass != null) {
+            QueryTransformer transformer = queryTransformerFactory.transformer(lc.getQuery().getQueryString());
+            StringBuilder parameterTypeCondition = new StringBuilder("r.inputEntityTypesIdx like :type escape '\\'");
+            lc.getQuery().setParameter("type", wrapIdxParameterForSearch(inputValueMetaClass.getName()));
+            List<MetaClass> ancestors = inputValueMetaClass.getAncestors();
+            for (int i = 0; i < ancestors.size(); i++) {
+                MetaClass metaClass = ancestors.get(i);
+                String paramName = "type" + (i + 1);
+                parameterTypeCondition.append(" or r.inputEntityTypesIdx like :").append(paramName).append(" escape '\\'");
+                lc.getQuery().setParameter(paramName, wrapIdxParameterForSearch(metaClass.getName()));
             }
+            transformer.addWhereAsIs(String.format("(%s)", parameterTypeCondition.toString()));
+            lc.getQuery().setQueryString(transformer.getResult());
         }
-
-        return reportsForEntity;
     }
 
     /**
-     * Return reports available by roles and screen restrictions
+     * Apply security constraints for query to select reports available by roles and screen restrictions
      */
-    protected List<Report> applySecurityPolicies(@Nullable String screen, @Nullable User user, List<Report> reports) {
-        List<Report> filter = checkRoles(user, reports);
-        filter = checkScreens(screen, filter);
-        return filter;
+    protected void applySecurityPolicies(LoadContext lc, @Nullable String screen, @Nullable User user) {
+        QueryTransformer transformer = queryTransformerFactory.transformer(lc.getQuery().getQueryString());
+        if (screen != null) {
+            transformer.addWhereAsIs("r.screensIdx is null or r.screensIdx like :screen escape '\\'");
+            lc.getQuery().setParameter("screen", wrapIdxParameterForSearch(screen));
+        }
+        if (user != null) {
+            List<UserRole> userRoles = user.getUserRoles();
+            boolean superRole = userRoles.stream().anyMatch(userRole -> userRole.getRole().getType() == RoleType.SUPER);
+            if (!superRole) {
+                StringBuilder roleCondition = new StringBuilder("r.rolesIdx is null");
+                for (int i = 0; i < userRoles.size(); i++) {
+                    UserRole ur = userRoles.get(i);
+                    String paramName = "role" + (i + 1);
+                    roleCondition.append(" or r.rolesIdx like :").append(paramName).append(" escape '\\'");
+                    lc.getQuery().setParameter(paramName, wrapIdxParameterForSearch(ur.getRole().getId().toString()));
+                }
+                transformer.addWhereAsIs(roleCondition.toString());
+            }
+        }
+        lc.getQuery().setQueryString(transformer.getResult());
     }
 
     protected void openReportParamsDialog(Frame window, Report report, @Nullable Map<String, Object> parameters,
@@ -460,56 +470,6 @@ public class ReportGuiManager {
                 OUTPUT_FILE_NAME_PARAMETER, outputFileName
         );
         window.openWindow("report$inputParameters", OpenType.DIALOG, params);
-    }
-
-    protected List<Report> checkRoles(@Nullable User user, List<Report> reports) {
-        if (user != null) {
-            List<Report> filter = new ArrayList<>();
-            for (Report report : reports) {
-                Set<Role> reportRoles = report.getRoles();
-                if (reportRoles == null || reportRoles.size() == 0) {
-                    filter.add(report);
-                } else {
-                    List<UserRole> userRoles = user.getUserRoles();
-                    userRoles.stream().filter(userRole -> {
-                        //noinspection CodeBlock2Expr
-                        return reportRoles.contains(userRole.getRole())
-                                || userRole.getRole().getType() == RoleType.SUPER;
-
-                    }).findFirst().ifPresent(userRole -> {
-                        //noinspection CodeBlock2Expr
-                        filter.add(report);
-                    });
-                }
-            }
-            return filter;
-        } else {
-            return reports;
-        }
-    }
-
-    protected List<Report> checkScreens(@Nullable final String screen, List<Report> reports) {
-        if (screen != null) {
-            List<Report> filter = new ArrayList<>();
-            for (Report report : reports) {
-                List<ReportScreen> reportScreens = report.getReportScreens();
-                if (reportScreens == null || reportScreens.size() == 0) {
-                    filter.add(report);
-                } else {
-                    reportScreens.stream().filter(reportScreen -> {
-                        //noinspection CodeBlock2Expr
-                        return StringUtils.equals(screen, reportScreen.getScreenId());
-
-                    }).findFirst().ifPresent(reportScreen -> {
-                        //noinspection CodeBlock2Expr
-                        filter.add(report);
-                    });
-                }
-            }
-            return filter;
-        } else {
-            return reports;
-        }
     }
 
     @Nullable
@@ -553,5 +513,9 @@ public class ReportGuiManager {
         }
 
         return paramValueWithCollection;
+    }
+
+    protected String wrapIdxParameterForSearch(String value) {
+        return "%," + QueryUtils.escapeForLike(value) + ",%";
     }
 }

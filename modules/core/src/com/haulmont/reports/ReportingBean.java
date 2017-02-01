@@ -14,6 +14,7 @@ import com.haulmont.cuba.core.app.dynamicattributes.DynamicAttributesManagerAPI;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.entity.FileDescriptor;
 import com.haulmont.cuba.core.global.*;
+import com.haulmont.cuba.security.entity.Role;
 import com.haulmont.reports.app.ParameterPrototype;
 import com.haulmont.reports.converter.GsonConverter;
 import com.haulmont.reports.converter.XStreamConverter;
@@ -44,10 +45,13 @@ import java.io.IOException;
 import java.util.*;
 import java.util.zip.CRC32;
 
+import static org.apache.commons.lang.StringUtils.isNotBlank;
+
 @Component(ReportingApi.NAME)
 public class ReportingBean implements ReportingApi {
     public static final String REPORT_EDIT_VIEW_NAME = "report.edit";
     protected static final int MAX_REPORT_NAME_LENGTH = 255;
+    protected static final String IDX_SEPARATOR = ",";
 
     @Inject
     protected Persistence persistence;
@@ -113,6 +117,7 @@ public class ReportingBean implements ReportingApi {
                 report.setVersion(0);
             }
 
+            storeIndexFields(report);
             dynamicAttributesManagerAPI.storeDynamicAttributes(report);
 
             report = em.merge(report);
@@ -523,5 +528,38 @@ public class ReportingBean implements ReportingApi {
         if (defaultTemplate == null)
             throw new ReportingException(String.format("No default template specified for report [%s]", report.getName()));
         return defaultTemplate;
+    }
+
+    protected void storeIndexFields(Report report) {
+        if (PersistenceHelper.isLoaded(report, "xml")) {
+            StringBuilder entityTypes = new StringBuilder(IDX_SEPARATOR);
+            if (report.getInputParameters() != null) {
+                for (ReportInputParameter parameter : report.getInputParameters()) {
+                    if (isNotBlank(parameter.getEntityMetaClass())) {
+                        entityTypes.append(parameter.getEntityMetaClass())
+                                .append(IDX_SEPARATOR);
+                    }
+                }
+            }
+            report.setInputEntityTypesIdx(entityTypes.length() > 1 ? entityTypes.toString() : null);
+
+            StringBuilder screens = new StringBuilder(IDX_SEPARATOR);
+            if (report.getReportScreens() != null) {
+                for (ReportScreen reportScreen : report.getReportScreens()) {
+                    screens.append(reportScreen.getScreenId())
+                            .append(IDX_SEPARATOR);
+                }
+            }
+            report.setScreensIdx(screens.length() > 1 ? screens.toString() : null);
+
+            StringBuilder roles = new StringBuilder(IDX_SEPARATOR);
+            if (report.getRoles() != null) {
+                for (Role role : report.getRoles()) {
+                    roles.append(role.getId().toString())
+                            .append(IDX_SEPARATOR);
+                }
+            }
+            report.setRolesIdx(roles.length() > 1 ? roles.toString() : null);
+        }
     }
 }

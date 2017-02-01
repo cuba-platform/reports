@@ -57,6 +57,15 @@ public class Report extends BaseReportEntity implements com.haulmont.yarg.struct
     @Lob
     protected String xml;
 
+    @Column(name = "ROLES_IDX", length = 1000)
+    protected String rolesIdx;
+
+    @Column(name = "SCREENS_IDX", length = 1000)
+    protected String screensIdx;
+
+    @Column(name = "INPUT_ENTITY_TYPES_IDX", length = 1000)
+    protected String inputEntityTypesIdx;
+
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "report")
     @Composition
     protected List<ReportTemplate> templates;
@@ -237,6 +246,30 @@ public class Report extends BaseReportEntity implements com.haulmont.yarg.struct
 
     public void setXml(String xml) {
         this.xml = xml;
+    }
+
+    public String getRolesIdx() {
+        return rolesIdx;
+    }
+
+    public void setRolesIdx(String rolesIdx) {
+        this.rolesIdx = rolesIdx;
+    }
+
+    public String getScreensIdx() {
+        return screensIdx;
+    }
+
+    public void setScreensIdx(String screensIdx) {
+        this.screensIdx = screensIdx;
+    }
+
+    public String getInputEntityTypesIdx() {
+        return inputEntityTypesIdx;
+    }
+
+    public void setInputEntityTypesIdx(String inputEntityTypesIdx) {
+        this.inputEntityTypesIdx = inputEntityTypesIdx;
     }
 
     @MetaProperty

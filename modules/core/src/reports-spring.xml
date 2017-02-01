@@ -97,6 +97,8 @@
                        value-ref="reporting_lib_OfficeIntegration"/>
                 <entry key="${cuba.webContextName}.reports:type=ReportImportExport"
                        value="reporting_ReportImportExport"/>
+                <entry key="${cuba.webContextName}.reports:type=ReportingMigrator"
+                       value="reporting_ReportingMigrator"/>
             </map>
         </property>
     </bean>

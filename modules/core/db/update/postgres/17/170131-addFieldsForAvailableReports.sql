@@ -1,0 +1,3 @@
+alter table REPORT_REPORT add column ROLES_IDX VARCHAR(1000)^
+alter table REPORT_REPORT add column SCREENS_IDX VARCHAR(1000)^
+alter table REPORT_REPORT add column INPUT_ENTITY_TYPES_IDX VARCHAR(1000)^

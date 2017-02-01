@@ -28,6 +28,9 @@ create table REPORT_REPORT (
     GROUP_ID varchar2(32) not null,
     DEFAULT_TEMPLATE_ID varchar2(32),
     XML clob,
+    ROLES_IDX varchar2(1000),
+    SCREENS_IDX varchar2(1000),
+    INPUT_ENTITY_TYPES_IDX varchar2(1000),
 
     REPORT_TYPE integer,
     primary key(ID)
