@@ -181,10 +181,7 @@ public class ReportBrowser extends AbstractLookup {
                         if (COMMIT_ACTION_ID.equals(actionId)) {
                             if (wizard.getItem() != null && wizard.getItem().getGeneratedReport() != null) {
                                 Report item = wizard.getItem().getGeneratedReport();
-                                CollectionDatasource datasource = reportsTable.getDatasource();
-                                boolean modified = datasource.isModified();
-                                datasource.addItem(item);
-                                ((DatasourceImplementation) datasource).setModified(modified);
+                                reportDs.includeItem(item);
                                 reportsTable.setSelected(item);
                                 ReportEditor reportEditor = (ReportEditor) openEditor("report$Report.edit",
                                         reportDs.getItem(), OpenType.THIS_TAB);
