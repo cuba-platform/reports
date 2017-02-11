@@ -32,7 +32,7 @@
 
     <bean id="reporting_lib_OfficeIntegration"
           class="com.haulmont.reports.libintegration.CubaOfficeIntegration">
-        <constructor-arg value="${cuba.reporting.openoffice.path?:/}"/>
+        <constructor-arg value="${reporting.openoffice.path?:/}"/>
         <constructor-arg>
             <list>
                 <value>8100</value>
@@ -42,16 +42,16 @@
             </list>
         </constructor-arg>
         <property name="displayDeviceAvailable">
-            <value>${cuba.reporting.displayDeviceAvailable?:false}</value>
+            <value>${reporting.displayDeviceAvailable?:false}</value>
         </property>
         <property name="timeoutInSeconds">
-            <value>${cuba.reporting.openoffice.docFormatterTimeout?:20}</value>
+            <value>${reporting.openoffice.docFormatterTimeout?:20}</value>
         </property>
         <property name="temporaryDirPath">
             <value>${cuba.tempDir}/reporting/</value>
         </property>
         <property name="countOfRetry">
-            <value>${cuba.reporting.openoffice.countOfRetry?:3}</value>
+            <value>${reporting.openoffice.countOfRetry?:3}</value>
         </property>
     </bean>
 
