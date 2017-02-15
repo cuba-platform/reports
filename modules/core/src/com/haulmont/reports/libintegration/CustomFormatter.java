@@ -2,12 +2,9 @@
  * Copyright (c) 2008-2016 Haulmont. All rights reserved.
  * Use is subject to license terms, see http://www.cuba-platform.com/commercial-software-license for details.
  */
-
-/**
- *
- */
 package com.haulmont.reports.libintegration;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.Configuration;
 import com.haulmont.cuba.core.global.GlobalConfig;
@@ -37,9 +34,14 @@ import java.util.concurrent.*;
 import static java.lang.String.format;
 
 public class CustomFormatter implements com.haulmont.yarg.formatters.CustomReport {
-    private static Logger log = LoggerFactory.getLogger(CustomFormatter.class);
+    private static final Logger log = LoggerFactory.getLogger(CustomFormatter.class);
 
-    protected static ScheduledExecutorService executor = Executors.newScheduledThreadPool(3);
+    protected static ScheduledExecutorService executor =
+            Executors.newScheduledThreadPool(3,
+                    new ThreadFactoryBuilder()
+                            .setNameFormat("ReportCustomFormatter-%d")
+                            .build()
+            );
 
     protected Report report;
     protected ReportTemplate template;
@@ -94,7 +96,7 @@ public class CustomFormatter implements com.haulmont.yarg.formatters.CustomRepor
             customDefinition = StringUtils.removeStart(customDefinition, "/");
         }
         Object result = scripting.runGroovyScript(customDefinition,
-                Collections.<String, Object>singletonMap("params", params));
+                Collections.singletonMap("params", params));
         if (result instanceof byte[]) {
             return (byte[]) result;
         } else if (result instanceof CharSequence) {
@@ -107,7 +109,7 @@ public class CustomFormatter implements com.haulmont.yarg.formatters.CustomRepor
     }
 
     protected byte[] generateReportWithUrl(String customDefinition) {
-        Map<String, Object> convertedParams = new HashMap<String, Object>();
+        Map<String, Object> convertedParams = new HashMap<>();
         for (Map.Entry<String, Object> entry : params.entrySet()) {
             if (entry.getValue() instanceof Date) {
                 convertedParams.put(entry.getKey(), new FormattedDate((Date) entry.getValue()));
@@ -138,11 +140,11 @@ public class CustomFormatter implements com.haulmont.yarg.formatters.CustomRepor
         }
     }
 
-    private static class FormattedDate extends Date {
+    protected static class FormattedDate extends Date {
         private static final long serialVersionUID = 6328140953372636008L;
         private static final SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss aaa");
 
-        private FormattedDate(Date date) {
+        public FormattedDate(Date date) {
             super(date.getTime());
         }
 
@@ -161,7 +163,7 @@ public class CustomFormatter implements com.haulmont.yarg.formatters.CustomRepor
             String curlToolPath = reportingConfig.getCurlPath();
             String curlToolParams = reportingConfig.getCurlParams();
             String command = format("%s %s %s", curlToolPath, curlToolParams, url);
-            log.info(format("Reporting::CustomFormatter::Trying to load report from URL: [%s]", url));
+            log.info("Reporting::CustomFormatter::Trying to load report from URL: [{}]", url);
             proc = runtime.exec(command);
 
             inputStream = proc.getInputStream();
