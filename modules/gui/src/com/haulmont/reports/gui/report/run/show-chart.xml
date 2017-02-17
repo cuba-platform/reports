@@ -21,7 +21,7 @@
             <lookupField id="reportLookup" optionsDatasource="reportsDs" width="400px"/>
         </hbox>
 
-        <groupBox id="reportParamsBox" collapsable="true" collapsed="false" visible="false" caption="msg://caption.reportParameters">
+        <groupBox id="reportParamsBox" collapsable="true" collapsed="false" visible="false" caption="msg://caption.reportParameters" spacing="true">
             <vbox id="parametersFrameHolder">
 
             </vbox>
