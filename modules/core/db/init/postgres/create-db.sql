@@ -76,4 +76,4 @@ references REPORT_TEMPLATE (ID);
 
 insert into REPORT_GROUP (ID, CREATE_TS, CREATED_BY, VERSION, TITLE, CODE, LOCALE_NAMES)
 values ('4e083530-0b9c-11e1-9b41-6bdaa41bff94', now(), 'admin', 0, 'General', 'ReportGroup.default',
-E'en=General \nru=Общие')^
+E'en=General\nru=Общие')^
