@@ -441,7 +441,7 @@ public class ReportGuiManager {
     protected void applySecurityPolicies(LoadContext lc, @Nullable String screen, @Nullable User user) {
         QueryTransformer transformer = queryTransformerFactory.transformer(lc.getQuery().getQueryString());
         if (screen != null) {
-            transformer.addWhereAsIs("r.screensIdx is null or r.screensIdx like :screen escape '\\'");
+            transformer.addWhereAsIs("r.screensIdx like :screen escape '\\'");
             lc.getQuery().setParameter("screen", wrapIdxParameterForSearch(screen));
         }
         if (user != null) {
