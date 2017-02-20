@@ -421,16 +421,20 @@ public class ReportEditor extends AbstractEditor<Report> {
         invisibleFileUpload.addFileUploadSucceedListener(invisibleUpload -> {
             final ReportTemplate defaultTemplate = getItem().getDefaultTemplate();
             if (defaultTemplate != null) {
-                File file = fileUpload.getFile(invisibleFileUpload.getFileId());
-                try {
-                    byte[] data = FileUtils.readFileToByteArray(file);
-                    defaultTemplate.setContent(data);
-                    defaultTemplate.setName(invisibleFileUpload.getFileName());
-                    templatesDs.modifyItem(defaultTemplate);
-                } catch (IOException e) {
-                    throw new RuntimeException(String.format(
-                            "An error occurred while uploading file for template [%s]",
-                            defaultTemplate.getCode()));
+                if (defaultTemplate.getOutputType() != CubaReportOutputType.chart) {
+                     File file = fileUpload.getFile(invisibleFileUpload.getFileId());
+                    try {
+                        byte[] data = FileUtils.readFileToByteArray(file);
+                        defaultTemplate.setContent(data);
+                        defaultTemplate.setName(invisibleFileUpload.getFileName());
+                        templatesDs.modifyItem(defaultTemplate);
+                    } catch (IOException e) {
+                        throw new RuntimeException(String.format(
+                                "An error occurred while uploading file for template [%s]",
+                                defaultTemplate.getCode()));
+                    }
+                } else {
+                    showNotification(getMessage("notification.fileIsNotAllowedForChart"), NotificationType.HUMANIZED);
                 }
             } else {
                 showNotification(getMessage("notification.defaultTemplateIsEmpty"), NotificationType.HUMANIZED);
