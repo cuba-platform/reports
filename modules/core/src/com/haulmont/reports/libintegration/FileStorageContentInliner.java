@@ -33,8 +33,12 @@ public class FileStorageContentInliner extends AbstractInliner {
         try {
             DataManager dataManager = AppBeans.get(DataManager.class);
             FileStorageAPI fileStorageAPI = AppBeans.get(FileStorageAPI.class);
-
-            FileDescriptor file = dataManager.load(new LoadContext<>(FileDescriptor.class).setId(UuidProvider.fromString(paramValue.toString())));
+            FileDescriptor file;
+            if (paramValue instanceof FileDescriptor) {
+                file = dataManager.load(new LoadContext<>(FileDescriptor.class).setId(((FileDescriptor) paramValue).getId()));
+            } else {
+                file = dataManager.load(new LoadContext<>(FileDescriptor.class).setId(UuidProvider.fromString(paramValue.toString())));
+            }
             byte[] bytes = fileStorageAPI.loadFile(file);
             return bytes;
         } catch (FileStorageException e) {
