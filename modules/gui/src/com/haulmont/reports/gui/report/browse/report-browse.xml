@@ -29,6 +29,10 @@
         </groupDatasource>
     </dsContext>
 
+    <dialogMode height="theme://cuba.gui.dialogSize.height.xlarge"
+                width="theme://cuba.gui.dialogSize.width.xlarge"
+                resizable="true"/>
+
     <layout expand="table" spacing="true">
         <filter id="genericFilter" datasource="reportDs" applyTo="table">
             <properties include=".*"/>

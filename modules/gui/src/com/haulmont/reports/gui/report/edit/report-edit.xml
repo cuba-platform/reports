@@ -46,6 +46,9 @@
             </query>
         </collectionDatasource>
     </dsContext>
+    <dialogMode height="theme://cuba.gui.dialogSize.height.xlarge"
+                width="theme://cuba.gui.dialogSize.width.xlarge"
+                resizable="true"/>
     <layout expand="tabsheet" spacing="true">
         <tabSheet id="tabsheet" width="100%">
             <tab id="generalTab" caption="msg://generalTab">

@@ -15,6 +15,10 @@
         </collectionDatasource>
     </dsContext>
 
+    <dialogMode height="theme://cuba.gui.dialogSize.height.large"
+                width="theme://cuba.gui.dialogSize.width.large"
+                resizable="true"/>
+
     <layout expand="chartBox">
         <hbox spacing="true">
             <label id="reportLookupLabel" align="MIDDLE_CENTER" value="msg://caption.reportForChart"/>
