@@ -26,13 +26,14 @@ import java.util.UUID;
 public class WebRegionEditorCompanion implements RegionEditor.Companion {
     @Override
     public void addTreeTableDblClickListener(final Tree entityTree, final CollectionDatasource<RegionProperty, UUID> reportRegionPropertiesTableDs) {
-        final CubaTree webTree = (CubaTree) WebComponentsHelper.unwrap(entityTree);
+        final CubaTree webTree = entityTree.unwrap(CubaTree.class);
         webTree.setDoubleClickMode(true);
         webTree.addItemClickListener(new ItemClickEvent.ItemClickListener() {
             @Override
             public void itemClick(ItemClickEvent event) {
                 if (event.isDoubleClick()) {
-                    if (event.getItem() instanceof ItemWrapper && ((ItemWrapper) event.getItem()).getItem() instanceof EntityTreeNode) {
+                    if (event.getItem() instanceof ItemWrapper
+                            && ((ItemWrapper) event.getItem()).getItem() instanceof EntityTreeNode) {
                         EntityTreeNode entityTreeNode = (EntityTreeNode) ((ItemWrapper) event.getItem()).getItem();
                         if (entityTreeNode.getWrappedMetaClass() != null) {
                             if (webTree.isExpanded(entityTreeNode.getId()))
@@ -52,12 +53,15 @@ public class WebRegionEditorCompanion implements RegionEditor.Companion {
                         Metadata metadata = AppBeans.get(Metadata.NAME);
                         RegionProperty regionProperty = metadata.create(RegionProperty.class);
                         regionProperty.setEntityTreeNode(entityTreeNode);
-                        regionProperty.setOrderNum((long) reportRegionPropertiesTableDs.getItemIds().size() + 1); //first element must be not zero cause later we do sorting by multiplying that values
+                        regionProperty.setOrderNum((long) reportRegionPropertiesTableDs.getItemIds().size() + 1);
+                        //first element must be not zero cause later we do sorting by multiplying that values
                         reportRegionPropertiesTableDs.addItem(regionProperty);
+
                         Table propertiesTable = (Table) entityTree.getFrame().getComponent("propertiesTable");
                         if (propertiesTable != null) {
                             propertiesTable.setSelected(regionProperty);
-                            ((com.vaadin.ui.Table) WebComponentsHelper.unwrap(propertiesTable)).setCurrentPageFirstItemId(regionProperty.getId());
+
+                            (propertiesTable.unwrap(com.vaadin.ui.Table.class)).setCurrentPageFirstItemId(regionProperty.getId());
                         }
                     }
                 }
@@ -67,15 +71,10 @@ public class WebRegionEditorCompanion implements RegionEditor.Companion {
 
     @Override
     public void initControlBtnsActions(Button button, final Table table) {
-        ((com.vaadin.ui.Button) WebComponentsHelper.unwrap(button)).addClickListener(new com.vaadin.ui.Button.ClickListener() {
-            @Override
-            public void buttonClick(com.vaadin.ui.Button.ClickEvent event) {
-                com.vaadin.ui.Table vaadinTable = (com.vaadin.ui.Table) WebComponentsHelper.unwrap(table);
-                vaadinTable.setCurrentPageFirstItemId(vaadinTable.lastItemId());
-                vaadinTable.refreshRowCache();
-            }
+        button.unwrap(com.vaadin.ui.Button.class).addClickListener((com.vaadin.ui.Button.ClickListener) event -> {
+            com.vaadin.ui.Table vaadinTable = table.unwrap(com.vaadin.ui.Table.class);
+            vaadinTable.setCurrentPageFirstItemId(vaadinTable.lastItemId());
+            vaadinTable.refreshRowCache();
         });
     }
-
-
 }

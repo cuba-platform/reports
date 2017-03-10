@@ -28,9 +28,10 @@
     </dsContext>
 
     <layout expand="editAreaVbox" spacing="true">
-        <label stylename="report-wizard-top-separator" width="100%"/>
-        <label id="tipLabel"/>
-        <label stylename="report-wizard-top-separator" width="100%"/>
+        <label id="tipLabel"
+               stylename="report-wizard-tip-label"
+               width="100%"/>
+
         <vbox id="editAreaVbox">
             <groupBox id="editAreaGroupBox" width="100%" height="100%">
                 <frame src="/com/haulmont/reports/gui/report/wizard/step/first-details-frame.xml" id="detailsStep"

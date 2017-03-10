@@ -20,20 +20,17 @@ import java.util.*;
 
 /**
  * Build Tree using rootEntity as root Node
- *
  */
 public class EntityTreeNodeDs extends AbstractTreeDatasource<EntityTreeNode, UUID> {
     protected boolean collectionsOnly;
     protected boolean scalarOnly;
     protected boolean persistentOnly;
     protected boolean showRoot;
-    protected Comparator<EntityTreeNode> nodeComparator = new Comparator<EntityTreeNode>() {
-        @Override
-        public int compare(EntityTreeNode o1, EntityTreeNode o2) {
-            //return o1.getNodeChildrenDepth().compareTo(o2.getNodeChildrenDepth());
-            Collator collator = Collator.getInstance();
-            return collator.compare(o1.getHierarchicalLocalizedNameExceptRoot(), o2.getHierarchicalLocalizedNameExceptRoot());
-        }
+
+    protected Comparator<EntityTreeNode> nodeComparator = (o1, o2) -> {
+
+        Collator collator = Collator.getInstance();
+        return collator.compare(o1.getHierarchicalLocalizedNameExceptRoot(), o2.getHierarchicalLocalizedNameExceptRoot());
     };
 
     protected Metadata metadata = AppBeans.get(Metadata.class);
@@ -44,8 +41,11 @@ public class EntityTreeNodeDs extends AbstractTreeDatasource<EntityTreeNode, UUI
         scalarOnly = isTreeForScalarOnly(params);
         persistentOnly = isTreeForPersistentOnly(params);
         showRoot = isTreeMustContainRoot(params);
+
         Tree<EntityTreeNode> resultTree = new Tree<>();
-        String searchValue = StringUtils.defaultIfBlank(((TextField) params.get("component$reportPropertyName")).<String>getValue(), "").toLowerCase().trim();
+
+        TextField reportPropertyField = (TextField) params.get("component$reportPropertyName");
+        String searchValue = StringUtils.defaultIfBlank(reportPropertyField.getValue(), "").toLowerCase().trim();
         if (params.get("rootEntity") != null) {
             EntityTreeNode rootNodeObject = (EntityTreeNode) params.get("rootEntity");
             List<Node<EntityTreeNode>> rootNodes;
@@ -55,7 +55,7 @@ public class EntityTreeNodeDs extends AbstractTreeDatasource<EntityTreeNode, UUI
                     fill(rootNode);
                 else
                     fill(rootNode, searchValue);
-                rootNodes = !rootNode.getChildren().isEmpty() ? Collections.singletonList(rootNode) : Collections.<Node<EntityTreeNode>>emptyList();
+                rootNodes = !rootNode.getChildren().isEmpty() ? Collections.singletonList(rootNode) : Collections.emptyList();
             } else {//don`t show current node in the tree. show only children
                 rootNodes = new ArrayList<>(rootNodeObject.getChildren().size());
                 for (EntityTreeNode child : rootNodeObject.getChildren()) {
@@ -77,7 +77,8 @@ public class EntityTreeNodeDs extends AbstractTreeDatasource<EntityTreeNode, UUI
     }
 
     protected void fill(final Node<EntityTreeNode> parentNode, String searchValue) {
-        Collections.sort(parentNode.getData().getChildren(), nodeComparator);
+        parentNode.getData().getChildren().sort(nodeComparator);
+
         for (EntityTreeNode child : parentNode.getData().getChildren()) {
             if (collectionsOnly && !child.getWrappedMetaProperty().getRange().getCardinality().isMany()) {
                 continue;
@@ -112,7 +113,7 @@ public class EntityTreeNodeDs extends AbstractTreeDatasource<EntityTreeNode, UUI
                 }
             } else {
                 if (scalarOnly && child.getWrappedMetaProperty().getRange().isClass()) {
-                    //doesn`t fetch if it is a last entity and is a class cause we can`t select it in UI anyway
+                    //doesn't fetch if it is a last entity and is a class cause we can`t select it in UI anyway
                     continue;
                 }
                 Node childNode = new Node<>(child);

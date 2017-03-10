@@ -11,9 +11,10 @@ import com.haulmont.cuba.gui.components.Window;
 import java.util.List;
 
 public class StepFrameManager {
-    protected final List<StepFrame> stepFrames;
-    private MainWizardFrame mainWizardFrame;
-    private int currentFrameIdx = 0;
+
+    protected List<StepFrame> stepFrames;
+    protected MainWizardFrame mainWizardFrame;
+    protected int currentFrameIdx = 0;
 
     public StepFrameManager(MainWizardFrame reportWizardCreatorFrame, List<StepFrame> stepFrames) {
         this.mainWizardFrame = reportWizardCreatorFrame;
@@ -45,7 +46,7 @@ public class StepFrameManager {
                 mainWizardFrame.formatMessage("stepNo", currentFrameIdx + 1, stepFrames.size());
 
         Window window = mainWizardFrame.getMainWizardFrame();
-        window.getWindowManager().setWindowCaption(window, newWindowCaption, "");
+        window.setCaption(newWindowCaption);
 
         setNavigationButtonProps();
     }

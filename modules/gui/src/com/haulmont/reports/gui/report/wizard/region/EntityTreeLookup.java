@@ -35,32 +35,31 @@ public class EntityTreeLookup extends AbstractLookup {
     @Override
     public void init(Map<String, Object> params) {
         super.init(params);
+
         params.put("component$reportPropertyName", reportPropertyName);
+
         reportEntityTreeNodeDs.refresh(params);
         rootNode = (EntityTreeNode) params.get("rootEntity");
         entityTree.expandTree();
-        this.setLookupValidator(new Validator() {
-
-            @Override
-            public boolean validate() {
-                if (entityTree.getSingleSelected() == null) {
-                    showNotification(getMessage("selectItemForContinue"), NotificationType.TRAY);
+        this.setLookupValidator(() -> {
+            if (entityTree.getSingleSelected() == null) {
+                showNotification(getMessage("selectItemForContinue"), NotificationType.TRAY);
+                return false;
+            } else {
+                if (((EntityTreeNode) entityTree.getSingleSelected()).getParent() == null) {
+                    showNotification(getMessage("selectNotARoot"), NotificationType.TRAY);
                     return false;
-                } else {
-                    if (((EntityTreeNode) entityTree.getSingleSelected()).getParent() == null) {
-                        showNotification(getMessage("selectNotARoot"), NotificationType.TRAY);
-                        return false;
-                    }
                 }
-                return true;
             }
+            return true;
         });
+
         Action search = new AbstractAction("search", configuration.getConfig(ClientConfig.class).getFilterApplyShortcut()) {
             @Override
             public void actionPerform(Component component) {
                 reportEntityTreeNodeDs.refresh();
                 if (!reportEntityTreeNodeDs.getItemIds().isEmpty()) {
-                    if (StringUtils.isEmpty(reportPropertyName.<String>getValue())) {
+                    if (StringUtils.isEmpty(reportPropertyName.getValue())) {
                         entityTree.collapseTree();
                         entityTree.expand(rootNode.getId());
                     } else

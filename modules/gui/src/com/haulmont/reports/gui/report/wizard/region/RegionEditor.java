@@ -88,11 +88,6 @@ public class RegionEditor extends AbstractEditor<ReportRegion> {
         initComponents(params);
     }
 
-    @Override
-    protected void postInit() {
-        super.postInit();
-    }
-
     protected void initComponents(Map<String, Object> params) {
         initControlBtnsActions();
         addRegionPropertiesDsListener();

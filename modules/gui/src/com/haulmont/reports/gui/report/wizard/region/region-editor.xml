@@ -20,9 +20,10 @@
     </dsContext>
 
     <layout spacing="true">
-        <label id="topSeparator" stylename="report-wizard-top-separator" width="100%"/>
-        <label id="tipLabel"/>
-        <label id="bottomSeparator" stylename="report-wizard-top-separator" width="100%"/>
+        <label id="tipLabel"
+               stylename="report-wizard-tip-label"
+               width="100%"/>
+
         <hbox id="mainContent" width="100%" expand="treePanel">
             <groupBox id="treePanel" height="500px">
                 <frame id="entityTreeFrame"
@@ -30,10 +31,10 @@
                         width="100%" height="100%"/>
             </groupBox>
             <vbox id="btnsControlPanel" margin="true" spacing="true" width="AUTO">
-                <button id="addItem" caption="" icon="icons/report-wizard-to-right-pane.png"/>
-                <button id="removeItem" caption="" icon="icons/remove.png"/>
-                <button id="upItem" caption="" enable="false" icon="icons/report-wizard-up-property.png"/>
-                <button id="downItem" caption="" enable="false" icon="icons/report-wizard-down-property.png"/>
+                <button id="addItem" icon="icons/report-wizard-to-right-pane.png"/>
+                <button id="removeItem" icon="icons/remove.png"/>
+                <button id="upItem" enable="false" icon="icons/report-wizard-up-property.png"/>
+                <button id="downItem" enable="false" icon="icons/report-wizard-down-property.png"/>
             </vbox>
             <groupBox id="selectedTreeItemsPanel" width="500px" height="500px">
                 <table id="propertiesTable" multiselect="true" sortable="false" reorderingAllowed="false"

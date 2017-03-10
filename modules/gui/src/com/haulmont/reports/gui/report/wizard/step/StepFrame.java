@@ -21,13 +21,17 @@ public class StepFrame {
     protected final String name;
     protected final Frame frame;
     protected final ReportWizardCreator wizard;
+
     protected InitStepFrameHandler initFrameHandler;
     protected BeforeHideStepFrameHandler beforeHideFrameHandler;
     protected BeforeShowStepFrameHandler beforeShowFrameHandler;
+
     protected boolean isLast;
     protected boolean isFirst;
+
     protected boolean validateBeforeNext = true;
-    protected boolean validateBeforePrev = false;//feel the difference!
+    protected boolean validateBeforePrev = false;
+
     protected FrameValidator frameValidator = new FrameValidator();
     protected boolean isInitialized;
 

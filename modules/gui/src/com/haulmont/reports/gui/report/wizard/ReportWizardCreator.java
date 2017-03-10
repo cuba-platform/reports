@@ -7,11 +7,9 @@ package com.haulmont.reports.gui.report.wizard;
 import com.google.common.collect.ImmutableMap;
 import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.cuba.core.global.*;
-import com.haulmont.cuba.gui.WindowManagerProvider;
 import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.components.Action.Status;
 import com.haulmont.cuba.gui.components.DialogAction.Type;
-import com.haulmont.cuba.gui.config.WindowConfig;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
 import com.haulmont.cuba.gui.data.Datasource;
 import com.haulmont.cuba.gui.theme.ThemeConstants;
@@ -36,7 +34,7 @@ import javax.inject.Named;
 import java.util.*;
 
 public class ReportWizardCreator extends AbstractWindow implements MainWizardFrame<AbstractWindow> {
-    //main wizard window
+
     @Inject
     protected Datasource reportDataDs;
     @Inject
@@ -60,17 +58,16 @@ public class ReportWizardCreator extends AbstractWindow implements MainWizardFra
     @Inject
     protected GroupBoxLayout editAreaGroupBox;
 
-    //detail frame
     @Named("detailsStep.mainFields")
     protected FieldGroup mainFields;
     @Named("detailsStep.setQuery")
     protected Button setQueryButton;
+
     protected OptionsGroup reportTypeOptionGroup;//this and following are set during creation
     protected LookupField templateFileFormat;
     protected LookupField entity;
     protected TextField reportName;
 
-    //regions frame
     @Named("regionsStep.addRegionDisabledBtn")
     protected Button addRegionDisabledBtn;
     @Named("regionsStep.addTabulatedRegionDisabledBtn")
@@ -92,7 +89,6 @@ public class ReportWizardCreator extends AbstractWindow implements MainWizardFra
     @Named("regionsStep.buttonsBox")
     protected BoxLayout buttonsBox;
 
-    //save frame
     @Named("saveStep.outputFileFormat")
     protected LookupField outputFileFormat;
     @Named("saveStep.outputFileName")
@@ -106,7 +102,6 @@ public class ReportWizardCreator extends AbstractWindow implements MainWizardFra
     @Named("saveStep.chartPreviewBox")
     protected BoxLayout chartPreviewBox;
 
-    //services
     @Inject
     protected Metadata metadata;
     @Inject
@@ -118,13 +113,8 @@ public class ReportWizardCreator extends AbstractWindow implements MainWizardFra
     @Inject
     protected ReportWizardService reportWizardService;
     @Inject
-    protected WindowManagerProvider windowManagerProvider;
-    @Inject
-    protected WindowConfig windowConfig;
-    @Inject
     protected ThemeConstants themeConstants;
 
-    //other
     protected StepFrame detailsStepFrame;
     protected StepFrame regionsStepFrame;
     protected StepFrame saveStepFrame;
@@ -436,7 +426,6 @@ public class ReportWizardCreator extends AbstractWindow implements MainWizardFra
     public String formatMessage(String key, Object... params) {
         return super.formatMessage(key, params);
     }
-
 
     protected void setCorrectReportOutputType() {
         ReportOutputType outputFileFormatPrevValue = outputFileFormat.getValue();

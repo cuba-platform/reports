@@ -22,11 +22,11 @@ import com.haulmont.cuba.gui.components.filter.FilterParser;
 import com.haulmont.cuba.gui.components.filter.Param;
 import com.haulmont.cuba.gui.components.filter.edit.FilterEditor;
 import com.haulmont.cuba.gui.config.WindowConfig;
-import com.haulmont.cuba.gui.config.WindowInfo;
 import com.haulmont.cuba.security.entity.FilterEntity;
 import com.haulmont.reports.entity.ParameterType;
 import com.haulmont.reports.entity.PredefinedTransformation;
 import com.haulmont.reports.entity.wizard.ReportData;
+import com.haulmont.reports.entity.wizard.ReportData.ReportType;
 import com.haulmont.reports.entity.wizard.TemplateFileType;
 import com.haulmont.reports.gui.report.run.ParameterClassResolver;
 import com.haulmont.reports.gui.report.run.ShowChartController;
@@ -79,12 +79,12 @@ public class DetailsStepFrame extends StepFrame {
         protected void initTemplateFormatLookupField() {
             wizard.templateFileFormat.setOptionsMap(getAvailableTemplateFormats());
             wizard.templateFileFormat.setTextInputAllowed(false);
-            wizard.templateFileFormat.setValue(TemplateFileType.DOCX);//select docx as default value
+            wizard.templateFileFormat.setValue(TemplateFileType.DOCX);
         }
 
         protected void initReportTypeOptionGroup() {
             wizard.reportTypeOptionGroup.setOptionsMap(getListedReportOptionsMap());
-            wizard.reportTypeOptionGroup.setValue(ReportData.ReportType.SINGLE_ENTITY);
+            wizard.reportTypeOptionGroup.setValue(ReportType.SINGLE_ENTITY);
             wizard.reportTypeOptionGroup.addValueChangeListener(new ClearRegionListener(
                     new DialogActionWithChangedValue(Type.YES) {
                         @Override
@@ -98,9 +98,9 @@ public class DetailsStepFrame extends StepFrame {
 
         protected Map<String, Object> getListedReportOptionsMap() {
             Map<String, Object> result = new LinkedHashMap<>(3);
-            result.put(wizard.getMessage("singleEntityReport"), ReportData.ReportType.SINGLE_ENTITY);
-            result.put(wizard.getMessage("listOfEntitiesReport"), ReportData.ReportType.LIST_OF_ENTITIES);
-            result.put(wizard.getMessage("listOfEntitiesReportWithQuery"), ReportData.ReportType.LIST_OF_ENTITIES_WITH_QUERY);
+            result.put(wizard.getMessage("singleEntityReport"), ReportType.SINGLE_ENTITY);
+            result.put(wizard.getMessage("listOfEntitiesReport"), ReportType.LIST_OF_ENTITIES);
+            result.put(wizard.getMessage("listOfEntitiesReportWithQuery"), ReportType.LIST_OF_ENTITIES_WITH_QUERY);
             return result;
         }
 
@@ -134,7 +134,7 @@ public class DetailsStepFrame extends StepFrame {
     @Override
     public List<String> validateFrame() {
         ArrayList<String> errors = new ArrayList<>(super.validateFrame());
-        if (wizard.reportTypeOptionGroup.getValue() == ReportData.ReportType.LIST_OF_ENTITIES_WITH_QUERY && wizard.query == null) {
+        if (wizard.reportTypeOptionGroup.getValue() == ReportType.LIST_OF_ENTITIES_WITH_QUERY && wizard.query == null) {
             errors.add(wizard.getMessage("fillReportQuery"));
         }
 
@@ -182,7 +182,7 @@ public class DetailsStepFrame extends StepFrame {
 
         @Override
         public boolean isVisible() {
-            return ReportData.ReportType.LIST_OF_ENTITIES_WITH_QUERY == wizard.reportTypeOptionGroup.getValue();
+            return ReportType.LIST_OF_ENTITIES_WITH_QUERY == wizard.reportTypeOptionGroup.getValue();
         }
 
         @Override
@@ -193,7 +193,6 @@ public class DetailsStepFrame extends StepFrame {
                 return;
             }
 
-            WindowInfo windowInfo = wizard.windowConfig.getWindowInfo("filterEditor");
             FakeFilterSupport fakeFilterSupport = new FakeFilterSupport(wizard, entityMetaClass);
             if (filter == null) {
                 filter = fakeFilterSupport.createFakeFilter();
@@ -207,8 +206,7 @@ public class DetailsStepFrame extends StepFrame {
             params.put("conditions", conditionsTree);
             params.put("useShortConditionForm", true);
 
-            FilterEditor filterEditor =
-                    (FilterEditor) wizard.windowManagerProvider.get().openWindow(windowInfo, OpenType.DIALOG, params);
+            FilterEditor filterEditor = (FilterEditor) wizard.openWindow("filterEditor", OpenType.DIALOG, params);
             filterEditor.addCloseListener(new Window.CloseListener() {
                 private ParameterClassResolver parameterClassResolver = new ParameterClassResolver();
 
@@ -320,7 +318,6 @@ public class DetailsStepFrame extends StepFrame {
 
         public DialogActionWithChangedValue(Type type) {
             super(type);
-
         }
 
         public DialogActionWithChangedValue setValue(Object value) {
@@ -355,7 +352,7 @@ public class DetailsStepFrame extends StepFrame {
 
             if (wizard.setQueryButton != null) {
                 wizard.setQueryButton.setVisible(
-                        wizard.reportTypeOptionGroup.getValue() == ReportData.ReportType.LIST_OF_ENTITIES_WITH_QUERY);
+                        wizard.reportTypeOptionGroup.getValue() == ReportType.LIST_OF_ENTITIES_WITH_QUERY);
             }
         }
     }

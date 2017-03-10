@@ -4,10 +4,11 @@
   -->
 
 <window xmlns="http://schemas.haulmont.com/cuba/window.xsd">
-    <!--<layout expand="regions">-->
     <layout spacing="true" expand="regionsBox">
-        <hbox spacing="true" width="100%" expand="spacer">
-            <!--btn visibility will be switched dynamically:-->
+        <hbox spacing="true"
+              width="100%"
+              expand="spacer">
+
             <hbox id="buttonsBox">
                 <button id="addRegionDisabledBtn" caption="msg://addRegion" enable="false"/>
                 <button id="addTabulatedRegionDisabledBtn" caption="msg://tabulatedRegion" enable="false"/>
@@ -16,14 +17,17 @@
                 <popupButton id="addRegionPopupBtn" caption="msg://add"/>
             </hbox>
             <button id="run" caption="msg://runReport" icon="icons/run.png"/>
-            <label value="" id="spacer"/>
+
+            <label id="spacer"/>
+
             <button id="moveUpBtn" icon="icons/report-wizard-up-property.png"/>
             <button id="moveDownBtn" icon="icons/report-wizard-down-property.png"/>
             <button id="removeBtn" icon="icons/remove.png"/>
         </hbox>
         <vbox id="regionsBox">
-            <table id="regionsTable" multiselect="false" sortable="false" reorderingAllowed="false"
-                   columnControlVisible="false" height="100%" width="100%">
+            <table id="regionsTable"
+                   sortable="false" reorderingAllowed="false" columnControlVisible="false"
+                   height="100%" width="100%">
                 <columns>
                     <column id="regionsGeneratedColumn" caption="msg://reportRegionsColumn"/>
                 </columns>
