@@ -25,9 +25,18 @@ buildscript {
     }
 }
 
+configurations {
+    bom
+}
+dependencies {
+    bom("com.haulmont.cuba:cuba-global:$cubaVersion")
+}
+
 apply(plugin: 'maven')
 apply(plugin: 'idea')
 apply(plugin: 'cuba')
+
+bom.load file('modules/global/src/com/haulmont/reports/bom.properties')
 
 cuba {
     artifact {
