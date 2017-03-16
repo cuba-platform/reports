@@ -47,7 +47,7 @@
         </collectionDatasource>
     </dsContext>
     <dialogMode height="theme://cuba.gui.dialogSize.height.xlarge"
-                width="theme://cuba.gui.dialogSize.width.xlarge"
+                width="theme://cuba.gui.report.report-edit.dialogSize.width"
                 resizable="true"/>
     <layout expand="tabsheet" spacing="true">
         <tabSheet id="tabsheet" width="100%">

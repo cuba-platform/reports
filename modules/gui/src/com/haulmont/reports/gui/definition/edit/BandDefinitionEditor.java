@@ -45,9 +45,9 @@ public class BandDefinitionEditor extends AbstractFrame implements Suggester {
     @Inject
     protected BoxLayout textBox;
     @Inject
-    protected GridLayout entityGrid;
+    protected Label entitiesParamLabel;
     @Inject
-    protected GridLayout entitiesGrid;
+    protected Label entityParamLabel;
     @Inject
     protected GridLayout commonEntityGrid;
     @Inject
@@ -95,11 +95,7 @@ public class BandDefinitionEditor extends AbstractFrame implements Suggester {
 
     public void setBandDefinition(BandDefinition bandDefinition) {
         bandDefinitionDs.setItem(bandDefinition);
-        if (bandDefinition != null && bandDefinition.getParent() == null) {
-            name.setEditable(false);
-        } else {
-            name.setEditable(true);
-        }
+        name.setEditable(bandDefinition == null || bandDefinition.getParent() != null);
     }
 
     public Datasource<BandDefinition> getBandDefinitionDs() {
@@ -343,14 +339,14 @@ public class BandDefinitionEditor extends AbstractFrame implements Suggester {
                     editPane.add(textBox);
                     break;
                 case SINGLE:
-                    editPane.add(entityGrid);
                     editPane.add(commonEntityGrid);
+                    setCommonEntityGridVisiblity(true, false);
                     editPane.add(spacer);
                     editPane.expand(spacer);
                     break;
                 case MULTI:
-                    editPane.add(entitiesGrid);
                     editPane.add(commonEntityGrid);
+                    setCommonEntityGridVisiblity(false, true);
                     editPane.add(spacer);
                     editPane.expand(spacer);
                     break;
@@ -368,11 +364,7 @@ public class BandDefinitionEditor extends AbstractFrame implements Suggester {
                     break;
 
                 case JPQL:
-                    if (processTemplate.isChecked()) {
-                        dataSetScriptField.setSuggester(null);
-                    } else {
-                        dataSetScriptField.setSuggester(this);
-                    }
+                    dataSetScriptField.setSuggester(processTemplate.isChecked() ? null : this);
                     dataSetScriptField.setMode(SourceCodeEditor.Mode.Text);
                     break;
 
@@ -409,8 +401,6 @@ public class BandDefinitionEditor extends AbstractFrame implements Suggester {
         textParamsBox.remove(dataStore);
         textBox.remove(processTemplate);
         editPane.remove(textBox);
-        editPane.remove(entityGrid);
-        editPane.remove(entitiesGrid);
         editPane.remove(commonEntityGrid);
         editPane.remove(spacer);
     }
@@ -442,5 +432,12 @@ public class BandDefinitionEditor extends AbstractFrame implements Suggester {
 
     protected boolean isViewEditAllowed(DataSet dataSet) {
         return true;
+    }
+
+    protected void setCommonEntityGridVisiblity(boolean visibleEntityGrid, boolean visibleEntitiesGrid) {
+        entityParamLabel.setVisible(visibleEntityGrid);
+        entityParamLookup.setVisible(visibleEntityGrid);
+        entitiesParamLabel.setVisible(visibleEntitiesGrid);
+        entitiesParamLookup.setVisible(visibleEntitiesGrid);
     }
 }

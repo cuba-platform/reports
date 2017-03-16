@@ -71,45 +71,28 @@
                               property="processTemplate"
                               caption="msg://dataSet.processTemplate"/>
                 </vbox>
-                <grid id="entitiesGrid" spacing="true" margin="true;false;false;false">
+                <grid id="commonEntityGrid" spacing="true" width="100%">
                     <columns>
                         <column flex="1"/>
                         <column flex="1"/>
                     </columns>
                     <rows>
                         <row>
-                            <label id="entitiesParamLabel" value="msg://dataSet.entitiesParamName"
-                                   width="${labelWidth}"/>
-                            <lookupField id="entitiesParamLookup" width="${width}" datasource="dataSetsDs" property="listEntitiesParamName"/>
+                            <label id="entitiesParamLabel" align="MIDDLE_LEFT" value="msg://dataSet.entitiesParamName"/>
+                            <lookupField id="entitiesParamLookup" datasource="dataSetsDs" property="listEntitiesParamName"/>
                         </row>
-                    </rows>
-                </grid>
-                <grid id="entityGrid" spacing="true" margin="true;false;false;false">
-                    <columns>
-                        <column flex="1"/>
-                        <column flex="1"/>
-                    </columns>
-                    <rows>
                         <row>
-                            <label id="entityParamLabel" value="msg://dataSet.entityParamName" width="${labelWidth}"/>
+                            <label id="entityParamLabel" align="MIDDLE_LEFT" value="msg://dataSet.entityParamName"/>
                             <lookupField id="entityParamLookup" width="${width}" datasource="dataSetsDs" property="entityParamName"/>
                         </row>
-                    </rows>
-                </grid>
-                <grid id="commonEntityGrid" spacing="true">
-                    <columns>
-                        <column flex="1"/>
-                        <column flex="1"/>
-                    </columns>
-                    <rows>
                         <row>
                             <button id="viewEditButton" caption="msg://dataSet.editView"/>
                             <label id="buttonEmptyElement"/>
                         </row>
                         <row>
-                            <label id="viewNameLabel" value="msg://dataSet.viewName" width="${labelWidth}"/>
+                            <label id="viewNameLabel" value="msg://dataSet.viewName"/>
                             <lookupField id="viewNameLookup" datasource="dataSetsDs" property="viewName"
-                                       width="${width}"/>
+                                         width="${width}"/>
                         </row>
                         <row>
                             <checkBox id="useExistingViewCheckbox" datasource="dataSetsDs"
