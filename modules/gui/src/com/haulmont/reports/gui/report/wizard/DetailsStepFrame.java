@@ -305,6 +305,8 @@ public class DetailsStepFrame extends StepFrame {
                                 return PredefinedTransformation.ENDS_WITH;
                             case CONTAINS:
                                 return PredefinedTransformation.CONTAINS;
+                            case DOES_NOT_CONTAIN:
+                                return PredefinedTransformation.CONTAINS;
                         }
                     }
                     return null;
