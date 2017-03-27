@@ -62,6 +62,12 @@ public class ReportInputParameter extends AbstractNotPersistentEntity implements
     protected String transformationScript;
 
     @MetaProperty
+    protected String validationScript;
+
+    @MetaProperty
+    protected Boolean validationOn = false;
+
+    @MetaProperty
     protected Integer predefinedTransformation;
 
     @Transient
@@ -216,5 +222,21 @@ public class ReportInputParameter extends AbstractNotPersistentEntity implements
 
     public void setPredefinedTransformation(PredefinedTransformation predefinedTransformation) {
         this.predefinedTransformation = predefinedTransformation != null ? predefinedTransformation.getId() : null;
+    }
+
+    public String getValidationScript() {
+        return validationScript;
+    }
+
+    public void setValidationScript(String validationScript) {
+        this.validationScript = validationScript;
+    }
+
+    public Boolean getValidationOn() {
+        return validationOn;
+    }
+
+    public void setValidationOn(Boolean validationOn) {
+        this.validationOn = validationOn;
     }
 }

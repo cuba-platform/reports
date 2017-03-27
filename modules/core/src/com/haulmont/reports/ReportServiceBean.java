@@ -21,6 +21,7 @@ import java.util.Map;
 
 @Service(ReportService.NAME)
 public class ReportServiceBean implements ReportService {
+
     @Inject
     protected ReportingApi reportingApi;
 

@@ -13,7 +13,6 @@ import com.haulmont.reports.entity.Report;
 import com.haulmont.reports.entity.wizard.EntityTreeNode;
 import com.haulmont.reports.entity.wizard.ReportData;
 import com.haulmont.reports.entity.wizard.ReportRegion;
-import com.haulmont.reports.entity.wizard.TemplateFileType;
 
 import javax.annotation.Nullable;
 import java.util.List;

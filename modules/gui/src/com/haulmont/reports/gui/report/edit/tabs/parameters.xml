@@ -20,6 +20,7 @@
                 <column id="alias" caption="msg://parameters.alias"/>
                 <column id="type" caption="msg://parameters.type"/>
                 <column id="required" caption="msg://parameters.required"/>
+                <column id="validationOn"/>
             </columns>
             <rows datasource="parametersDs"/>
         </table>

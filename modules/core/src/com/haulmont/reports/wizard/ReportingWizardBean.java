@@ -7,7 +7,6 @@ package com.haulmont.reports.wizard;
 
 import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.chile.core.model.MetaProperty;
-import com.haulmont.cuba.core.Persistence;
 import com.haulmont.cuba.core.global.*;
 import com.haulmont.reports.ReportingApi;
 import com.haulmont.reports.ReportingBean;
@@ -38,8 +37,6 @@ public class ReportingWizardBean implements ReportingWizardApi {
 
     private final Logger log = LoggerFactory.getLogger(ReportingBean.class);
 
-    @Inject
-    protected Persistence persistence;
     @Inject
     protected Metadata metadata;
     @Inject

@@ -92,6 +92,23 @@
                 <sourceCodeEditor id="transformationScript" datasource="parameterDs" property="transformationScript"
                                   mode="Groovy" width="100%" height="240px"/>
             </tab>
+            <tab id="validationTab" caption="msg://parameters.validationTab" margin="true;false;false;false" spacing="true">
+                <grid id="includeValidationBox" spacing="true">
+                    <columns count="2"/>
+                    <rows>
+                        <row>
+                            <label value="msg://parameters.validateFields" align="MIDDLE_LEFT"/>
+                            <checkBox id="includeValidation" datasource="parameterDs" property="validationOn"/>
+                        </row>
+                    </rows>
+                </grid>
+                <label id="validationScriptLabel" value="msg://parameters.groovyScript"/>
+                <hbox width="100%" expand="validationScript">
+                    <sourceCodeEditor id="validationScript" datasource="parameterDs" property="validationScript"
+                                      mode="Groovy" width="100%" height="240px"/>
+                    <linkButton id="validationScriptHelp" icon="icons/question-white.png" invoke="getValidationScriptHelp"/>
+                </hbox>
+            </tab>
         </tabSheet>
         <frame id="windowActions" screen="editWindowActions"/>
     </layout>

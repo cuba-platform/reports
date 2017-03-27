@@ -16,7 +16,6 @@ import com.haulmont.reports.entity.ParameterType;
 import com.haulmont.reports.entity.ReportInputParameter;
 import com.haulmont.reports.gui.report.run.ParameterClassResolver;
 import com.haulmont.reports.gui.report.run.ParameterFieldCreator;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.apache.commons.lang.StringUtils;
 
 import javax.inject.Inject;
@@ -244,5 +243,12 @@ public class ParameterEditor extends AbstractEditor {
         transformationScriptLabel.setVisible(!hasPredefinedTransformation);
         wildcards.setVisible(hasPredefinedTransformation);
         wildcardsLabel.setVisible(hasPredefinedTransformation);
+    }
+
+    public void getValidationScriptHelp() {
+        showMessageDialog(getMessage("validationScript"), getMessage("validationScriptHelp"),
+                MessageType.CONFIRMATION_HTML
+                        .modal(false)
+                        .width(600));
     }
 }
