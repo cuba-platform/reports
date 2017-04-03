@@ -329,10 +329,10 @@ public class ReportEditor extends AbstractEditor<Report> {
     }
 
     protected void sortParametersByPosition() {
-        final MetaClass metaClass = AppBeans.get(Metadata.class).getSession().getClass(ReportInputParameter.class);
-        final MetaPropertyPath mpp = new MetaPropertyPath(metaClass, metaClass.getProperty("position"));
+        MetaClass metaClass = metadata.getClassNN(ReportInputParameter.class);
+        MetaPropertyPath mpp = new MetaPropertyPath(metaClass, metaClass.getProperty("position"));
 
-        CollectionDatasource.Sortable.SortInfo sortInfo = new CollectionDatasource.Sortable.SortInfo();
+        CollectionDatasource.Sortable.SortInfo<MetaPropertyPath> sortInfo = new CollectionDatasource.Sortable.SortInfo<>();
         sortInfo.setOrder(CollectionDatasource.Sortable.Order.ASC);
         sortInfo.setPropertyPath(mpp);
 
@@ -340,14 +340,12 @@ public class ReportEditor extends AbstractEditor<Report> {
     }
 
     protected void initValuesFormats() {
-        formatsTable.addAction(
-                new CreateAction(formatsTable, OpenType.DIALOG) {
-                    @Override
-                    public Map<String, Object> getInitialValues() {
-                        return Collections.<String, Object>singletonMap("report", getItem());
-                    }
-                }
+        CreateAction formatCreateAction = CreateAction.create(formatsTable, OpenType.DIALOG);
+        formatCreateAction.setInitialValuesSupplier(() ->
+                ParamsMap.of("report", getItem())
         );
+        formatsTable.addAction(formatCreateAction);
+
         formatsTable.addAction(new RemoveAction(formatsTable, false));
         formatsTable.addAction(new EditAction(formatsTable, OpenType.DIALOG));
     }
@@ -888,21 +886,20 @@ public class ReportEditor extends AbstractEditor<Report> {
     }
 
     protected void initTemplates() {
-        templatesTable.addAction(new CreateAction(templatesTable, OpenType.DIALOG) {
-            @Override
-            public Map<String, Object> getInitialValues() {
-                return Collections.singletonMap("report", getItem());
-            }
+        CreateAction templateCreateAction = CreateAction.create(templatesTable, OpenType.DIALOG);
 
-            @Override
-            protected void afterCommit(Entity entity) {
-                ReportTemplate reportTemplate = (ReportTemplate) entity;
-                ReportTemplate defaultTemplate = getItem().getDefaultTemplate();
-                if (defaultTemplate == null) {
-                    getItem().setDefaultTemplate(reportTemplate);
-                }
+        templateCreateAction.setInitialValuesSupplier(() ->
+                ParamsMap.of("report", getItem())
+        );
+        templateCreateAction.setAfterCommitHandler(entity -> {
+            ReportTemplate reportTemplate = (ReportTemplate) entity;
+            ReportTemplate defaultTemplate = getItem().getDefaultTemplate();
+            if (defaultTemplate == null) {
+                getItem().setDefaultTemplate(reportTemplate);
             }
         });
+
+        templatesTable.addAction(templateCreateAction);
 
         templatesTable.addAction(new EditAction(templatesTable, OpenType.DIALOG){
             @Override
