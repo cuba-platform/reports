@@ -542,23 +542,27 @@ public class ReportEditor extends AbstractEditor<Report> {
                     public void actionPerform(Component component) {
                         final ReportTemplate defaultTemplate = getItem().getDefaultTemplate();
                         if (defaultTemplate != null) {
-                            final FileUploadDialog dialog = (FileUploadDialog) openWindow("fileUploadDialog", OpenType.DIALOG);
-                            dialog.addCloseListener(actionId -> {
-                                if (COMMIT_ACTION_ID.equals(actionId)) {
-                                    File file = fileUpload.getFile(dialog.getFileId());
-                                    try {
-                                        byte[] data = FileUtils.readFileToByteArray(file);
-                                        defaultTemplate.setContent(data);
-                                        defaultTemplate.setName(dialog.getFileName());
-                                        templatesDs.modifyItem(defaultTemplate);
-                                    } catch (IOException e) {
-                                        throw new RuntimeException(String.format(
-                                                "An error occurred while uploading file for template [%s]",
-                                                defaultTemplate.getCode()));
+                            if (defaultTemplate.getOutputType() != CubaReportOutputType.chart) {
+                                final FileUploadDialog dialog = (FileUploadDialog) openWindow("fileUploadDialog", OpenType.DIALOG);
+                                dialog.addCloseListener(actionId -> {
+                                    if (COMMIT_ACTION_ID.equals(actionId)) {
+                                        File file = fileUpload.getFile(dialog.getFileId());
+                                        try {
+                                            byte[] data = FileUtils.readFileToByteArray(file);
+                                            defaultTemplate.setContent(data);
+                                            defaultTemplate.setName(dialog.getFileName());
+                                            templatesDs.modifyItem(defaultTemplate);
+                                        } catch (IOException e) {
+                                            throw new RuntimeException(String.format(
+                                                    "An error occurred while uploading file for template [%s]",
+                                                    defaultTemplate.getCode()));
+                                        }
                                     }
-                                }
-                                lookupPickerField.requestFocus();
-                            });
+                                    lookupPickerField.requestFocus();
+                                });
+                            } else {
+                                showNotification(getMessage("notification.fileIsNotAllowedForChart"), NotificationType.HUMANIZED);
+                            }
                         } else {
                             showNotification(getMessage("notification.defaultTemplateIsEmpty"), NotificationType.HUMANIZED);
                         }
