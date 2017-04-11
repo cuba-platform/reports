@@ -6,8 +6,7 @@
 package com.haulmont.reports.gui.actions;
 
 import com.haulmont.chile.core.model.MetaClass;
-import com.haulmont.cuba.core.global.AppBeans;
-import com.haulmont.cuba.core.global.UserSessionSource;
+import com.haulmont.cuba.core.global.*;
 import com.haulmont.cuba.gui.WindowManager;
 import com.haulmont.cuba.gui.components.AbstractAction;
 import com.haulmont.cuba.gui.components.Action;
@@ -28,6 +27,7 @@ import java.util.*;
 public abstract class AbstractPrintFormAction extends AbstractAction implements Action.HasBeforeActionPerformedHandler {
 
     protected ReportGuiManager reportGuiManager = AppBeans.get(ReportGuiManager.class);
+    protected DataManager dataManager = AppBeans.get(DataManager.class);
 
     protected BeforeActionPerformedHandler beforeActionPerformedHandler;
 
@@ -53,7 +53,7 @@ public abstract class AbstractPrintFormAction extends AbstractAction implements 
                 public void handleLookup(Collection items) {
                     if (CollectionUtils.isNotEmpty(items)) {
                         Report report = (Report) items.iterator().next();
-                        ReportInputParameter parameter = getParameterAlias(report, inputValueMetaClass);
+                        ReportInputParameter parameter = getParameterAlias(dataManager.reload(report, new View(Report.class).addProperty("xml")), inputValueMetaClass);
                         if (selectedValue instanceof ParameterPrototype) {
                             ((ParameterPrototype) selectedValue).setParamName(parameter.getAlias());
                         }
@@ -63,7 +63,7 @@ public abstract class AbstractPrintFormAction extends AbstractAction implements 
             }, WindowManager.OpenType.DIALOG, params);
         } else if (reports.size() == 1) {
             Report report = reports.get(0);
-            ReportInputParameter parameter = getParameterAlias(report, inputValueMetaClass);
+            ReportInputParameter parameter = getParameterAlias(dataManager.reload(report, new View(Report.class).addProperty("xml")), inputValueMetaClass);
             if (selectedValue instanceof ParameterPrototype) {
                 ((ParameterPrototype) selectedValue).setParamName(parameter.getAlias());
             }
