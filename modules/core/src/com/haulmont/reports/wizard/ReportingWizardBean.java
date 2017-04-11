@@ -285,7 +285,7 @@ public class ReportingWizardBean implements ReportingWizardApi {
     @Override
     @SuppressWarnings("unchecked")
     public View createViewByReportRegions(EntityTreeNode entityTreeRootNode, List<ReportRegion> reportRegions) {
-        View view = new View(entityTreeRootNode.getWrappedMetaClass().getJavaClass());
+        View view = new View(entityTreeRootNode.getWrappedMetaClass().getJavaClass(), false);
 
         Map<EntityTreeNode, View> viewsForNodes = new HashMap<>();
         viewsForNodes.put(entityTreeRootNode, view);
