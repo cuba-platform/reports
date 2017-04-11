@@ -54,7 +54,6 @@ public class EntityTreeModelBuilder implements EntityTreeModelBuilderApi {
         if (depth > getEntityTreeModelMaxDeep()) {
             return parentEntityTreeNode;
         }
-        MetaClass fileDescriptorMetaClass = metadata.getClassNN(FileDescriptor.class);
         for (com.haulmont.chile.core.model.MetaProperty metaProperty : parentEntityTreeNode.getWrappedMetaClass().getProperties()) {
             if (!reportingWizardApi.isPropertyAllowedForReportWizard(parentEntityTreeNode.getWrappedMetaClass(), metaProperty)) {
                 continue;
@@ -66,7 +65,7 @@ public class EntityTreeModelBuilder implements EntityTreeModelBuilderApi {
 
                 MetadataTools metadataTools = metadata.getTools();
 
-                if (fileDescriptorMetaClass.equals(effectiveMetaClass) || !metadataTools.isSystemLevel(effectiveMetaClass) && !metadataTools.isSystemLevel(metaProperty)) {
+                if (!metadataTools.isSystemLevel(effectiveMetaClass) && !metadataTools.isSystemLevel(metaProperty)) {
                     int newDepth = depth + 1;
                     EntityTreeNode newParentModelNode = metadata.create(EntityTreeNode.class);
                     newParentModelNode.setName(metaProperty.getName());
