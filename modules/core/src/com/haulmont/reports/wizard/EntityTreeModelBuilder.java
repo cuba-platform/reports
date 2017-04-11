@@ -6,6 +6,7 @@
 package com.haulmont.reports.wizard;
 
 import com.haulmont.chile.core.model.MetaClass;
+import com.haulmont.cuba.core.entity.FileDescriptor;
 import com.haulmont.cuba.core.global.*;
 import com.haulmont.reports.ReportingConfig;
 import com.haulmont.reports.app.EntityTree;
@@ -53,6 +54,7 @@ public class EntityTreeModelBuilder implements EntityTreeModelBuilderApi {
         if (depth > getEntityTreeModelMaxDeep()) {
             return parentEntityTreeNode;
         }
+        MetaClass fileDescriptorMetaClass = metadata.getClassNN(FileDescriptor.class);
         for (com.haulmont.chile.core.model.MetaProperty metaProperty : parentEntityTreeNode.getWrappedMetaClass().getProperties()) {
             if (!reportingWizardApi.isPropertyAllowedForReportWizard(parentEntityTreeNode.getWrappedMetaClass(), metaProperty)) {
                 continue;
@@ -64,7 +66,7 @@ public class EntityTreeModelBuilder implements EntityTreeModelBuilderApi {
 
                 MetadataTools metadataTools = metadata.getTools();
 
-                if (!metadataTools.isSystemLevel(effectiveMetaClass) && !metadataTools.isSystemLevel(metaProperty)) {
+                if (fileDescriptorMetaClass.equals(effectiveMetaClass) || !metadataTools.isSystemLevel(effectiveMetaClass) && !metadataTools.isSystemLevel(metaProperty)) {
                     int newDepth = depth + 1;
                     EntityTreeNode newParentModelNode = metadata.create(EntityTreeNode.class);
                     newParentModelNode.setName(metaProperty.getName());
