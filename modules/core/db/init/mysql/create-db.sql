@@ -7,7 +7,7 @@ create table REPORT_GROUP (
   UPDATE_TS datetime(3),
   UPDATED_BY varchar(50),
   --
-  TITLE varchar(255) not null,
+  TITLE varchar(190) not null,
   CODE varchar(255),
   LOCALE_NAMES text,
   --
@@ -27,7 +27,7 @@ create table REPORT_REPORT
   UPDATE_TS datetime(3),
   UPDATED_BY varchar(50),
   --
-  NAME varchar(255) not null,
+  NAME varchar(190) not null,
   CODE varchar(255),
   DESCRIPTION varchar(500),
   LOCALE_NAMES text,
