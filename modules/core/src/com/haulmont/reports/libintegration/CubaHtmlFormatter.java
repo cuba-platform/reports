@@ -40,6 +40,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.regex.Pattern;
 
 import static java.lang.String.format;
 
@@ -69,6 +70,7 @@ public class CubaHtmlFormatter extends HtmlFormatter {
     protected void renderPdfDocument(String htmlContent, OutputStream outputStream) {
         ITextRenderer renderer = new ITextRenderer();
         try {
+            htmlContent = Pattern.compile("(?i)<!doctype").matcher(htmlContent).replaceAll("<!DOCTYPE");
             File tmpFile = File.createTempFile("htmlReport", ".htm");
             DataOutputStream dataOutputStream = new DataOutputStream(new FileOutputStream(tmpFile));
             dataOutputStream.write(htmlContent.getBytes(StandardCharsets.UTF_8));
