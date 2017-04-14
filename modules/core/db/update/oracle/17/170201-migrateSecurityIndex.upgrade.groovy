@@ -6,11 +6,12 @@ def sql = new Sql(ds)
 sql.withTransaction {
     List<ReportIdx> indexes = new ArrayList<>();
     sql.eachRow('select id, xml from REPORT_REPORT') { row ->
-        if (row.xml != null) {
-            if (row.xml.startsWith('<')) {
-                migrateIdxForXml(indexes, row.id, row.xml)
+        def xmlString = row.xml.stringValue()
+        if (xmlString != null) {
+            if (xmlString.startsWith('<')) {
+                migrateIdxForXml(indexes, row.id, xmlString)
             } else {
-                migrateIdxForJson(indexes, row.id, row.xml)
+                migrateIdxForJson(indexes, row.id, xmlString)
             }
         }
     }
