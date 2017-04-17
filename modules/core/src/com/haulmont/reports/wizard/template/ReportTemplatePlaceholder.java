@@ -9,6 +9,7 @@ import com.haulmont.chile.core.model.MetaProperty;
 import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.reports.entity.wizard.RegionProperty;
+import com.haulmont.reports.entity.wizard.ReportData;
 import com.haulmont.reports.entity.wizard.ReportRegion;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -80,9 +81,15 @@ public class ReportTemplatePlaceholder {
             }
             return String.format(HTML_DATE_MASK, bandName, fieldName, dateMask, generatePathForEntityField(partsFieldName), generateConditions(partsFieldName, bandName, fieldName, false));
         } else {
-            String[] partsFieldName = fieldName.split("\\.");
-            if (partsFieldName.length > 1) {
-                fieldName = partsFieldName[0];
+            ReportData reportData = reportRegion.getReportData();
+            String[] partsFieldName;
+            if (reportData != null && reportData.getReportType() == ReportData.ReportType.LIST_OF_ENTITIES_WITH_QUERY) {
+                partsFieldName = new String[]{fieldName};
+            } else {
+                partsFieldName = fieldName.split("\\.");
+                if (partsFieldName.length > 1) {
+                    fieldName = partsFieldName[0];
+                }
             }
             String condition = generateConditions(partsFieldName, bandName, fieldName, true);
             return String.format(HTML_COMMON_MASK, bandName, fieldName, generatePathForEntityField(partsFieldName), condition, condition.length() > 0 ? "</#if>" : "");
