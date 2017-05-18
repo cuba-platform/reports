@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
@@ -36,7 +37,7 @@ import static java.lang.String.format;
 public class CustomFormatter implements com.haulmont.yarg.formatters.CustomReport {
     private static final Logger log = LoggerFactory.getLogger(CustomFormatter.class);
 
-    protected static ScheduledExecutorService executor =
+    protected static final ScheduledExecutorService executor =
             Executors.newScheduledThreadPool(3,
                     new ThreadFactoryBuilder()
                             .setNameFormat("ReportCustomFormatter-%d")
@@ -100,7 +101,7 @@ public class CustomFormatter implements com.haulmont.yarg.formatters.CustomRepor
         if (result instanceof byte[]) {
             return (byte[]) result;
         } else if (result instanceof CharSequence) {
-            return result.toString().getBytes();
+            return result.toString().getBytes(StandardCharsets.UTF_8);
         } else {
             throw new ReportingException(
                     format("Result returned from custom report is of type %s " +
@@ -118,15 +119,12 @@ public class CustomFormatter implements com.haulmont.yarg.formatters.CustomRepor
             }
         }
 
-        final String url = scripting.evaluateGroovy("return \"" + customDefinition + "\"", convertedParams).toString();
+        String url = scripting.evaluateGroovy("return \"" + customDefinition + "\"", convertedParams).toString();
 
         try {
-            Future<byte[]> future = executor.submit(new Callable<byte[]>() {
-                @Override
-                public byte[] call() throws Exception {
-                    return doReadBytesFromUrl(url);
-                }
-            });
+            Future<byte[]> future = executor.submit(() ->
+                    doReadBytesFromUrl(url)
+            );
 
             byte[] bytes = future.get(reportingConfig.getCurlTimeout(), TimeUnit.SECONDS);
 

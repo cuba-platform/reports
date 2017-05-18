@@ -7,8 +7,6 @@ package com.haulmont.reports.gui.report.wizard.region;
 
 import com.haulmont.bali.datastruct.Node;
 import com.haulmont.bali.datastruct.Tree;
-import com.haulmont.cuba.core.global.AppBeans;
-import com.haulmont.cuba.core.global.Metadata;
 import com.haulmont.cuba.gui.components.TextField;
 import com.haulmont.cuba.gui.data.impl.AbstractTreeDatasource;
 import com.haulmont.reports.entity.wizard.EntityTreeNode;
@@ -28,15 +26,12 @@ public class EntityTreeNodeDs extends AbstractTreeDatasource<EntityTreeNode, UUI
     protected boolean showRoot;
 
     protected Comparator<EntityTreeNode> nodeComparator = (o1, o2) -> {
-
         Collator collator = Collator.getInstance();
         return collator.compare(o1.getHierarchicalLocalizedNameExceptRoot(), o2.getHierarchicalLocalizedNameExceptRoot());
     };
 
-    protected Metadata metadata = AppBeans.get(Metadata.class);
-
     @Override
-    protected Tree loadTree(Map<String, Object> params) {
+    protected Tree<EntityTreeNode> loadTree(Map<String, Object> params) {
         collectionsOnly = isTreeForCollectionsOnly(params);
         scalarOnly = isTreeForScalarOnly(params);
         persistentOnly = isTreeForPersistentOnly(params);
@@ -116,14 +111,13 @@ public class EntityTreeNodeDs extends AbstractTreeDatasource<EntityTreeNode, UUI
                     //doesn't fetch if it is a last entity and is a class cause we can`t select it in UI anyway
                     continue;
                 }
-                Node childNode = new Node<>(child);
+                Node<EntityTreeNode> childNode = new Node<>(child);
                 if (StringUtils.isEmpty(searchValue) || child.getLocalizedName().toLowerCase().contains(searchValue)) {
                     parentNode.addChild(childNode);
                 }
             }
         }
     }
-
 
     protected void fill(final Node<EntityTreeNode> parentNode) {
         fill(parentNode, "");

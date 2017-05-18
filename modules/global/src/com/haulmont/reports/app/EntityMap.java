@@ -10,6 +10,8 @@ import com.haulmont.chile.core.model.MetaProperty;
 import com.haulmont.cuba.core.entity.Entity;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -17,11 +19,14 @@ import java.util.Map;
 import java.util.Set;
 
 public class EntityMap implements Map<String, Object> {
-    public static final String INSTANCE_NAME_KEY = "_instanceName";
-    private Instance instance;
-    private HashMap<String, Object> explicitData;
+    private static final Logger log = LoggerFactory.getLogger(EntityMap.class);
 
-    private boolean loaded = false;
+    public static final String INSTANCE_NAME_KEY = "_instanceName";
+
+    protected Instance instance;
+    protected HashMap<String, Object> explicitData;
+
+    protected boolean loaded = false;
 
     public EntityMap(Entity entity) {
         instance = entity;
@@ -40,9 +45,9 @@ public class EntityMap implements Map<String, Object> {
 
     @Override
     public boolean containsKey(Object key) {
-        if (explicitData.containsKey(key))
+        if (explicitData.containsKey(key)) {
             return true;
-        else {
+        } else {
             MetaClass metaClass = instance.getMetaClass();
             for (MetaProperty property : metaClass.getProperties()) {
                 if (ObjectUtils.equals(property.getName(), key))
@@ -105,7 +110,7 @@ public class EntityMap implements Map<String, Object> {
         return explicitData.entrySet();
     }
 
-    private void loadAllProperties() {
+    protected void loadAllProperties() {
         if (!loaded) {
             MetaClass metaClass = instance.getMetaClass();
             for (MetaProperty property : metaClass.getProperties()) {
@@ -117,7 +122,7 @@ public class EntityMap implements Map<String, Object> {
         }
     }
 
-    private Object getValue(Instance instance, Object key) {
+    protected Object getValue(Instance instance, Object key) {
         if (key == null) return null;
 
         String path = String.valueOf(key);
@@ -135,11 +140,16 @@ public class EntityMap implements Map<String, Object> {
         Object value = null;
         try {
             value = instance.getValue(path);
-        } catch (Exception e) {/*Do nothing*/}
+        } catch (Exception e) {
+            log.trace("Suppressed error from underlying EntityMap instance.getValue", e);
+        }
+
         if (value == null) {
             try {
                 value = instance.getValueEx(path);
-            } catch (Exception e) {/*Do nothing*/}
+            } catch (Exception e) {
+                log.trace("Suppressed error from underlying EntityMap instance.getValue", e);
+            }
         }
         return value;
     }

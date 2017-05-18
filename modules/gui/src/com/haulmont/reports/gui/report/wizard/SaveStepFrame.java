@@ -5,6 +5,7 @@
 
 package com.haulmont.reports.gui.report.wizard;
 
+import com.haulmont.bali.util.ParamsMap;
 import com.haulmont.cuba.gui.AppConfig;
 import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.components.DialogAction.Type;
@@ -20,8 +21,8 @@ import com.haulmont.reports.gui.report.wizard.step.StepFrame;
 import com.haulmont.reports.gui.template.edit.RandomChartDataGenerator;
 import org.apache.commons.lang.StringUtils;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -40,8 +41,9 @@ public class SaveStepFrame extends StepFrame {
             initSaveAction();
             initDownloadAction();
 
-            if (StringUtils.isEmpty(wizard.outputFileName.<String>getValue())) {
-                wizard.outputFileName.setValue(wizard.generateOutputFileName(wizard.templateFileFormat.getValue().toString().toLowerCase()));
+            if (StringUtils.isEmpty(wizard.outputFileName.getValue())) {
+                Object value = wizard.templateFileFormat.getValue();
+                wizard.outputFileName.setValue(wizard.generateOutputFileName(value.toString().toLowerCase()));
             }
             wizard.setCorrectReportOutputType();
 
@@ -139,7 +141,8 @@ public class SaveStepFrame extends StepFrame {
         }
 
         protected void showChart() {
-            String chartDescriptionJson = new String(wizard.buildReport(true).getDefaultTemplate().getContent());
+            byte[] content = wizard.buildReport(true).getDefaultTemplate().getContent();
+            String chartDescriptionJson = new String(content, StandardCharsets.UTF_8);
             AbstractChartDescription chartDescription = AbstractChartDescription.fromJsonString(chartDescriptionJson);
             RandomChartDataGenerator randomChartDataGenerator = new RandomChartDataGenerator();
             List<Map<String, Object>> randomChartData = randomChartDataGenerator.generateRandomChartData(chartDescription);
@@ -152,7 +155,7 @@ public class SaveStepFrame extends StepFrame {
             }
 
             wizard.openFrame(wizard.chartPreviewBox, ShowChartController.JSON_CHART_SCREEN_ID,
-                    Collections.<String, Object>singletonMap(ShowChartController.CHART_JSON_PARAMETER, chartJson));
+                    ParamsMap.of(ShowChartController.CHART_JSON_PARAMETER, chartJson));
         }
     }
 

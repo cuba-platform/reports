@@ -16,6 +16,7 @@ import freemarker.template.TemplateException;
 import org.apache.commons.collections.CollectionUtils;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public class ChartGenerator implements Generator {
@@ -57,7 +58,7 @@ public class ChartGenerator implements Generator {
                 }
             }
 
-            return AbstractChartDescription.toJsonString(serialChartDescription).getBytes();
+            return AbstractChartDescription.toJsonString(serialChartDescription).getBytes(StandardCharsets.UTF_8);
         }
 
         return new byte[0];
@@ -85,6 +86,6 @@ public class ChartGenerator implements Generator {
             }
         }
 
-        return AbstractChartDescription.toJsonString(pieChartDescription).getBytes();
+        return AbstractChartDescription.toJsonString(pieChartDescription).getBytes(StandardCharsets.UTF_8);
     }
 }

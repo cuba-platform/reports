@@ -7,7 +7,6 @@ package com.haulmont.reports.gui.actions;
 
 import com.haulmont.bali.util.ParamsMap;
 import com.haulmont.cuba.core.global.AppBeans;
-import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.gui.ComponentsHelper;
 import com.haulmont.cuba.gui.WindowManager.OpenType;
 import com.haulmont.cuba.gui.components.*;
@@ -22,8 +21,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 public class RunReportAction extends AbstractAction implements Action.HasBeforeActionPerformedHandler {
 
     protected Frame window;
-
-    protected Messages messages = AppBeans.get(Messages.class);
 
     protected ReportGuiManager reportGuiManager = AppBeans.get(ReportGuiManager.class);
 

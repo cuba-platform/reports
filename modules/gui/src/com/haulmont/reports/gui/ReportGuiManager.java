@@ -34,6 +34,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -217,7 +218,7 @@ public class ReportGuiManager {
                                     @Nullable String templateCode, @Nullable String outputFileName, @Nullable Frame window) {
         if (document.getReportOutputType().getId().equals(CubaReportOutputType.chart.getId())) {
             HashMap<String, Object> screenParams = new HashMap<>();
-            screenParams.put(ShowChartController.CHART_JSON_PARAMETER, new String(document.getContent()));
+            screenParams.put(ShowChartController.CHART_JSON_PARAMETER, new String(document.getContent(), StandardCharsets.UTF_8));
             screenParams.put(ShowChartController.REPORT_PARAMETER, document.getReport());
             screenParams.put(ShowChartController.TEMPLATE_CODE_PARAMETER, templateCode);
             screenParams.put(ShowChartController.PARAMS_PARAMETER, params);

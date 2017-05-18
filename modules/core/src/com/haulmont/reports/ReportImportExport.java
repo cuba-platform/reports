@@ -26,6 +26,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.zip.CRC32;
 
@@ -160,11 +161,10 @@ public class ReportImportExport implements ReportImportExportAPI, ReportImportEx
         zipOutputStream.setMethod(ZipArchiveOutputStream.STORED);
         zipOutputStream.setEncoding(ENCODING);
 
-
         report = reloadReport(report);
 
         String xml = report.getXml();
-        byte[] xmlBytes = xml.getBytes();
+        byte[] xmlBytes = xml.getBytes(StandardCharsets.UTF_8);
         ArchiveEntry zipEntryReportObject = newStoredEntry("report.structure", xmlBytes);
         zipOutputStream.putArchiveEntry(zipEntryReportObject);
         zipOutputStream.write(xmlBytes);
@@ -198,7 +198,7 @@ public class ReportImportExport implements ReportImportExportAPI, ReportImportEx
         // importing report.xml to report object
         while (((archiveEntry = archiveReader.getNextZipEntry()) != null) && (report == null)) {
             if (isReportsStructureFile(archiveEntry.getName())) {
-                String xml = new String(readBytesFromEntry(archiveReader));
+                String xml = new String(readBytesFromEntry(archiveReader), StandardCharsets.UTF_8);
                 if (xml.startsWith("<")) {//previous xml structure version
                     XStreamConverter xStreamConverter = new XStreamConverter();
                     report = xStreamConverter.convertToReport(xml);

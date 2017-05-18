@@ -97,7 +97,7 @@ configure([globalModule, coreModule, guiModule, webModule, desktopModule]) {
 
     findbugs {
         toolVersion = "3.0.1"
-        ignoreFailures = true
+        ignoreFailures = false
         omitVisitors = ['FindDoubleCheck']
         excludeFilter = rootProject.file("findbugs/exclude-filter.xml")
         effort = "max"
