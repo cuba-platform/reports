@@ -24,7 +24,7 @@ import java.nio.charset.StandardCharsets;
 @Entity(name = "report$ReportTemplate")
 @Table(name = "REPORT_TEMPLATE")
 @SystemLevel
-@NamePattern("#getCaption|code,name,customDefinition")
+@NamePattern("#getCaption|code,name,customDefinition,custom")
 @SuppressWarnings("unused")
 public class ReportTemplate extends BaseReportEntity implements com.haulmont.yarg.structure.ReportTemplate {
     private static final long serialVersionUID = 3692751073234357754L;
