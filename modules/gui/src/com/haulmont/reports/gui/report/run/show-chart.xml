@@ -20,7 +20,7 @@
                 resizable="true"/>
 
     <layout expand="chartBox">
-        <hbox spacing="true">
+        <hbox id="reportSelectorBox" spacing="true">
             <label id="reportLookupLabel" align="MIDDLE_CENTER" value="msg://caption.reportForChart"/>
             <lookupField id="reportLookup" optionsDatasource="reportsDs" width="400px"/>
         </hbox>

@@ -41,9 +41,6 @@ public class ShowChartController extends AbstractWindow {
     protected LookupField reportLookup;
 
     @Inject
-    protected Label reportLookupLabel;
-
-    @Inject
     protected ComponentsFactory componentsFactory;
 
     @Inject
@@ -51,6 +48,8 @@ public class ShowChartController extends AbstractWindow {
 
     @Inject
     protected BoxLayout parametersFrameHolder;
+    @Inject
+    protected HBoxLayout reportSelectorBox;
 
     protected InputParametersFrame inputParametersFrame;
 
@@ -74,8 +73,8 @@ public class ShowChartController extends AbstractWindow {
         Map<String, Object> reportParameters = (Map<String, Object>) params.get(PARAMS_PARAMETER);
 
         if (report != null) {
-            reportLookup.setVisible(false);
-            reportLookupLabel.setVisible(false);
+            reportSelectorBox.setVisible(false);
+
             initFrames(chartJson, reportParameters);
         } else {
             showDiagramStubText();
