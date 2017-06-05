@@ -7,6 +7,7 @@ package com.haulmont.reports.libintegration;
 
 import com.google.common.base.Strings;
 import com.haulmont.cuba.core.Persistence;
+import com.haulmont.cuba.core.app.execution.ResourceCanceledException;
 import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.Metadata;
 import com.haulmont.cuba.core.global.QueryUtils;
@@ -14,6 +15,7 @@ import com.haulmont.cuba.core.global.Resources;
 import com.haulmont.cuba.core.global.filter.ParametersHelper;
 import com.haulmont.reports.entity.PredefinedTransformation;
 import com.haulmont.reports.entity.ReportInputParameter;
+import com.haulmont.yarg.exception.ReportingException;
 import com.haulmont.yarg.reporting.Reporting;
 import com.haulmont.yarg.structure.BandData;
 import com.haulmont.yarg.structure.Report;
@@ -21,6 +23,7 @@ import com.haulmont.yarg.structure.ReportParameter;
 import com.haulmont.yarg.structure.ReportTemplate;
 import com.haulmont.yarg.util.groovy.Scripting;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.codehaus.groovy.runtime.MethodClosure;
 
 import java.util.HashMap;
@@ -93,5 +96,14 @@ public class CubaReporting extends Reporting {
 
     protected String wrapValueForLike(Object value, boolean before, boolean after) {
         return ParametersHelper.CASE_INSENSITIVE_MARKER + (before ? "%" : "") + value + (after ? "%" : "");
+    }
+
+    @Override
+    protected void logException(ReportingException e) {
+        if (ExceptionUtils.getRootCause(e) instanceof ResourceCanceledException) {
+            logger.info("Report is canceled by user request");
+        } else {
+            super.logException(e);
+        }
     }
 }

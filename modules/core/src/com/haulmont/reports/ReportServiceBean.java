@@ -14,10 +14,7 @@ import com.haulmont.yarg.util.converter.ObjectToStringConverter;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.util.Collection;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service(ReportService.NAME)
 public class ReportServiceBean implements ReportService {
@@ -119,5 +116,10 @@ public class ReportServiceBean implements ReportService {
     @Override
     public Object convertFromString(Class parameterClass, String paramValueStr) {
         return objectToStringConverter.convertFromString(parameterClass, paramValueStr);
+    }
+
+    @Override
+    public void cancelReportExecution(UUID userSessionId, UUID reportId) {
+        reportingApi.cancelReportExecution(userSessionId, reportId);
     }
 }

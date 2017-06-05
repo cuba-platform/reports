@@ -13,10 +13,7 @@ import com.haulmont.reports.app.ParameterPrototype;
 import com.haulmont.reports.entity.*;
 import com.haulmont.yarg.reporting.ReportOutputDocument;
 
-import java.util.Collection;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * API for reporting
@@ -63,4 +60,11 @@ public interface ReportingApi {
     String generateReportName(String sourceName);
 
     List loadDataForParameterPrototype(ParameterPrototype prototype);
+
+    /**
+     * Cancel report execution
+     * @param userSessionId - user session that started report execution
+     * @param reportId - identifier of executed report
+     */
+    void cancelReportExecution(UUID userSessionId, UUID reportId);
 }

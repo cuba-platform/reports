@@ -10,10 +10,7 @@ import com.haulmont.reports.app.ParameterPrototype;
 import com.haulmont.reports.entity.*;
 import com.haulmont.yarg.reporting.ReportOutputDocument;
 
-import java.util.Collection;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public interface ReportService {
     String NAME = "report_ReportService";
@@ -81,4 +78,11 @@ public interface ReportService {
     String convertToString(Class parameterClass, Object paramValue);
 
     Object convertFromString(Class parameterClass, String paramValueStr);
+
+    /**
+     * Cancel report execution
+     * @param userSessionId - user session that started report execution
+     * @param reportId - identifier of executed report
+     */
+    void cancelReportExecution(UUID userSessionId, UUID reportId);
 }

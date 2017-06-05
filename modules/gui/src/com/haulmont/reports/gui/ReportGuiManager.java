@@ -71,6 +71,9 @@ public class ReportGuiManager {
     @Inject
     protected QueryTransformerFactory queryTransformerFactory;
 
+    @Inject
+    protected UserSessionSource userSessionSource;
+
     /**
      * Open input parameters dialog if report has parameters otherwise print report
      *
@@ -254,6 +257,7 @@ public class ReportGuiManager {
         Report targetReport = getReportForPrinting(report);
 
         long timeout = reportingClientConfig.getBackgroundReportProcessingTimeoutMs();
+        final UUID userSessionId = userSessionSource.getUserSession().getId();
         BackgroundTask<Void, ReportOutputDocument> task = new BackgroundTask<Void, ReportOutputDocument>(timeout, TimeUnit.MILLISECONDS, window) {
 
             @SuppressWarnings("UnnecessaryLocalVariable")
@@ -266,6 +270,12 @@ public class ReportGuiManager {
             @Override
             public void done(ReportOutputDocument document) {
                 showReportResult(document, params, templateCode, outputFileName, window);
+            }
+
+            @Override
+            public void canceled() {
+                super.canceled();
+                reportService.cancelReportExecution(userSessionId, report.getId());
             }
         };
 

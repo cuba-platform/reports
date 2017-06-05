@@ -11,6 +11,8 @@ import com.haulmont.cuba.core.Persistence;
 import com.haulmont.cuba.core.Transaction;
 import com.haulmont.cuba.core.app.FileStorageAPI;
 import com.haulmont.cuba.core.app.dynamicattributes.DynamicAttributesManagerAPI;
+import com.haulmont.cuba.core.app.execution.Executions;
+import com.haulmont.cuba.core.app.execution.ResourceCanceledException;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.entity.FileDescriptor;
 import com.haulmont.cuba.core.global.*;
@@ -77,6 +79,8 @@ public class ReportingBean implements ReportingApi {
     protected DynamicAttributesManagerAPI dynamicAttributesManagerAPI;
     @Inject
     protected ViewRepository viewRepository;
+    @Inject
+    protected Executions executions;
 
     protected PrototypesLoader prototypesLoader = new PrototypesLoader();
 
@@ -245,6 +249,7 @@ public class ReportingBean implements ReportingApi {
         StopWatch stopWatch = null;
         MDC.put("user", userSessionSource.getUserSession().getUser().getLogin());
         MDC.put("webContextName", globalConfig.getWebContextName());
+        executions.startExecution(report.getId().toString(), "Reporting");
         try {
             stopWatch = new Log4JStopWatch("Reporting#" + report.getName());
             List<String> prototypes = new LinkedList<>();
@@ -275,6 +280,9 @@ public class ReportingBean implements ReportingApi {
         } catch (com.haulmont.yarg.exception.ValidationException ve) {
             throw new ValidationException(ve.getMessage());
         } catch (com.haulmont.yarg.exception.ReportingException re) {
+            if (ExceptionUtils.getRootCause(re) instanceof ResourceCanceledException) {
+                return null;
+            }
             //noinspection unchecked
             List<Throwable> list = ExceptionUtils.getThrowableList(re);
             StringBuilder sb = new StringBuilder();
@@ -287,6 +295,7 @@ public class ReportingBean implements ReportingApi {
 
             throw new ReportingException(sb.toString());
         } finally {
+            executions.endExecution();
             MDC.remove("user");
             MDC.remove("webContextName");
             if (stopWatch != null) {
@@ -512,6 +521,11 @@ public class ReportingBean implements ReportingApi {
     @Override
     public String generateReportName(String sourceName) {
         return generateReportName(sourceName, 0);
+    }
+
+    @Override
+    public void cancelReportExecution(UUID userSessionId, UUID reportId) {
+        executions.cancelExecution(userSessionId, "Reporting", reportId.toString());
     }
 
     @SuppressWarnings("unchecked")
