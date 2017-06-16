@@ -52,10 +52,13 @@
             </vbox>
             <!-- Split -->
             <vbox id="editPane" margin="false;false;false;true" height="100%" spacing="true">
-                <vbox id="textBox" expand="text" height="100%" spacing="true">
+                <vbox id="textBox" expand="textHBox" height="100%" spacing="true">
                     <label id="dataSetTextLabel" value="msg://dataSet.text"/>
-                    <sourceCodeEditor id="text" datasource="dataSetsDs" property="text"
-                                      mode="Text" width="100%"/>
+                    <hbox id="textHBox" width="100%" expand="text">
+                        <sourceCodeEditor id="text" datasource="dataSetsDs" property="text"
+                                          mode="Text" height="100%"/>
+                        <linkButton id="textHelp" icon="icons/question-white.png" invoke="getTextHelp"/>
+                    </hbox>
                     <hbox id="textParamsBox" spacing="true">
                         <textField id="linkParameterName" width="${width}"
                                    datasource="dataSetsDs"

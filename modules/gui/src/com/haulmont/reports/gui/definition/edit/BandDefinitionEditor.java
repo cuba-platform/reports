@@ -42,6 +42,8 @@ public class BandDefinitionEditor extends AbstractFrame implements Suggester {
     protected Table<DataSet> dataSets;
     @Named("text")
     protected SourceCodeEditor dataSetScriptField;
+    @Named("textHelp")
+    protected LinkButton dataSetHelpField;
     @Inject
     protected BoxLayout textBox;
     @Inject
@@ -136,6 +138,13 @@ public class BandDefinitionEditor extends AbstractFrame implements Suggester {
 
         initDataStoreField();
 
+    }
+
+    public void getTextHelp() {
+        showMessageDialog(getMessage("dataSet.text"), getMessage("dataSet.textHelp"),
+                MessageType.CONFIRMATION_HTML
+                        .modal(false)
+                        .width(700));
     }
 
     protected void initDataStoreField() {
@@ -356,21 +365,25 @@ public class BandDefinitionEditor extends AbstractFrame implements Suggester {
                 case SQL:
                     dataSetScriptField.setMode(SourceCodeEditor.Mode.SQL);
                     dataSetScriptField.setSuggester(null);
+                    dataSetHelpField.setVisible(false);
                     break;
 
                 case GROOVY:
                     dataSetScriptField.setSuggester(null);
                     dataSetScriptField.setMode(SourceCodeEditor.Mode.Groovy);
+                    dataSetHelpField.setVisible(true);
                     break;
 
                 case JPQL:
                     dataSetScriptField.setSuggester(processTemplate.isChecked() ? null : this);
                     dataSetScriptField.setMode(SourceCodeEditor.Mode.Text);
+                    dataSetHelpField.setVisible(false);
                     break;
 
                 default:
                     dataSetScriptField.setSuggester(null);
                     dataSetScriptField.setMode(SourceCodeEditor.Mode.Text);
+                    dataSetHelpField.setVisible(false);
                     break;
             }
         }
