@@ -10,9 +10,7 @@ package com.haulmont.reports.libintegration;
 
 import com.haulmont.cuba.core.Persistence;
 import com.haulmont.cuba.core.Transaction;
-import com.haulmont.cuba.core.global.AppBeans;
-import com.haulmont.cuba.core.global.Metadata;
-import com.haulmont.cuba.core.global.Resources;
+import com.haulmont.cuba.core.global.*;
 import com.haulmont.yarg.exception.DataLoadingException;
 import com.haulmont.yarg.exception.ValidationException;
 import com.haulmont.yarg.loaders.ReportDataLoader;
@@ -43,11 +41,17 @@ public class CubaGroovyDataLoader implements ReportDataLoader {
         try {
             String script = reportQuery.getScript();
             Map<String, Object> scriptParams = new HashMap<String, Object>();
+            UserSessionSource userSessionSource = AppBeans.get(UserSessionSource.class);
             scriptParams.put("reportQuery", reportQuery);
             scriptParams.put("parentBand", parentBand);
             scriptParams.put("params", params);
             scriptParams.put("persistence", AppBeans.get(Persistence.class));
             scriptParams.put("metadata", AppBeans.get(Metadata.class));
+            scriptParams.put("dataManager", AppBeans.get(DataManager.class));
+            scriptParams.put("security", AppBeans.get(Security.class));
+            scriptParams.put("timeSource", AppBeans.get(TimeSource.class));
+            scriptParams.put("userSession", userSessionSource.getUserSession());
+            scriptParams.put("userSessionSource", userSessionSource);
             scriptParams.put("transactional", new MethodClosure(this, "transactional"));
             scriptParams.put("validationException", new MethodClosure(this, "validationException"));
 
