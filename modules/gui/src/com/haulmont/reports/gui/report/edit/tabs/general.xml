@@ -6,14 +6,15 @@
 <window xmlns="http://schemas.haulmont.com/cuba/window.xsd">
 
     <assign name="width" value="250"/>
-    <assign name="widthBig" value="300"/>
+    <assign name="widthBig" value="265"/>
+    <assign name="widthTemplate" value="380"/>
 
     <layout expand="bands" spacing="true" margin="true;true;false;true">
         <hbox id="reportFields" spacing="true" width="100%" expand="spacer">
             <fieldGroup id="propertiesFieldGroup" border="hidden" datasource="reportDs" width="AUTO">
                 <column>
-                    <field id="name" required="true" requiredMessage="msg://report.nameMsg" width="${widthBig}"/>
-                    <field id="defaultTemplate" custom="true" width="${widthBig}"/>
+                    <field id="name" required="true" requiredMessage="msg://report.nameMsg" width="${widthTemplate}"/>
+                    <field id="defaultTemplate" custom="true" width="${widthTemplate}"/>
                 </column>
                 <column>
                     <field id="group" required="true" optionsDatasource="groupsDs"
