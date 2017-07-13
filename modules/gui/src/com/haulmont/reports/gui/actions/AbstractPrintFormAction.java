@@ -6,7 +6,10 @@
 package com.haulmont.reports.gui.actions;
 
 import com.haulmont.chile.core.model.MetaClass;
-import com.haulmont.cuba.core.global.*;
+import com.haulmont.cuba.core.global.AppBeans;
+import com.haulmont.cuba.core.global.DataManager;
+import com.haulmont.cuba.core.global.UserSessionSource;
+import com.haulmont.cuba.core.global.View;
 import com.haulmont.cuba.gui.WindowManager;
 import com.haulmont.cuba.gui.components.AbstractAction;
 import com.haulmont.cuba.gui.components.Action;
@@ -22,7 +25,9 @@ import com.haulmont.reports.gui.report.run.ReportRun;
 import org.apache.commons.collections.CollectionUtils;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 public abstract class AbstractPrintFormAction extends AbstractAction implements Action.HasBeforeActionPerformedHandler {
 
@@ -47,27 +52,25 @@ public abstract class AbstractPrintFormAction extends AbstractAction implements 
         if (reports.size() > 1) {
             Map<String, Object> params = Collections.<String, Object>singletonMap(ReportRun.REPORTS_PARAMETER, reports);
 
-            window.openLookup("report$Report.run", new Window.Lookup.Handler() {
-
-                @Override
-                public void handleLookup(Collection items) {
-                    if (CollectionUtils.isNotEmpty(items)) {
-                        Report report = (Report) items.iterator().next();
-                        ReportInputParameter parameter = getParameterAlias(dataManager.reload(report, new View(Report.class).addProperty("xml")), inputValueMetaClass);
-                        if (selectedValue instanceof ParameterPrototype) {
-                            ((ParameterPrototype) selectedValue).setParamName(parameter.getAlias());
-                        }
-                        reportGuiManager.runReport(report, window, parameter, selectedValue, null, outputFileName);
+            window.openLookup("report$Report.run", items -> {
+                if (CollectionUtils.isNotEmpty(items)) {
+                    Report report = (Report) items.iterator().next();
+                    Report reloadedReport = reloadReport(report);
+                    ReportInputParameter parameter = getParameterAlias(reloadedReport, inputValueMetaClass);
+                    if (selectedValue instanceof ParameterPrototype) {
+                        ((ParameterPrototype) selectedValue).setParamName(parameter.getAlias());
                     }
+                    reportGuiManager.runReport(reloadedReport, window, parameter, selectedValue, null, outputFileName);
                 }
             }, WindowManager.OpenType.DIALOG, params);
         } else if (reports.size() == 1) {
             Report report = reports.get(0);
-            ReportInputParameter parameter = getParameterAlias(dataManager.reload(report, new View(Report.class).addProperty("xml")), inputValueMetaClass);
+            Report reloadedReport = reloadReport(report);
+            ReportInputParameter parameter = getParameterAlias(reloadedReport, inputValueMetaClass);
             if (selectedValue instanceof ParameterPrototype) {
                 ((ParameterPrototype) selectedValue).setParamName(parameter.getAlias());
             }
-            reportGuiManager.runReport(report, window, parameter, selectedValue, null, outputFileName);
+            reportGuiManager.runReport(reloadedReport, window, parameter, selectedValue, null, outputFileName);
         } else {
             window.showNotification(messages.getMessage(ReportGuiManager.class, "report.notFoundReports"),
                     Frame.NotificationType.HUMANIZED);
@@ -93,5 +96,15 @@ public abstract class AbstractPrintFormAction extends AbstractAction implements 
     @Override
     public void setBeforeActionPerformedHandler(BeforeActionPerformedHandler handler) {
         beforeActionPerformedHandler = handler;
+    }
+
+    protected Report reloadReport(Report report) {
+        View view = new View(Report.class)
+                .addProperty("name")
+                .addProperty("localeNames")
+                .addProperty("description")
+                .addProperty("code")
+                .addProperty("xml");
+        return dataManager.reload(report, view);
     }
 }
