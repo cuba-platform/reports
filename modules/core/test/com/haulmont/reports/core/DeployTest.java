@@ -3,9 +3,6 @@
  * Use is subject to license terms, see http://www.cuba-platform.com/commercial-software-license for details.
  */
 
-/**
- *
- */
 package com.haulmont.reports.core;
 
 import com.haulmont.cuba.core.global.AppBeans;
@@ -15,7 +12,6 @@ import org.junit.ClassRule;
 import org.junit.Test;
 
 public class DeployTest {
-
     @ClassRule
     public static ReportsTestContainer cont = ReportsTestContainer.Common.INSTANCE;
 

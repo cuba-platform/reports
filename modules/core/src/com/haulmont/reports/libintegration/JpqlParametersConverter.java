@@ -3,16 +3,13 @@
  * Use is subject to license terms, see http://www.cuba-platform.com/commercial-software-license for details.
  */
 
-/**
- *
- */
 package com.haulmont.reports.libintegration;
 
 import com.haulmont.chile.core.datatypes.impl.EnumClass;
 import com.haulmont.cuba.core.Persistence;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.yarg.loaders.ReportParametersConverter;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.ArrayUtils;
 
 import javax.inject.Inject;

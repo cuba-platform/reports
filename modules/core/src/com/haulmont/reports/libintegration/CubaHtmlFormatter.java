@@ -3,9 +3,6 @@
  * Use is subject to license terms, see http://www.cuba-platform.com/commercial-software-license for details.
  */
 
-/**
- *
- */
 package com.haulmont.reports.libintegration;
 
 import com.haulmont.cuba.core.app.FileStorageAPI;
@@ -345,5 +342,4 @@ public class CubaHtmlFormatter extends HtmlFormatter {
     protected void throwIncorrectArgType(String methodName, int argIdx, String type) throws TemplateModelException {
         throw new TemplateModelException(String.format("Incorrect argument[%s] type for method %s. Expected type %s", argIdx, methodName, type));
     }
-
 }

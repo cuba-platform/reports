@@ -3,9 +3,6 @@
  * Use is subject to license terms, see http://www.cuba-platform.com/commercial-software-license for details.
  */
 
-/**
- *
- */
 package com.haulmont.reports.exception;
 
 public class ValidationException extends ReportingException {

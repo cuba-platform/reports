@@ -15,7 +15,7 @@ import com.haulmont.reports.app.service.ReportService;
 import com.haulmont.reports.entity.Report;
 import com.haulmont.reports.entity.ReportGroup;
 import com.haulmont.reports.gui.ReportGuiManager;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 
@@ -112,7 +112,7 @@ public class ReportRun extends AbstractLookup {
                 reportGuiManager.getAvailableReports(screenParameter, userSessionSource.getUserSession().getUser(), null)
         );
 
-        CollectionUtils.filter(reports, new org.apache.commons.collections.Predicate() {
+        CollectionUtils.filter(reports, new org.apache.commons.collections4.Predicate() {
             @Override
             public boolean evaluate(Object object) {
                 Report report = (Report) object;

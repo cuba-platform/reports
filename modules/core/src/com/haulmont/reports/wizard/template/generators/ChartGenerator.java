@@ -13,7 +13,7 @@ import com.haulmont.reports.entity.wizard.ReportRegion;
 import com.haulmont.reports.exception.TemplateGenerationException;
 import com.haulmont.reports.wizard.template.Generator;
 import freemarker.template.TemplateException;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;

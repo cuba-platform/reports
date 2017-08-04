@@ -20,7 +20,7 @@ import com.haulmont.cuba.gui.data.impl.DatasourceImplementation;
 import com.haulmont.reports.app.service.ReportService;
 import com.haulmont.reports.app.service.ReportWizardService;
 import com.haulmont.reports.entity.*;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 
 import javax.annotation.Nullable;

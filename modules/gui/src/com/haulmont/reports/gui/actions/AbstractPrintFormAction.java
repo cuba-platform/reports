@@ -22,7 +22,7 @@ import com.haulmont.reports.entity.ReportInputParameter;
 import com.haulmont.reports.exception.ReportingException;
 import com.haulmont.reports.gui.ReportGuiManager;
 import com.haulmont.reports.gui.report.run.ReportRun;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 
 import javax.annotation.Nullable;
 import java.util.Collections;

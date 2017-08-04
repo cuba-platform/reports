@@ -8,7 +8,7 @@ package com.haulmont.reports.entity.charts;
 import com.google.gson.*;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.reports.entity.charts.serialization.DateSerializer;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 
 import javax.annotation.Nullable;

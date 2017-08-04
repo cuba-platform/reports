@@ -39,7 +39,7 @@ import com.haulmont.reports.app.service.ReportService;
 import com.haulmont.reports.entity.*;
 import com.haulmont.reports.gui.ReportPrintHelper;
 import com.haulmont.reports.gui.definition.edit.BandDefinitionEditor;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;

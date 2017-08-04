@@ -11,8 +11,8 @@ import com.haulmont.cuba.core.entity.annotation.Listeners;
 import com.haulmont.cuba.security.entity.Role;
 import com.haulmont.yarg.structure.ReportBand;
 import com.haulmont.yarg.structure.ReportFieldFormat;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Predicate;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.Predicate;
 import org.apache.commons.lang.StringUtils;
 
 import javax.persistence.*;

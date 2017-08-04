@@ -15,7 +15,7 @@ import com.haulmont.cuba.gui.data.CollectionDatasource;
 import com.haulmont.cuba.gui.data.Datasource;
 import com.haulmont.reports.app.ParameterPrototype;
 import com.haulmont.reports.gui.ReportGuiManager;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.Set;
 
