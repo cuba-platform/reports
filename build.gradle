@@ -200,8 +200,6 @@ configure(coreModule) {
         compile(group: 'com.haulmont.cuba', name: 'cuba-core', version: baseVersion)
 		compile(bom['com.haulmont.yarg:yarg']) {
             exclude group: 'org.codehaus.groovy', module: 'groovy-all'
-            exclude group: 'org.slf4j', module: 'slf4j-log4j12'
-            exclude group: 'log4j', module: 'log4j'
             exclude group: 'commons-dbcp', module: 'commons-dbcp'
         }
 		
