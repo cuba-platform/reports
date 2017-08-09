@@ -31,10 +31,10 @@
                         width="100%" height="100%"/>
             </groupBox>
             <vbox id="btnsControlPanel" margin="true" spacing="true" width="AUTO">
-                <button id="addItem" icon="icons/report-wizard-to-right-pane.png"/>
-                <button id="removeItem" icon="icons/remove.png"/>
-                <button id="upItem" enable="false" icon="icons/report-wizard-up-property.png"/>
-                <button id="downItem" enable="false" icon="icons/report-wizard-down-property.png"/>
+                <button id="addItem" icon="icons/report-wizard-to-right-pane.png" width="40px"/>
+                <button id="removeItem" icon="icons/remove.png" width="40px"/>
+                <button id="upItem" enable="false" icon="icons/report-wizard-up-property.png" width="40px"/>
+                <button id="downItem" enable="false" icon="icons/report-wizard-down-property.png" width="40px"/>
             </vbox>
             <groupBox id="selectedTreeItemsPanel" width="500px" height="500px">
                 <table id="propertiesTable" multiselect="true" sortable="false" reorderingAllowed="false"
