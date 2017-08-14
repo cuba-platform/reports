@@ -27,12 +27,14 @@ public class ReportPrintHelper {
         inputOutputTypesMapping.put("xls", Arrays.asList(XLS, PDF));
         inputOutputTypesMapping.put("html", Arrays.asList(HTML, PDF));
         inputOutputTypesMapping.put("ftl", Arrays.asList(HTML, PDF));
+        inputOutputTypesMapping.put("csv", Arrays.asList(CSV));
         exportFormats.put(ReportOutputType.xls, ExportFormat.XLS);
         exportFormats.put(ReportOutputType.xlsx, ExportFormat.XLSX);
         exportFormats.put(ReportOutputType.doc, ExportFormat.DOC);
         exportFormats.put(ReportOutputType.docx, ExportFormat.DOCX);
         exportFormats.put(ReportOutputType.pdf, ExportFormat.PDF);
         exportFormats.put(ReportOutputType.html, ExportFormat.HTML);
+        exportFormats.put(ReportOutputType.csv, ExportFormat.CSV);
     }
 
     public static ExportFormat getExportFormat(ReportOutputType outputType) {
