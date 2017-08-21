@@ -27,6 +27,7 @@ import com.haulmont.reports.app.ParameterPrototype;
 import com.haulmont.reports.app.service.ReportService;
 import com.haulmont.reports.entity.*;
 import com.haulmont.reports.gui.report.run.ShowChartController;
+import com.haulmont.reports.gui.report.run.ShowReportTable;
 import com.haulmont.yarg.reporting.ReportOutputDocument;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -220,7 +221,7 @@ public class ReportGuiManager {
     protected void showReportResult(ReportOutputDocument document, Map<String, Object> params,
                                     @Nullable String templateCode, @Nullable String outputFileName, @Nullable Frame window) {
         if (document.getReportOutputType().getId().equals(CubaReportOutputType.chart.getId())) {
-            HashMap<String, Object> screenParams = new HashMap<>();
+            Map<String, Object> screenParams = new HashMap<>();
             screenParams.put(ShowChartController.CHART_JSON_PARAMETER, new String(document.getContent(), StandardCharsets.UTF_8));
             screenParams.put(ShowChartController.REPORT_PARAMETER, document.getReport());
             screenParams.put(ShowChartController.TEMPLATE_CODE_PARAMETER, templateCode);
@@ -232,7 +233,21 @@ public class ReportGuiManager {
                 WindowInfo windowInfo = windowConfig.getWindowInfo("report$showChart");
                 windowManagerProvider.get().openWindow(windowInfo, OpenType.DIALOG, screenParams);
             }
-        } else {
+        } else if (document.getReportOutputType().getId().equals(CubaReportOutputType.table.getId())) {
+            Map<String, Object> screenParams = new HashMap<>();
+            screenParams.put(ShowReportTable.TABLE_DATA_PARAMETER, document.getContent());
+            screenParams.put(ShowReportTable.REPORT_PARAMETER, document.getReport());
+            screenParams.put(ShowReportTable.TEMPLATE_CODE_PARAMETER, templateCode);
+            screenParams.put(ShowReportTable.PARAMS_PARAMETER, params);
+
+            if (window != null) {
+                window.openWindow("report$showReportTable", OpenType.DIALOG, screenParams);
+            } else {
+                WindowInfo windowInfo = windowConfig.getWindowInfo("report$showReportData");
+                windowManagerProvider.get().openWindow(windowInfo, OpenType.DIALOG, screenParams);
+            }
+        }
+        else {
             byte[] byteArr = document.getContent();
             ExportFormat exportFormat = ReportPrintHelper.getExportFormat(document.getReportOutputType());
             ExportDisplay exportDisplay = AppConfig.createExportDisplay(window);

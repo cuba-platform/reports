@@ -45,6 +45,8 @@ public class CubaFormatterFactory extends DefaultFormatterFactory {
             return xlsxFormatter;
         };
         formattersMap.put("xlsx", xlsxCreator);
+
+        formattersMap.put("table", CubaTableFormatter::new);
     }
 
     @Override

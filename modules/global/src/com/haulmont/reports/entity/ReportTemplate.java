@@ -207,4 +207,10 @@ public class ReportTemplate extends BaseReportEntity implements com.haulmont.yar
             setName(".chart");
         }
     }
+
+    public void setTableName() {
+        if (getReportOutputType() == ReportOutputType.TABLE) {
+            setName(".table");
+        }
+    }
 }

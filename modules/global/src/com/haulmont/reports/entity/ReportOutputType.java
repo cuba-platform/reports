@@ -19,7 +19,8 @@ public enum ReportOutputType implements EnumClass<Integer> {
     XLSX(50, CubaReportOutputType.xlsx),
     CUSTOM(60, CubaReportOutputType.custom),
     CHART(70, CubaReportOutputType.chart),
-    CSV(80, CubaReportOutputType.csv);
+    CSV(80, CubaReportOutputType.csv),
+    TABLE(90, CubaReportOutputType.table);
 
     private Integer id;
 

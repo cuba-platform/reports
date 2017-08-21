@@ -173,10 +173,13 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
             chartEdit.hideChartPreviewBox();
         }
 
-        templateUploadField.setVisible(!chartOutputType);
-        templateFileLabel.setVisible(!chartOutputType);
-        outputNamePattern.setVisible(!chartOutputType);
-        outputNamePatternLabel.setVisible(!chartOutputType);
+        boolean tableOutputType = reportOutputType == ReportOutputType.TABLE;
+        boolean templateOutputVisibility = !(chartOutputType || tableOutputType);
+
+        templateUploadField.setVisible(templateOutputVisibility);
+        templateFileLabel.setVisible(templateOutputVisibility);
+        outputNamePattern.setVisible(templateOutputVisibility);
+        outputNamePatternLabel.setVisible(templateOutputVisibility);
     }
 
     @Override
@@ -231,6 +234,9 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
             AbstractChartDescription chartDescription = chartEdit.getChartDescription();
             reportTemplate.setChartDescription(chartDescription);
         }
+        if (reportTemplate.getReportOutputType() == ReportOutputType.TABLE) {
+            reportTemplate.setTableName();
+        }
 
         return super.commit(validate);
     }
@@ -240,6 +246,7 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
         String name = reportTemplate.getName();
         if (!Boolean.TRUE.equals(reportTemplate.getCustom())
                 && reportTemplate.getReportOutputType() != ReportOutputType.CHART
+                && reportTemplate.getReportOutputType() != ReportOutputType.TABLE
                 && name != null) {
             String inputType = name.contains(".") ? name.substring(name.lastIndexOf(".") + 1) : "";
 
@@ -257,6 +264,7 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
         ReportTemplate template = getItem();
         if (!Boolean.TRUE.equals(template.getCustom())
                 && template.getReportOutputType() != ReportOutputType.CHART
+                && template.getReportOutputType() != ReportOutputType.TABLE
                 && template.getContent() == null) {
             StringBuilder notification = new StringBuilder(getMessage("template.uploadTemplate"));
 

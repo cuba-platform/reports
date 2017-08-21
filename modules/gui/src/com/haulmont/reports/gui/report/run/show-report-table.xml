@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+  ~ Copyright (c) 2008-2017 Haulmont. All rights reserved.
+  ~ Use is subject to license terms, see http://www.cuba-platform.com/commercial-software-license for details.
+  -->
+
+<window xmlns="http://schemas.haulmont.com/cuba/window.xsd"
+        caption="msg://showReportTable.caption"
+        class="com.haulmont.reports.gui.report.run.ShowReportTable"
+        messagesPack="com.haulmont.reports.gui.report.run">
+
+    <dsContext>
+        <collectionDatasource id="reportsDs" class="com.haulmont.reports.entity.Report">
+            <query><![CDATA[select r from report$Report r, in (r.templates) t where t.reportOutputType <> 70]]></query>
+        </collectionDatasource>
+        <hierarchicalDatasource id="reportDataDs" class="com.haulmont.cuba.core.entity.KeyValueEntity"
+                              allowCommit="false"
+                              refreshMode="NEVER"/>
+    </dsContext>
+
+    <dialogMode height="theme://cuba.gui.dialogSize.height.large"
+                width="theme://cuba.gui.dialogSize.width.large"
+                resizable="true"/>
+
+    <layout expand="tablesHolderGroup">
+        <hbox id="reportSelectorBox" spacing="true">
+            <label id="reportLookupLabel" align="MIDDLE_CENTER" value="msg://caption.reportForChart"/>
+            <lookupField id="reportLookup" optionsDatasource="reportsDs" width="400px"/>
+        </hbox>
+
+        <groupBox id="reportParamsBox" collapsable="true" collapsed="false" visible="false" caption="msg://caption.reportParameters" spacing="true">
+            <vbox id="parametersFrameHolder">
+
+            </vbox>
+            <button id="printReportBtn" invoke="printReport"
+                    caption="msg://input.printReport" icon="icons/run.png"/>
+        </groupBox>
+
+        <groupBox id="tablesHolderGroup">
+            <scrollBox id="tablesHolder" spacing="true">
+
+            </scrollBox>
+        </groupBox>
+    </layout>
+</window>

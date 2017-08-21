@@ -54,6 +54,9 @@
     <screen id="report$showChart"
             template="/com/haulmont/reports/gui/report/run/show-chart.xml"/>
 
+    <screen id="report$showReportTable"
+            template="/com/haulmont/reports/gui/report/run/show-report-table.xml"/>
+
     <screen id="report$inputParametersFrame"
             template="/com/haulmont/reports/gui/report/run/input-parameters-frame.xml"/>
 </screen-config>
