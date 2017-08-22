@@ -5,12 +5,16 @@
 package com.haulmont.reports.gui.report.run;
 
 import com.haulmont.bali.util.Preconditions;
+import com.haulmont.bali.util.ParamsMap;
 import com.haulmont.cuba.client.ClientConfig;
 import com.haulmont.cuba.gui.components.AbstractWindow;
 import com.haulmont.cuba.gui.components.Action;
 import com.haulmont.cuba.gui.components.Button;
 import com.haulmont.reports.entity.Report;
 import com.haulmont.reports.entity.ReportInputParameter;
+import com.haulmont.cuba.gui.components.*;
+import com.haulmont.cuba.gui.data.CollectionDatasource;
+import com.haulmont.reports.entity.ReportTemplate;
 import com.haulmont.reports.gui.ReportGuiManager;
 import org.apache.commons.lang.BooleanUtils;
 
@@ -18,6 +22,10 @@ import javax.inject.Inject;
 import java.util.*;
 
 import static com.haulmont.reports.gui.report.run.InputParametersFrame.PARAMETERS_PARAMETER;
+import java.util.Map;
+import java.util.UUID;
+
+import static com.haulmont.reports.gui.report.run.InputParametersFrame.REPORT_PARAMETER;
 
 public class InputParametersWindow extends AbstractWindow {
     public static final String TEMPLATE_CODE_PARAMETER = "templateCode";
@@ -47,6 +55,13 @@ public class InputParametersWindow extends AbstractWindow {
     @Inject
     private InputParametersFrame inputParametersFrame;
 
+    @Inject
+    protected HBoxLayout templatesBox;
+    @Inject
+    protected LookupField templateField;
+    @Inject
+    protected CollectionDatasource<ReportTemplate, UUID> templateReportsDs;
+
     @Override
     public void init(Map<String, Object> params) {
         super.init(params);
@@ -69,6 +84,15 @@ public class InputParametersWindow extends AbstractWindow {
             selectedEntities = (Collection) parameters.get(inputParameter.getAlias());
         }
 
+        Report report = (Report) params.get(REPORT_PARAMETER);
+        if (report != null && !report.getIsTmp()) {
+            if (report.getTemplates() != null && report.getTemplates().size() > 1) {
+                templateReportsDs.refresh(ParamsMap.of("reportId", report.getId()));
+                templateField.setValue(report.getDefaultTemplate());
+                templatesBox.setVisible(true);
+            }
+        }
+
         Action printReportAction = printReportBtn.getAction();
         String commitShortcut = clientConfig.getCommitShortcut();
         printReportAction.setShortcut(commitShortcut);
@@ -78,6 +102,10 @@ public class InputParametersWindow extends AbstractWindow {
     public void printReport() {
         if (inputParametersFrame.getReport() != null) {
             if (validateAll()) {
+                ReportTemplate template = templateField.getValue();
+                if (template != null)
+                    templateCode = template.getCode();
+
                 Report report = inputParametersFrame.getReport();
                 Map<String, Object> parameters = inputParametersFrame.collectParameters();
                 if (bulkPrint) {

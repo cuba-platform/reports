@@ -85,7 +85,8 @@ public class ReportGuiManager {
             throw new IllegalArgumentException("Can not run null report");
         }
 
-        if (report.getInputParameters() != null && report.getInputParameters().size() > 0) {
+        if ((report.getInputParameters() != null && report.getInputParameters().size() > 0) ||
+                (report.getTemplates() != null && report.getTemplates().size() > 1)) {
             openReportParamsDialog(window, report, null, null, null);
         } else {
             printReport(report, ParamsMap.empty(), window);

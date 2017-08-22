@@ -95,7 +95,8 @@ public class ReportBrowser extends AbstractLookup {
                 Report report = (Report) target.getSingleSelected();
                 if (report != null) {
                     report = getDsContext().getDataSupplier().reload(report, "report.edit");
-                    if (report.getInputParameters() != null && report.getInputParameters().size() > 0) {
+                    if ((report.getInputParameters() != null && report.getInputParameters().size() > 0) ||
+                            (report.getTemplates() != null && report.getTemplates().size() > 1)) {
                         Window paramsWindow = openWindow("report$inputParameters", OpenType.DIALOG,
                                 ParamsMap.of("report", report));
                         paramsWindow.addCloseListener(actionId ->
