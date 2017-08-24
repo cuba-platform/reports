@@ -37,6 +37,8 @@ import static java.lang.String.format;
 public class CustomFormatter implements com.haulmont.yarg.formatters.CustomReport {
     private static final Logger log = LoggerFactory.getLogger(CustomFormatter.class);
 
+    private static final String ROOT_BAND = "rootBand";
+
     protected static final ScheduledExecutorService executor =
             Executors.newScheduledThreadPool(3,
                     new ThreadFactoryBuilder()
@@ -71,9 +73,9 @@ public class CustomFormatter implements com.haulmont.yarg.formatters.CustomRepor
         if (CustomTemplateDefinedBy.CLASS == definedBy) {
             return generateReportWithClass(rootBand, customDefinition);
         } else if (CustomTemplateDefinedBy.SCRIPT == definedBy) {
-            return generateReportWithScript(customDefinition);
+            return generateReportWithScript(rootBand, customDefinition);
         } else if (CustomTemplateDefinedBy.URL == definedBy) {
-            return generateReportWithUrl(customDefinition);
+            return generateReportWithUrl(rootBand, customDefinition);
         } else {
             throw new ReportingException(
                     format("The value of \"Defined by\" field is not supported [%s]", definedBy));
@@ -92,12 +94,15 @@ public class CustomFormatter implements com.haulmont.yarg.formatters.CustomRepor
         }
     }
 
-    protected byte[] generateReportWithScript(String customDefinition) {
+    protected byte[] generateReportWithScript(BandData rootBand, String customDefinition) {
         if (customDefinition.startsWith("/")) {
             customDefinition = StringUtils.removeStart(customDefinition, "/");
         }
-        Object result = scripting.runGroovyScript(customDefinition,
-                Collections.singletonMap("params", params));
+        Map<String, Object> scriptParams = new HashMap<>();
+        scriptParams.put("params", params);
+        scriptParams.put(ROOT_BAND, rootBand);
+
+        Object result = scripting.runGroovyScript(customDefinition, scriptParams);
         if (result instanceof byte[]) {
             return (byte[]) result;
         } else if (result instanceof CharSequence) {
@@ -109,7 +114,7 @@ public class CustomFormatter implements com.haulmont.yarg.formatters.CustomRepor
         }
     }
 
-    protected byte[] generateReportWithUrl(String customDefinition) {
+    protected byte[] generateReportWithUrl(BandData rootBand, String customDefinition) {
         Map<String, Object> convertedParams = new HashMap<>();
         for (Map.Entry<String, Object> entry : params.entrySet()) {
             if (entry.getValue() instanceof Date) {
@@ -118,6 +123,8 @@ public class CustomFormatter implements com.haulmont.yarg.formatters.CustomRepor
                 convertedParams.put(entry.getKey(), entry.getValue());
             }
         }
+
+        convertedParams.put(ROOT_BAND, rootBand);
 
         String url = scripting.evaluateGroovy("return \"" + customDefinition + "\"", convertedParams).toString();
 
