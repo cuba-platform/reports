@@ -11,42 +11,40 @@ import com.haulmont.yarg.formatters.factory.FormatterFactoryInput;
 import com.haulmont.yarg.formatters.impl.AbstractFormatter;
 import com.haulmont.yarg.formatters.impl.DocxFormatter;
 import com.haulmont.yarg.formatters.impl.HtmlFormatter;
+import com.haulmont.yarg.formatters.impl.XlsxFormatter;
 
 public class CubaFormatterFactory extends DefaultFormatterFactory {
     protected boolean useOfficeForDocxPdfConversion = true;
 
     public CubaFormatterFactory() {
         super();
-        FormatterCreator ftlCreator = new FormatterCreator() {
-            @Override
-            public ReportFormatter create(FormatterFactoryInput factoryInput) {
-                HtmlFormatter htmlFormatter = new CubaHtmlFormatter(factoryInput);
-                htmlFormatter.setDefaultFormatProvider(defaultFormatProvider);
-                return htmlFormatter;
-            }
+        FormatterCreator ftlCreator = factoryInput -> {
+            HtmlFormatter htmlFormatter = new CubaHtmlFormatter(factoryInput);
+            htmlFormatter.setDefaultFormatProvider(defaultFormatProvider);
+            return htmlFormatter;
         };
         formattersMap.put("ftl", ftlCreator);
         formattersMap.put("html", ftlCreator);
 
-        FormatterCreator docxCreator = new FormatterCreator() {
-            @Override
-            public ReportFormatter create(FormatterFactoryInput factoryInput) {
-                DocxFormatter docxFormatter = new DocxFormatter(factoryInput);
-                docxFormatter.setDefaultFormatProvider(defaultFormatProvider);
-                if (useOfficeForDocxPdfConversion) {
-                    docxFormatter.setPdfConverter(pdfConverter);
-                }
-                return docxFormatter;
+        FormatterCreator docxCreator = factoryInput -> {
+            DocxFormatter docxFormatter = new DocxFormatter(factoryInput);
+            docxFormatter.setDefaultFormatProvider(defaultFormatProvider);
+            if (useOfficeForDocxPdfConversion) {
+                docxFormatter.setPdfConverter(pdfConverter);
             }
+            return docxFormatter;
         };
 
         formattersMap.put("docx", docxCreator);
-        formattersMap.put("chart", new FormatterCreator() {
-            @Override
-            public ReportFormatter create(FormatterFactoryInput formatterFactoryInput) {
-                return new ChartFormatter(formatterFactoryInput);
-            }
-        });
+        formattersMap.put("chart", ChartFormatter::new);
+
+        FormatterCreator xlsxCreator = factoryInput -> {
+            XlsxFormatter xlsxFormatter = new CubaXlsxFormatter(factoryInput);
+            xlsxFormatter.setDefaultFormatProvider(defaultFormatProvider);
+            xlsxFormatter.setPdfConverter(pdfConverter);
+            return xlsxFormatter;
+        };
+        formattersMap.put("xlsx", xlsxCreator);
     }
 
     @Override
