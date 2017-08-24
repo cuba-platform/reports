@@ -7,7 +7,9 @@ package com.haulmont.reports.libintegration;
 
 import com.haulmont.chile.core.datatypes.impl.EnumClass;
 import com.haulmont.cuba.core.Persistence;
+import com.haulmont.cuba.core.entity.BaseDbGeneratedIdEntity;
 import com.haulmont.cuba.core.entity.Entity;
+import com.haulmont.cuba.core.entity.IdProxy;
 import com.haulmont.yarg.loaders.ReportParametersConverter;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.ArrayUtils;
@@ -33,7 +35,12 @@ public class SqlParametersConverter implements ReportParametersConverter {
                 if (firstObject instanceof Entity) {
                     List<Object> entityIds = new ArrayList<>();
                     for (Object object : collection) {
-                        entityIds.add(dbSpecificConvert(((Entity) object).getId()));
+                        Object id = ((Entity) object).getId();
+                        if (id instanceof IdProxy) {
+                            entityIds.add(dbSpecificConvert(((IdProxy) id).getNN()));
+                        } else {
+                            entityIds.add(dbSpecificConvert(id));
+                        }
                     }
 
                     return (T) entityIds;
@@ -46,14 +53,24 @@ public class SqlParametersConverter implements ReportParametersConverter {
                 if (firstObject instanceof Entity) {
                     List<Object> entityIds = new ArrayList<>();
                     for (Object object : objects) {
-                        entityIds.add(dbSpecificConvert(((Entity) object).getId()));
+                        Object id = ((Entity) object).getId();
+                        if (id instanceof IdProxy) {
+                            entityIds.add(dbSpecificConvert(((IdProxy) id).getNN()));
+                        } else {
+                            entityIds.add(dbSpecificConvert(id));
+                        }
                     }
 
                     return (T) entityIds;
                 }
             }
         } else if (input instanceof Entity) {
-            return (T) dbSpecificConvert(((Entity) input).getId());
+            Object id = ((Entity) input).getId();
+            if (id instanceof IdProxy) {
+                return (T) dbSpecificConvert(((IdProxy) id).getNN());
+            } else {
+                return (T) dbSpecificConvert(id);
+            }
         }
 
         return (T) dbSpecificConvert(input);
