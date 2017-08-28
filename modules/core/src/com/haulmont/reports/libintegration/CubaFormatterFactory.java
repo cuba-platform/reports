@@ -30,7 +30,7 @@ public class CubaFormatterFactory extends DefaultFormatterFactory {
             DocxFormatter docxFormatter = new DocxFormatter(factoryInput);
             docxFormatter.setDefaultFormatProvider(defaultFormatProvider);
             if (useOfficeForDocxPdfConversion) {
-                docxFormatter.setPdfConverter(pdfConverter);
+                docxFormatter.setDocumentConverter(documentConverter);
             }
             return docxFormatter;
         };
@@ -41,7 +41,7 @@ public class CubaFormatterFactory extends DefaultFormatterFactory {
         FormatterCreator xlsxCreator = factoryInput -> {
             XlsxFormatter xlsxFormatter = new CubaXlsxFormatter(factoryInput);
             xlsxFormatter.setDefaultFormatProvider(defaultFormatProvider);
-            xlsxFormatter.setPdfConverter(pdfConverter);
+            xlsxFormatter.setDocumentConverter(documentConverter);
             return xlsxFormatter;
         };
         formattersMap.put("xlsx", xlsxCreator);
