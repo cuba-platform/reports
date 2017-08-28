@@ -6,6 +6,8 @@ create table REPORT_GROUP (
   VERSION integer,
   UPDATE_TS datetime,
   UPDATED_BY varchar(50),
+  DELETE_TS datetime,
+  DELETED_BY varchar(50),
   --
   TITLE varchar(255) not null,
   CODE varchar(255),
@@ -14,7 +16,7 @@ create table REPORT_GROUP (
   primary key (ID)
 )^
 
-create unique index IDX_REPORT_GROUP_UNIQ_TITLE on REPORT_GROUP (TITLE)^
+create unique index IDX_REPORT_GROUP_UNIQ_TITLE on REPORT_GROUP (TITLE, DELETE_TS)^
 
 --------------------------------------------------------------------------------------------------------------
 
@@ -26,6 +28,8 @@ create table REPORT_REPORT
   VERSION integer,
   UPDATE_TS datetime,
   UPDATED_BY varchar(50),
+  DELETE_TS datetime,
+  DELETED_BY varchar(50),
   --
   NAME varchar(255) not null,
   CODE varchar(255),
@@ -44,7 +48,7 @@ create table REPORT_REPORT
       references REPORT_GROUP (ID)
 )^
 
-create unique index IDX_REPORT_REPORT_UNIQ_NAME on REPORT_REPORT (NAME)^
+create unique index IDX_REPORT_REPORT_UNIQ_NAME on REPORT_REPORT (NAME, DELETE_TS)^
 
 --------------------------------------------------------------------------------------------------------------
 
@@ -56,6 +60,8 @@ create table REPORT_TEMPLATE
   VERSION integer,
   UPDATE_TS datetime,
   UPDATED_BY varchar(50),
+  DELETE_TS datetime,
+  DELETED_BY varchar(50),
   --
   REPORT_ID uniqueidentifier not null,
   CODE varchar(50),

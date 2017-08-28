@@ -6,13 +6,15 @@ create table REPORT_GROUP (
     VERSION integer,
     UPDATE_TS timestamp,
     UPDATED_BY varchar2(50),
+    DELETE_TS timestamp,
+    DELETED_BY varchar2(50),
     TITLE varchar2(255) not null,
     CODE varchar2(255),
     LOCALE_NAMES clob,
     primary key(ID)
 )^
 
-create unique index IDX_REPORT_GROUP_UNIQ_TITLE on REPORT_GROUP(TITLE)^
+create unique index IDX_REPORT_GROUP_UNIQ_TITLE on REPORT_GROUP(TITLE, DELETE_TS)^
 
 create table REPORT_REPORT (
     ID varchar2(32) not null,
@@ -21,6 +23,8 @@ create table REPORT_REPORT (
     VERSION integer,
     UPDATE_TS timestamp,
     UPDATED_BY varchar2(50),
+    DELETE_TS timestamp,
+    DELETED_BY varchar2(50),
     NAME varchar2(255) not null,
     CODE varchar2(255),
     DESCRIPTION varchar2(500),
@@ -36,7 +40,7 @@ create table REPORT_REPORT (
     primary key(ID)
 )^
 
-create unique index IDX_REPORT_REPORT_UNIQ_NAME on REPORT_REPORT(NAME)^
+create unique index IDX_REPORT_REPORT_UNIQ_NAME on REPORT_REPORT(NAME, DELETE_TS)^
 
 create table REPORT_TEMPLATE (
     ID varchar2(32) not null,
@@ -45,6 +49,8 @@ create table REPORT_TEMPLATE (
     VERSION integer,
     UPDATE_TS timestamp,
     UPDATED_BY varchar2(50),
+    DELETE_TS timestamp,
+    DELETED_BY varchar2(50),
     REPORT_ID varchar2(32) not null,
     CODE varchar2(50),
     OUTPUT_TYPE integer not null,

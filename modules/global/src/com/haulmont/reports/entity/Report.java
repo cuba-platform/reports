@@ -7,6 +7,7 @@ package com.haulmont.reports.entity;
 import com.haulmont.chile.core.annotations.Composition;
 import com.haulmont.chile.core.annotations.MetaProperty;
 import com.haulmont.chile.core.annotations.NamePattern;
+import com.haulmont.cuba.core.entity.StandardEntity;
 import com.haulmont.cuba.core.entity.annotation.Listeners;
 import com.haulmont.cuba.core.entity.LocaleHelper;
 import com.haulmont.cuba.security.entity.Role;
@@ -28,7 +29,7 @@ import java.util.*;
 @NamePattern("%s|locName,name,localeNames")
 @Listeners("report_ReportDetachListener")
 @SuppressWarnings("unused")
-public class Report extends BaseReportEntity implements com.haulmont.yarg.structure.Report {
+public class Report extends StandardEntity implements com.haulmont.yarg.structure.Report {
     private static final long serialVersionUID = -2817764915661205093L;
 
     @Column(name = "NAME", length = 255, nullable = false, unique = true)

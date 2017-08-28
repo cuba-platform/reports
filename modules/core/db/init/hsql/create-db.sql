@@ -6,6 +6,8 @@ create table REPORT_GROUP (
   VERSION integer,
   UPDATE_TS timestamp,
   UPDATED_BY varchar(50),
+  DELETE_TS timestamp,
+  DELETED_BY varchar(50),
 
   TITLE varchar(255) not null,
   CODE varchar(255),
@@ -14,7 +16,7 @@ create table REPORT_GROUP (
   primary key (ID)
 )^
 
-alter table REPORT_GROUP add constraint REPORT_GROUP_UNIQ_TITLE unique (TITLE)^
+alter table REPORT_GROUP add constraint REPORT_GROUP_UNIQ_TITLE unique (TITLE, DELETE_TS)^
 
 ----------------------------------------------------------------------------------------------------------------
 
@@ -26,6 +28,8 @@ create table REPORT_REPORT
   VERSION integer,
   UPDATE_TS timestamp,
   UPDATED_BY varchar(50),
+  DELETE_TS timestamp,
+  DELETED_BY varchar(50),
 
   NAME varchar(255) not null,
   CODE varchar(255),
@@ -44,7 +48,7 @@ create table REPORT_REPORT
       references REPORT_GROUP (ID)
 )^
 
-alter table REPORT_REPORT add constraint REPORT_REPORT_UNIQ_NAME unique (NAME)^
+alter table REPORT_REPORT add constraint REPORT_REPORT_UNIQ_NAME unique (NAME, DELETE_TS)^
 
 --------------------------------------------------------------------------------------------------------------
 
@@ -56,6 +60,8 @@ create table REPORT_TEMPLATE
   VERSION integer,
   UPDATE_TS timestamp,
   UPDATED_BY varchar(50),
+  DELETE_TS timestamp,
+  DELETED_BY varchar(50),
 
   REPORT_ID varchar(36) not null,
   CODE varchar(50),

@@ -6,6 +6,7 @@
 package com.haulmont.reports.entity;
 
 import com.haulmont.chile.core.annotations.NamePattern;
+import com.haulmont.cuba.core.entity.StandardEntity;
 import com.haulmont.cuba.core.entity.annotation.SystemLevel;
 import com.haulmont.reports.entity.charts.AbstractChartDescription;
 import com.haulmont.yarg.formatters.CustomReport;
@@ -26,7 +27,7 @@ import java.nio.charset.StandardCharsets;
 @SystemLevel
 @NamePattern("#getCaption|code,name,customDefinition,custom")
 @SuppressWarnings("unused")
-public class ReportTemplate extends BaseReportEntity implements com.haulmont.yarg.structure.ReportTemplate {
+public class ReportTemplate extends StandardEntity implements com.haulmont.yarg.structure.ReportTemplate {
     private static final long serialVersionUID = 3692751073234357754L;
 
     public static final String DEFAULT_TEMPLATE_CODE = "DEFAULT";

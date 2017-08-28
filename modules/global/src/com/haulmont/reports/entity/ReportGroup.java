@@ -8,6 +8,7 @@ package com.haulmont.reports.entity;
 import com.haulmont.chile.core.annotations.MetaProperty;
 import com.haulmont.chile.core.annotations.NamePattern;
 import com.haulmont.cuba.core.entity.LocaleHelper;
+import com.haulmont.cuba.core.entity.StandardEntity;
 import org.apache.commons.lang.StringUtils;
 
 import javax.persistence.Column;
@@ -19,7 +20,7 @@ import javax.persistence.Transient;
 @Table(name = "REPORT_GROUP")
 @NamePattern("#getLocName|title,localeNames")
 @SuppressWarnings("unused")
-public class ReportGroup extends BaseReportEntity {
+public class ReportGroup extends StandardEntity {
 
     private static final long serialVersionUID = 5399528790289039413L;
 
