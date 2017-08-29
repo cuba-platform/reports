@@ -139,6 +139,9 @@ public class ReportingBean implements ReportingApi {
                     ReportTemplate existingTemplate = em.find(ReportTemplate.class, loadedTemplate.getId());
                     if (existingTemplate != null) {
                         loadedTemplate.setVersion(existingTemplate.getVersion());
+                        if (PersistenceHelper.isNew(loadedTemplate)) {
+                            PersistenceHelper.makeDetached(loadedTemplate);
+                        }
                     } else {
                         loadedTemplate.setVersion(0);
                     }
