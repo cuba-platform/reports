@@ -28,6 +28,8 @@ public class ReportPrintHelper {
         inputOutputTypesMapping.put("html", Arrays.asList(HTML, PDF));
         inputOutputTypesMapping.put("ftl", Arrays.asList(HTML, PDF));
         inputOutputTypesMapping.put("csv", Arrays.asList(CSV));
+        inputOutputTypesMapping.put("jrxml", Arrays.asList(XLS, DOC, PDF, HTML, DOCX, XLSX, CSV));
+        inputOutputTypesMapping.put("jasper", Arrays.asList(XLS, DOC, PDF, HTML, DOCX, XLSX, CSV));
         exportFormats.put(ReportOutputType.xls, ExportFormat.XLS);
         exportFormats.put(ReportOutputType.xlsx, ExportFormat.XLSX);
         exportFormats.put(ReportOutputType.doc, ExportFormat.DOC);
