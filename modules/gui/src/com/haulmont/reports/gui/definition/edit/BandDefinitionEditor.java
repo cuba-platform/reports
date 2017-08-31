@@ -200,9 +200,6 @@ public class BandDefinitionEditor extends AbstractFrame implements Suggester {
                     dataset.setType(DataSetType.GROOVY);
                     dataset.setText("return [[:]]");
 
-                    dataset.setEntityParamName("entity");
-                    dataset.setListEntitiesParamName("entities");
-
                     selectedBand.getDataSets().add(dataset);
                     dataSetsDs.addItem(dataset);
                     dataSetsDs.setItem(dataset);

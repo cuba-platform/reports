@@ -77,7 +77,11 @@ public class EditViewAction extends AbstractAction {
     //Detect metaclass by an alias and parameter
     protected MetaClass findMetaClassByAlias(DataSet dataSet) {
         String dataSetAlias = getNameForEntityParameter(dataSet);
-
+        if (dataSetAlias == null) {
+            bandDefinitionEditor.showNotification(
+                    bandDefinitionEditor.formatMessage("dataSet.entityAliasNull"), Frame.NotificationType.TRAY);
+            return null;
+        }
         MetaClass byAliasMetaClass = bandDefinitionEditor.reportService.findMetaClassByDataSetEntityAlias(dataSetAlias, dataSet.getType(),
                 bandDefinitionEditor.bandDefinitionDs.getItem().getReport().getInputParameters());
 
