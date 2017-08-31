@@ -11,7 +11,7 @@
 
     <dsContext>
         <collectionDatasource id="reportsDs" class="com.haulmont.reports.entity.Report">
-            <query><![CDATA[select r from report$Report r, in (r.templates) t where t.reportOutputType <> 70]]></query>
+            <query><![CDATA[select r from report$Report r, in (r.templates) t where t.reportOutputType = 90]]></query>
         </collectionDatasource>
         <hierarchicalDatasource id="reportDataDs" class="com.haulmont.cuba.core.entity.KeyValueEntity"
                               allowCommit="false"
@@ -24,7 +24,7 @@
 
     <layout expand="tablesHolderGroup">
         <hbox id="reportSelectorBox" spacing="true">
-            <label id="reportLookupLabel" align="MIDDLE_CENTER" value="msg://caption.reportForChart"/>
+            <label id="reportLookupLabel" align="MIDDLE_CENTER" value="msg://caption.reportForTable"/>
             <lookupField id="reportLookup" optionsDatasource="reportsDs" width="400px"/>
         </hbox>
 
