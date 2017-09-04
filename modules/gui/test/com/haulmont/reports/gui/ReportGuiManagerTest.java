@@ -29,6 +29,7 @@ public class ReportGuiManagerTest {
         String data2 = "data2";
         String data3 = "data3";
         final List<String> collection = Arrays.asList(data1, data2, data3);
+        final List<String> collection1 = Arrays.asList(data1);
 
         new NonStrictExpectations() {
             {
@@ -54,11 +55,11 @@ public class ReportGuiManagerTest {
         Assert.assertTrue(converted == collection);
 
         converted = reportGuiManager.convertParameterIfNecessary(entityParameter, collection, true);
-        Assert.assertTrue(converted == data1);
+        Assert.assertTrue(converted == collection);
         converted = reportGuiManager.convertParameterIfNecessary(entityParameter, Collections.emptyList(), true);
         Assert.assertTrue(converted == null);
         converted = reportGuiManager.convertParameterIfNecessary(entityParameter, parameterPrototype, true);
-        Assert.assertTrue(converted == data1);
+        Assert.assertTrue(converted == collection);
 
         entityParameter.setType(ParameterType.ENTITY_LIST);
 
