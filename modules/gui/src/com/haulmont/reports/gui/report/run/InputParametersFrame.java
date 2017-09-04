@@ -17,10 +17,10 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.BooleanUtils;
 
 import javax.inject.Inject;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+
+import static com.haulmont.reports.gui.report.run.InputParametersWindow.BULK_PRINT;
+import static com.haulmont.reports.gui.report.run.InputParametersWindow.INPUT_PARAMETER;
 
 public class InputParametersFrame extends AbstractFrame {
     public static final String REPORT_PARAMETER = "report";
@@ -28,6 +28,8 @@ public class InputParametersFrame extends AbstractFrame {
 
     protected Report report;
     protected Map<String, Object> parameters;
+    protected boolean bulkPrint;
+    protected ReportInputParameter inputParameter;
 
     @Inject
     protected GridLayout parametersGrid;
@@ -57,6 +59,8 @@ public class InputParametersFrame extends AbstractFrame {
         if (parameters == null) {
             parameters = Collections.emptyMap();
         }
+        bulkPrint = BooleanUtils.isTrue((Boolean) params.get(BULK_PRINT));
+        inputParameter = (ReportInputParameter) params.get(INPUT_PARAMETER);
 
         if (report != null) {
             if (CollectionUtils.isNotEmpty(report.getInputParameters())) {
@@ -64,6 +68,9 @@ public class InputParametersFrame extends AbstractFrame {
 
                 int currentGridRow = 0;
                 for (ReportInputParameter parameter : report.getInputParameters()) {
+                    if (bulkPrint && Objects.equals(inputParameter, parameter)) {
+                        continue;
+                    }
                     createComponent(parameter, currentGridRow);
                     currentGridRow++;
                 }

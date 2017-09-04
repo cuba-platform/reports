@@ -298,15 +298,17 @@ public class DetailsStepFrame extends StepFrame {
                 protected PredefinedTransformation resolveParameterTransformation(Condition condition) {
                     if (condition instanceof Clause) {
                         Clause clause = (Clause) condition;
-                        switch (clause.getOperator()) {
-                            case STARTS_WITH:
-                                return PredefinedTransformation.STARTS_WITH;
-                            case ENDS_WITH:
-                                return PredefinedTransformation.ENDS_WITH;
-                            case CONTAINS:
-                                return PredefinedTransformation.CONTAINS;
-                            case DOES_NOT_CONTAIN:
-                                return PredefinedTransformation.CONTAINS;
+                        if (clause.getOperator() != null) {
+                            switch (clause.getOperator()) {
+                                case STARTS_WITH:
+                                    return PredefinedTransformation.STARTS_WITH;
+                                case ENDS_WITH:
+                                    return PredefinedTransformation.ENDS_WITH;
+                                case CONTAINS:
+                                    return PredefinedTransformation.CONTAINS;
+                                case DOES_NOT_CONTAIN:
+                                    return PredefinedTransformation.CONTAINS;
+                            }
                         }
                     }
                     return null;

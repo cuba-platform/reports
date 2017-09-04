@@ -4,29 +4,39 @@
  */
 package com.haulmont.reports.gui.report.run;
 
+import com.haulmont.bali.util.Preconditions;
 import com.haulmont.cuba.client.ClientConfig;
-import com.haulmont.cuba.core.global.Configuration;
 import com.haulmont.cuba.gui.components.AbstractWindow;
 import com.haulmont.cuba.gui.components.Action;
 import com.haulmont.cuba.gui.components.Button;
+import com.haulmont.reports.entity.Report;
+import com.haulmont.reports.entity.ReportInputParameter;
 import com.haulmont.reports.gui.ReportGuiManager;
+import org.apache.commons.lang.BooleanUtils;
 
 import javax.inject.Inject;
-import java.util.Map;
+import java.util.*;
+
+import static com.haulmont.reports.gui.report.run.InputParametersFrame.PARAMETERS_PARAMETER;
 
 public class InputParametersWindow extends AbstractWindow {
     public static final String TEMPLATE_CODE_PARAMETER = "templateCode";
     public static final String OUTPUT_FILE_NAME_PARAMETER = "outputFileName";
+    public static final String INPUT_PARAMETER = "inputParameter";
+    public static final String BULK_PRINT = "bulkPrint";
 
     protected String templateCode;
 
     protected String outputFileName;
 
-    @Inject
-    protected ReportGuiManager reportGuiManager;
+    protected boolean bulkPrint;
+
+    protected ReportInputParameter inputParameter;
+
+    protected Collection selectedEntities;
 
     @Inject
-    protected Configuration configuration;
+    protected ReportGuiManager reportGuiManager;
 
     @Inject
     protected ClientConfig clientConfig;
@@ -49,6 +59,15 @@ public class InputParametersWindow extends AbstractWindow {
         //noinspection unchecked
         templateCode = (String) params.get(TEMPLATE_CODE_PARAMETER);
         outputFileName = (String) params.get(OUTPUT_FILE_NAME_PARAMETER);
+        bulkPrint = BooleanUtils.isTrue((Boolean) params.get(BULK_PRINT));
+        inputParameter = (ReportInputParameter) params.get(INPUT_PARAMETER);
+
+        if (bulkPrint) {
+            Preconditions.checkNotNullArgument(inputParameter, String.format("%s is null for bulk print", INPUT_PARAMETER));
+            //noinspection unchecked
+            Map<String, Object> parameters = (Map<String, Object>) params.get(PARAMETERS_PARAMETER);
+            selectedEntities = (Collection) parameters.get(inputParameter.getAlias());
+        }
 
         Action printReportAction = printReportBtn.getAction();
         String commitShortcut = clientConfig.getCommitShortcut();
@@ -59,8 +78,13 @@ public class InputParametersWindow extends AbstractWindow {
     public void printReport() {
         if (inputParametersFrame.getReport() != null) {
             if (validateAll()) {
-                reportGuiManager.printReport(inputParametersFrame.getReport(), inputParametersFrame.collectParameters(),
-                        templateCode, outputFileName, this);
+                Report report = inputParametersFrame.getReport();
+                Map<String, Object> parameters = inputParametersFrame.collectParameters();
+                if (bulkPrint) {
+                    reportGuiManager.bulkPrint(report, inputParameter.getAlias(), selectedEntities, this, parameters);
+                } else {
+                    reportGuiManager.printReport(report, parameters, templateCode, outputFileName, this);
+                }
             }
         }
     }

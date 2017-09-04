@@ -114,7 +114,9 @@ public class ParameterFieldCreator {
 
         @Override
         public Field createField(ReportInputParameter parameter) {
-            return componentsFactory.createComponent(CheckBox.class);
+            CheckBox checkBox = componentsFactory.createComponent(CheckBox.class);
+            checkBox.setAlignment(Alignment.MIDDLE_LEFT);
+            return checkBox;
         }
     }
 

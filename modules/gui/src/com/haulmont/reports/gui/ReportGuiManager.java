@@ -41,8 +41,7 @@ import java.util.concurrent.TimeUnit;
 
 import static com.haulmont.reports.gui.report.run.InputParametersFrame.PARAMETERS_PARAMETER;
 import static com.haulmont.reports.gui.report.run.InputParametersFrame.REPORT_PARAMETER;
-import static com.haulmont.reports.gui.report.run.InputParametersWindow.OUTPUT_FILE_NAME_PARAMETER;
-import static com.haulmont.reports.gui.report.run.InputParametersWindow.TEMPLATE_CODE_PARAMETER;
+import static com.haulmont.reports.gui.report.run.InputParametersWindow.*;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 
 @Component("cuba_ReportGuiManager")
@@ -115,12 +114,17 @@ public class ReportGuiManager {
 
         Object resultingParamValue = convertParameterIfNecessary(parameter, parameterValue, reportHasMoreThanOneParameter);
 
+        boolean reportTypeIsSingleEntity = ParameterType.ENTITY == parameter.getType() && resultingParamValue instanceof Collection;
+        boolean moreThanOneEntitySelected = resultingParamValue instanceof Collection && ((Collection)resultingParamValue).size() > 1;
+
         if (reportHasMoreThanOneParameter) {
-            openReportParamsDialog(window, report, ParamsMap.of(parameter.getAlias(), resultingParamValue), templateCode, outputFileName);
+            boolean bulkPrint = reportTypeIsSingleEntity && moreThanOneEntitySelected;
+            openReportParamsDialog(window, report, ParamsMap.of(parameter.getAlias(), resultingParamValue), parameter, templateCode, outputFileName,
+                    bulkPrint);
         } else {
-            if (ParameterType.ENTITY == parameter.getType() && resultingParamValue instanceof Collection) {
+            if (reportTypeIsSingleEntity) {
                 Collection selectedEntities = (Collection) resultingParamValue;
-                if (selectedEntities.size() > 1) {
+                if (moreThanOneEntitySelected) {
                     bulkPrint(report, parameter.getAlias(), selectedEntities, window);
                 } else if (selectedEntities.size() == 1) {
                     printReport(report, ParamsMap.of(parameter.getAlias(), selectedEntities.iterator().next()), templateCode, outputFileName, window);
@@ -331,14 +335,30 @@ public class ReportGuiManager {
      * @param alias            - parameter alias
      * @param selectedEntities - list of selected entities
      * @param window           - caller window
+     * @param additionalParameters - user-defined parameters
      */
-    public void bulkPrint(Report report, String alias, Collection selectedEntities, @Nullable Frame window) {
+    public void bulkPrint(Report report, String alias, Collection selectedEntities, @Nullable Frame window,
+                          @Nullable Map<String, Object> additionalParameters) {
         ReportingClientConfig reportingClientConfig = configuration.getConfig(ReportingClientConfig.class);
         if (window != null && reportingClientConfig.getUseBackgroundReportProcessing()) {
-            bulkPrintBackground(report, alias, selectedEntities, window);
+            bulkPrintBackground(report, alias, selectedEntities, window, additionalParameters);
         } else {
-            bulkPrintSync(report, alias, selectedEntities, window);
+            bulkPrintSync(report, alias, selectedEntities, window, additionalParameters);
         }
+    }
+
+    /**
+     * Print certain reports for list of entities and pack result files into ZIP.
+     * Each entity is passed  to report as inputParameter with certain alias.
+     * Synchronously or asynchronously, depending on configurations
+     *
+     * @param report           - target report
+     * @param alias            - inputParameter alias
+     * @param selectedEntities - list of selected entities
+     * @param window           - caller window
+     */
+    public void bulkPrint(Report report, String alias, Collection selectedEntities, @Nullable Frame window) {
+        bulkPrint(report, alias, selectedEntities, window, null);
     }
 
     /**
@@ -363,17 +383,38 @@ public class ReportGuiManager {
      * @param alias            - parameter alias
      * @param selectedEntities - list of selected entities
      * @param window           - caller window
+     * @param additionalParameters - user-defined parameters
      */
-    public void bulkPrintSync(Report report, String alias, Collection selectedEntities, @Nullable Frame window) {
+    public void bulkPrintSync(Report report, String alias, Collection selectedEntities, @Nullable Frame window,
+                              Map<String, Object> additionalParameters) {
         List<Map<String, Object>> paramsList = new ArrayList<>();
         for (Object selectedEntity : selectedEntities) {
-            paramsList.add(ParamsMap.of(alias, selectedEntity));
+            Map<String, Object> map = new HashMap<>();
+            map.put(alias, selectedEntity);
+            if (additionalParameters != null) {
+                map.putAll(additionalParameters);
+            }
+            paramsList.add(map);
         }
 
         ReportOutputDocument reportOutputDocument = reportService.bulkPrint(report, paramsList);
         ExportDisplay exportDisplay = AppConfig.createExportDisplay(window);
         String documentName = reportOutputDocument.getDocumentName();
         exportDisplay.show(new ByteArrayDataProvider(reportOutputDocument.getContent()), documentName, ExportFormat.ZIP);
+    }
+
+    /**
+     * Print certain reports for list of entities and pack result files into ZIP.
+     * Each entity is passed  to report as inputParameter with certain alias.
+     * Synchronously.
+     *
+     * @param report           - target report
+     * @param alias            - inputParameter alias
+     * @param selectedEntities - list of selected entities
+     * @param window           - caller window
+     */
+    public void bulkPrintSync(Report report, String alias, Collection selectedEntities, @Nullable Frame window) {
+        bulkPrintSync(report, alias, selectedEntities, window, null);
     }
 
     /**
@@ -385,8 +426,10 @@ public class ReportGuiManager {
      * @param alias            - parameter alias
      * @param selectedEntities - list of selected entities
      * @param window           - caller window
+     * @param additionalParameters - user-defined parameters
      */
-    public void bulkPrintBackground(Report report, String alias, Collection selectedEntities, final Frame window) {
+    public void bulkPrintBackground(Report report, String alias, Collection selectedEntities, final Frame window,
+                                    Map<String, Object> additionalParameters) {
         ReportingClientConfig reportingClientConfig = configuration.getConfig(ReportingClientConfig.class);
 
         final Report targetReport = getReportForPrinting(report);
@@ -395,7 +438,12 @@ public class ReportGuiManager {
 
         List<Map<String, Object>> paramsList = new ArrayList<>();
         for (Object selectedEntity : selectedEntities) {
-            paramsList.add(ParamsMap.of(alias, selectedEntity));
+            Map<String, Object> map = new HashMap<>();
+            map.put(alias, selectedEntity);
+            if (additionalParameters != null) {
+                map.putAll(additionalParameters);
+            }
+            paramsList.add(map);
         }
 
         BackgroundTask<Void, ReportOutputDocument> task = new BackgroundTask<Void, ReportOutputDocument>(timeout, TimeUnit.MILLISECONDS, window) {
@@ -418,6 +466,20 @@ public class ReportGuiManager {
         String description = messages.getMessage(getClass(), "runReportBackgroundMessage");
 
         BackgroundWorkWindow.show(task, caption, description, true);
+    }
+
+    /**
+     * Print certain reports for list of entities and pack result files into ZIP.
+     * Each entity is passed  to report as parameter with certain alias.
+     * Asynchronously.
+     *
+     * @param report           - target report
+     * @param alias            - parameter alias
+     * @param selectedEntities - list of selected entities
+     * @param window           - caller window
+     */
+    public void bulkPrintBackground(Report report, String alias, Collection selectedEntities, final Frame window) {
+        bulkPrintBackground(report, alias, selectedEntities, window, null);
     }
 
     /**
@@ -488,14 +550,23 @@ public class ReportGuiManager {
     }
 
     protected void openReportParamsDialog(Frame window, Report report, @Nullable Map<String, Object> parameters,
-                                          @Nullable String templateCode, @Nullable String outputFileName) {
+                                          @Nullable ReportInputParameter inputParameter, @Nullable String templateCode,
+                                          @Nullable String outputFileName,
+                                          boolean bulkPrint) {
         Map<String, Object> params = ParamsMap.of(
                 REPORT_PARAMETER, report,
                 PARAMETERS_PARAMETER, parameters,
+                INPUT_PARAMETER, inputParameter,
                 TEMPLATE_CODE_PARAMETER, templateCode,
-                OUTPUT_FILE_NAME_PARAMETER, outputFileName
+                OUTPUT_FILE_NAME_PARAMETER, outputFileName,
+                BULK_PRINT, bulkPrint
         );
         window.openWindow("report$inputParameters", OpenType.DIALOG, params);
+    }
+
+    protected void openReportParamsDialog(Frame window, Report report, @Nullable Map<String, Object> parameters,
+                                          @Nullable String templateCode, @Nullable String outputFileName) {
+        openReportParamsDialog(window, report, parameters, null, templateCode, outputFileName, false);
     }
 
     @Nullable
@@ -522,10 +593,6 @@ public class ReportGuiManager {
             paramValueWithCollection = (Collection) paramValue;
         } else if (paramValue instanceof ParameterPrototype) {
             ParameterPrototype prototype = (ParameterPrototype) paramValue;
-            if (reportHasMoreThanOneParameter) {
-                //if the case of several params we can not do bulk print, because the params should be filled, so we don't need to load more than 1 entity
-                prototype.setMaxResults(1);
-            }
             paramValueWithCollection = reportService.loadDataForParameterPrototype(prototype);
         }
 
@@ -533,7 +600,7 @@ public class ReportGuiManager {
             return null;
         }
 
-        if (reportHasMoreThanOneParameter) {
+        if (reportHasMoreThanOneParameter && paramValueWithCollection.size() == 1) {
             //if the case of several params we can not do bulk print, because the params should be filled, so we get only first object from the list
             return paramValueWithCollection.iterator().next();
         }
