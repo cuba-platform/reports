@@ -7,12 +7,10 @@ package com.haulmont.reports.libintegration;
 import com.haulmont.cuba.core.sys.AppContext;
 import com.haulmont.cuba.core.sys.SecurityContext;
 import com.haulmont.yarg.exception.OpenOfficeException;
-import com.haulmont.yarg.formatters.impl.doc.connector.NoFreePortsException;
-import com.haulmont.yarg.formatters.impl.doc.connector.OfficeConnection;
-import com.haulmont.yarg.formatters.impl.doc.connector.OfficeIntegration;
-import com.haulmont.yarg.formatters.impl.doc.connector.OfficeTask;
+import com.haulmont.yarg.formatters.impl.doc.connector.*;
 import com.sun.star.comp.helper.BootstrapException;
 
+import javax.annotation.PreDestroy;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -30,14 +28,12 @@ public class CubaOfficeIntegration extends OfficeIntegration implements CubaOffi
         final OfficeConnection connection = acquireConnection();
         Future future = null;
         try {
-            Callable<Void> task = new Callable<Void>() {
-                @Override
-                public Void call() throws java.lang.Exception {
-                    AppContext.setSecurityContext(securityContext);
+            Callable<Void> task = () -> {
+                AppContext.withSecurityContext(securityContext, () ->{
                     connection.open();
                     officeTask.processTaskInOpenOffice(connection.getOOResourceProvider());
-                    return null;
-                }
+                });
+                return null;
             };
             future = executor.submit(task);
             future.get(timeoutInSeconds, TimeUnit.SECONDS);
@@ -69,4 +65,16 @@ public class CubaOfficeIntegration extends OfficeIntegration implements CubaOffi
         }
     }
 
+    @PreDestroy
+    protected void destroyOfficeIntegration() {
+        connectionsQueue.clear();
+        for (OfficeConnection connection : connections) {
+            try {
+                connection.close();
+            } catch (Exception e) {
+                //Do nothing
+            }
+        }
+        executor.shutdown();
+    }
 }
