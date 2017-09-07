@@ -58,7 +58,7 @@ public class ChartToJsonConverter {
         chart.put("categoryField", description.getCategoryField());
         addField(fields, description.getCategoryField());
         chart.put("chartScrollbar", Collections.emptyMap());
-        chart.put("pathToImages", "VAADIN/resources/amcharts/images/");
+        chart.put("pathToImages", "VAADIN/webjars/amcharts/images/");
         exportConfig(chart);
 
         if (Boolean.TRUE.equals(description.getShowLegend())) {
@@ -150,7 +150,7 @@ public class ChartToJsonConverter {
         addField(fields, description.getTitleField());
         chart.put("valueField", description.getValueField());
         addField(fields, description.getValueField());
-        chart.put("pathToImages", "VAADIN/resources/amcharts/images/");
+        chart.put("pathToImages", "VAADIN/webjars/amcharts/images/");
         exportConfig(chart);
 
         if (Boolean.TRUE.equals(description.getShowLegend())) {
