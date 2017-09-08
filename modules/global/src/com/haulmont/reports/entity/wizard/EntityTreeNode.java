@@ -8,7 +8,7 @@ package com.haulmont.reports.entity.wizard;
 import com.haulmont.chile.core.annotations.Composition;
 import com.haulmont.chile.core.annotations.MetaClass;
 import com.haulmont.chile.core.annotations.MetaProperty;
-import com.haulmont.cuba.core.entity.AbstractNotPersistentEntity;
+import com.haulmont.cuba.core.entity.BaseUuidEntity;
 import com.haulmont.cuba.core.entity.annotation.SystemLevel;
 
 import javax.persistence.Transient;
@@ -17,7 +17,10 @@ import java.util.List;
 
 @MetaClass(name = "report$WizardReportEntityTreeNode")
 @SystemLevel
-public class EntityTreeNode extends AbstractNotPersistentEntity {
+public class EntityTreeNode extends BaseUuidEntity {
+
+    private static final long serialVersionUID = 465985155557062476L;
+
     @MetaProperty
     @Transient
     protected String name;

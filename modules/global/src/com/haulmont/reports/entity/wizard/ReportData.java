@@ -8,7 +8,7 @@ package com.haulmont.reports.entity.wizard;
 import com.haulmont.chile.core.annotations.Composition;
 import com.haulmont.chile.core.annotations.MetaClass;
 import com.haulmont.chile.core.annotations.MetaProperty;
-import com.haulmont.cuba.core.entity.AbstractNotPersistentEntity;
+import com.haulmont.cuba.core.entity.BaseUuidEntity;
 import com.haulmont.cuba.core.entity.annotation.SystemLevel;
 import com.haulmont.reports.entity.*;
 import com.haulmont.reports.entity.charts.ChartType;
@@ -21,7 +21,10 @@ import java.util.List;
 
 @MetaClass(name = "report$WizardReportData")
 @SystemLevel
-public class ReportData extends AbstractNotPersistentEntity {
+public class ReportData extends BaseUuidEntity {
+
+    private static final long serialVersionUID = -1649648403032678085L;
+
     public static class Parameter implements Serializable {
         public final String name;
         public final Class javaClass;

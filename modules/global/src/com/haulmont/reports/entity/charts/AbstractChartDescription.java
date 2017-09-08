@@ -11,14 +11,17 @@ import com.google.gson.JsonPrimitive;
 import com.haulmont.bali.util.Preconditions;
 import com.haulmont.chile.core.annotations.MetaClass;
 import com.haulmont.chile.core.annotations.MetaProperty;
-import com.haulmont.cuba.core.entity.AbstractNotPersistentEntity;
+import com.haulmont.cuba.core.entity.BaseUuidEntity;
 import com.haulmont.cuba.core.entity.annotation.SystemLevel;
 
 import javax.annotation.Nullable;
 
 @MetaClass(name = "report$AbstractChartDescription")
 @SystemLevel
-public abstract class AbstractChartDescription extends AbstractNotPersistentEntity {
+public abstract class AbstractChartDescription extends BaseUuidEntity {
+    
+    private static final long serialVersionUID = 3418759346397067914L;
+
     @MetaProperty
     protected final String type;
     @MetaProperty

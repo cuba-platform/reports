@@ -6,7 +6,7 @@ package com.haulmont.reports.entity;
 
 import com.haulmont.chile.core.annotations.MetaClass;
 import com.haulmont.chile.core.annotations.MetaProperty;
-import com.haulmont.cuba.core.entity.AbstractNotPersistentEntity;
+import com.haulmont.cuba.core.entity.BaseUuidEntity;
 import com.haulmont.cuba.core.entity.annotation.SystemLevel;
 import com.haulmont.cuba.core.global.View;
 import com.haulmont.yarg.structure.ReportQuery;
@@ -16,7 +16,8 @@ import java.util.Map;
 
 @MetaClass(name = "report$DataSet")
 @SystemLevel
-public class DataSet extends AbstractNotPersistentEntity implements ReportQuery {
+public class DataSet extends BaseUuidEntity implements ReportQuery {
+
     public static final String ENTITY_PARAM_NAME = "entityParamName";
     public static final String LIST_ENTITIES_PARAM_NAME = "listEntitiesParamName";
     public static final String DATA_STORE_PARAM_NAME = "dataStore";

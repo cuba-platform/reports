@@ -7,7 +7,7 @@ package com.haulmont.reports.entity.wizard;
 
 import com.haulmont.chile.core.annotations.MetaClass;
 import com.haulmont.chile.core.annotations.MetaProperty;
-import com.haulmont.cuba.core.entity.AbstractNotPersistentEntity;
+import com.haulmont.cuba.core.entity.BaseUuidEntity;
 import com.haulmont.cuba.core.entity.annotation.SystemLevel;
 
 import javax.persistence.Transient;
@@ -18,7 +18,10 @@ import javax.persistence.Transient;
  */
 @MetaClass(name = "report$WizardReportRegionProperty")
 @SystemLevel
-public class RegionProperty extends AbstractNotPersistentEntity implements OrderableEntity {
+public class RegionProperty extends BaseUuidEntity implements OrderableEntity {
+
+    private static final long serialVersionUID = 8528946767216568803L;
+
     @MetaProperty
     @Transient
     protected EntityTreeNode entityTreeNode;

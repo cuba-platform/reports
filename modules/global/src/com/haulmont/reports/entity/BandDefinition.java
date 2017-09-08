@@ -7,7 +7,7 @@ package com.haulmont.reports.entity;
 import com.haulmont.chile.core.annotations.MetaClass;
 import com.haulmont.chile.core.annotations.MetaProperty;
 import com.haulmont.chile.core.annotations.NamePattern;
-import com.haulmont.cuba.core.entity.AbstractNotPersistentEntity;
+import com.haulmont.cuba.core.entity.BaseUuidEntity;
 import com.haulmont.cuba.core.entity.annotation.SystemLevel;
 import com.haulmont.yarg.structure.BandOrientation;
 import com.haulmont.yarg.structure.ReportBand;
@@ -19,7 +19,8 @@ import java.util.List;
 @MetaClass(name = "report$BandDefinition")
 @NamePattern("%s|name")
 @SystemLevel
-public class BandDefinition extends AbstractNotPersistentEntity implements ReportBand {
+public class BandDefinition extends BaseUuidEntity implements ReportBand {
+
     private static final long serialVersionUID = 8658220979738705511L;
 
     @MetaProperty

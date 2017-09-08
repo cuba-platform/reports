@@ -7,12 +7,15 @@ package com.haulmont.reports.entity.charts;
 
 import com.haulmont.chile.core.annotations.MetaClass;
 import com.haulmont.chile.core.annotations.MetaProperty;
-import com.haulmont.cuba.core.entity.AbstractNotPersistentEntity;
+import com.haulmont.cuba.core.entity.BaseUuidEntity;
 import com.haulmont.cuba.core.entity.annotation.SystemLevel;
 
 @MetaClass(name = "report$ChartSeries")
 @SystemLevel
-public class ChartSeries extends AbstractNotPersistentEntity {
+public class ChartSeries extends BaseUuidEntity {
+
+    private static final long serialVersionUID = -3205550424620740535L;
+
     @MetaProperty
     protected String name;
     @MetaProperty(mandatory = true)
