@@ -111,6 +111,7 @@ public class DetailsStepFrame extends StepFrame {
             result.put(messages.getMessage(TemplateFileType.XLSX), TemplateFileType.XLSX);
             result.put(messages.getMessage(TemplateFileType.DOCX), TemplateFileType.DOCX);
             result.put(messages.getMessage(TemplateFileType.HTML), TemplateFileType.HTML);
+            result.put(messages.getMessage(TemplateFileType.CSV), TemplateFileType.CSV);
             WindowConfig windowConfig = AppBeans.get(WindowConfig.NAME);
             if (windowConfig.hasWindow(ShowChartController.JSON_CHART_SCREEN_ID)) {
                 result.put(messages.getMessage(TemplateFileType.CHART), TemplateFileType.CHART);

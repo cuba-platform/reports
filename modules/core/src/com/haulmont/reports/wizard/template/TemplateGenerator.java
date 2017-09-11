@@ -52,6 +52,9 @@ public class TemplateGenerator implements TemplateGeneratorApi {
             case CHART:
                 generator = new ChartGenerator();
                 break;
+            case CSV:
+                generator = new CsvGenerator();
+                break;
             default:
                 throw new TemplateGenerationException(templateFileType + " format is unsupported yet");
         }

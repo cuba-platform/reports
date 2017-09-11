@@ -463,6 +463,7 @@ public class ReportWizardCreator extends AbstractWindow implements MainWizardFra
                 .put(TemplateFileType.XLSX, new ImmutableMap.Builder<String, Object>()
                         .put(messages.getMessage(ReportOutputType.XLSX), ReportOutputType.XLSX)
                         .put(messages.getMessage(ReportOutputType.PDF), ReportOutputType.PDF)
+                        .put(messages.getMessage(ReportOutputType.CSV), ReportOutputType.CSV)
                         .build())
                 .put(TemplateFileType.HTML, new ImmutableMap.Builder<String, Object>()
                         .put(messages.getMessage(ReportOutputType.HTML), ReportOutputType.HTML)
@@ -470,6 +471,9 @@ public class ReportWizardCreator extends AbstractWindow implements MainWizardFra
                         .build())
                 .put(TemplateFileType.CHART, new ImmutableMap.Builder<String, Object>()
                         .put(messages.getMessage(ReportOutputType.CHART), ReportOutputType.CHART)
+                        .build())
+                .put(TemplateFileType.CSV, new ImmutableMap.Builder<String, Object>()
+                        .put(messages.getMessage(ReportOutputType.CSV), ReportOutputType.CSV)
                         .build())
                 .build();
     }
