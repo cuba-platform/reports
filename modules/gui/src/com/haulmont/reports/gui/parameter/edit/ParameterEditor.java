@@ -144,8 +144,13 @@ public class ParameterEditor extends AbstractEditor {
     }
 
     protected void initScreensLookup() {
-        Map<String, Object> screensMap = screensHelper.getAvailableBrowserScreens(parameter.getParameterClass());
-        screen.setOptionsMap(screensMap);
+        if (parameter.getType() == ParameterType.ENTITY ||  parameter.getType() == ParameterType.ENTITY_LIST) {
+            Class clazz = parameterClassResolver.resolveClass(parameter);
+            if (clazz != null) {
+                Map<String, Object> screensMap = screensHelper.getAvailableBrowserScreens(clazz);
+                screen.setOptionsMap(screensMap);
+            }
+        }
     }
 
     protected void initEnumsLookup() {
