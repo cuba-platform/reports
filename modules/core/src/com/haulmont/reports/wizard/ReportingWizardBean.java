@@ -114,6 +114,7 @@ public class ReportingWizardBean implements ReportingWizardApi {
                 parameter.setParameterClass(queryParameter.javaClass);
                 parameter.setDefaultValue(queryParameter.defaultValue);
                 parameter.setPredefinedTransformation(queryParameter.predefinedTransformation);
+                parameter.setHidden(queryParameter.hidden);
 
                 if (queryParameter.parameterType == ParameterType.ENTITY
                         || queryParameter.parameterType == ParameterType.ENTITY_LIST) {

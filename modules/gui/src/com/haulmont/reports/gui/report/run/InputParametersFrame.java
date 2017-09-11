@@ -71,8 +71,11 @@ public class InputParametersFrame extends AbstractFrame {
                     if (bulkPrint && Objects.equals(inputParameter, parameter)) {
                         continue;
                     }
-                    createComponent(parameter, currentGridRow);
-                    currentGridRow++;
+
+                    if (BooleanUtils.isNotTrue(parameter.getHidden())) {
+                        createComponent(parameter, currentGridRow);
+                        currentGridRow++;
+                    }
                 }
             }
         }

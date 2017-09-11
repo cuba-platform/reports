@@ -71,6 +71,9 @@ public class ReportInputParameter extends BaseUuidEntity implements ReportParame
     @MetaProperty
     protected Integer predefinedTransformation;
 
+    @MetaProperty
+    protected Boolean hidden;
+
     @Transient
     protected String localeName;
 
@@ -239,5 +242,13 @@ public class ReportInputParameter extends BaseUuidEntity implements ReportParame
 
     public void setValidationOn(Boolean validationOn) {
         this.validationOn = validationOn;
+    }
+
+    public Boolean getHidden() {
+        return hidden;
+    }
+
+    public void setHidden(Boolean hidden) {
+        this.hidden = hidden;
     }
 }

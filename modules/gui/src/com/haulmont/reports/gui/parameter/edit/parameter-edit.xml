@@ -44,6 +44,10 @@
                                          width="100%" requiredMessage="msg://parameters.typeMsg"/>
                         </row>
                         <row>
+                            <label value="msg://parameters.hidden" align="MIDDLE_LEFT"/>
+                            <checkBox id="hidden" datasource="parameterDs" property="hidden"/>
+                        </row>
+                        <row>
                             <label value="msg://parameters.required" align="MIDDLE_LEFT"/>
                             <checkBox id="required" datasource="parameterDs" property="required"/>
                         </row>

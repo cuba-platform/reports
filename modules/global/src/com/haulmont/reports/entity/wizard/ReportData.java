@@ -31,17 +31,20 @@ public class ReportData extends BaseUuidEntity {
         public final ParameterType parameterType;
         public final String defaultValue;
         public final PredefinedTransformation predefinedTransformation;
+        public final Boolean hidden;
 
-        public Parameter(String name, Class javaClass, ParameterType parameterType, String defaultValue) {
-            this(name, javaClass, parameterType, defaultValue, null);
+        public Parameter(String name, Class javaClass, ParameterType parameterType, String defaultValue, Boolean hidden) {
+            this(name, javaClass, parameterType, defaultValue, null, hidden);
         }
 
-        public Parameter(String name, Class javaClass, ParameterType parameterType, String defaultValue, PredefinedTransformation transformation) {
+        public Parameter(String name, Class javaClass, ParameterType parameterType, String defaultValue, PredefinedTransformation transformation,
+                         Boolean hidden) {
             this.name = name;
             this.javaClass = javaClass;
             this.parameterType = parameterType;
             this.defaultValue = defaultValue;
             this.predefinedTransformation = transformation;
+            this.hidden = hidden;
         }
     }
 

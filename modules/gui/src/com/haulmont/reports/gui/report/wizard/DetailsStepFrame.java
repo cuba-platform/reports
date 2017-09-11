@@ -20,6 +20,7 @@ import com.haulmont.cuba.gui.components.filter.ConditionsTree;
 import com.haulmont.cuba.gui.components.filter.FakeFilterSupport;
 import com.haulmont.cuba.gui.components.filter.FilterParser;
 import com.haulmont.cuba.gui.components.filter.Param;
+import com.haulmont.cuba.gui.components.filter.condition.AbstractCondition;
 import com.haulmont.cuba.gui.components.filter.edit.FilterEditor;
 import com.haulmont.cuba.gui.config.WindowConfig;
 import com.haulmont.cuba.security.entity.FilterEntity;
@@ -205,6 +206,7 @@ public class DetailsStepFrame extends StepFrame {
             params.put("filter", filter);
             params.put("conditions", conditionsTree);
             params.put("useShortConditionForm", true);
+            params.put("showConditionHiddenOption", true);
 
             FilterEditor filterEditor = (FilterEditor) wizard.openWindow("filterEditor", OpenType.DIALOG, params);
             filterEditor.addCloseListener(new Window.CloseListener() {
@@ -246,6 +248,9 @@ public class DetailsStepFrame extends StepFrame {
                         if (conditionName == null) {
                             conditionName = "parameter";
                         }
+
+                        Boolean hiddenConditionPropertyValue = findHiddenPropertyValueByConditionName(conditionName);
+
                         conditionName = conditionName.replaceAll("\\.", "_");
 
                         String parameterName = conditionName + i;
@@ -264,7 +269,8 @@ public class DetailsStepFrame extends StepFrame {
                                 parameterClass,
                                 parameterType,
                                 parameterValue,
-                                resolveParameterTransformation(condition)));
+                                resolveParameterTransformation(condition),
+                                hiddenConditionPropertyValue));
 
                         wizard.query = wizard.query.replace(":" + parameterInfo.getName(), "${" + parameterName + "}");
                     }
@@ -312,6 +318,15 @@ public class DetailsStepFrame extends StepFrame {
                         }
                     }
                     return null;
+                }
+
+                protected Boolean findHiddenPropertyValueByConditionName(String propertyName) {
+                    return conditionsTree.toConditionsList().stream()
+                            .filter(condition -> Objects.nonNull(condition.getName()))
+                            .filter(condition -> condition.getName().equals(propertyName))
+                            .map(AbstractCondition::getHidden)
+                            .findFirst()
+                            .orElse(Boolean.FALSE);
                 }
             });
         }
