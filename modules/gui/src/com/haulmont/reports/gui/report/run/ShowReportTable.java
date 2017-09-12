@@ -74,8 +74,8 @@ public class ShowReportTable extends AbstractWindow {
         dsContext = new DsContextImpl(getDsContext().getDataSupplier());
 
         getDialogOptions()
-                .setWidth(themeConstants.getInt("cuba.gui.report.ShowReportTable.width"))
-                .setHeight(themeConstants.getInt("cuba.gui.report.ShowReportTable.height"))
+                .setWidth(themeConstants.get("cuba.gui.report.ShowReportTable.width"))
+                .setHeight(themeConstants.get("cuba.gui.report.ShowReportTable.height"))
                 .setResizable(true);
 
         if (report != null) {

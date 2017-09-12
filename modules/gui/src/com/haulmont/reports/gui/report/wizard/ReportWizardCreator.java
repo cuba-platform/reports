@@ -143,8 +143,8 @@ public class ReportWizardCreator extends AbstractWindow implements MainWizardFra
         wizardWidth = themeConstants.getInt("cuba.gui.report.ReportWizard.width");
         wizardHeight = themeConstants.getInt("cuba.gui.report.ReportWizard.height");
         getDialogOptions()
-                .setWidth(wizardWidth)
-                .setHeight(wizardHeight);
+                .setWidth(wizardWidth).setWidthUnit(SizeUnit.PIXELS)
+                .setHeight(wizardHeight).setHeightUnit(SizeUnit.PIXELS);
 
         stepFrameManager = new StepFrameManager(this, getStepFrames());
 

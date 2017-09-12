@@ -390,7 +390,7 @@ public class DetailsStepFrame extends StepFrame {
         @Override
         public void beforeShowFrame() {
             wizard.getDialogOptions()
-                    .setHeight(wizard.wizardHeight)
+                    .setHeight(wizard.wizardHeight).setHeightUnit(SizeUnit.PIXELS)
                     .center();
         }
     }

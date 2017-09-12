@@ -17,6 +17,6 @@ public class ReportGroupEditor extends AbstractEditor {
 
         getDialogOptions()
                 .setResizable(false)
-                .setWidth(400);
+                .setWidth("400px");
     }
 }

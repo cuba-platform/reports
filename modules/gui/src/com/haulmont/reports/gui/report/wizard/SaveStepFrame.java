@@ -59,7 +59,7 @@ public class SaveStepFrame extends StepFrame {
                 showChart();
 
                 wizard.getDialogOptions()
-                        .setHeight(wizard.wizardHeight + 400)
+                        .setHeight(wizard.wizardHeight + 400).setHeightUnit(SizeUnit.PIXELS)
                         .center();
 
                 wizard.diagramType.setRequired(true);
