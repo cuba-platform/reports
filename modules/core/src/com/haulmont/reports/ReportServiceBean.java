@@ -84,6 +84,11 @@ public class ReportServiceBean implements ReportService {
     }
 
     @Override
+    public ReportImportResult importReportsWithResult(byte[] zipBytes, EnumSet<ReportImportOption> importOptions) {
+        return reportingApi.importReportsWithResult(zipBytes, importOptions);
+    }
+
+    @Override
     public String convertToString(Report report) {
         return reportingApi.convertToString(report);
     }

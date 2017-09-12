@@ -45,6 +45,8 @@ public interface ReportingApi {
 
     Collection<Report> importReports(byte[] zipBytes, EnumSet<ReportImportOption> importOptions);
 
+    ReportImportResult importReportsWithResult(byte[] zipBytes, EnumSet<ReportImportOption> importOptions);
+
     String convertToString(Report report);
 
     Report convertToReport(String xml);

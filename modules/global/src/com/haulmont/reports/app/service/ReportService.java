@@ -58,7 +58,23 @@ public interface ReportService {
      */
     Collection<Report> importReports(byte[] zipBytes);
 
+    /**
+     * Imports reports from ZIP archive. Archive file format is described in exportReports method.
+     *
+     * @param zipBytes ZIP archive as a byte array.
+     * @param importOptions - report import options
+     * @return Collection of imported reports.
+     */
     Collection<Report> importReports(byte[] zipBytes, EnumSet<ReportImportOption> importOptions);
+
+    /**
+     * Imports reports from ZIP archive. Archive file format is described in exportReports method.
+     *
+     * @param zipBytes ZIP archive as a byte array.
+     * @param importOptions report - import options
+     * @return import result - collection of updated, created reports
+     */
+    ReportImportResult importReportsWithResult(byte[] zipBytes, EnumSet<ReportImportOption> importOptions);
 
     String convertToString(Report report);
 

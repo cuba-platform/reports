@@ -12,6 +12,7 @@ import com.haulmont.cuba.gui.export.ExportFormat;
 import com.haulmont.cuba.gui.upload.FileUploadingAPI;
 import com.haulmont.reports.app.service.ReportService;
 import com.haulmont.reports.entity.ReportImportOption;
+import com.haulmont.reports.entity.ReportImportResult;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.BooleanUtils;
@@ -19,7 +20,9 @@ import org.apache.commons.lang.StringUtils;
 
 import javax.inject.Inject;
 import java.io.File;
-import java.util.*;
+import java.util.EnumSet;
+import java.util.Map;
+import java.util.UUID;
 
 public class ReportImportDialog extends AbstractWindow {
     @Inject
@@ -83,7 +86,10 @@ public class ReportImportDialog extends AbstractWindow {
             File file = fileUploadingApi.getFile(fileID);
             byte[] bytes = FileUtils.readFileToByteArray(file);
             fileUploadingApi.deleteFile(fileID);
-            reportService.importReports(bytes, getImportOptions());
+            ReportImportResult result = reportService.importReportsWithResult(bytes, getImportOptions());
+            showNotification(formatMessage("importResult",
+                    result.getCreatedReports().size(), result.getUpdatedReports().size()),
+                    NotificationType.HUMANIZED);
         } catch (Exception e) {
             String msg = getMessage("reportException.unableToImportReport");
             showNotification(msg, e.toString(), NotificationType.ERROR);

@@ -7,6 +7,7 @@ package com.haulmont.reports;
 
 import com.haulmont.reports.entity.Report;
 import com.haulmont.reports.entity.ReportImportOption;
+import com.haulmont.reports.entity.ReportImportResult;
 
 import java.util.Collection;
 import java.util.EnumSet;
@@ -17,4 +18,5 @@ public interface ReportImportExportAPI {
     byte[] exportReports(Collection<Report> reports);
     Collection<Report> importReports(byte[] zipBytes);
     Collection<Report> importReports(byte[] zipBytes, EnumSet<ReportImportOption> importOptions);
+    ReportImportResult importReportsWithResult(byte[] zipBytes, EnumSet<ReportImportOption> importOptions);
 }

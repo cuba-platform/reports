@@ -432,6 +432,11 @@ public class ReportingBean implements ReportingApi {
     }
 
     @Override
+    public ReportImportResult importReportsWithResult(byte[] zipBytes, EnumSet<ReportImportOption> importOptions) {
+        return reportImportExport.importReportsWithResult(zipBytes, importOptions);
+    }
+
+    @Override
     public String convertToString(Report report) {
         return gsonConverter.convertToString(report);
     }
