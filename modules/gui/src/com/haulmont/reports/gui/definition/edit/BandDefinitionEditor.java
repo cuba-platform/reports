@@ -53,6 +53,22 @@ public class BandDefinitionEditor extends AbstractFrame implements Suggester {
     @Inject
     protected GridLayout commonEntityGrid;
     @Inject
+    protected LookupField jsonSourceTypeField;
+    @Inject
+    protected VBoxLayout jsonDataSetTypeVBox;
+    @Inject
+    protected Label jsonPathQueryLabel;
+    @Inject
+    protected HBoxLayout jsonPathQueryHBox;
+    @Inject
+    protected VBoxLayout jsonSourceGroovyCodeVBox;
+    @Inject
+    protected VBoxLayout jsonSourceURLCodeVBox;
+    @Inject
+    protected VBoxLayout jsonSourceParameterCodeVBox;
+    @Inject
+    protected SourceCodeEditor jsonGroovyCodeEditor;
+    @Inject
     protected HBoxLayout textParamsBox;
     @Inject
     protected Label viewNameLabel;
@@ -137,11 +153,51 @@ public class BandDefinitionEditor extends AbstractFrame implements Suggester {
         initActions();
 
         initDataStoreField();
+    }
 
+    protected void initJsonDataSetOptions(DataSet dataSet) {
+
+        jsonDataSetTypeVBox.removeAll();
+        jsonDataSetTypeVBox.add(jsonSourceTypeField);
+        jsonDataSetTypeVBox.add(jsonPathQueryLabel);
+        jsonDataSetTypeVBox.add(jsonPathQueryHBox);
+
+        if (dataSet.getJsonSourceType() == null) {
+            dataSet.setJsonSourceType(JsonSourceType.GROOVY_SCRIPT);
+        }
+
+        switch (dataSet.getJsonSourceType()) {
+            case GROOVY_SCRIPT:
+                jsonDataSetTypeVBox.add(jsonSourceGroovyCodeVBox);
+                jsonDataSetTypeVBox.expand(jsonSourceGroovyCodeVBox);
+                break;
+            case URL:
+                jsonDataSetTypeVBox.add(jsonSourceURLCodeVBox);
+                jsonDataSetTypeVBox.expand(jsonSourceURLCodeVBox);
+                break;
+            case PARAMETER:
+                jsonDataSetTypeVBox.add(jsonSourceParameterCodeVBox);
+                jsonDataSetTypeVBox.expand(jsonSourceParameterCodeVBox);
+                break;
+        }
     }
 
     public void getTextHelp() {
         showMessageDialog(getMessage("dataSet.text"), getMessage("dataSet.textHelp"),
+                MessageType.CONFIRMATION_HTML
+                        .modal(false)
+                        .width(700));
+    }
+
+    public void getJsonSourceTextHelp() {
+        showMessageDialog(getMessage("dataSet.text"), getMessage("dataSet.jsonSourceTextHelp"),
+                MessageType.CONFIRMATION_HTML
+                        .modal(false)
+                        .width(700));
+    }
+
+    public void getJsonPathQueryHelp() {
+        showMessageDialog(getMessage("dataSet.text"), getMessage("dataSet.jsonPathQueryHelp"),
                 MessageType.CONFIRMATION_HTML
                         .modal(false)
                         .width(700));
@@ -274,7 +330,7 @@ public class BandDefinitionEditor extends AbstractFrame implements Suggester {
             }
 
             if ("processTemplate".equals(e.getProperty()) && e.getItem() != null) {
-                applyVisibilityRulesForType(e.getItem().getType());
+                applyVisibilityRulesForType(e.getItem());
             }
 
             @SuppressWarnings("unchecked")
@@ -324,17 +380,17 @@ public class BandDefinitionEditor extends AbstractFrame implements Suggester {
     }
 
     protected void applyVisibilityRules(DataSet item) {
-        applyVisibilityRulesForType(item.getType());
+        applyVisibilityRulesForType(item);
         if (item.getType() == DataSetType.SINGLE || item.getType() == DataSetType.MULTI) {
             applyVisibilityRulesForEntityType(item);
         }
     }
 
-    protected void applyVisibilityRulesForType(DataSetType dsType) {
+    protected void applyVisibilityRulesForType(DataSet dataSet) {
         hideAllDataSetEditComponents();
 
-        if (dsType != null) {
-            switch (dsType) {
+        if (dataSet.getType() != null) {
+            switch (dataSet.getType()) {
                 case SQL:
                     textParamsBox.add(dataStore);
                     textBox.add(processTemplate);
@@ -356,9 +412,13 @@ public class BandDefinitionEditor extends AbstractFrame implements Suggester {
                     editPane.add(spacer);
                     editPane.expand(spacer);
                     break;
+                case JSON:
+                    initJsonDataSetOptions(dataSet);
+                    editPane.add(jsonDataSetTypeVBox);
+                    break;
             }
 
-            switch (dsType) {
+            switch (dataSet.getType()) {
                 case SQL:
                     dataSetScriptField.setMode(SourceCodeEditor.Mode.SQL);
                     dataSetScriptField.setSuggester(null);
@@ -412,6 +472,7 @@ public class BandDefinitionEditor extends AbstractFrame implements Suggester {
         textBox.remove(processTemplate);
         editPane.remove(textBox);
         editPane.remove(commonEntityGrid);
+        editPane.remove(jsonDataSetTypeVBox);
         editPane.remove(spacer);
     }
 

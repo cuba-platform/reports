@@ -20,6 +20,11 @@
     <bean id="reporting_lib_GroovyDataLoader" class="com.haulmont.reports.libintegration.CubaGroovyDataLoader">
         <constructor-arg ref="reporting_lib_Scripting"/>
     </bean>
+
+    <bean id="reporting_lib_JsonDataLoader" class="com.haulmont.reports.libintegration.CubaJsonDataLoader">
+        <constructor-arg ref="reporting_lib_Scripting"/>
+    </bean>
+
     <bean id="reporting_lib_SqlDataLoader" class="com.haulmont.reports.libintegration.CubaSqlDataLoader">
         <constructor-arg ref="cubaDataSource"/>
         <property name="parametersConverter" ref="reporting_lib_SqlParametersConverter"/>
@@ -70,6 +75,7 @@
                 <entry key="sql" value-ref="reporting_lib_SqlDataLoader"/>
                 <entry key="groovy" value-ref="reporting_lib_GroovyDataLoader"/>
                 <entry key="jpql" value-ref="reporting_lib_JpqlDataLoader"/>
+                <entry key="json" value-ref="reporting_lib_JsonDataLoader"/>
                 <entry key="single" value-ref="reporting_lib_SingleEntityDataLoader"/>
                 <entry key="multi" value-ref="reporting_lib_MultiEntityDataLoader"/>
             </map>

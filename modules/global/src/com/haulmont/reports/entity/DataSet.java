@@ -21,6 +21,11 @@ public class DataSet extends BaseUuidEntity implements ReportQuery {
     public static final String ENTITY_PARAM_NAME = "entityParamName";
     public static final String LIST_ENTITIES_PARAM_NAME = "listEntitiesParamName";
     public static final String DATA_STORE_PARAM_NAME = "dataStore";
+    public static final String JSON_SOURCE_TYPE = "jsonSourceType";
+    public static final String JSON_SOURCE_TEXT = "jsonSourceText";
+    public static final String JSON_PATH_QUERY = "jsonPathQuery";
+    public static final String JSON_INPUT_PARAMETER = "jsonSourceInputParameter";
+
     private static final long serialVersionUID = -3706206933129963303L;
 
     protected View view;
@@ -34,6 +39,14 @@ public class DataSet extends BaseUuidEntity implements ReportQuery {
     protected String text;
     @MetaProperty
     protected Integer type;
+    @MetaProperty
+    protected Integer jsonSourceType = JsonSourceType.GROOVY_SCRIPT.getId();
+    @MetaProperty
+    protected String jsonSourceText;
+    @MetaProperty
+    protected String jsonPathQuery;
+    @MetaProperty
+    protected ReportInputParameter jsonSourceInputParameter;
     @MetaProperty
     protected String entityParamName;
     @MetaProperty
@@ -156,12 +169,49 @@ public class DataSet extends BaseUuidEntity implements ReportQuery {
         return getType().getCode();
     }
 
+    public JsonSourceType getJsonSourceType() {
+        return jsonSourceType != null ? JsonSourceType.fromId(jsonSourceType) : null;
+    }
+
+    public void setJsonSourceType(JsonSourceType jsonSourceType) {
+        this.jsonSourceType = jsonSourceType != null ? jsonSourceType.getId() : null;
+    }
+
+    public String getJsonSourceText() {
+        return jsonSourceText;
+    }
+
+    public void setJsonSourceText(String jsonSourceText) {
+        this.jsonSourceText = jsonSourceText;
+    }
+
+    public ReportInputParameter getJsonSourceInputParameter() {
+        return jsonSourceInputParameter;
+    }
+
+    public void setJsonSourceInputParameter(ReportInputParameter jsonSourceInputParameter) {
+        this.jsonSourceInputParameter = jsonSourceInputParameter;
+    }
+
+    public String getJsonPathQuery() {
+        return jsonPathQuery;
+    }
+
+    public void setJsonPathQuery(String jsonPathQuery) {
+        this.jsonPathQuery = jsonPathQuery;
+    }
+
     @Override
     public Map<String, Object> getAdditionalParams() {
         Map<String, Object> params = new HashMap<>();
         params.put(ENTITY_PARAM_NAME, entityParamName);
         params.put(LIST_ENTITIES_PARAM_NAME, listEntitiesParamName);
         params.put(DATA_STORE_PARAM_NAME, dataStore);
+        params.put(JSON_SOURCE_TYPE, getJsonSourceType());
+        params.put(JSON_SOURCE_TEXT, jsonSourceText);
+        params.put(JSON_PATH_QUERY, jsonPathQuery);
+        params.put(JSON_INPUT_PARAMETER, jsonSourceInputParameter);
+
         return params;
     }
 }

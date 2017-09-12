@@ -7,7 +7,8 @@ package com.haulmont.reports.libintegration;
 
 import com.haulmont.cuba.core.Persistence;
 import com.haulmont.cuba.core.Transaction;
-import com.haulmont.cuba.core.global.*;
+import com.haulmont.cuba.core.global.AppBeans;
+import com.haulmont.cuba.core.global.Resources;
 import com.haulmont.yarg.exception.DataLoadingException;
 import com.haulmont.yarg.exception.ValidationException;
 import com.haulmont.yarg.loaders.ReportDataLoader;
@@ -16,10 +17,8 @@ import com.haulmont.yarg.structure.ReportQuery;
 import com.haulmont.yarg.util.groovy.Scripting;
 import groovy.lang.Closure;
 import org.apache.commons.lang.StringUtils;
-import org.codehaus.groovy.runtime.MethodClosure;
 
 import javax.inject.Inject;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -29,6 +28,10 @@ public class CubaGroovyDataLoader implements ReportDataLoader {
     @Inject
     protected Resources resources;
 
+    @Inject
+    protected GroovyScriptParametersProvider groovyScriptParametersProvider;
+
+    @Inject
     public CubaGroovyDataLoader(Scripting scripting) {
         this.scripting = scripting;
     }
@@ -37,20 +40,7 @@ public class CubaGroovyDataLoader implements ReportDataLoader {
     public List<Map<String, Object>> loadData(ReportQuery reportQuery, BandData parentBand, Map<String, Object> params) {
         try {
             String script = reportQuery.getScript();
-            Map<String, Object> scriptParams = new HashMap<String, Object>();
-            UserSessionSource userSessionSource = AppBeans.get(UserSessionSource.class);
-            scriptParams.put("reportQuery", reportQuery);
-            scriptParams.put("parentBand", parentBand);
-            scriptParams.put("params", params);
-            scriptParams.put("persistence", AppBeans.get(Persistence.class));
-            scriptParams.put("metadata", AppBeans.get(Metadata.class));
-            scriptParams.put("dataManager", AppBeans.get(DataManager.class));
-            scriptParams.put("security", AppBeans.get(Security.class));
-            scriptParams.put("timeSource", AppBeans.get(TimeSource.class));
-            scriptParams.put("userSession", userSessionSource.getUserSession());
-            scriptParams.put("userSessionSource", userSessionSource);
-            scriptParams.put("transactional", new MethodClosure(this, "transactional"));
-            scriptParams.put("validationException", new MethodClosure(this, "validationException"));
+            Map<String, Object> scriptParams = groovyScriptParametersProvider.prepareParameters(reportQuery, parentBand, params);
 
             script = StringUtils.trim(script);
             if (script.endsWith(".groovy")) {

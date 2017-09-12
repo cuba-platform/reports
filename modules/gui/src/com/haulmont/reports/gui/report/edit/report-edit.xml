@@ -29,6 +29,9 @@
                 <collectionDatasource id="dataSetsDs" property="dataSets"
                     datasourceClass="com.haulmont.reports.gui.datasource.DatasetsDatasource"/>
             </hierarchicalDatasource>
+            <collectionDatasource id="stringParametersDs"
+                                  property="inputParameters"
+                                  datasourceClass="com.haulmont.reports.gui.datasource.TextInputParametersDataSource"/>
         </datasource>
 
         <collectionDatasource id="availableParentBandsDs" class="com.haulmont.reports.entity.BandDefinition"

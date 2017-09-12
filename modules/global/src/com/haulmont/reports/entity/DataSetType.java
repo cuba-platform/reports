@@ -32,7 +32,12 @@ public enum DataSetType implements EnumClass<Integer> {
     /**
      * Entities list
      */
-    MULTI(50, "multi");
+    MULTI(50, "multi"),
+
+    /**
+     * json
+     */
+    JSON(60, "json");
 
     private Integer id;
 
