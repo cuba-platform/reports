@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.haulmont.reports.entity.DataSet.*;
+import static java.lang.String.format;
 
 public class CubaJsonDataLoader extends JsonDataLoader {
 
@@ -44,10 +45,9 @@ public class CubaJsonDataLoader extends JsonDataLoader {
         JsonSourceType jsonSourceType = (JsonSourceType) reportQuery.getAdditionalParams().get(JSON_SOURCE_TYPE);
 
         switch (jsonSourceType) {
-            case GROOVY_SCRIPT: {
+            case GROOVY_SCRIPT:
                 result = loadDataFromGroovyScript(reportQuery, parentBand, reportParams);
                 break;
-            }
             case URL:
                 result = loadDataFromUrl(reportQuery);
                 break;
@@ -103,14 +103,13 @@ public class CubaJsonDataLoader extends JsonDataLoader {
                 if (httpEntity != null) {
                     json = IOUtils.toString(httpEntity.getContent(), StandardCharsets.UTF_8);
                 } else {
-                    throw new RuntimeException("Unable to read json from " + url + "\nHttpEntity is null");
+                    throw new RuntimeException(format("Unable to read json from %s\nHttpEntity is null", url));
                 }
             } else {
-                throw new RuntimeException("Unable to read json from " + url + "\n" + httpResponse.getStatusLine());
+                throw new RuntimeException(format("Unable to read json from %s\n%s", url, httpResponse.getStatusLine()));
             }
-
         } catch (IOException e) {
-            throw new RuntimeException("Unable to read json from" + url, e);
+            throw new RuntimeException(format("Unable to read json from %s", url), e);
         } finally {
             connectionManager.shutdown();
         }
