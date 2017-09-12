@@ -1,5 +1,6 @@
 package com.haulmont.reports.libintegration;
 
+import com.haulmont.cuba.core.global.Resources;
 import com.haulmont.reports.entity.JsonSourceType;
 import com.haulmont.reports.entity.ReportInputParameter;
 import com.haulmont.yarg.loaders.impl.JsonDataLoader;
@@ -7,6 +8,7 @@ import com.haulmont.yarg.structure.BandData;
 import com.haulmont.yarg.structure.ReportQuery;
 import com.haulmont.yarg.util.groovy.Scripting;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -31,6 +33,9 @@ public class CubaJsonDataLoader extends JsonDataLoader {
 
     @Inject
     protected GroovyScriptParametersProvider groovyScriptParametersProvider;
+
+    @Inject
+    protected Resources resources;
 
     @Inject
     public CubaJsonDataLoader(Scripting scripting) {
@@ -81,6 +86,12 @@ public class CubaJsonDataLoader extends JsonDataLoader {
 
     protected String readJsonFromGroovyScript(ReportQuery reportQuery, BandData parentBand, Map<String, Object> reportParams) {
         String jsonSourceText = getJsonSourceText(reportQuery);
+
+        jsonSourceText = StringUtils.trim(jsonSourceText);
+        if (jsonSourceText.endsWith(".groovy")) {
+            jsonSourceText = resources.getResourceAsString(jsonSourceText);
+        }
+
         Map<String, Object> scriptParams = groovyScriptParametersProvider.prepareParameters(reportQuery, parentBand, reportParams);
         return scripting.evaluateGroovy(jsonSourceText, scriptParams);
     }

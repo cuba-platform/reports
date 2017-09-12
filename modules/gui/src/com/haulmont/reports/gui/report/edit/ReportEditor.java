@@ -1061,6 +1061,10 @@ public class ReportEditor extends AbstractEditor<Report> {
                     if (StringUtils.isBlank(dataSet.getScript())) {
                         errors.add(formatMessage("error.dataSetScriptNull", dataSet.getName()));
                     }
+                } else if (dataSet.getType() == DataSetType.JSON) {
+                    if (StringUtils.isBlank(dataSet.getScript())) {
+                        errors.add(formatMessage("error.jsonDataSetScriptNull", dataSet.getName()));
+                    }
                 }
             }
         }

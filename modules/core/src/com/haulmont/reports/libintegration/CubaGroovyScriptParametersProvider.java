@@ -1,9 +1,12 @@
 package com.haulmont.reports.libintegration;
 
 import com.haulmont.cuba.core.Persistence;
+import com.haulmont.cuba.core.Transaction;
 import com.haulmont.cuba.core.global.*;
+import com.haulmont.yarg.exception.ValidationException;
 import com.haulmont.yarg.structure.BandData;
 import com.haulmont.yarg.structure.ReportQuery;
+import groovy.lang.Closure;
 import org.codehaus.groovy.runtime.MethodClosure;
 import org.springframework.stereotype.Component;
 
@@ -32,5 +35,20 @@ public class CubaGroovyScriptParametersProvider implements GroovyScriptParameter
         scriptParams.put("validationException", new MethodClosure(this, "validationException"));
 
         return scriptParams;
+    }
+
+    protected void validationException(String message) {
+        throw new ValidationException(message);
+    }
+
+    protected void transactional(Closure closure) {
+        Persistence persistence = AppBeans.get(Persistence.class);
+        Transaction tx = persistence.getTransaction();
+        try {
+            closure.call(persistence.getEntityManager());
+            tx.commit();
+        } finally {
+            tx.end();
+        }
     }
 }
