@@ -66,7 +66,10 @@ public class MultiEntityDataLoader extends AbstractEntityDataLoader {
                 entity = reloadEntityByDataSetView(dataSet, entity);
             }
 
-            resultList.add(new EntityMap(entity));
+            if (dataSet instanceof DataSet)
+                resultList.add(new EntityMap(entity, ((DataSet) dataSet).getView()));
+            else
+                resultList.add(new EntityMap(entity));
         }
         return resultList;
     }

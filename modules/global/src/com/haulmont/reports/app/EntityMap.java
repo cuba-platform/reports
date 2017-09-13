@@ -7,8 +7,8 @@ package com.haulmont.reports.app;
 import com.haulmont.chile.core.model.Instance;
 import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.chile.core.model.MetaProperty;
-import com.haulmont.chile.core.model.utils.InstanceUtils;
 import com.haulmont.cuba.core.entity.Entity;
+import com.haulmont.cuba.core.global.View;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -25,6 +25,7 @@ public class EntityMap implements Map<String, Object> {
     public static final String INSTANCE_NAME_KEY = "_instanceName";
 
     protected Instance instance;
+    protected View view;
     protected HashMap<String, Object> explicitData;
 
     protected boolean loaded = false;
@@ -32,6 +33,11 @@ public class EntityMap implements Map<String, Object> {
     public EntityMap(Entity entity) {
         instance = entity;
         explicitData = new HashMap<>();
+    }
+
+    public EntityMap(Entity entity, View loadedAttributes) {
+        this(entity);
+        view = loadedAttributes;
     }
 
     @Override
@@ -115,32 +121,14 @@ public class EntityMap implements Map<String, Object> {
         if (!loaded) {
             MetaClass metaClass = instance.getMetaClass();
             for (MetaProperty property : metaClass.getProperties()) {
-                explicitData.put(property.getName(), getValue(instance, property.getName()));
+                if (view != null && view.getProperty(property.getName()) != null)
+                    explicitData.put(property.getName(), getValue(instance, property.getName()));
             }
 
-            if (instanceNameAvailable(metaClass))
-                explicitData.put(INSTANCE_NAME_KEY, instance.getInstanceName());
-            else
-                explicitData.put(INSTANCE_NAME_KEY, null);
+            explicitData.put(INSTANCE_NAME_KEY, instance.getInstanceName());
 
             loaded = true;
         }
-    }
-
-    protected boolean instanceNameAvailable(MetaClass metaClass) {
-        InstanceUtils.NamePatternRec namePattern = InstanceUtils.parseNamePattern(metaClass);
-        String[] fields = new String[0];
-        if (namePattern != null) {
-            fields = namePattern.fields;
-        }
-
-        for (String field : fields) {
-            Object value = getValue(instance, field);
-            if (value == null)
-                return false;
-        }
-
-        return true;
     }
 
     protected Object getValue(Instance instance, Object key) {

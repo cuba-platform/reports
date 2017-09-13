@@ -23,6 +23,7 @@ import java.util.List;
 public class ReportRegion extends BaseUuidEntity implements OrderableEntity {
 
     private static final long serialVersionUID = -3122228074679382191L;
+    public static final String HEADER_BAND_PREFIX = "header";
 
     @MetaProperty
     @Transient
@@ -112,7 +113,7 @@ public class ReportRegion extends BaseUuidEntity implements OrderableEntity {
     @MetaProperty
     @Transient
     public String getNameForHeaderBand() {
-        return "header" + getNameForBand();
+        return HEADER_BAND_PREFIX + getNameForBand();
     }
 
     public boolean isTabulatedRegion() {

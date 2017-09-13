@@ -6,9 +6,11 @@
 package com.haulmont.reports.libintegration;
 
 import com.haulmont.bali.datastruct.Pair;
+import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.entity.KeyValueEntity;
 import com.haulmont.cuba.core.sys.serialization.SerializationSupport;
 import com.haulmont.reports.entity.tables.dto.CubaTableDTO;
+import com.haulmont.yarg.exception.ReportFormattingException;
 import com.haulmont.yarg.formatters.factory.FormatterFactoryInput;
 import com.haulmont.yarg.formatters.impl.AbstractFormatter;
 import com.haulmont.yarg.structure.BandData;
@@ -16,6 +18,9 @@ import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.util.*;
+
+import static com.haulmont.reports.app.EntityMap.INSTANCE_NAME_KEY;
+import static com.haulmont.reports.entity.wizard.ReportRegion.HEADER_BAND_PREFIX;
 
 public class CubaTableFormatter extends AbstractFormatter {
 
@@ -40,35 +45,59 @@ public class CubaTableFormatter extends AbstractFormatter {
 
         Map<String, List<BandData>> childrenBands = rootBand.getChildrenBands();
         childrenBands.forEach((bandName, bandDataList) -> {
-            List<KeyValueEntity> entities = new ArrayList<>();
-            Set<Pair<String, Class>> headers = new HashSet<>();
-            Set<String> emptyHeaders = new HashSet<>();
+            if (!bandName.startsWith(HEADER_BAND_PREFIX)) {
+                List<KeyValueEntity> entities = new ArrayList<>();
+                Set<Pair<String, Class>> headers = new HashSet<>();
+                Set<String> emptyHeaders = new HashSet<>();
 
-            bandDataList.forEach(bandData -> {
-                Map<String, Object> data = bandData.getData();
-                KeyValueEntity entity = new KeyValueEntity();
-                data.forEach(entity::setValue);
-                if (headers.isEmpty() || headers.size() < data.size()) {
-                    data.forEach((s, o) -> {
-                        if (s != null && o != null)
-                            headers.add(new Pair<>(s, o.getClass()));
-                        if (s != null && o == null)
-                            emptyHeaders.add(s);
+                bandDataList.forEach(bandData -> {
+                    Map<String, Object> data = bandData.getData();
+                    KeyValueEntity entityRow = new KeyValueEntity();
+
+                    data.forEach((name, value) -> {
+                        if (!INSTANCE_NAME_KEY.equals(name)) {
+                            checkInstanceNameLoaded(value);
+                            entityRow.setValue(name, value);
+                        }
                     });
-                }
-                entities.add(entity);
-            });
 
-            emptyHeaders.forEach(header -> {
-                if (!containsHeader(headers, header))
-                    headers.add(new Pair<>(header, String.class));
-            });
+                    if (headers.isEmpty() || headers.size() < data.size()) {
+                        data.forEach((name, value) -> {
+                            if (!INSTANCE_NAME_KEY.equals(name)) {
+                                if (name != null && value != null)
+                                    headers.add(new Pair<>(name, value.getClass()));
+                                if (name != null && value == null)
+                                    emptyHeaders.add(name);
+                            }
+                        });
+                    }
+                    entities.add(entityRow);
+                });
 
-            transformedData.put(bandName, entities);
-            headerMap.put(bandName, headers);
+                emptyHeaders.forEach(header -> {
+                    if (!containsHeader(headers, header))
+                        headers.add(new Pair<>(header, String.class));
+                });
+
+                transformedData.put(bandName, entities);
+                headerMap.put(bandName, headers);
+            }
         });
 
         return new CubaTableDTO(transformedData, headerMap);
+    }
+
+    protected void checkInstanceNameLoaded(Object value) {
+        if (!(value instanceof Entity))
+            return;
+
+        try {
+            ((Entity) value).getInstanceName();
+        }
+        catch (RuntimeException e) {
+            throw new ReportFormattingException("Cannot fetch instance name for entity " + value.getClass()
+                    + ". Please add all attributes used at instance name to report configuration.", e);
+        }
     }
 
     protected boolean containsHeader(Set<Pair<String, Class>> headers, String header) {
