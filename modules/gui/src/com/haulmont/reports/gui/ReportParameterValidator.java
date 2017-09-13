@@ -5,9 +5,11 @@
 
 package com.haulmont.reports.gui;
 
+import com.haulmont.bali.util.ParamsMap;
 import com.haulmont.cuba.core.global.*;
+import com.haulmont.reports.entity.Report;
 import com.haulmont.reports.entity.ReportInputParameter;
-import com.haulmont.reports.exception.ReportFieldValidationException;
+import com.haulmont.reports.exception.ReportParametersValidationException;
 import com.haulmont.reports.exception.ReportingException;
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.groovy.runtime.MethodClosure;
@@ -40,18 +42,27 @@ public class ReportParameterValidator {
      */
     public void validateParameterValue(ReportInputParameter parameter, Object value) {
         String groovyScript = parameter.getValidationScript();
-        if (StringUtils.isNotBlank(groovyScript)) {
-            Map<String, Object> context = new HashMap<>();
-            context.put("value", value);
-            context.put("userSession", userSessionSource.getUserSession());
-            context.put("dataManager", dataManager);
-            context.put("security", security);
-            context.put("metadata", metadata);
-            context.put("invalid", new MethodClosure(this, "invalidThrowMethod"));
+        Map<String, Object> scriptContext = createScriptContext(ParamsMap.of("value", value));
+        runValidationScript(groovyScript, scriptContext);
+    }
 
+    /**
+     * Performs cross field parameters validation before running the report.
+     *
+     * @param report report instance
+     * @param reportParameters  map of parameters values taken from components
+     */
+    public void crossValidateParameters(Report report, Map<String, Object> reportParameters) {
+        String groovyScript = report.getValidationScript();
+        Map<String, Object> scriptContext = createScriptContext(ParamsMap.of("params", reportParameters));
+        runValidationScript(groovyScript, scriptContext);
+    }
+
+    protected void runValidationScript(String groovyScript, Map<String, Object> scriptContext) {
+        if (StringUtils.isNotBlank(groovyScript)) {
             try {
-                scripting.evaluateGroovy(groovyScript, context);
-            } catch (ReportFieldValidationException e) {
+                scripting.evaluateGroovy(groovyScript, scriptContext);
+            } catch (ReportParametersValidationException e) {
                 throw e;
             } catch (Exception e) {
                 String message = "Error applying field validation Groovy script. \n" + e.toString();
@@ -60,9 +71,24 @@ public class ReportParameterValidator {
         }
     }
 
+    protected Map<String, Object> createScriptContext(Map<String, Object> contextParameters) {
+        Map<String, Object> context = new HashMap<>();
+        context.putAll(contextParameters);
+        addCommonContext(context);
+        return context;
+    }
+
+    protected void addCommonContext(Map<String, Object> context) {
+        context.put("userSession", userSessionSource.getUserSession());
+        context.put("dataManager", dataManager);
+        context.put("security", security);
+        context.put("metadata", metadata);
+        context.put("invalid", new MethodClosure(this, "invalidThrowMethod"));
+    }
+
     // Used for invalid("") syntax
     @SuppressWarnings("unused")
     protected void invalidThrowMethod(String message) {
-        throw new ReportFieldValidationException(message);
+        throw new ReportParametersValidationException(message);
     }
 }

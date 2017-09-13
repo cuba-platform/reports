@@ -41,6 +41,7 @@ import com.haulmont.reports.gui.ReportPrintHelper;
 import com.haulmont.reports.gui.definition.edit.BandDefinitionEditor;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 
@@ -105,6 +106,9 @@ public class ReportEditor extends AbstractEditor<Report> {
 
     @Named("generalFrame.serviceTree")
     protected Tree<BandDefinition> bandTree;
+
+    @Named("parametersFrame.validationScriptGroupBox")
+    protected GroupBoxLayout validationScriptGroupBox;
 
     @Inject
     protected WindowConfig windowConfig;
@@ -201,6 +205,8 @@ public class ReportEditor extends AbstractEditor<Report> {
         }
 
         setupDropZoneForTemplate();
+
+        initValidationScriptGroupBoxCaption();
     }
 
     @Override
@@ -1073,6 +1079,26 @@ public class ReportEditor extends AbstractEditor<Report> {
             for (BandDefinition child : band.getChildrenBandDefinitions()) {
                 validateBand(errors, child, names);
             }
+        }
+    }
+
+    protected void initValidationScriptGroupBoxCaption() {
+        setValidationScriptGroupBoxCaption(reportDs.getItem().getValidationOn());
+
+        reportDs.addItemPropertyChangeListener(e -> {
+            boolean validationOnChanged = e.getProperty().equalsIgnoreCase("validationOn");
+
+            if (validationOnChanged) {
+                setValidationScriptGroupBoxCaption(e.getItem().getValidationOn());
+            }
+        });
+    }
+
+    protected void setValidationScriptGroupBoxCaption(Boolean onOffFlag) {
+        if (BooleanUtils.isTrue(onOffFlag)) {
+            validationScriptGroupBox.setCaption(getMessage("report.validationScriptOn"));
+        } else {
+            validationScriptGroupBox.setCaption(getMessage("report.validationScriptOff"));
         }
     }
 }

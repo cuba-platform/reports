@@ -10,7 +10,7 @@ import com.haulmont.cuba.core.global.DevelopmentException;
 import com.haulmont.cuba.gui.components.Field;
 import com.haulmont.cuba.gui.components.ValidationException;
 import com.haulmont.reports.entity.ReportInputParameter;
-import com.haulmont.reports.exception.ReportFieldValidationException;
+import com.haulmont.reports.exception.ReportParametersValidationException;
 import com.haulmont.reports.gui.ReportParameterValidator;
 
 public class ReportParamFieldValidator implements Field.Validator {
@@ -31,7 +31,7 @@ public class ReportParamFieldValidator implements Field.Validator {
         if (value != null) {
             try {
                 reportParameterValidator.validateParameterValue(inputParameter, value);
-            } catch (ReportFieldValidationException e) {
+            } catch (ReportParametersValidationException e) {
                 throw new ValidationException(e.getMessage());
             }
         }

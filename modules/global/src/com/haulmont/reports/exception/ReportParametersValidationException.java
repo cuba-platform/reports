@@ -8,9 +8,9 @@ package com.haulmont.reports.exception;
 import com.haulmont.cuba.core.global.SupportedByClient;
 
 @SupportedByClient
-public class ReportFieldValidationException extends ReportingException {
+public class ReportParametersValidationException extends ReportingException {
 
-    public ReportFieldValidationException(String message) {
+    public ReportParametersValidationException(String message) {
         super(message);
     }
 }

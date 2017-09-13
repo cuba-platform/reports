@@ -3,7 +3,8 @@
   ~ Use is subject to license terms, see http://www.cuba-platform.com/commercial-software-license for details.
   -->
 
-<window xmlns="http://schemas.haulmont.com/cuba/window.xsd">
+<window xmlns="http://schemas.haulmont.com/cuba/window.xsd"
+        class="com.haulmont.reports.gui.report.edit.tabs.ParametersFrame">
     <layout margin="true" spacing="true" expand="inputParametersTable">
         <label value="msg://report.parameters" stylename="h2"/>
         <table id="inputParametersTable" sortable="false" width="100%"
@@ -24,5 +25,23 @@
             </columns>
             <rows datasource="parametersDs"/>
         </table>
+        <label value="msg://report.crossParametersValidation" stylename="h2"/>
+        <groupBox id="validationScriptGroupBox" collapsable="true" collapsed="true">
+            <vbox id="validationScriptVBox" expand="validationScriptHBox">
+                <hbox margin="true;true;true;false" spacing="true">
+                    <label value="msg://parameters.crossFieldValidate" />
+                    <checkBox id="validationOnCheckBox" datasource="reportDs" property="validationOn"/>
+                </hbox>
+                <label id="validationScriptLabel" value="msg://parameters.groovyScript"/>
+                <hbox id="validationScriptHBox" expand="validationScriptCodeEditor" spacing="true" width="100%">
+                    <sourceCodeEditor id="validationScriptCodeEditor"
+                                      datasource="reportDs"
+                                      property="validationScript"
+                                      mode="Groovy"/>
+                    <linkButton id="validationScriptHelpButton" icon="icons/question-white.png" invoke="getCrossFieldValidationScriptHelp"/>
+                </hbox>
+            </vbox>
+
+        </groupBox>
     </layout>
 </window>

@@ -4,27 +4,25 @@
  */
 package com.haulmont.reports.gui.report.run;
 
-import com.haulmont.bali.util.Preconditions;
 import com.haulmont.bali.util.ParamsMap;
+import com.haulmont.bali.util.Preconditions;
 import com.haulmont.cuba.client.ClientConfig;
-import com.haulmont.cuba.gui.components.AbstractWindow;
-import com.haulmont.cuba.gui.components.Action;
-import com.haulmont.cuba.gui.components.Button;
-import com.haulmont.reports.entity.Report;
-import com.haulmont.reports.entity.ReportInputParameter;
 import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
+import com.haulmont.reports.entity.Report;
+import com.haulmont.reports.entity.ReportInputParameter;
 import com.haulmont.reports.entity.ReportTemplate;
+import com.haulmont.reports.exception.ReportParametersValidationException;
 import com.haulmont.reports.gui.ReportGuiManager;
+import com.haulmont.reports.gui.ReportParameterValidator;
 import org.apache.commons.lang.BooleanUtils;
 
 import javax.inject.Inject;
-import java.util.*;
-
-import static com.haulmont.reports.gui.report.run.InputParametersFrame.PARAMETERS_PARAMETER;
+import java.util.Collection;
 import java.util.Map;
 import java.util.UUID;
 
+import static com.haulmont.reports.gui.report.run.InputParametersFrame.PARAMETERS_PARAMETER;
 import static com.haulmont.reports.gui.report.run.InputParametersFrame.REPORT_PARAMETER;
 
 public class InputParametersWindow extends AbstractWindow {
@@ -57,10 +55,15 @@ public class InputParametersWindow extends AbstractWindow {
 
     @Inject
     protected HBoxLayout templatesBox;
+
     @Inject
     protected LookupField templateField;
+
     @Inject
     protected CollectionDatasource<ReportTemplate, UUID> templateReportsDs;
+
+    @Inject
+    protected ReportParameterValidator reportParameterValidator;
 
     @Override
     public void init(Map<String, Object> params) {
@@ -115,6 +118,27 @@ public class InputParametersWindow extends AbstractWindow {
                 }
             }
         }
+    }
+
+    @Override
+    public boolean validateAll() {
+        return super.validateAll() && crossValidateParameters();
+    }
+
+    protected boolean crossValidateParameters() {
+        boolean isValid = true;
+        if (BooleanUtils.isTrue(inputParametersFrame.getReport().getValidationOn())) {
+            try {
+                reportParameterValidator.crossValidateParameters(inputParametersFrame.getReport(),
+                        inputParametersFrame.collectParameters());
+            } catch (ReportParametersValidationException e) {
+                NotificationType notificationType = NotificationType.valueOf(clientConfig.getValidationNotificationType());
+                showNotification(formatMessage("error.crossFieldValidation", e.getMessage()), notificationType);
+                isValid = false;
+            }
+        }
+
+        return isValid;
     }
 
     public void cancel() {

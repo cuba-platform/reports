@@ -94,6 +94,14 @@ public class Report extends BaseReportEntity implements com.haulmont.yarg.struct
     @Transient
     protected Boolean isTmp = Boolean.FALSE;
 
+    @Transient
+    @MetaProperty
+    protected String validationScript;
+
+    @Transient
+    @MetaProperty
+    protected Boolean validationOn = false;
+
     public Boolean getIsTmp() {
         return isTmp;
     }
@@ -305,5 +313,21 @@ public class Report extends BaseReportEntity implements com.haulmont.yarg.struct
     @Override
     public ReportBand getRootBand() {
         return getRootBandDefinition();
+    }
+
+    public String getValidationScript() {
+        return validationScript;
+    }
+
+    public void setValidationScript(String validationScript) {
+        this.validationScript = validationScript;
+    }
+
+    public Boolean getValidationOn() {
+        return validationOn;
+    }
+
+    public void setValidationOn(Boolean validationOn) {
+        this.validationOn = validationOn;
     }
 }
