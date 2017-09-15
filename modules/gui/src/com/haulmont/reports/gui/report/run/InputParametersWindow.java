@@ -133,7 +133,7 @@ public class InputParametersWindow extends AbstractWindow {
                         inputParametersFrame.collectParameters());
             } catch (ReportParametersValidationException e) {
                 NotificationType notificationType = NotificationType.valueOf(clientConfig.getValidationNotificationType());
-                showNotification(formatMessage("error.crossFieldValidation", e.getMessage()), notificationType);
+                showNotification(messages.getMainMessage("validationFail.caption"), e.getMessage(), notificationType);
                 isValid = false;
             }
         }
