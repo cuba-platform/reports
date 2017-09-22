@@ -318,6 +318,7 @@ public class ReportingBean implements ReportingApi {
         Report copiedReport = metadata.getTools().deepCopy(source);
         copiedReport.setId(uuidSource.createUuid());
         copiedReport.setName(generateReportName(source.getName()));
+        copiedReport.setCode(null);
         for (ReportTemplate copiedTemplate : copiedReport.getTemplates()) {
             copiedTemplate.setId(uuidSource.createUuid());
         }
