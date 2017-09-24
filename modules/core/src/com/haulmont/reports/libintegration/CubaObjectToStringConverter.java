@@ -62,7 +62,7 @@ public class CubaObjectToStringConverter extends AbstractObjectToStringConverter
                 } catch (ParseException e) {
                     throw new ReportingException(
                             String.format("Couldn't read value [%s] with datatype [%s].",
-                                    paramValueStr, datatype.getName()));
+                                    paramValueStr, datatype));
                 }
             } else {
                 return convertFromStringUnresolved(parameterClass, paramValueStr);
