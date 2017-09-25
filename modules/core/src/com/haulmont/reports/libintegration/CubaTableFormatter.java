@@ -6,8 +6,12 @@
 package com.haulmont.reports.libintegration;
 
 import com.haulmont.bali.datastruct.Pair;
+import com.haulmont.chile.core.model.Instance;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.entity.KeyValueEntity;
+import com.haulmont.cuba.core.global.AppBeans;
+import com.haulmont.cuba.core.global.Messages;
+import com.haulmont.cuba.core.global.MetadataTools;
 import com.haulmont.cuba.core.sys.serialization.SerializationSupport;
 import com.haulmont.reports.app.EntityMap;
 import com.haulmont.reports.entity.tables.dto.CubaTableDTO;
@@ -24,9 +28,13 @@ import static com.haulmont.reports.app.EntityMap.INSTANCE_NAME_KEY;
 import static com.haulmont.reports.entity.wizard.ReportRegion.HEADER_BAND_PREFIX;
 
 public class CubaTableFormatter extends AbstractFormatter {
+    protected Messages messages;
+    protected MetadataTools metadataTools;
 
     public CubaTableFormatter(FormatterFactoryInput formatterFactoryInput) {
         super(formatterFactoryInput);
+        messages = AppBeans.get(Messages.class);
+        metadataTools = AppBeans.get(MetadataTools.class);
     }
 
     @Override
@@ -43,7 +51,6 @@ public class CubaTableFormatter extends AbstractFormatter {
     protected CubaTableDTO transformData(BandData rootBand) {
         Map<String, List<KeyValueEntity>> transformedData = new LinkedHashMap<>();
         Map<String, Set<Pair<String, Class>>> headerMap = new HashMap<>();
-
         Map<String, List<BandData>> childrenBands = rootBand.getChildrenBands();
         childrenBands.forEach((bandName, bandDataList) -> {
             if (!bandName.startsWith(HEADER_BAND_PREFIX)) {
@@ -64,8 +71,13 @@ public class CubaTableFormatter extends AbstractFormatter {
                     });
 
                     if (headers.isEmpty() || headers.size() < data.size()) {
+                        Instance instance = (data instanceof EntityMap) ? ((EntityMap) data).getInstance() : null;
+
                         data.forEach((name, value) -> {
                             if (!INSTANCE_NAME_KEY.equals(name)) {
+                                if (instance != null)
+                                    name = localizeName(name, instance.getClass());
+
                                 if (name != null && value != null)
                                     headers.add(new Pair<>(name, value.getClass()));
                                 if (name != null && value == null)
@@ -87,6 +99,12 @@ public class CubaTableFormatter extends AbstractFormatter {
         });
 
         return new CubaTableDTO(transformedData, headerMap);
+    }
+
+    protected String localizeName(String name, Class entityClass) {
+        String entityClassName = metadataTools.getEntityName(entityClass);
+        entityClassName = entityClassName.substring(entityClassName.indexOf("$") + 1);
+        return messages.getMessage(entityClass, entityClassName + "." + name);
     }
 
     protected void checkInstanceNameLoaded(Object value) {
