@@ -103,6 +103,7 @@ public abstract class AbstractPrintFormAction extends AbstractAction implements 
                 .addProperty("name")
                 .addProperty("localeNames")
                 .addProperty("description")
+                .addProperty("templates")
                 .addProperty("code")
                 .addProperty("xml");
         return dataManager.reload(report, view);
