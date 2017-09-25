@@ -60,19 +60,20 @@ public class CubaTableFormatter extends AbstractFormatter {
 
                 bandDataList.forEach(bandData -> {
                     Map<String, Object> data = bandData.getData();
+                    Instance instance = (data instanceof EntityMap) ? ((EntityMap) data).getInstance() : null;
                     KeyValueEntity entityRow = new KeyValueEntity();
 
                     checkInstanceNameLoaded(data);
                     data.forEach((name, value) -> {
                         if (!INSTANCE_NAME_KEY.equals(name)) {
+                            if (instance != null)
+                                name = localizeName(name, instance.getClass());
                             checkInstanceNameLoaded(value);
                             entityRow.setValue(name, value);
                         }
                     });
 
                     if (headers.isEmpty() || headers.size() < data.size()) {
-                        Instance instance = (data instanceof EntityMap) ? ((EntityMap) data).getInstance() : null;
-
                         data.forEach((name, value) -> {
                             if (!INSTANCE_NAME_KEY.equals(name)) {
                                 if (instance != null)
