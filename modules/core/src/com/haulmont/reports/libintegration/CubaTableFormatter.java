@@ -9,6 +9,7 @@ import com.haulmont.bali.datastruct.Pair;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.entity.KeyValueEntity;
 import com.haulmont.cuba.core.sys.serialization.SerializationSupport;
+import com.haulmont.reports.app.EntityMap;
 import com.haulmont.reports.entity.tables.dto.CubaTableDTO;
 import com.haulmont.yarg.exception.ReportFormattingException;
 import com.haulmont.yarg.formatters.factory.FormatterFactoryInput;
@@ -54,6 +55,7 @@ public class CubaTableFormatter extends AbstractFormatter {
                     Map<String, Object> data = bandData.getData();
                     KeyValueEntity entityRow = new KeyValueEntity();
 
+                    checkInstanceNameLoaded(data);
                     data.forEach((name, value) -> {
                         if (!INSTANCE_NAME_KEY.equals(name)) {
                             checkInstanceNameLoaded(value);
@@ -88,8 +90,11 @@ public class CubaTableFormatter extends AbstractFormatter {
     }
 
     protected void checkInstanceNameLoaded(Object value) {
-        if (!(value instanceof Entity))
+        if (!(value instanceof Entity || value instanceof EntityMap))
             return;
+
+        if (value instanceof EntityMap)
+            value = ((EntityMap) value).getInstance();
 
         try {
             ((Entity) value).getInstanceName();
