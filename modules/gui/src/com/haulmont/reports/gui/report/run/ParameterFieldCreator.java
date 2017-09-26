@@ -18,14 +18,13 @@ import com.haulmont.cuba.gui.data.CollectionDatasource;
 import com.haulmont.cuba.gui.data.CollectionDatasource.RefreshMode;
 import com.haulmont.cuba.gui.data.DsBuilder;
 import com.haulmont.cuba.gui.xml.layout.ComponentsFactory;
+import com.haulmont.reports.app.service.ReportService;
 import com.haulmont.reports.entity.ParameterType;
 import com.haulmont.reports.entity.ReportInputParameter;
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.haulmont.cuba.gui.commonlookup.CommonLookupController.CLASS_PARAMETER;
 
@@ -38,6 +37,7 @@ public class ParameterFieldCreator {
     protected Messages messages = AppBeans.get(Messages.class);
     protected Metadata metadata = AppBeans.get(Metadata.class);
     protected Scripting scripting = AppBeans.get(Scripting.class);
+    protected ReportService reportService = AppBeans.get(ReportService.class);
 
     protected AbstractFrame frame;
 
@@ -78,6 +78,12 @@ public class ParameterFieldCreator {
         return field;
     }
 
+    protected void setCurrentDateAsNow(ReportInputParameter parameter, Field dateField) {
+        Date now = reportService.adjustDate(parameter.getType());
+        dateField.setValue(now);
+        parameter.setDefaultValue(reportService.convertToString(now.getClass(), now));
+    }
+
     protected interface FieldCreator {
         Field createField(ReportInputParameter parameter);
     }
@@ -88,6 +94,11 @@ public class ParameterFieldCreator {
             DateField dateField = componentsFactory.createComponent(DateField.class);
             dateField.setResolution(DateField.Resolution.DAY);
             dateField.setDateFormat(messages.getMainMessage("dateFormat"));
+
+            if (BooleanUtils.isTrue(parameter.getDefaultDateIsCurrent())) {
+                setCurrentDateAsNow(parameter, dateField);
+            }
+
             return dateField;
         }
     }
@@ -98,6 +109,11 @@ public class ParameterFieldCreator {
             DateField dateField = componentsFactory.createComponent(DateField.class);
             dateField.setResolution(DateField.Resolution.MIN);
             dateField.setDateFormat(messages.getMainMessage("dateTimeFormat"));
+
+            if (BooleanUtils.isTrue(parameter.getDefaultDateIsCurrent())) {
+                setCurrentDateAsNow(parameter, dateField);
+            }
+
             return dateField;
         }
     }
@@ -106,6 +122,12 @@ public class ParameterFieldCreator {
 
         @Override
         public Field createField(ReportInputParameter parameter) {
+            Field timeField = componentsFactory.createComponent(TimeField.class);
+
+            if (BooleanUtils.isTrue(parameter.getDefaultDateIsCurrent())) {
+                setCurrentDateAsNow(parameter, timeField);
+            }
+
             return componentsFactory.createComponent(TimeField.class);
         }
     }

@@ -85,4 +85,12 @@ public interface ReportService {
      * @param reportId - identifier of executed report
      */
     void cancelReportExecution(UUID userSessionId, UUID reportId);
+
+    /**
+     * Adjusts {@link Date} according to {@link ParameterType} value
+     *
+     * @param parameterType - ParameterType value.
+     * @return adjusted Date
+     */
+    Date adjustDate(ParameterType parameterType);
 }

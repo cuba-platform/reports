@@ -75,6 +75,9 @@ public class ReportInputParameter extends BaseUuidEntity implements ReportParame
     @MetaProperty
     protected Boolean hidden;
 
+    @MetaProperty
+    protected Boolean defaultDateIsCurrent = false;
+
     @Transient
     protected String localeName;
 
@@ -251,5 +254,13 @@ public class ReportInputParameter extends BaseUuidEntity implements ReportParame
 
     public void setHidden(Boolean hidden) {
         this.hidden = hidden;
+    }
+
+    public Boolean getDefaultDateIsCurrent() {
+        return defaultDateIsCurrent;
+    }
+
+    public void setDefaultDateIsCurrent(Boolean defaultDateIsCurrent) {
+        this.defaultDateIsCurrent = defaultDateIsCurrent;
     }
 }

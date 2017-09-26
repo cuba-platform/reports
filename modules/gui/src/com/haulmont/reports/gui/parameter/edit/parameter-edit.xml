@@ -48,7 +48,7 @@
                             <checkBox id="hidden" datasource="parameterDs" property="hidden"/>
                         </row>
                         <row>
-                            <label value="msg://parameters.required" align="MIDDLE_LEFT"/>
+                            <label id="requiredLabel" value="msg://parameters.required" align="MIDDLE_LEFT"/>
                             <checkBox id="required" datasource="parameterDs" property="required"/>
                         </row>
                         <row>
@@ -70,6 +70,10 @@
                         <row>
                             <label id="defaultValueLabel" value="msg://parameters.defaultValue" align="MIDDLE_LEFT"/>
                             <hbox id="defaultValueBox" width="100%"/>
+                        </row>
+                        <row>
+                            <label id="defaultDateIsCurrentLabel" value="msg://parameters.defaultDateIsCurrent" align="MIDDLE_LEFT"/>
+                            <checkBox id="defaultDateIsCurrentCheckBox" datasource="parameterDs" property="defaultDateIsCurrent"/>
                         </row>
                     </rows>
                 </grid>

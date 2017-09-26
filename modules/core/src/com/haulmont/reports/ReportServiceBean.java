@@ -6,9 +6,11 @@ package com.haulmont.reports;
 
 import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.cuba.core.entity.FileDescriptor;
+import com.haulmont.cuba.core.global.TimeSource;
 import com.haulmont.reports.app.ParameterPrototype;
 import com.haulmont.reports.app.service.ReportService;
 import com.haulmont.reports.entity.*;
+import com.haulmont.reports.exception.ReportingException;
 import com.haulmont.yarg.reporting.ReportOutputDocument;
 import com.haulmont.yarg.util.converter.ObjectToStringConverter;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,9 @@ public class ReportServiceBean implements ReportService {
 
     @Inject
     protected ObjectToStringConverter objectToStringConverter;
+
+    @Inject
+    protected TimeSource timeSource;
 
     @Override
     public Report storeReportEntity(Report report) {
@@ -121,5 +126,43 @@ public class ReportServiceBean implements ReportService {
     @Override
     public void cancelReportExecution(UUID userSessionId, UUID reportId) {
         reportingApi.cancelReportExecution(userSessionId, reportId);
+    }
+
+    @Override
+    public Date adjustDate(ParameterType parameterType) {
+        Date now = timeSource.currentTimestamp();
+        switch (parameterType) {
+            case TIME:
+                now = getTime(now);
+                break;
+            case DATETIME:
+                break;
+            case DATE:
+                now = getDate(now);
+                break;
+            default:
+                throw new ReportingException("Not Date/Time related parameter types are not supported.");
+        }
+
+        return now;
+    }
+
+    protected Date getDate(Date date) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        return cal.getTime();
+    }
+
+    protected Date getTime(Date date) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        cal.set(Calendar.YEAR, 1970);
+        cal.set(Calendar.MONTH, 0);
+        cal.set(Calendar.DAY_OF_MONTH, 1);
+        return cal.getTime();
     }
 }

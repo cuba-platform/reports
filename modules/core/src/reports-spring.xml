@@ -94,6 +94,7 @@
         <property name="dataExtractor" ref="reporting_lib_DataExtractor"/>
         <property name="objectToStringConverter" ref="reporting_lib_StringConverter"/>
         <property name="scripting" ref="reporting_lib_Scripting"/>
+        <property name="reportService" ref="report_ReportService"/>
     </bean>
 
     <!-- MBeans registration -->

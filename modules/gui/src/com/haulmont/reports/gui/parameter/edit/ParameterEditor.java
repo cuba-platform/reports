@@ -16,6 +16,7 @@ import com.haulmont.reports.entity.ParameterType;
 import com.haulmont.reports.entity.ReportInputParameter;
 import com.haulmont.reports.gui.report.run.ParameterClassResolver;
 import com.haulmont.reports.gui.report.run.ParameterFieldCreator;
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 
 import javax.inject.Inject;
@@ -66,6 +67,18 @@ public class ParameterEditor extends AbstractEditor {
 
     @Inject
     protected Label wildcardsLabel;
+
+    @Inject
+    protected CheckBox defaultDateIsCurrentCheckBox;
+
+    @Inject
+    protected Label defaultDateIsCurrentLabel;
+
+    @Inject
+    protected Label requiredLabel;
+
+    @Inject
+    protected CheckBox required;
 
     @Inject
     protected Metadata metadata;
@@ -123,6 +136,7 @@ public class ParameterEditor extends AbstractEditor {
             boolean typeChanged = e.getProperty().equalsIgnoreCase("type");
             boolean classChanged = e.getProperty().equalsIgnoreCase("entityMetaClass")
                     || e.getProperty().equalsIgnoreCase("enumerationClass");
+            boolean defaultDateIsCurrentChanged = e.getProperty().equalsIgnoreCase("defaultDateIsCurrent");
             if (typeChanged || classChanged) {
                 parameter.setParameterClass(parameterClassResolver.resolveClass(parameter));
 
@@ -137,6 +151,11 @@ public class ParameterEditor extends AbstractEditor {
                 initScreensLookup();
 
                 initDefaultValueField();
+            }
+
+            if (defaultDateIsCurrentChanged) {
+               initDefaultValueField();
+               initCurrentDateTimeField();
             }
 
             ((DatasourceImplementation<ReportInputParameter>) parameterDs).modified(e.getItem());
@@ -194,13 +213,35 @@ public class ParameterEditor extends AbstractEditor {
             field.setRequired(false);
 
             defaultValueBox.add(field);
-            defaultValueLabel.setVisible(true);
         }
+    }
+
+    protected void initCurrentDateTimeField() {
+        if (isParameterDateOrTime()) {
+            defaultDateIsCurrentLabel.setVisible(true);
+            defaultDateIsCurrentCheckBox.setVisible(true);
+        } else {
+            defaultDateIsCurrentLabel.setVisible(false);
+            defaultDateIsCurrentCheckBox.setVisible(false);
+        }
+    }
+
+    protected void switchDateOrTimeRelatedDefaultFieldComponentsVisibility(boolean value) {
+        defaultValueBox.setVisible(value);
+        defaultValueLabel.setVisible(value);
+        required.setVisible(value);
+        requiredLabel.setVisible(value);
     }
 
     protected boolean canHaveDefaultValue() {
         if (parameter == null) {
             return false;
+        }
+
+        if (BooleanUtils.isTrue(parameter.getDefaultDateIsCurrent()) && isParameterDateOrTime()) {
+            switchDateOrTimeRelatedDefaultFieldComponentsVisibility(false);
+        } else {
+            switchDateOrTimeRelatedDefaultFieldComponentsVisibility(true);
         }
 
         ParameterType type = parameter.getType();
@@ -227,6 +268,7 @@ public class ParameterEditor extends AbstractEditor {
         predefinedTransformationBox.setVisible(isText);
 
         initDefaultValueField();
+        initCurrentDateTimeField();
     }
 
     protected void initTransformations() {
@@ -255,5 +297,14 @@ public class ParameterEditor extends AbstractEditor {
                 MessageType.CONFIRMATION_HTML
                         .modal(false)
                         .width(600));
+    }
+
+    protected boolean isParameterDateOrTime() {
+        return Optional.ofNullable(parameter)
+                .map(reportInputParameter ->
+                        ParameterType.DATE.equals(parameter.getType()) ||
+                        ParameterType.DATETIME.equals(parameter.getType()) ||
+                        ParameterType.TIME.equals(parameter.getType()))
+                .orElse(false);
     }
 }
