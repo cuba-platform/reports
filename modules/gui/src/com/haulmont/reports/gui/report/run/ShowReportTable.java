@@ -7,8 +7,13 @@ package com.haulmont.reports.gui.report.run;
 
 import com.haulmont.bali.datastruct.Pair;
 import com.haulmont.bali.util.ParamsMap;
+import com.haulmont.chile.core.model.MetaClass;
+import com.haulmont.chile.core.model.MetaProperty;
+import com.haulmont.chile.core.model.MetaPropertyPath;
 import com.haulmont.cuba.core.entity.KeyValueEntity;
+import com.haulmont.cuba.core.global.MessageTools;
 import com.haulmont.cuba.core.global.Metadata;
+import com.haulmont.cuba.core.global.MetadataTools;
 import com.haulmont.cuba.core.sys.serialization.SerializationSupport;
 import com.haulmont.cuba.gui.WindowParam;
 import com.haulmont.cuba.gui.components.*;
@@ -23,8 +28,11 @@ import com.haulmont.reports.entity.Report;
 import com.haulmont.reports.entity.tables.dto.CubaTableDTO;
 import com.haulmont.reports.gui.ReportGuiManager;
 import com.haulmont.yarg.reporting.ReportOutputDocument;
+import org.dom4j.DocumentHelper;
+import org.dom4j.Element;
 
 import javax.inject.Inject;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -45,6 +53,10 @@ public class ShowReportTable extends AbstractWindow {
     protected ComponentsFactory componentsFactory;
     @Inject
     protected Metadata metadata;
+    @Inject
+    protected MetadataTools metadataTools;
+    @Inject
+    protected MessageTools messageTools;
 
     @Inject
     protected LookupField reportLookup;
@@ -55,7 +67,7 @@ public class ShowReportTable extends AbstractWindow {
     @Inject
     protected HBoxLayout reportSelectorBox;
     @Inject
-    protected ScrollBoxLayout tablesHolder;
+    protected GroupBoxLayout tablesHolderGroup;
 
 
     @WindowParam(name = REPORT_PARAMETER, required = true)
@@ -122,7 +134,7 @@ public class ShowReportTable extends AbstractWindow {
     protected void drawTables(CubaTableDTO dto) {
         Map<String, List<KeyValueEntity>> data = dto.getData();
         Map<String, Set<Pair<String, Class>>> headerMap = dto.getHeaders();
-        tablesHolder.removeAll();
+        tablesHolderGroup.removeAll();
 
         if (data == null || data.isEmpty())
             return;
@@ -130,8 +142,10 @@ public class ShowReportTable extends AbstractWindow {
         data.forEach((dataSetName, keyValueEntities) -> {
             if (keyValueEntities != null && !keyValueEntities.isEmpty()) {
                 GroupDatasource dataSource = createDataSource(dataSetName, keyValueEntities, headerMap);
-                GroupBoxLayout groupBoxLayout = createTable(dataSetName, dataSource);
-                tablesHolder.add(groupBoxLayout);
+                Table table = createTable(dataSetName, dataSource);
+                tablesHolderGroup.setCaption(dataSetName);
+                tablesHolderGroup.add(table);
+                tablesHolderGroup.expand(table);
             }
         });
     }
@@ -151,15 +165,32 @@ public class ShowReportTable extends AbstractWindow {
         return ds;
     }
 
-    protected GroupBoxLayout createTable(String dataSetName, GroupDatasource dataSource) {
+    protected Table createTable(String dataSetName, GroupDatasource dataSource) {
         Table table = componentsFactory.createComponent(GroupTable.class);
         table.setId(dataSetName + "Table");
+        createColumns(dataSource, table);
         table.setDatasource(dataSource);
         table.setWidth("100%");
+        return table;
+    }
 
-        GroupBoxLayout groupBox = componentsFactory.createComponent(GroupBoxLayout.class);
-        groupBox.setCaption(dataSetName);
-        groupBox.add(table);
-        return groupBox;
+    protected void createColumns(GroupDatasource dataSource, Table table) {
+        Collection<MetaPropertyPath> paths = metadataTools.getPropertyPaths(dataSource.getMetaClass());
+        for (MetaPropertyPath metaPropertyPath : paths) {
+            MetaProperty property = metaPropertyPath.getMetaProperty();
+            if (!property.getRange().getCardinality().isMany() && !metadataTools.isSystem(property)) {
+                Table.Column column = new Table.Column(metaPropertyPath);
+
+                String propertyName = property.getName();
+                MetaClass propertyMetaClass = metadataTools.getPropertyEnclosingMetaClass(metaPropertyPath);
+
+                column.setCaption(messageTools.getPropertyCaption(propertyMetaClass, propertyName));
+                column.setType(metaPropertyPath.getRangeJavaClass());
+
+                Element element = DocumentHelper.createElement("column");
+                column.setXmlDescriptor(element);
+                table.addColumn(column);
+            }
+        }
     }
 }

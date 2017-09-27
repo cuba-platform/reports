@@ -36,10 +36,7 @@
                     caption="msg://input.printReport" icon="icons/run.png"/>
         </groupBox>
 
-        <groupBox id="tablesHolderGroup">
-            <scrollBox id="tablesHolder" spacing="true">
-
-            </scrollBox>
+        <groupBox id="tablesHolderGroup" spacing="true">
         </groupBox>
     </layout>
 </window>
