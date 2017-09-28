@@ -9,16 +9,20 @@ import com.haulmont.bali.util.Preconditions;
 import com.haulmont.cuba.client.ClientConfig;
 import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
+import com.haulmont.cuba.gui.export.ExportFormat;
 import com.haulmont.reports.entity.Report;
 import com.haulmont.reports.entity.ReportInputParameter;
+import com.haulmont.reports.entity.ReportOutputType;
 import com.haulmont.reports.entity.ReportTemplate;
 import com.haulmont.reports.exception.ReportParametersValidationException;
 import com.haulmont.reports.gui.ReportGuiManager;
 import com.haulmont.reports.gui.ReportParameterValidator;
+import com.haulmont.reports.gui.ReportPrintHelper;
 import org.apache.commons.lang.BooleanUtils;
 
 import javax.inject.Inject;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -36,6 +40,8 @@ public class InputParametersWindow extends AbstractWindow {
     protected String outputFileName;
 
     protected boolean bulkPrint;
+
+    protected Report report;
 
     protected ReportInputParameter inputParameter;
 
@@ -63,6 +69,12 @@ public class InputParametersWindow extends AbstractWindow {
     protected CollectionDatasource<ReportTemplate, UUID> templateReportsDs;
 
     @Inject
+    protected HBoxLayout outputTypeBox;
+
+    @Inject
+    protected LookupField outputTypeField;
+
+    @Inject
     protected ReportParameterValidator reportParameterValidator;
 
     @Override
@@ -87,7 +99,7 @@ public class InputParametersWindow extends AbstractWindow {
             selectedEntities = (Collection) parameters.get(inputParameter.getAlias());
         }
 
-        Report report = (Report) params.get(REPORT_PARAMETER);
+        report = (Report) params.get(REPORT_PARAMETER);
         if (report != null && !report.getIsTmp()) {
             if (report.getTemplates() != null && report.getTemplates().size() > 1) {
                 templateReportsDs.refresh(ParamsMap.of("reportId", report.getId()));
@@ -96,10 +108,42 @@ public class InputParametersWindow extends AbstractWindow {
             }
         }
 
+        templateField.addValueChangeListener(e -> updateOutputTypes());
+        updateOutputTypes();
+
         Action printReportAction = printReportBtn.getAction();
         String commitShortcut = clientConfig.getCommitShortcut();
         printReportAction.setShortcut(commitShortcut);
         addAction(printReportAction);
+    }
+
+    protected void updateOutputTypes() {
+        if (!reportGuiManager.containsAlterableTemplate(report)) {
+            outputTypeBox.setVisible(false);
+            return;
+        }
+
+        ReportTemplate template;
+        if (report.getTemplates() != null && report.getTemplates().size() > 1)
+            template = templateField.getValue();
+        else
+            template = report.getDefaultTemplate();
+
+        if (template != null && template.getAlterable()) {
+            com.haulmont.yarg.structure.ReportOutputType outputType = template.getOutputType();
+            ExportFormat exportFormat = ReportPrintHelper.getExportFormat(outputType);
+
+            Map<String, List<ReportOutputType>> inputOutputTypesMapping = ReportPrintHelper.getInputOutputTypesMapping();
+            List<ReportOutputType> reportOutputTypes = inputOutputTypesMapping.get(exportFormat.getFileExt());
+
+            outputTypeField.setOptionsList(reportOutputTypes);
+            if (outputTypeField.getValue() == null)
+                outputTypeField.setValue(ReportOutputType.getTypeFromExtension(exportFormat.getFileExt().toUpperCase()));
+            outputTypeBox.setVisible(true);
+        } else {
+            outputTypeField.setValue(null);
+            outputTypeBox.setVisible(false);
+        }
     }
 
     public void printReport() {
@@ -112,9 +156,9 @@ public class InputParametersWindow extends AbstractWindow {
                 Report report = inputParametersFrame.getReport();
                 Map<String, Object> parameters = inputParametersFrame.collectParameters();
                 if (bulkPrint) {
-                    reportGuiManager.bulkPrint(report, inputParameter.getAlias(), selectedEntities, this, parameters);
+                    reportGuiManager.bulkPrint(report, templateCode, outputTypeField.getValue(), inputParameter.getAlias(), selectedEntities, this, parameters);
                 } else {
-                    reportGuiManager.printReport(report, parameters, templateCode, outputFileName, this);
+                    reportGuiManager.printReport(report, parameters, templateCode, outputFileName, outputTypeField.getValue(), this);
                 }
             }
         }

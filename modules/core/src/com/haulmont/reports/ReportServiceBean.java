@@ -41,8 +41,18 @@ public class ReportServiceBean implements ReportService {
     }
 
     @Override
+    public ReportOutputDocument createReport(Report report, Map<String, Object> params, ReportOutputType outputType) {
+        return reportingApi.createReport(report, params, outputType);
+    }
+
+    @Override
     public ReportOutputDocument createReport(Report report, String templateCode, Map<String, Object> params) {
         return reportingApi.createReport(report, templateCode, params);
+    }
+
+    @Override
+    public ReportOutputDocument createReport(Report report, String templateCode, Map<String, Object> params, ReportOutputType outputType) {
+        return reportingApi.createReport(report, templateCode, params, outputType);
     }
 
     @Override
@@ -106,6 +116,11 @@ public class ReportServiceBean implements ReportService {
     @Override
     public ReportOutputDocument bulkPrint(Report report, List<Map<String, Object>> paramsList) {
         return reportingApi.bulkPrint(report, paramsList);
+    }
+
+    @Override
+    public ReportOutputDocument bulkPrint(Report report, String templateCode, ReportOutputType outputType, List<Map<String, Object>> paramsList) {
+        return reportingApi.bulkPrint(report, templateCode, outputType, paramsList);
     }
 
     @Override

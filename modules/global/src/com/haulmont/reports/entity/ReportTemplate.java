@@ -25,7 +25,7 @@ import java.nio.charset.StandardCharsets;
 @Entity(name = "report$ReportTemplate")
 @Table(name = "REPORT_TEMPLATE")
 @SystemLevel
-@NamePattern("#getCaption|code,name,customDefinition,custom")
+@NamePattern("#getCaption|code,name,customDefinition,custom,alterable")
 @SuppressWarnings("unused")
 public class ReportTemplate extends StandardEntity implements com.haulmont.yarg.structure.ReportTemplate {
     private static final long serialVersionUID = 3692751073234357754L;
@@ -46,6 +46,9 @@ public class ReportTemplate extends StandardEntity implements com.haulmont.yarg.
 
     @Column(name = "IS_CUSTOM")
     protected Boolean custom = false;
+
+    @Column(name = "IS_ALTERABLE_OUTPUT")
+    protected Boolean alterable = false;
 
     @Column(name = "CUSTOM_CLASS")
     protected String customDefinition;
@@ -97,6 +100,14 @@ public class ReportTemplate extends StandardEntity implements com.haulmont.yarg.
 
     public void setCustom(Boolean custom) {
         this.custom = custom;
+    }
+
+    public Boolean getAlterable() {
+        return alterable;
+    }
+
+    public void setAlterable(Boolean alterable) {
+        this.alterable = alterable;
     }
 
     public String getCustomDefinition() {

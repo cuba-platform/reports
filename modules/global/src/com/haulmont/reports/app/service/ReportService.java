@@ -23,7 +23,11 @@ public interface ReportService {
 
     ReportOutputDocument createReport(Report report, Map<String, Object> params);
 
+    ReportOutputDocument createReport(Report report, Map<String, Object> params, ReportOutputType outputType);
+
     ReportOutputDocument createReport(Report report, String templateCode, Map<String, Object> params);
+
+    ReportOutputDocument createReport(Report report, String templateCode, Map<String, Object> params, ReportOutputType outputType);
 
     ReportOutputDocument createReport(Report report, ReportTemplate template, Map<String, Object> params);
 
@@ -86,6 +90,11 @@ public interface ReportService {
      * Prints the report several times for each parameter map in the paramsList. Put the result files to zip archive.
      */
     ReportOutputDocument bulkPrint(Report report, List<Map<String, Object>> paramsList);
+
+    /**
+     * Prints the report several times for each parameter map in the paramsList. Put the result files to zip archive.
+     */
+    ReportOutputDocument bulkPrint(Report report, String templateCode, ReportOutputType outputType, List<Map<String, Object>> paramsList);
 
     MetaClass findMetaClassByDataSetEntityAlias(String alias, DataSetType dataSetType, List<ReportInputParameter> reportInputParameters);
 

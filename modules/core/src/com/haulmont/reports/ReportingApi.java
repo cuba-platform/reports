@@ -26,7 +26,11 @@ public interface ReportingApi {
 
     ReportOutputDocument createReport(Report report, Map<String, Object> params);
 
+    ReportOutputDocument createReport(Report report, Map<String, Object> params, ReportOutputType outputType);
+
     ReportOutputDocument createReport(Report report, String templateCode, Map<String, Object> params);
+
+    ReportOutputDocument createReport(Report report, String templateCode, Map<String, Object> params, ReportOutputType outputType);
 
     ReportOutputDocument createReport(Report report, ReportTemplate template, Map<String, Object> params);
 
@@ -54,6 +58,8 @@ public interface ReportingApi {
     Report copyReport(Report source);
 
     ReportOutputDocument bulkPrint(Report report, List<Map<String, Object>> paramsList);
+
+    ReportOutputDocument bulkPrint(Report report, String templateCode, ReportOutputType outputType, List<Map<String, Object>> paramsList);
 
     <T extends Entity> T reloadEntity(T entity, View view);
 

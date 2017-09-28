@@ -16,7 +16,6 @@ import com.haulmont.cuba.core.global.Metadata;
 import com.haulmont.cuba.core.global.MetadataTools;
 import com.haulmont.cuba.core.sys.serialization.SerializationSupport;
 import com.haulmont.cuba.gui.WindowParam;
-import com.haulmont.cuba.gui.app.core.entityinspector.EntityInspectorBrowse;
 import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.components.actions.ExcelAction;
 import com.haulmont.cuba.gui.data.CollectionDatasource;

@@ -68,6 +68,11 @@
                                       width="${width}"/>
                         </row>
                         <row>
+                            <label value="msg://template.isAlterableOutput" align="MIDDLE_LEFT"/>
+                            <checkBox id="alterable" datasource="templateDs" property="alterable"
+                                      width="${width}"/>
+                        </row>
+                        <row>
                             <label id="customDefinedByLabel" value="msg://template.customDefinedBy" align="MIDDLE_LEFT"/>
                             <lookupField id="customDefinedBy" datasource="templateDs" property="customDefinedBy"
                                          width="${width}"/>

@@ -68,6 +68,7 @@ create table REPORT_TEMPLATE
   OUTPUT_TYPE integer default 0 not null,
   IS_DEFAULT tinyint default 0,
   IS_CUSTOM tinyint default 0,
+  IS_ALTERABLE_OUTPUT tinyint default 0,
   CUSTOM_DEFINED_BY integer default 100,
   CUSTOM_CLASS varchar(max),
   OUTPUT_NAME_PATTERN varchar(255),

@@ -179,6 +179,13 @@ public class ReportingBean implements ReportingApi {
     }
 
     @Override
+    public ReportOutputDocument createReport(Report report, Map<String, Object> params, com.haulmont.reports.entity.ReportOutputType outputType) {
+        report = reloadEntity(report, REPORT_EDIT_VIEW_NAME);
+        ReportTemplate template = getDefaultTemplate(report);
+        return createReportDocument(report, template, outputType, params);
+    }
+
+    @Override
     public ReportOutputDocument createReport(Report report, String templateCode, Map<String, Object> params) {
         report = reloadEntity(report, REPORT_EDIT_VIEW_NAME);
         ReportTemplate template = report.getTemplateByCode(templateCode);
@@ -186,7 +193,19 @@ public class ReportingBean implements ReportingApi {
     }
 
     @Override
+    public ReportOutputDocument createReport(Report report, String templateCode, Map<String, Object> params, com.haulmont.reports.entity.ReportOutputType outputType) {
+        report = reloadEntity(report, REPORT_EDIT_VIEW_NAME);
+        ReportTemplate template = report.getTemplateByCode(templateCode);
+        return createReportDocument(report, template, outputType, params);
+    }
+
+    @Override
     public ReportOutputDocument bulkPrint(Report report, List<Map<String, Object>> paramsList) {
+        return bulkPrint(report, null, null, paramsList);
+    }
+
+    @Override
+    public ReportOutputDocument bulkPrint(Report report, String templateCode, com.haulmont.reports.entity.ReportOutputType outputType, List<Map<String, Object>> paramsList) {
         try {
             report = reloadEntity(report, REPORT_EDIT_VIEW_NAME);
 
@@ -197,10 +216,13 @@ public class ReportingBean implements ReportingApi {
             zipOutputStream.setEncoding(ReportImportExport.ENCODING);
 
             ReportTemplate reportTemplate = getDefaultTemplate(report);
+            ReportTemplate template = report.getTemplateByCode(templateCode);
+            reportTemplate = (template != null ) ? template : reportTemplate;
+
             Map<String, Integer> alreadyUsedNames = new HashMap<>();
 
             for (Map<String, Object> params : paramsList) {
-                ReportOutputDocument reportDocument = createReportDocument(report, reportTemplate, params);
+                ReportOutputDocument reportDocument = createReportDocument(report, reportTemplate, outputType, params);
 
                 String documentName = reportDocument.getDocumentName();
                 if (alreadyUsedNames.containsKey(documentName)) {
@@ -249,6 +271,11 @@ public class ReportingBean implements ReportingApi {
     }
 
     protected ReportOutputDocument createReportDocument(Report report, ReportTemplate template, Map<String, Object> params) {
+        return createReportDocument(report, template, null, params);
+    }
+
+    protected ReportOutputDocument createReportDocument(Report report, ReportTemplate template,
+                                                        com.haulmont.reports.entity.ReportOutputType outputType, Map<String, Object> params) {
         StopWatch stopWatch = null;
         MDC.put("user", userSessionSource.getUserSession().getUser().getLogin());
         MDC.put("webContextName", globalConfig.getWebContextName());
@@ -273,7 +300,9 @@ public class ReportingBean implements ReportingApi {
                 template.setCustomReport(customFormatter);
             }
 
-            return reportingApi.runReport(new RunParams(report).template(template).params(resultParams));
+            ReportOutputType resultOutputType = (outputType != null) ? outputType.getOutputType() : template.getOutputType();
+
+            return reportingApi.runReport(new RunParams(report).template(template).params(resultParams).output(resultOutputType));
         } catch (NoFreePortsException nfe) {
             throw new NoOpenOfficeFreePortsException(nfe.getMessage());
         } catch (com.haulmont.yarg.exception.OpenOfficeException ooe) {

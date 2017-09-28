@@ -26,11 +26,11 @@ public class CubaReportingTest {
         reportTemplate.setReportOutputType(ReportOutputType.CUSTOM);
         reportTemplate.setName(basicName);
 
-        String outputName = cubaReporting.resolveOutputFileName(new Report(), reportTemplate, rootBand);
+        String outputName = cubaReporting.resolveOutputFileName(new Report(), reportTemplate, null, rootBand);
         Assert.assertEquals(overridenName, outputName);
 
         rootBand.addData(CubaReporting.REPORT_FILE_NAME_KEY, "");
-        outputName = cubaReporting.resolveOutputFileName(new Report(), reportTemplate, rootBand);
+        outputName = cubaReporting.resolveOutputFileName(new Report(), reportTemplate, null, rootBand);
         Assert.assertEquals(basicName, outputName);
     }
 }

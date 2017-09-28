@@ -19,6 +19,7 @@
                 <column id="code"/>
                 <column id="reportOutputType"/>
                 <column id="customDefinition"/>
+                <column id="alterable"/>
             </columns>
             <rows datasource="templatesDs"/>
         </table>
