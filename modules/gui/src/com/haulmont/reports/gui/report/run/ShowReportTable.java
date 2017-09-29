@@ -176,11 +176,8 @@ public class ShowReportTable extends AbstractWindow {
 
         ExcelAction excelAction = ExcelAction.create(table);
         excelAction.setFileName(dataSetName);
-
         Button excelButton = componentsFactory.createComponent(Button.class);
-        excelButton.setCaption(messages.getMessage(EntityInspectorBrowse.class, "excel"));
         excelButton.setAction(excelAction);
-        excelButton.setIcon(themeConstants.get("actions.Excel.icon"));
 
         ButtonsPanel buttonsPanel = componentsFactory.createComponent(ButtonsPanel.class);
         table.setButtonsPanel(buttonsPanel);
