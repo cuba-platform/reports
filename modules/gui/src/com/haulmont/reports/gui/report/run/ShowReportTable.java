@@ -16,7 +16,9 @@ import com.haulmont.cuba.core.global.Metadata;
 import com.haulmont.cuba.core.global.MetadataTools;
 import com.haulmont.cuba.core.sys.serialization.SerializationSupport;
 import com.haulmont.cuba.gui.WindowParam;
+import com.haulmont.cuba.gui.app.core.entityinspector.EntityInspectorBrowse;
 import com.haulmont.cuba.gui.components.*;
+import com.haulmont.cuba.gui.components.actions.ExcelAction;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
 import com.haulmont.cuba.gui.data.DsBuilder;
 import com.haulmont.cuba.gui.data.GroupDatasource;
@@ -171,6 +173,19 @@ public class ShowReportTable extends AbstractWindow {
         createColumns(dataSource, table);
         table.setDatasource(dataSource);
         table.setWidth("100%");
+
+        ExcelAction excelAction = ExcelAction.create(table);
+        excelAction.setFileName(dataSetName);
+
+        Button excelButton = componentsFactory.createComponent(Button.class);
+        excelButton.setCaption(messages.getMessage(EntityInspectorBrowse.class, "excel"));
+        excelButton.setAction(excelAction);
+        excelButton.setIcon(themeConstants.get("actions.Excel.icon"));
+
+        ButtonsPanel buttonsPanel = componentsFactory.createComponent(ButtonsPanel.class);
+        table.setButtonsPanel(buttonsPanel);
+        table.addAction(excelAction);
+        buttonsPanel.add(excelButton);
         return table;
     }
 
