@@ -1,5 +1,5 @@
 alter table REPORT_REPORT add DELETE_TS timestamp^
-alter table REPORT_REPORT add column DELETED_BY varchar2(50)^
+alter table REPORT_REPORT add DELETED_BY varchar2(50)^
 
 alter table REPORT_GROUP add DELETE_TS timestamp^
 alter table REPORT_GROUP add DELETED_BY varchar2(50)^
