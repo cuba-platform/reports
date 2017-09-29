@@ -69,4 +69,12 @@ public interface ReportingApi {
      * @param reportId - identifier of executed report
      */
     void cancelReportExecution(UUID userSessionId, UUID reportId);
+
+    /**
+     * Get current date {@link Date} according to {@link ParameterType} value
+     *
+     * @param parameterType - ParameterType value.
+     * @return adjusted Date
+     */
+    Date currentDateOrTime(ParameterType parameterType);
 }

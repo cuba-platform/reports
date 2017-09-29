@@ -134,40 +134,7 @@ public class ReportServiceBean implements ReportService {
     }
 
     @Override
-    public Date adjustDate(ParameterType parameterType) {
-        Date now = timeSource.currentTimestamp();
-        switch (parameterType) {
-            case TIME:
-                now = getTime(now);
-                break;
-            case DATETIME:
-                break;
-            case DATE:
-                now = getDate(now);
-                break;
-            default:
-                throw new ReportingException("Not Date/Time related parameter types are not supported.");
-        }
-
-        return now;
-    }
-
-    protected Date getDate(Date date) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(date);
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 0);
-        return cal.getTime();
-    }
-
-    protected Date getTime(Date date) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(date);
-        cal.set(Calendar.YEAR, 1970);
-        cal.set(Calendar.MONTH, 0);
-        cal.set(Calendar.DAY_OF_MONTH, 1);
-        return cal.getTime();
+    public Date currentDateOrTime(ParameterType parameterType) {
+        return reportingApi.currentDateOrTime(parameterType);
     }
 }

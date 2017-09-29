@@ -213,24 +213,14 @@ public class ParameterEditor extends AbstractEditor {
             field.setRequired(false);
 
             defaultValueBox.add(field);
+            defaultValueLabel.setVisible(true);
         }
     }
 
     protected void initCurrentDateTimeField() {
-        if (isParameterDateOrTime()) {
-            defaultDateIsCurrentLabel.setVisible(true);
-            defaultDateIsCurrentCheckBox.setVisible(true);
-        } else {
-            defaultDateIsCurrentLabel.setVisible(false);
-            defaultDateIsCurrentCheckBox.setVisible(false);
-        }
-    }
-
-    protected void switchDateOrTimeRelatedDefaultFieldComponentsVisibility(boolean value) {
-        defaultValueBox.setVisible(value);
-        defaultValueLabel.setVisible(value);
-        required.setVisible(value);
-        requiredLabel.setVisible(value);
+        boolean parameterDateOrTime = isParameterDateOrTime();
+        defaultDateIsCurrentLabel.setVisible(parameterDateOrTime);
+        defaultDateIsCurrentCheckBox.setVisible(parameterDateOrTime);
     }
 
     protected boolean canHaveDefaultValue() {
@@ -238,10 +228,8 @@ public class ParameterEditor extends AbstractEditor {
             return false;
         }
 
-        if (BooleanUtils.isTrue(parameter.getDefaultDateIsCurrent()) && isParameterDateOrTime()) {
-            switchDateOrTimeRelatedDefaultFieldComponentsVisibility(false);
-        } else {
-            switchDateOrTimeRelatedDefaultFieldComponentsVisibility(true);
+        if (isParameterDateOrTime() && BooleanUtils.isTrue(parameter.getDefaultDateIsCurrent())) {
+            return false;
         }
 
         ParameterType type = parameter.getType();

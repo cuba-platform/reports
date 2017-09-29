@@ -103,10 +103,10 @@ public interface ReportService {
     void cancelReportExecution(UUID userSessionId, UUID reportId);
 
     /**
-     * Adjusts {@link Date} according to {@link ParameterType} value
+     * Get current date {@link Date} according to {@link ParameterType} value
      *
      * @param parameterType - ParameterType value.
      * @return adjusted Date
      */
-    Date adjustDate(ParameterType parameterType);
+    Date currentDateOrTime(ParameterType parameterType);
 }

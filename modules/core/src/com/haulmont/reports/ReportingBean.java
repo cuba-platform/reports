@@ -537,6 +537,24 @@ public class ReportingBean implements ReportingApi {
         executions.cancelExecution(userSessionId, "Reporting", reportId.toString());
     }
 
+    @Override
+    public Date currentDateOrTime(ParameterType parameterType) {
+        Date now = timeSource.currentTimestamp();
+        switch (parameterType) {
+            case TIME:
+                now = truncateToTime(now);
+                break;
+            case DATETIME:
+                break;
+            case DATE:
+                now = truncateToDay(now);
+                break;
+            default:
+                throw new ReportingException("Not Date/Time related parameter types are not supported.");
+        }
+        return now;
+    }
+
     @SuppressWarnings("unchecked")
     protected <T extends Entity> T reloadEntity(T entity, String viewName) {
         if (entity instanceof Report && ((Report) entity).getIsTmp()) {
@@ -584,5 +602,24 @@ public class ReportingBean implements ReportingApi {
             }
             report.setRolesIdx(roles.length() > 1 ? roles.toString() : null);
         }
+    }
+
+    protected Date truncateToDay(Date date) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        return cal.getTime();
+    }
+
+    protected Date truncateToTime(Date date) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        cal.set(Calendar.YEAR, 1970);
+        cal.set(Calendar.MONTH, 0);
+        cal.set(Calendar.DAY_OF_MONTH, 1);
+        return cal.getTime();
     }
 }

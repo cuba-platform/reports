@@ -10,7 +10,7 @@ import com.haulmont.cuba.core.Persistence;
 import com.haulmont.cuba.core.app.execution.ResourceCanceledException;
 import com.haulmont.cuba.core.global.*;
 import com.haulmont.cuba.core.global.filter.ParametersHelper;
-import com.haulmont.reports.app.service.ReportService;
+import com.haulmont.reports.ReportingApi;
 import com.haulmont.reports.entity.ParameterType;
 import com.haulmont.reports.entity.PredefinedTransformation;
 import com.haulmont.reports.entity.ReportInputParameter;
@@ -34,14 +34,14 @@ public class CubaReporting extends Reporting {
 
     protected Scripting scripting;
 
-    protected ReportService reportService;
+    protected ReportingApi reportingApi;
 
     public void setScripting(Scripting scripting) {
         this.scripting = scripting;
     }
 
-    public void setReportService(ReportService reportService) {
-        this.reportService = reportService;
+    public void setReportingApi(ReportingApi reportingApi) {
+        this.reportingApi = reportingApi;
     }
 
     @Override
@@ -85,7 +85,7 @@ public class CubaReporting extends Reporting {
     protected void handleDateTimeRelatedParameterAsNow(String paramName, Object paramValue, ParameterType parameterType,
                                                        Map<String, Object> handledParams) {
          if (Objects.isNull(paramValue)) {
-             paramValue = reportService.adjustDate(parameterType);
+             paramValue = reportingApi.currentDateOrTime(parameterType);
              handledParams.put(paramName, paramValue);
          }
     }
