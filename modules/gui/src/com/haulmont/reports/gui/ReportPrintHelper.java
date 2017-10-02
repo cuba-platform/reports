@@ -22,7 +22,7 @@ public class ReportPrintHelper {
         inputOutputTypesMapping.put("docx", Arrays.asList(DOCX, HTML, PDF));
         inputOutputTypesMapping.put("doc", Arrays.asList(DOC, PDF));
         inputOutputTypesMapping.put("odt", Arrays.asList(DOC, PDF));
-        inputOutputTypesMapping.put("xlsx", Arrays.asList(XLSX, PDF, CSV));
+        inputOutputTypesMapping.put("xlsx", Arrays.asList(XLSX, HTML, PDF, CSV));
         inputOutputTypesMapping.put("xlsm", Arrays.asList(XLSX, PDF));
         inputOutputTypesMapping.put("xls", Arrays.asList(XLS, PDF));
         inputOutputTypesMapping.put("html", Arrays.asList(HTML, PDF));

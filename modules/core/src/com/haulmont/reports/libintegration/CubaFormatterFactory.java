@@ -14,7 +14,7 @@ import com.haulmont.yarg.formatters.impl.HtmlFormatter;
 import com.haulmont.yarg.formatters.impl.XlsxFormatter;
 
 public class CubaFormatterFactory extends DefaultFormatterFactory {
-    protected boolean useOfficeForDocxPdfConversion = true;
+    protected boolean useOfficeForDocumentConversion = true;
 
     public CubaFormatterFactory() {
         super();
@@ -29,7 +29,7 @@ public class CubaFormatterFactory extends DefaultFormatterFactory {
         FormatterCreator docxCreator = factoryInput -> {
             DocxFormatter docxFormatter = new DocxFormatter(factoryInput);
             docxFormatter.setDefaultFormatProvider(defaultFormatProvider);
-            if (useOfficeForDocxPdfConversion) {
+            if (useOfficeForDocumentConversion) {
                 docxFormatter.setDocumentConverter(documentConverter);
             }
             return docxFormatter;
@@ -60,11 +60,11 @@ public class CubaFormatterFactory extends DefaultFormatterFactory {
         return formatter;
     }
 
-    public boolean isUseOfficeForDocxPdfConversion() {
-        return useOfficeForDocxPdfConversion;
+    public boolean isUseOfficeForDocumentConversion() {
+        return useOfficeForDocumentConversion;
     }
 
-    public void setUseOfficeForDocxPdfConversion(boolean useOfficeForDocxPdfConversion) {
-        this.useOfficeForDocxPdfConversion = useOfficeForDocxPdfConversion;
+    public void setUseOfficeForDocumentConversion(boolean useOfficeForDocumentConversion) {
+        this.useOfficeForDocumentConversion = useOfficeForDocumentConversion;
     }
 }
