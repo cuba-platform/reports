@@ -91,12 +91,26 @@ public class CubaTableFormatter extends AbstractFormatter {
                         headers.add(new Pair<>(header, String.class));
                 });
 
+                headers.removeIf(pair -> containsLowerCaseDuplicate(pair, headers));
+
                 transformedData.put(bandName, entities);
                 headerMap.put(bandName, headers);
             }
         });
 
         return new CubaTableDTO(transformedData, headerMap);
+    }
+
+    protected boolean containsLowerCaseDuplicate(Pair<String, Class> pair, Set<Pair<String, Class>> headers) {
+        if (!pair.getFirst().equals(pair.getFirst().toUpperCase()))
+            return false;
+
+        for (Pair<String, Class> header : headers) {
+            if (!pair.equals(header) && header.getFirst().toUpperCase().equals(pair.getFirst()))
+                return true;
+        }
+
+        return false;
     }
 
     protected void checkInstanceNameLoaded(Object value) {
