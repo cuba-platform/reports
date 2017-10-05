@@ -37,9 +37,13 @@
                         </row>
                         <row>
                             <label id="templateFileLabel" value="msg://template.file" align="MIDDLE_LEFT"/>
-                            <hbox width="${width}" expand="templateUploadField" spacing="true">
-                                <upload id="templateUploadField" dropZone="createTemplateFields"  showFileName="true"/>
-                            </hbox>
+                            <upload id="templateUploadField" dropZone="createTemplateFields" width="${width}" showFileName="true"/>
+                        </row>
+                        <row>
+                            <sourceCodeEditor id="templateFileEditor" width="100%" height="350"
+                                              highlightActiveLine="true"
+                                              printMargin="true"
+                                              showGutter="true" colspan="2"/>
                         </row>
                         <row>
                             <label value="msg://template.outputType" align="MIDDLE_LEFT"/>
@@ -75,14 +79,6 @@
                         </row>
                     </rows>
                 </grid>
-                <vbox id="templateEditorBox" width="100%" visible="false" spacing="true">
-                    <hbox spacing="true" width="100%" align="MIDDLE_LEFT" >
-                        <checkBox id="highlightActiveLineCheck" align="MIDDLE_LEFT" caption="msg://templateEditor.HighlightActiveLine"/>
-                        <checkBox id="printMarginCheck" align="MIDDLE_LEFT" caption="msg://templateEditor.PrintMargin"/>
-                        <checkBox id="showGutterCheck" align="MIDDLE_LEFT" caption="msg://templateEditor.ShowGutter"/>
-                    </hbox>
-                    <sourceCodeEditor id="sourceCodeEditor" width="650" height="200"/>
-                </vbox>
                 <hbox id="chartEditBox" visible="false">
                     <frame id="chartEdit" screen="chartEdit" width="AUTO"/>
                 </hbox>

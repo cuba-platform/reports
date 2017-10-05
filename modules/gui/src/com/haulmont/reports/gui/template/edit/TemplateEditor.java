@@ -30,7 +30,10 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 public class TemplateEditor extends AbstractEditor<ReportTemplate> {
     @Inject
@@ -76,15 +79,7 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
     protected BoxLayout chartPreviewBox;
 
     @Inject
-    protected SourceCodeEditor sourceCodeEditor;
-    @Inject
-    protected CheckBox highlightActiveLineCheck;
-    @Inject
-    protected CheckBox printMarginCheck;
-    @Inject
-    protected CheckBox showGutterCheck;
-    @Inject
-    protected VBoxLayout templateEditorBox;
+    protected SourceCodeEditor templateFileEditor;
 
     @Inject
     protected WindowConfig windowConfig;
@@ -112,9 +107,9 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
     protected void postInit() {
         super.postInit();
 
-        initUploadField(getItem().getContent());
-
         ReportTemplate reportTemplate = getItem();
+
+        initUploadField();
         templateDs.addItemPropertyChangeListener(e -> {
             if ("reportOutputType".equals(e.getProperty())) {
                 setupVisibility(reportTemplate.getCustom(), (ReportOutputType) e.getValue());
@@ -137,12 +132,14 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
         outputType.setOptionsList(outputTypes);
     }
 
-    protected void initUploadField(byte[] templateFile) {
+    protected void initUploadField() {
+        ReportTemplate reportTemplate = getItem();
+        byte[] templateFile = reportTemplate.getContent();
         if (templateFile != null) {
             templateUploadField.setContentProvider(() ->
                     new ByteArrayInputStream(templateFile));
             FileDescriptor fileDescriptor = metadata.create(FileDescriptor.class);
-            fileDescriptor.setName(getItem().getName());
+            fileDescriptor.setName(reportTemplate.getName());
             templateUploadField.setValue(fileDescriptor);
         }
     }
@@ -150,11 +147,9 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
     @Override
     public void ready() {
         super.ready();
-
         ReportTemplate reportTemplate = getItem();
         setupVisibility(reportTemplate.getCustom(), reportTemplate.getReportOutputType());
-
-        initTemplateEditor();
+        initTemplateEditor(reportTemplate);
     }
 
     protected void setupVisibility(boolean customEnabled, ReportOutputType reportOutputType) {
@@ -201,9 +196,18 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
 
         templateUploadField.addFileUploadSucceedListener(e -> {
             String fileName = templateUploadField.getFileName();
-            getItem().setName(fileName);
+            ReportTemplate reportTemplate = getItem();
+            reportTemplate.setName(fileName);
 
-            saveTemplateContentFromFile();
+            File file = fileUploading.getFile(templateUploadField.getFileId());
+            try {
+                byte[] data = FileUtils.readFileToByteArray(file);
+                reportTemplate.setContent(data);
+            } catch (IOException ex) {
+                throw new RuntimeException(
+                        String.format("An error occurred while uploading file for template [%s]", getItem().getCode()), ex);
+            }
+            initTemplateEditor(reportTemplate);
             updateOutputType();
 
             showNotification(getMessage("templateEditor.uploadSuccess"), NotificationType.TRAY);
@@ -222,44 +226,21 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
         }
     }
 
-    protected void saveTemplateContentFromFile() {
-        File file = fileUploading.getFile(templateUploadField.getFileId());
-        try {
-            byte[] data = FileUtils.readFileToByteArray(file);
-            getItem().setContent(data);
-            initEditorValue();
-        } catch (IOException ex) {
-            throw new RuntimeException(
-                    String.format("An error occurred while uploading file for template [%s]", getItem().getCode()), ex);
-        }
-    }
-
-    protected void initTemplateEditor() {
+    protected void initTemplateEditor(ReportTemplate reportTemplate) {
+        templateFileEditor.setMode(SourceCodeEditor.Mode.HTML);
         String extension = FilenameUtils.getExtension(templateUploadField.getFileName());
-        if (extension != null && (extension.toLowerCase().equals("csv") || extension.toLowerCase().equals("html"))) {
-            templateEditorBox.setVisible(true);
-            initEditorValue();
-            initSourceCodeControls();
-        } else {
-            templateEditorBox.setVisible(false);
+        if (extension == null) {
+            templateFileEditor.setVisible(false);
+            return;
         }
-    }
-
-    protected void initEditorValue() {
-        String templateContent = new String(getItem().getContent(), StandardCharsets.UTF_8);
-        sourceCodeEditor.setMode(SourceCodeEditor.Mode.HTML);
-        sourceCodeEditor.setValue(templateContent);
-    }
-
-    protected void initSourceCodeControls() {
-        highlightActiveLineCheck.setValue(sourceCodeEditor.isHighlightActiveLine());
-        highlightActiveLineCheck.addValueChangeListener(e -> sourceCodeEditor.setHighlightActiveLine(Boolean.TRUE.equals(e.getValue())));
-
-        printMarginCheck.setValue(sourceCodeEditor.isShowPrintMargin());
-        printMarginCheck.addValueChangeListener(e -> sourceCodeEditor.setShowPrintMargin(Boolean.TRUE.equals(e.getValue())));
-
-        showGutterCheck.setValue(sourceCodeEditor.isShowGutter());
-        showGutterCheck.addValueChangeListener(e -> sourceCodeEditor.setShowGutter(Boolean.TRUE.equals(e.getValue())));
+        ReportOutputType outputType = ReportOutputType.getTypeFromExtension(extension.toUpperCase());
+        if (outputType == ReportOutputType.CSV || outputType == ReportOutputType.HTML) {
+            templateFileEditor.setVisible(true);
+            String templateContent = new String(reportTemplate.getContent(), StandardCharsets.UTF_8);
+            templateFileEditor.setValue(templateContent);
+        } else {
+            templateFileEditor.setVisible(false);
+        }
     }
 
     @Override
@@ -280,9 +261,12 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
         }
 
         String extension = FilenameUtils.getExtension(templateUploadField.getFileName());
-        if (extension != null && (extension.toLowerCase().equals("csv") || extension.toLowerCase().equals("html"))) {
-            getItem().setContent(sourceCodeEditor.getValue().getBytes());
-            initUploadField(sourceCodeEditor.getValue().getBytes());
+        if (extension != null) {
+            ReportOutputType outputType = ReportOutputType.getTypeFromExtension(extension.toUpperCase());
+            if (outputType == ReportOutputType.CSV || outputType == ReportOutputType.HTML) {
+                byte[] bytes = templateFileEditor.getValue().getBytes(StandardCharsets.UTF_8);
+                reportTemplate.setContent(bytes);
+            }
         }
 
         return super.commit(validate);
