@@ -27,6 +27,8 @@ import com.haulmont.cuba.gui.data.impl.ValueGroupDatasourceImpl;
 import com.haulmont.cuba.gui.theme.ThemeConstants;
 import com.haulmont.cuba.gui.xml.layout.ComponentsFactory;
 import com.haulmont.reports.entity.Report;
+import com.haulmont.reports.entity.ReportOutputType;
+import com.haulmont.reports.entity.ReportTemplate;
 import com.haulmont.reports.entity.tables.dto.CubaTableDTO;
 import com.haulmont.reports.gui.ReportGuiManager;
 import com.haulmont.yarg.reporting.ReportOutputDocument;
@@ -126,11 +128,21 @@ public class ShowReportTable extends AbstractWindow {
             if (validateAll()) {
                 Map<String, Object> parameters = inputParametersFrame.collectParameters();
                 Report report = inputParametersFrame.getReport();
+                if (templateCode == null || templateCode.isEmpty())
+                    templateCode = findTableCode(report);
                 ReportOutputDocument reportResult = reportGuiManager.getReportResult(report, parameters, templateCode);
                 CubaTableDTO dto = (CubaTableDTO) SerializationSupport.deserialize(reportResult.getContent());
                 drawTables(dto);
             }
         }
+    }
+
+    protected String findTableCode(Report report) {
+        for (ReportTemplate reportTemplate : report.getTemplates()) {
+            if (ReportOutputType.TABLE.equals(reportTemplate.getReportOutputType()))
+                return reportTemplate.getCode();
+        }
+        return null;
     }
 
     protected void drawTables(CubaTableDTO dto) {
