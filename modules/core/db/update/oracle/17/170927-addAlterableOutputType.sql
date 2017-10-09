@@ -1,1 +1,1 @@
-alter table REPORT_TEMPLATE add column IS_ALTERABLE_OUTPUT char(1)^
+alter table REPORT_TEMPLATE add IS_ALTERABLE_OUTPUT char(1)^
