@@ -109,22 +109,32 @@ public class ReportingBean implements ReportingApi {
                     em.persist(report.getGroup());
                 }
             }
-
-            Report existingReport = em.find(Report.class, report.getId(), "report.withTemplates");
+            em.setSoftDeletion(false);
+            Report existingReport;
             List<ReportTemplate> existingTemplates = null;
-            if (existingReport != null) {
-                report.setVersion(existingReport.getVersion());
-                if (existingReport.getTemplates() != null) {
-                    existingTemplates = existingReport.getTemplates();
+            try {
+                existingReport = em.find(Report.class, report.getId(), "report.withTemplates");
+
+                if (existingReport != null) {
+                    report.setVersion(existingReport.getVersion());
+                    if (existingReport.getTemplates() != null) {
+                        existingTemplates = existingReport.getTemplates();
+                    }
+                    if (existingReport.getDeleteTs() != null) {
+                        existingReport.setDeleteTs(null);
+                        existingReport.setDeletedBy(null);
+                    }
+                } else {
+                    report.setVersion(0);
                 }
-            } else {
-                report.setVersion(0);
+
+                storeIndexFields(report);
+                dynamicAttributesManagerAPI.storeDynamicAttributes(report);
+
+                report = em.merge(report);
+            } finally {
+                em.setSoftDeletion(true);
             }
-
-            storeIndexFields(report);
-            dynamicAttributesManagerAPI.storeDynamicAttributes(report);
-
-            report = em.merge(report);
 
             if (loadedTemplates != null) {
                 if (existingTemplates != null) {
