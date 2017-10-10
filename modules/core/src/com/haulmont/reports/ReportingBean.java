@@ -132,33 +132,33 @@ public class ReportingBean implements ReportingApi {
                 dynamicAttributesManagerAPI.storeDynamicAttributes(report);
 
                 report = em.merge(report);
+
+                if (loadedTemplates != null) {
+                    if (existingTemplates != null) {
+                        for (ReportTemplate template : existingTemplates) {
+                            if (!loadedTemplates.contains(template)) {
+                                em.remove(template);
+                            }
+                        }
+                    }
+
+                    for (ReportTemplate loadedTemplate : loadedTemplates) {
+                        ReportTemplate existingTemplate = em.find(ReportTemplate.class, loadedTemplate.getId());
+                        if (existingTemplate != null) {
+                            loadedTemplate.setVersion(existingTemplate.getVersion());
+                            if (PersistenceHelper.isNew(loadedTemplate)) {
+                                PersistenceHelper.makeDetached(loadedTemplate);
+                            }
+                        } else {
+                            loadedTemplate.setVersion(0);
+                        }
+
+                        loadedTemplate.setReport(report);
+                        savedTemplates.add(em.merge(loadedTemplate));
+                    }
+                }
             } finally {
                 em.setSoftDeletion(true);
-            }
-
-            if (loadedTemplates != null) {
-                if (existingTemplates != null) {
-                    for (ReportTemplate template : existingTemplates) {
-                        if (!loadedTemplates.contains(template)) {
-                            em.remove(template);
-                        }
-                    }
-                }
-
-                for (ReportTemplate loadedTemplate : loadedTemplates) {
-                    ReportTemplate existingTemplate = em.find(ReportTemplate.class, loadedTemplate.getId());
-                    if (existingTemplate != null) {
-                        loadedTemplate.setVersion(existingTemplate.getVersion());
-                        if (PersistenceHelper.isNew(loadedTemplate)) {
-                            PersistenceHelper.makeDetached(loadedTemplate);
-                        }
-                    } else {
-                        loadedTemplate.setVersion(0);
-                    }
-
-                    loadedTemplate.setReport(report);
-                    savedTemplates.add(em.merge(loadedTemplate));
-                }
             }
             em.flush();
 
