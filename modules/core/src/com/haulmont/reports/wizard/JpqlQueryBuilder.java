@@ -9,6 +9,7 @@ import com.haulmont.bali.util.Preconditions;
 import com.haulmont.reports.entity.wizard.RegionProperty;
 import com.haulmont.reports.entity.wizard.ReportData;
 import com.haulmont.reports.entity.wizard.ReportRegion;
+import com.haulmont.reports.entity.wizard.TemplateFileType;
 import org.apache.commons.lang.StringUtils;
 
 import javax.annotation.Nullable;
@@ -41,7 +42,10 @@ public class JpqlQueryBuilder {
 
             addPropertyToQuery(propertyPath, nestedEntityAlias);
             addAliasToQuery(propertyPath);
+
         }
+
+        addDefaultOrderBy();
 
         insertOutputFields();
         if (joinsExist()) {
@@ -49,6 +53,19 @@ public class JpqlQueryBuilder {
         }
 
         return result.trim().replace("queryEntity", "e");
+    }
+
+    protected void addDefaultOrderBy() {
+        if (reportData.getReportType() == ReportData.ReportType.LIST_OF_ENTITIES_WITH_QUERY) {
+            if (reportData.getTemplateFileType() == TemplateFileType.CHART) {
+                reportRegion.getRegionProperties().stream()
+                        .findFirst()
+                        .ifPresent(regionProperty -> {
+                            String regionPropertyName = regionProperty.getEntityTreeNode().getName();
+                            result += " order by queryEntity." + regionPropertyName;
+                        });
+            }
+        }
     }
 
     protected void insertOutputFields() {

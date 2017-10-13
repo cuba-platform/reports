@@ -5,11 +5,8 @@
 
 package com.haulmont.reports.wizard;
 
-import com.haulmont.reports.entity.wizard.EntityTreeNode;
-import com.haulmont.reports.entity.wizard.RegionProperty;
-import com.haulmont.reports.entity.wizard.ReportData;
-import com.haulmont.reports.entity.wizard.ReportRegion;
-import junit.framework.Assert;
+import com.haulmont.reports.entity.wizard.*;
+import org.junit.Assert;
 import org.junit.Test;
 
 public class JpqlQueryBuilderTest {
@@ -105,6 +102,25 @@ public class JpqlQueryBuilderTest {
                 "left join e.colour colour \n" +
                 "left join e.seller seller \n" +
                 ", in(e.repairs) repairs where e.model.id = ${param}", result);
+    }
+
+    @Test
+    public void testDefaultOrderByForChartsTemplate() throws Exception {
+        String query = "select queryEntity from ref$Car queryEntity";
+        ReportData reportData = new ReportData();
+        reportData.setQuery(query);
+        reportData.setReportType(ReportData.ReportType.LIST_OF_ENTITIES_WITH_QUERY);
+        reportData.setTemplateFileType(TemplateFileType.CHART);
+        ReportRegion reportRegion = new ReportRegion();
+        reportData.addRegion(reportRegion);
+        EntityTreeNode root = new EntityTreeNode();
+
+        createProperty(reportRegion, root, "vin");
+        JpqlQueryBuilder jpqlQueryBuilder = new JpqlQueryBuilder(reportData, reportRegion);
+        String result = jpqlQueryBuilder.buildQuery();
+        Assert.assertEquals("select\n" +
+                "e.vin as \"vin\"\n" +
+                "from ref$Car e order by e.vin", result);
     }
 
     protected void createProperty(ReportRegion reportRegion, EntityTreeNode root, String name) {

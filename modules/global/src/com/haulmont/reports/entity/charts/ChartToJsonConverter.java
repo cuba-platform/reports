@@ -7,6 +7,7 @@ package com.haulmont.reports.entity.charts;
 
 import com.google.gson.*;
 import com.haulmont.cuba.core.entity.Entity;
+import com.haulmont.reports.app.EntityMap;
 import com.haulmont.reports.entity.charts.serialization.DateSerializer;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -113,10 +114,40 @@ public class ChartToJsonConverter {
             graphs.add(graph);
         }
 
+        Optional.ofNullable(data.get(0)).ifPresent(map -> {
+            if (map instanceof EntityMap) {
+                sortByCategoryField(data, description.getCategoryField());
+            }
+        });
+
         JsonElement jsonTree = gson.toJsonTree(chart);
         jsonTree.getAsJsonObject().add("dataProvider", serializeData(data, fields));
 
         return gson.toJson(jsonTree);
+    }
+
+    private void sortByCategoryField(List<Map<String, Object>> data, String categoryField) {
+        data.sort((entityMap1, entityMap2) -> {
+            int compareResult;
+
+            Object objToCompare1 = entityMap1.get(categoryField);
+            Object objToCompare2 = entityMap2.get(categoryField);
+
+            if (Objects.isNull(objToCompare1) && !Objects.isNull(objToCompare2)) {
+                compareResult = -1;
+            } else if (Objects.isNull(objToCompare1) && Objects.isNull(objToCompare2)) {
+                compareResult = -1;
+            } else {
+                if (objToCompare1 instanceof Comparable) {
+                    Comparable comparable1 = (Comparable) objToCompare1;
+                    Comparable comparable2 = (Comparable) objToCompare2;
+                    compareResult = comparable1.compareTo(comparable2);
+                } else {
+                    throw new UnsupportedOperationException("Chart category entity field type must implement Comparable interface");
+                }
+            }
+            return compareResult;
+        });
     }
 
     private boolean isByDate(String categoryField, List<Map<String, Object>> data) {
