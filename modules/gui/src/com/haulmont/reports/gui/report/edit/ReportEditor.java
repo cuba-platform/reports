@@ -932,7 +932,13 @@ public class ReportEditor extends AbstractEditor<Report> {
                 Report report = getItem();
                 ReportTemplate defaultTemplate = report.getDefaultTemplate();
                 if (defaultTemplate != null && selected.contains(defaultTemplate)) {
-                    report.setDefaultTemplate(null);
+                    ReportTemplate newDefaultTemplate = null;
+
+                    if (templatesDs.getItems().size() == 1) {
+                        newDefaultTemplate = templatesDs.getItems().iterator().next();
+                    }
+
+                    report.setDefaultTemplate(newDefaultTemplate);
                 }
             }
         });
