@@ -133,10 +133,12 @@ public class ChartToJsonConverter {
             Object objToCompare1 = entityMap1.get(categoryField);
             Object objToCompare2 = entityMap2.get(categoryField);
 
-            if (Objects.isNull(objToCompare1) && !Objects.isNull(objToCompare2)) {
+            if (Objects.isNull(objToCompare1) && Objects.nonNull(objToCompare2)) {
                 compareResult = -1;
-            } else if (Objects.isNull(objToCompare1) && Objects.isNull(objToCompare2)) {
+            } else if (Objects.isNull(objToCompare1)) {
                 compareResult = -1;
+            } else if (Objects.isNull(objToCompare2)) {
+                compareResult = 1;
             } else {
                 if (objToCompare1 instanceof Comparable) {
                     Comparable comparable1 = (Comparable) objToCompare1;
