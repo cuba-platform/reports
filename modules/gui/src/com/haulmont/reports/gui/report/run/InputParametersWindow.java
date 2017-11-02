@@ -129,7 +129,7 @@ public class InputParametersWindow extends AbstractWindow {
         else
             template = report.getDefaultTemplate();
 
-        if (template != null && template.getAlterable()) {
+        if (template != null && BooleanUtils.isTrue(template.getAlterable())) {
             com.haulmont.yarg.structure.ReportOutputType outputType = template.getOutputType();
             ExportFormat exportFormat = ReportPrintHelper.getExportFormat(outputType);
 

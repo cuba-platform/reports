@@ -30,6 +30,7 @@ import com.haulmont.reports.gui.report.run.ShowChartController;
 import com.haulmont.reports.gui.report.run.ShowReportTable;
 import com.haulmont.yarg.reporting.ReportOutputDocument;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 
@@ -742,7 +743,7 @@ public class ReportGuiManager {
 
     public boolean containsAlterableTemplate(Report report) {
         for (ReportTemplate template : report.getTemplates()) {
-            if (template.getAlterable())
+            if (BooleanUtils.isTrue(template.getAlterable()))
                 return true;
         }
         return false;

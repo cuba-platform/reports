@@ -1,0 +1,1 @@
+update REPORT_TEMPLATE set IS_ALTERABLE_OUTPUT = false where IS_ALTERABLE_OUTPUT is null^
