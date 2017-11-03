@@ -184,6 +184,7 @@ public class ShowReportTable extends AbstractWindow {
         createColumns(dataSource, table);
         table.setDatasource(dataSource);
         table.setWidth("100%");
+        table.setMultiSelect(true);
 
         ExcelAction excelAction = ExcelAction.create(table);
         excelAction.setFileName(dataSetName);
