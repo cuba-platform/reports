@@ -22,7 +22,7 @@ import org.apache.commons.lang.StringUtils;
 import javax.inject.Inject;
 import java.util.*;
 
-public class ParameterEditor extends AbstractEditor {
+public class ParameterEditor extends AbstractEditor<ReportInputParameter> {
     @Inject
     protected Label defaultValueLabel;
 
@@ -100,16 +100,15 @@ public class ParameterEditor extends AbstractEditor {
 
     @Override
     public void setItem(Entity item) {
-        ReportInputParameter newItem = parameterDs.getDataSupplier().newInstance(parameterDs.getMetaClass());
-        metadata.getTools().copy(item, newItem);
-        newItem.setId((UUID) item.getId());
-        if (newItem.getParameterClass() == null) {
-            newItem.setParameterClass(parameterClassResolver.resolveClass(newItem));
+        ReportInputParameter newParameter = (ReportInputParameter) metadata.create(parameterDs.getMetaClass());
+        metadata.getTools().copy(item, newParameter);
+        newParameter.setId((UUID) item.getId());
+        if (newParameter.getParameterClass() == null) {
+            newParameter.setParameterClass(parameterClassResolver.resolveClass(newParameter));
         }
 
-        super.setItem(newItem);
-        parameter = (ReportInputParameter) getItem();
-        enableControlsByParamType(parameter.getType());
+        super.setItem(newParameter);
+        enableControlsByParamType(newParameter.getType());
         initScreensLookup();
         initTransformations();
     }
@@ -129,6 +128,15 @@ public class ParameterEditor extends AbstractEditor {
         initListeners();
     }
 
+    @Override
+    public boolean commit() {
+        if (super.commit()) {
+            metadata.getTools().copy(getItem(), parameter);
+            return true;
+        }
+        return false;
+    }
+
     protected void initListeners() {
         type.addValueChangeListener(e -> enableControlsByParamType((ParameterType) e.getValue()));
 
@@ -137,6 +145,7 @@ public class ParameterEditor extends AbstractEditor {
             boolean classChanged = e.getProperty().equalsIgnoreCase("entityMetaClass")
                     || e.getProperty().equalsIgnoreCase("enumerationClass");
             boolean defaultDateIsCurrentChanged = e.getProperty().equalsIgnoreCase("defaultDateIsCurrent");
+            ReportInputParameter parameter = getItem();
             if (typeChanged || classChanged) {
                 parameter.setParameterClass(parameterClassResolver.resolveClass(parameter));
 
@@ -163,6 +172,7 @@ public class ParameterEditor extends AbstractEditor {
     }
 
     protected void initScreensLookup() {
+        ReportInputParameter parameter = getItem();
         if (parameter.getType() == ParameterType.ENTITY ||  parameter.getType() == ParameterType.ENTITY_LIST) {
             Class clazz = parameterClassResolver.resolveClass(parameter);
             if (clazz != null) {
@@ -196,7 +206,7 @@ public class ParameterEditor extends AbstractEditor {
     protected void initDefaultValueField() {
         defaultValueLabel.setVisible(false);
         defaultValueBox.removeAll();
-
+        ReportInputParameter parameter = getItem();
         if (canHaveDefaultValue()) {
             Field field = parameterFieldCreator.createField(parameter);
             field.addValueChangeListener(e -> {
@@ -224,6 +234,7 @@ public class ParameterEditor extends AbstractEditor {
     }
 
     protected boolean canHaveDefaultValue() {
+        ReportInputParameter parameter = getItem();
         if (parameter == null) {
             return false;
         }
@@ -260,6 +271,7 @@ public class ParameterEditor extends AbstractEditor {
     }
 
     protected void initTransformations() {
+        ReportInputParameter parameter = getItem();
         predefinedTransformation.setValue(parameter.getPredefinedTransformation() != null);
         enableControlsByTransformationType(parameter.getPredefinedTransformation() != null);
         predefinedTransformation.addValueChangeListener(e -> {
@@ -284,10 +296,11 @@ public class ParameterEditor extends AbstractEditor {
         showMessageDialog(getMessage("validationScript"), getMessage("validationScriptHelp"),
                 MessageType.CONFIRMATION_HTML
                         .modal(false)
-                        .width(600));
+                        .width(600f));
     }
 
     protected boolean isParameterDateOrTime() {
+        ReportInputParameter parameter = getItem();
         return Optional.ofNullable(parameter)
                 .map(reportInputParameter ->
                         ParameterType.DATE.equals(parameter.getType()) ||
