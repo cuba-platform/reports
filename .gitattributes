@@ -1,0 +1,9 @@
+* text eol=auto
+
+*.png binary
+*.ico binary
+*.jar binary
+*.doc binary
+*.docx binary
+*.xls binary
+*.xlsx binary
