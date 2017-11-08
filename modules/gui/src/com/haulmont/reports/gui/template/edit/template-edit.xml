@@ -68,7 +68,7 @@
                                       width="${width}"/>
                         </row>
                         <row>
-                            <label value="msg://template.isAlterableOutput" align="MIDDLE_LEFT"/>
+                            <label id="alterableLabel" value="msg://template.isAlterableOutput" align="MIDDLE_LEFT"/>
                             <checkBox id="alterable" datasource="templateDs" property="alterable"
                                       width="${width}"/>
                         </row>

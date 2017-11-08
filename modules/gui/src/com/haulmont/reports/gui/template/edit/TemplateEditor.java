@@ -18,6 +18,7 @@ import com.haulmont.reports.entity.charts.AbstractChartDescription;
 import com.haulmont.reports.entity.charts.ChartSeries;
 import com.haulmont.reports.entity.charts.ChartType;
 import com.haulmont.reports.entity.charts.SerialChartDescription;
+import com.haulmont.reports.gui.ReportGuiManager;
 import com.haulmont.reports.gui.ReportPrintHelper;
 import com.haulmont.reports.gui.datasource.NotPersistenceDatasource;
 import com.haulmont.reports.gui.report.run.ShowChartController;
@@ -55,6 +56,12 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
     protected Label customDefinedByLabel;
 
     @Inject
+    protected CheckBox alterable;
+
+    @Inject
+    protected Label alterableLabel;
+
+    @Inject
     protected FileUploadingAPI fileUploading;
 
     @Inject
@@ -83,8 +90,12 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
 
     @Inject
     protected WindowConfig windowConfig;
+
     @Inject
-    private Metadata metadata;
+    protected Metadata metadata;
+
+    @Inject
+    protected ReportGuiManager reportGuiManager;
 
     public TemplateEditor() {
         showSaveNotification = false;
@@ -163,6 +174,10 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
         customDefinedBy.setRequiredMessage(getMessage("templateEditor.customDefinedBy"));
         customDefinition.setRequired(customEnabled);
         customDefinition.setRequiredMessage(getMessage("templateEditor.classRequired"));
+
+        boolean supportAlterableForTemplate = reportGuiManager.supportAlterableForTemplate(getItem());
+        alterable.setVisible(supportAlterableForTemplate);
+        alterableLabel.setVisible(supportAlterableForTemplate);
 
         boolean chartOutputType = reportOutputType == ReportOutputType.CHART;
         chartEditBox.setVisible(chartOutputType && !customEnabled);

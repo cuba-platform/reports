@@ -9,7 +9,6 @@ import com.haulmont.bali.util.Preconditions;
 import com.haulmont.cuba.client.ClientConfig;
 import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
-import com.haulmont.cuba.gui.export.ExportFormat;
 import com.haulmont.reports.entity.Report;
 import com.haulmont.reports.entity.ReportInputParameter;
 import com.haulmont.reports.entity.ReportOutputType;
@@ -124,22 +123,25 @@ public class InputParametersWindow extends AbstractWindow {
         }
 
         ReportTemplate template;
-        if (report.getTemplates() != null && report.getTemplates().size() > 1)
+        if (report.getTemplates() != null && report.getTemplates().size() > 1) {
             template = templateField.getValue();
-        else
+        }
+        else {
             template = report.getDefaultTemplate();
+        }
 
-        if (template != null && BooleanUtils.isTrue(template.getAlterable())) {
-            com.haulmont.yarg.structure.ReportOutputType outputType = template.getOutputType();
-            ExportFormat exportFormat = ReportPrintHelper.getExportFormat(outputType);
-
-            Map<String, List<ReportOutputType>> inputOutputTypesMapping = ReportPrintHelper.getInputOutputTypesMapping();
-            List<ReportOutputType> reportOutputTypes = inputOutputTypesMapping.get(exportFormat.getFileExt());
-
-            outputTypeField.setOptionsList(reportOutputTypes);
-            if (outputTypeField.getValue() == null)
-                outputTypeField.setValue(ReportOutputType.getTypeFromExtension(exportFormat.getFileExt().toUpperCase()));
-            outputTypeBox.setVisible(true);
+        if (template != null && reportGuiManager.supportAlterableForTemplate(template)) {
+            List<ReportOutputType> outputTypes = ReportPrintHelper.getInputOutputTypesMapping().get(template.getExt());
+            if (outputTypes != null && !outputTypes.isEmpty()) {
+                outputTypeField.setOptionsList(outputTypes);
+                if (outputTypeField.getValue() == null) {
+                    outputTypeField.setValue(template.getReportOutputType());
+                }
+                outputTypeBox.setVisible(true);
+            } else {
+                outputTypeField.setValue(null);
+                outputTypeBox.setVisible(false);
+            }
         } else {
             outputTypeField.setValue(null);
             outputTypeBox.setVisible(false);
@@ -150,9 +152,9 @@ public class InputParametersWindow extends AbstractWindow {
         if (inputParametersFrame.getReport() != null) {
             if (validateAll()) {
                 ReportTemplate template = templateField.getValue();
-                if (template != null)
+                if (template != null) {
                     templateCode = template.getCode();
-
+                }
                 Report report = inputParametersFrame.getReport();
                 Map<String, Object> parameters = inputParametersFrame.collectParameters();
                 if (bulkPrint) {

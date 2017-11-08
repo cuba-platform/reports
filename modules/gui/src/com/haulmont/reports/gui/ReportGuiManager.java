@@ -743,9 +743,20 @@ public class ReportGuiManager {
 
     public boolean containsAlterableTemplate(Report report) {
         for (ReportTemplate template : report.getTemplates()) {
-            if (BooleanUtils.isTrue(template.getAlterable()))
+            if (supportAlterableForTemplate(template)) {
                 return true;
+            }
         }
         return false;
+    }
+
+    public boolean supportAlterableForTemplate(ReportTemplate template) {
+        if (BooleanUtils.isTrue(template.getCustom())) {
+            return false;
+        }
+        if (template.getReportOutputType() == ReportOutputType.CHART || template.getReportOutputType() == ReportOutputType.TABLE) {
+            return false;
+        }
+        return BooleanUtils.isTrue(template.getAlterable());
     }
 }
