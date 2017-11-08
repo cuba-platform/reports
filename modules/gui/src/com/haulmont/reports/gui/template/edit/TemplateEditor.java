@@ -18,7 +18,6 @@ import com.haulmont.reports.entity.charts.AbstractChartDescription;
 import com.haulmont.reports.entity.charts.ChartSeries;
 import com.haulmont.reports.entity.charts.ChartType;
 import com.haulmont.reports.entity.charts.SerialChartDescription;
-import com.haulmont.reports.gui.ReportGuiManager;
 import com.haulmont.reports.gui.ReportPrintHelper;
 import com.haulmont.reports.gui.datasource.NotPersistenceDatasource;
 import com.haulmont.reports.gui.report.run.ShowChartController;
@@ -94,9 +93,6 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
     @Inject
     protected Metadata metadata;
 
-    @Inject
-    protected ReportGuiManager reportGuiManager;
-
     public TemplateEditor() {
         showSaveNotification = false;
     }
@@ -164,6 +160,10 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
     }
 
     protected void setupVisibility(boolean customEnabled, ReportOutputType reportOutputType) {
+        boolean tableOutputType = reportOutputType == ReportOutputType.TABLE;
+        boolean chartOutputType = reportOutputType == ReportOutputType.CHART;
+        boolean templateOutputVisibility = !(chartOutputType || tableOutputType);
+
         templateUploadField.setVisible(!customEnabled);
         customDefinedBy.setVisible(customEnabled);
         customDefinition.setVisible(customEnabled);
@@ -175,11 +175,10 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
         customDefinition.setRequired(customEnabled);
         customDefinition.setRequiredMessage(getMessage("templateEditor.classRequired"));
 
-        boolean supportAlterableForTemplate = reportGuiManager.supportAlterableForTemplate(getItem());
+        boolean supportAlterableForTemplate = templateOutputVisibility && !customEnabled;
         alterable.setVisible(supportAlterableForTemplate);
         alterableLabel.setVisible(supportAlterableForTemplate);
 
-        boolean chartOutputType = reportOutputType == ReportOutputType.CHART;
         chartEditBox.setVisible(chartOutputType && !customEnabled);
         chartPreviewBox.setVisible(chartOutputType && !customEnabled);
         if (chartOutputType && !customEnabled) {
@@ -188,10 +187,7 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
             chartEdit.hideChartPreviewBox();
         }
 
-        boolean tableOutputType = reportOutputType == ReportOutputType.TABLE;
-        boolean templateOutputVisibility = !(chartOutputType || tableOutputType);
-
-        templateUploadField.setVisible(templateOutputVisibility);
+       templateUploadField.setVisible(templateOutputVisibility);
         templateFileLabel.setVisible(templateOutputVisibility);
         outputNamePattern.setVisible(templateOutputVisibility);
         outputNamePatternLabel.setVisible(templateOutputVisibility);
