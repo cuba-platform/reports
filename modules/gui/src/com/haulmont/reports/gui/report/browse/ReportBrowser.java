@@ -28,7 +28,6 @@ import com.haulmont.reports.app.service.ReportService;
 import com.haulmont.reports.entity.Report;
 import com.haulmont.reports.gui.ReportGuiManager;
 import com.haulmont.reports.gui.report.edit.ReportEditor;
-import com.haulmont.reports.gui.report.run.ShowReportTable;
 import com.haulmont.reports.gui.report.wizard.ReportWizardCreator;
 import org.apache.commons.lang.StringUtils;
 
@@ -96,7 +95,8 @@ public class ReportBrowser extends AbstractLookup {
                 Report report = (Report) target.getSingleSelected();
                 if (report != null) {
                     report = getDsContext().getDataSupplier().reload(report, "report.edit");
-                    if (reportGuiManager.inputParametersRequired(report)) {
+                    if (report.getInputParameters() != null && report.getInputParameters().size() > 0 ||
+                            reportGuiManager.inputParametersRequiredByTemplates(report)) {
                         Window paramsWindow = openWindow("report$inputParameters", OpenType.DIALOG,
                                 ParamsMap.of("report", report));
                         paramsWindow.addCloseListener(actionId ->

@@ -86,7 +86,8 @@ public class ReportGuiManager {
             throw new IllegalArgumentException("Can not run null report");
         }
 
-        if (inputParametersRequired(report)) {
+        if (report.getInputParameters() != null && report.getInputParameters().size() > 0
+                || inputParametersRequiredByTemplates(report)) {
             openReportParamsDialog(window, report, null, null, null);
         } else {
             printReport(report, ParamsMap.empty(), window);
@@ -112,13 +113,15 @@ public class ReportGuiManager {
         List<ReportInputParameter> params = report.getInputParameters();
 
         boolean reportHasMoreThanOneParameter = params != null && params.size() > 1;
+        boolean inputParametersRequiredByTemplates = inputParametersRequiredByTemplates(report);
 
-        Object resultingParamValue = convertParameterIfNecessary(parameter, parameterValue, reportHasMoreThanOneParameter);
+        Object resultingParamValue = convertParameterIfNecessary(parameter, parameterValue,
+                reportHasMoreThanOneParameter || inputParametersRequiredByTemplates);
 
         boolean reportTypeIsSingleEntity = ParameterType.ENTITY == parameter.getType() && resultingParamValue instanceof Collection;
         boolean moreThanOneEntitySelected = resultingParamValue instanceof Collection && ((Collection) resultingParamValue).size() > 1;
 
-        if (reportHasMoreThanOneParameter) {
+        if (reportHasMoreThanOneParameter || inputParametersRequiredByTemplates) {
             boolean bulkPrint = reportTypeIsSingleEntity && moreThanOneEntitySelected;
             openReportParamsDialog(window, report, ParamsMap.of(parameter.getAlias(), resultingParamValue), parameter, templateCode, outputFileName,
                     bulkPrint);
@@ -693,11 +696,11 @@ public class ReportGuiManager {
 
     @Nullable
     protected Object convertParameterIfNecessary(ReportInputParameter parameter, @Nullable Object paramValue,
-                                                 boolean reportHasMoreThanOneParameter) {
+                                                 boolean convertToSingleItem) {
         Object resultingParamValue = paramValue;
         if (ParameterType.ENTITY == parameter.getType()) {
             if (paramValue instanceof Collection || paramValue instanceof ParameterPrototype) {
-                resultingParamValue = handleCollectionParameter(paramValue, reportHasMoreThanOneParameter);
+                resultingParamValue = handleCollectionParameter(paramValue, convertToSingleItem);
             }
         } else if (ParameterType.ENTITY_LIST == parameter.getType()) {
             if (!(paramValue instanceof Collection) && !(paramValue instanceof ParameterPrototype)) {
@@ -709,7 +712,7 @@ public class ReportGuiManager {
     }
 
     @Nullable
-    protected Object handleCollectionParameter(@Nullable Object paramValue, boolean reportHasMoreThanOneParameter) {
+    protected Object handleCollectionParameter(@Nullable Object paramValue, boolean convertToSingleItem) {
         Collection paramValueWithCollection = null;
         if (paramValue instanceof Collection) {
             paramValueWithCollection = (Collection) paramValue;
@@ -722,7 +725,7 @@ public class ReportGuiManager {
             return null;
         }
 
-        if (reportHasMoreThanOneParameter && paramValueWithCollection.size() == 1) {
+        if (convertToSingleItem && paramValueWithCollection.size() == 1) {
             //if the case of several params we can not do bulk print, because the params should be filled, so we get only first object from the list
             return paramValueWithCollection.iterator().next();
         }
@@ -734,11 +737,8 @@ public class ReportGuiManager {
         return "%," + QueryUtils.escapeForLike(value) + ",%";
     }
 
-    public boolean inputParametersRequired(Report report) {
-        return (report.getInputParameters() != null && report.getInputParameters().size() > 0) ||
-                (report.getTemplates() != null && report.getTemplates().size() > 1) ||
-                containsAlterableTemplate(report);
-
+    public boolean inputParametersRequiredByTemplates(Report report) {
+        return report.getTemplates() != null && report.getTemplates().size() > 1 || containsAlterableTemplate(report);
     }
 
     public boolean containsAlterableTemplate(Report report) {

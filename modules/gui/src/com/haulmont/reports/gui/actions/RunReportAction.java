@@ -80,7 +80,8 @@ public class RunReportAction extends AbstractAction implements Action.HasBeforeA
             if (items != null && items.size() > 0) {
                 Report report = (Report) items.iterator().next();
                 report = window.getDsContext().getDataSupplier().reload(report, "report.edit");
-                if (reportGuiManager.inputParametersRequired(report)) {
+                if (report.getInputParameters() != null && report.getInputParameters().size() > 0
+                        || reportGuiManager.inputParametersRequiredByTemplates(report)) {
                     openReportParamsDialog(report, window);
                 } else {
                     reportGuiManager.printReport(report, Collections.emptyMap(), window);
