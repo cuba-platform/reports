@@ -105,11 +105,11 @@
                     </rows>
                 </grid>
                 <vbox id="jsonDataSetTypeVBox" spacing="true" height="100%">
+                    <label value="msg://dataSet.jsonSourceType"/>
                     <lookupField id="jsonSourceTypeField"
-                                 datasource="dataSetsDs"
-                                 property="jsonSourceType"
-                                 width="${width}"
-                                 caption="msg://dataSet.jsonSourceType"/>
+                                     datasource="dataSetsDs"
+                                     property="jsonSourceType"
+                                     width="${width}"/>
                     <label id="jsonPathQueryLabel" value="msg://dataSet.jsonPathQuery"/>
                     <hbox id="jsonPathQueryHBox" width="100%" expand="jsonPathQueryTextAreaField">
                         <textArea id="jsonPathQueryTextAreaField" rows="3"
@@ -120,29 +120,29 @@
                         <linkButton id="jsonPathQueryHelp" icon="icons/question-white.png" invoke="getJsonPathQueryHelp"/>
                     </hbox>
                     <vbox id="jsonSourceGroovyCodeVBox" expand="jsonSourceGroovyCodeHBox">
-                        <label id="groovyCodeLabel" value="msg://dataSet.text"/>
+                        <label value="msg://dataSet.text"/>
                         <hbox id="jsonSourceGroovyCodeHBox" expand="jsonGroovyCodeEditor" spacing="true" width="100%">
                             <sourceCodeEditor id="jsonGroovyCodeEditor" height="100%"
                                               datasource="dataSetsDs"
                                               property="jsonSourceText"
                                               mode="Groovy"/>
-                            <linkButton id="jsonDataHelp" icon="icons/question-white.png" invoke="getJsonSourceTextHelp"/>
+                            <linkButton id="jsonSourceGroovyCodeHelp" icon="icons/question-white.png" invoke="getJsonSourceGroovyCodeHelp"/>
                         </hbox>
                     </vbox>
-                    <vbox id="jsonSourceURLCodeVBox" spacing="true" expand="urlTextArea">
-                        <textArea id="urlTextArea" width="100%"
+                    <vbox id="jsonSourceURLVBox" spacing="true" expand="jsonSourceURLTextArea">
+                        <label value="msg://dataSet.urlJsonSource"/>
+                        <textArea id="jsonSourceURLTextArea" width="100%"
                                   datasource="dataSetsDs"
                                   property="jsonSourceText" required="true"
-                                  caption="msg://dataSet.urlJsonSource"
                                   requiredMessage="msg://dataSet.urlJsonSourceMessage"/>
                     </vbox>
                     <vbox id="jsonSourceParameterCodeVBox" spacing="true">
+                        <label value="msg://dataSet.jsonParameter"/>
                         <lookupField id="jsonQueryParameterField"
                                      datasource="dataSetsDs"
                                      optionsDatasource="stringParametersDs"
                                      property="jsonSourceInputParameter"
-                                     nullOptionVisible="false"
-                                     caption="msg://dataSet.jsonParameter"/>
+                                     nullOptionVisible="false"/>
                     </vbox>
                 </vbox>
                 <label id="spacer"/>

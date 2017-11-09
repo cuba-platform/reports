@@ -63,11 +63,9 @@ public class BandDefinitionEditor extends AbstractFrame implements Suggester {
     @Inject
     protected VBoxLayout jsonSourceGroovyCodeVBox;
     @Inject
-    protected VBoxLayout jsonSourceURLCodeVBox;
+    protected VBoxLayout jsonSourceURLVBox;
     @Inject
     protected VBoxLayout jsonSourceParameterCodeVBox;
-    @Inject
-    protected SourceCodeEditor jsonGroovyCodeEditor;
     @Inject
     protected HBoxLayout textParamsBox;
     @Inject
@@ -172,12 +170,13 @@ public class BandDefinitionEditor extends AbstractFrame implements Suggester {
                 jsonDataSetTypeVBox.expand(jsonSourceGroovyCodeVBox);
                 break;
             case URL:
-                jsonDataSetTypeVBox.add(jsonSourceURLCodeVBox);
-                jsonDataSetTypeVBox.expand(jsonSourceURLCodeVBox);
+                jsonDataSetTypeVBox.add(jsonSourceURLVBox);
+                jsonDataSetTypeVBox.expand(jsonSourceURLVBox);
                 break;
             case PARAMETER:
                 jsonDataSetTypeVBox.add(jsonSourceParameterCodeVBox);
-                jsonDataSetTypeVBox.expand(jsonSourceParameterCodeVBox);
+                jsonDataSetTypeVBox.add(spacer);
+                jsonDataSetTypeVBox.expand(spacer);
                 break;
         }
     }
@@ -186,21 +185,21 @@ public class BandDefinitionEditor extends AbstractFrame implements Suggester {
         showMessageDialog(getMessage("dataSet.text"), getMessage("dataSet.textHelp"),
                 MessageType.CONFIRMATION_HTML
                         .modal(false)
-                        .width(700));
+                        .width(700f));
     }
 
-    public void getJsonSourceTextHelp() {
-        showMessageDialog(getMessage("dataSet.text"), getMessage("dataSet.jsonSourceTextHelp"),
+    public void getJsonSourceGroovyCodeHelp() {
+        showMessageDialog(getMessage("dataSet.text"), getMessage("dataSet.jsonSourceGroovyCodeHelp"),
                 MessageType.CONFIRMATION_HTML
                         .modal(false)
-                        .width(700));
+                        .width(700f));
     }
 
     public void getJsonPathQueryHelp() {
         showMessageDialog(getMessage("dataSet.text"), getMessage("dataSet.jsonPathQueryHelp"),
                 MessageType.CONFIRMATION_HTML
                         .modal(false)
-                        .width(700));
+                        .width(700f));
     }
 
     protected void initDataStoreField() {
