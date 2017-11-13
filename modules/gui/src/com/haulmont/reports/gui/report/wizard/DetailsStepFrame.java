@@ -165,7 +165,15 @@ public class DetailsStepFrame extends StepFrame {
                     //if old text contains MetaClass name substring, just replace it
                     String prevEntityCaption = messageTools.getEntityCaption(prevValue);
                     if (StringUtils.contains(oldReportName, prevEntityCaption)) {
-                        String newText = StringUtils.replace(oldReportName, prevEntityCaption, messageTools.getEntityCaption(value));
+
+                        String newText = oldReportName;
+                        int index = oldReportName.lastIndexOf(prevEntityCaption);
+                        if (index > -1) {
+                            newText = StringUtils.substring(oldReportName, 0, index)
+                                    + messageTools.getEntityCaption(value)
+                                    + StringUtils.substring(oldReportName, index + prevEntityCaption.length(), oldReportName.length());
+                        }
+
                         wizard.reportName.setValue(newText);
                         if (!oldReportName.equals(wizard.formatMessage("reportNamePattern", prevEntityCaption))) {
                             //if user changed auto generated report name and we have changed it, we show message to him
