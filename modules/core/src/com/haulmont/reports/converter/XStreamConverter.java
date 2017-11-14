@@ -7,25 +7,20 @@ package com.haulmont.reports.converter;
 
 import com.haulmont.cuba.core.global.View;
 import com.haulmont.cuba.core.global.ViewProperty;
+import com.haulmont.cuba.core.sys.CubaXStream;
 import com.haulmont.cuba.security.entity.Role;
 import com.haulmont.reports.entity.*;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.basic.DateConverter;
 import com.thoughtworks.xstream.converters.collections.CollectionConverter;
-import com.thoughtworks.xstream.converters.reflection.ExternalizableConverter;
 import com.thoughtworks.xstream.converters.reflection.SerializableConverter;
-import com.thoughtworks.xstream.core.DefaultConverterLookup;
-import com.thoughtworks.xstream.core.util.ClassLoaderReference;
-import com.thoughtworks.xstream.io.xml.XppDriver;
 import com.thoughtworks.xstream.mapper.MapperWrapper;
 
 import java.util.*;
 
 public class XStreamConverter {
     protected XStream createXStream() {
-        XStream xStream = new XStream(null, new XppDriver(),
-                new ClassLoaderReference(Thread.currentThread().getContextClassLoader()),
-                null, new DefaultConverterLookup(), null) {
+        XStream xStream = new CubaXStream(Collections.singletonList(SerializableConverter.class)) {
             @Override
             protected MapperWrapper wrapMapper(MapperWrapper next) {
                 return new MapperWrapper(next) {
@@ -41,8 +36,6 @@ public class XStreamConverter {
                 };
             }
         };
-        xStream.getConverterRegistry().removeConverter(ExternalizableConverter.class);
-        xStream.getConverterRegistry().removeConverter(SerializableConverter.class);
         xStream.registerConverter(new CollectionConverter(xStream.getMapper()) {
             @Override
             public boolean canConvert(Class type) {
