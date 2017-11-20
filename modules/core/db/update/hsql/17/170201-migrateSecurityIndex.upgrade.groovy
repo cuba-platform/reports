@@ -1,6 +1,5 @@
 import groovy.json.JsonSlurper
 import groovy.sql.Sql
-import org.apache.commons.lang.StringUtils
 
 def sql = new Sql(ds)
 sql.withTransaction {
@@ -73,8 +72,11 @@ protected boolean isNotEmpty(String str) {
 }
 
 protected String buildIdx(List<String> list) {
+    if (list == null) {
+        return null
+    }
     def idxSeparator = ","
-    String result = StringUtils.join(list, idxSeparator)
+    String result = String.join(idxSeparator, list)
     if (isNotEmpty(result)) {
         result = idxSeparator + result + idxSeparator
     }
