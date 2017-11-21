@@ -65,11 +65,11 @@ public class MultiEntityDataLoader extends AbstractEntityDataLoader {
             if (!hasNestedCollection) {
                 entity = reloadEntityByDataSetView(dataSet, entity);
             }
-
-            if (dataSet instanceof DataSet)
-                resultList.add(new EntityMap(entity, ((DataSet) dataSet).getView()));
-            else
+            if (dataSet instanceof DataSet) {
+                resultList.add(new EntityMap(entity, getView(entity, (DataSet) dataSet)));
+            } else {
                 resultList.add(new EntityMap(entity));
+            }
         }
         return resultList;
     }

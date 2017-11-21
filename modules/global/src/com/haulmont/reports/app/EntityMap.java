@@ -121,8 +121,11 @@ public class EntityMap implements Map<String, Object> {
         if (!loaded) {
             MetaClass metaClass = instance.getMetaClass();
             for (MetaProperty property : metaClass.getProperties()) {
-                if (view != null && view.getProperty(property.getName()) != null)
+                if (view != null && view.getProperty(property.getName()) != null) {
                     explicitData.put(property.getName(), getValue(instance, property.getName()));
+                } else if (view == null) {
+                    explicitData.put(property.getName(), getValue(instance, property.getName()));
+                }
             }
 
             explicitData.put(INSTANCE_NAME_KEY, instance.getInstanceName());

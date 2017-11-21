@@ -43,11 +43,11 @@ public class SingleEntityDataLoader extends AbstractEntityDataLoader {
         params.put(paramName, entity);
 
         EntityMap result;
-        if (dataSet instanceof DataSet)
-            result = new EntityMap((Entity) entity, ((DataSet) dataSet).getView());
-        else
+        if (dataSet instanceof DataSet) {
+            result = new EntityMap((Entity) entity, getView((Entity)entity, (DataSet) dataSet));
+        } else {
             result = new EntityMap((Entity) entity);
-
+        }
         return Collections.singletonList(result);
     }
 
