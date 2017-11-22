@@ -696,15 +696,18 @@ public class ReportGuiManager {
 
     @Nullable
     protected Object convertParameterIfNecessary(ReportInputParameter parameter, @Nullable Object paramValue,
-                                                 boolean convertToSingleItem) {
+                                                 boolean useForInputParametersForm) {
         Object resultingParamValue = paramValue;
         if (ParameterType.ENTITY == parameter.getType()) {
             if (paramValue instanceof Collection || paramValue instanceof ParameterPrototype) {
-                resultingParamValue = handleCollectionParameter(paramValue, convertToSingleItem);
+                resultingParamValue = handleCollectionParameter(paramValue,
+                        useForInputParametersForm);
             }
         } else if (ParameterType.ENTITY_LIST == parameter.getType()) {
             if (!(paramValue instanceof Collection) && !(paramValue instanceof ParameterPrototype)) {
                 resultingParamValue = Collections.singletonList(paramValue);
+            } else if (paramValue instanceof ParameterPrototype && useForInputParametersForm) {
+                resultingParamValue = handleCollectionParameter(paramValue, false);
             }
         }
 

@@ -70,7 +70,7 @@ public class ReportGuiManagerTest {
         converted = reportGuiManager.convertParameterIfNecessary(entityParameter, parameterPrototype, false);
         Assert.assertTrue(converted == parameterPrototype);
         converted = reportGuiManager.convertParameterIfNecessary(entityParameter, parameterPrototype, true);
-        Assert.assertTrue(converted == parameterPrototype);
+        Assert.assertTrue(converted instanceof Collection);
         converted = reportGuiManager.convertParameterIfNecessary(entityParameter, "simpleString", true);
         Assert.assertTrue(converted instanceof Collection);
         Assert.assertTrue(((Collection)converted).iterator().next().equals("simpleString"));
