@@ -22,7 +22,7 @@
                 resizable="true"/>
 
     <layout expand="reportGroupsTable">
-        <filter applyTo="reportGroupsTable" datasource="groupsDs" margin="false,false,true,false" collapsed="true">
+        <filter applyTo="reportGroupsTable" datasource="groupsDs" margin="false,false,true,false">
             <properties include=".*"/>
         </filter>
         <table id="reportGroupsTable" width="100%">
