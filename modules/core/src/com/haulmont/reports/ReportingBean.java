@@ -37,7 +37,7 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.perf4j.StopWatch;
-import org.perf4j.log4j.Log4JStopWatch;
+import org.perf4j.slf4j.Slf4JStopWatch;
 import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 
@@ -291,7 +291,7 @@ public class ReportingBean implements ReportingApi {
         MDC.put("webContextName", globalConfig.getWebContextName());
         executions.startExecution(report.getId().toString(), "Reporting");
         try {
-            stopWatch = new Log4JStopWatch("Reporting#" + report.getName());
+            stopWatch = new Slf4JStopWatch("Reporting#" + report.getName());
             List<String> prototypes = new LinkedList<>();
             for (Map.Entry<String, Object> param : params.entrySet()) {
                 if (param.getValue() instanceof ParameterPrototype)
