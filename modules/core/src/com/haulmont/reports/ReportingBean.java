@@ -321,9 +321,12 @@ public class ReportingBean implements ReportingApi {
             throw new UnsupportedFormatException(fe.getMessage());
         } catch (com.haulmont.yarg.exception.ValidationException ve) {
             throw new ValidationException(ve.getMessage());
+        } catch (com.haulmont.yarg.exception.ReportingInterruptedException ie) {
+            throw new ReportCanceledException(String.format("Report is canceled. %s", ie.getMessage()));
         } catch (com.haulmont.yarg.exception.ReportingException re) {
-            if (ExceptionUtils.getRootCause(re) instanceof ResourceCanceledException) {
-                return null;
+            Throwable rootCause = ExceptionUtils.getRootCause(re);
+            if (rootCause instanceof ResourceCanceledException) {
+                throw new ReportCanceledException(String.format("Report is canceled. %s", rootCause.getMessage()));
             }
             //noinspection unchecked
             List<Throwable> list = ExceptionUtils.getThrowableList(re);
