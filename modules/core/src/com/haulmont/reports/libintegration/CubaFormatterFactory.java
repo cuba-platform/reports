@@ -32,6 +32,7 @@ public class CubaFormatterFactory extends DefaultFormatterFactory {
             if (useOfficeForDocumentConversion) {
                 docxFormatter.setDocumentConverter(documentConverter);
             }
+            docxFormatter.setHtmlImportProcessor(htmlImportProcessor);
             return docxFormatter;
         };
 
