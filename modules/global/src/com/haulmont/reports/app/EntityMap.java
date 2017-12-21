@@ -8,16 +8,15 @@ import com.haulmont.chile.core.model.Instance;
 import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.chile.core.model.MetaProperty;
 import com.haulmont.cuba.core.entity.Entity;
+import com.haulmont.cuba.core.global.AppBeans;
+import com.haulmont.cuba.core.global.Metadata;
 import com.haulmont.cuba.core.global.View;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class EntityMap implements Map<String, Object> {
     private static final Logger log = LoggerFactory.getLogger(EntityMap.class);
@@ -120,8 +119,12 @@ public class EntityMap implements Map<String, Object> {
     protected void loadAllProperties() {
         if (!loaded) {
             MetaClass metaClass = instance.getMetaClass();
+            Metadata metadata = AppBeans.get(Metadata.class);
+            String pkName = metadata.getTools().getPrimaryKeyName(metaClass);
             for (MetaProperty property : metaClass.getProperties()) {
                 if (view != null && view.getProperty(property.getName()) != null) {
+                    explicitData.put(property.getName(), getValue(instance, property.getName()));
+                } else if (view != null && Objects.equals(pkName, property.getName())) {
                     explicitData.put(property.getName(), getValue(instance, property.getName()));
                 } else if (view == null) {
                     explicitData.put(property.getName(), getValue(instance, property.getName()));
