@@ -1,0 +1,46 @@
+name: Root
+children:
+  - name: cross
+    orientation: C
+    queries:
+      - #Horizontal tab
+        name: cross_dynamic_header
+        json-type: GROOVY_SCRIPT
+        json-path: $.[*]
+        json: "import groovy.json.*
+
+          def result \n
+          transactional { em->
+              result = em.createQuery('select e.name as month_name, e.id as month_id from test$Month e')
+              .getResultList().collect { ['month_name': it[0], 'month_id': it[1]] }
+          } \n
+          JsonOutput.toJson(result)"
+      - #Vertical tab
+        name: cross_master_data
+        list-entities-param: user
+        multi: test$User
+      - #Cross data tab - one execution for all intersections
+        name: data
+        groovy: "
+          def result \n
+          return transactional { em->
+              result = em.createQuery('select
+                     u.id cross_master_data_user_id,
+                     m.id as cross_dynamic_header_month_id,
+                     coalesce((select sum(e.timeInMinutes) / 60
+                        from test$TimeEntry e
+                        where m.id = EXTRACT(month from e.date) and e.user.id = u.id), 0.0) as hours
+                   from
+                      test$Month m,
+                      test$User u
+                   where u.id in :user_ids and m.id in :month_ids')
+                   .setParameter('month_ids', params['cross_dynamic_header'].collect { it.month_id })
+                   .setParameter('user_ids', params['user'].collect { it.id })
+                   .getResultList().collect { [
+                      'cross_master_data_user_id': it[0],
+                      'cross_dynamic_header_month_id': it[1],
+                      'hours': it[2]
+                   ]}
+          } \n
+          return result"
+

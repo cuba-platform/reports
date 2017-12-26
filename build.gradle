@@ -215,6 +215,19 @@ configure(coreModule) {
 
         compile(bom['org.codehaus.groovy:groovy-all'])
         compile(bom['asm:asm'])
+
+        testCompile(bom['org.springframework:spring-test'])
+        testCompile(bom['com.fasterxml.jackson.dataformat:jackson-dataformat-yaml'])
+        testCompile(bom['org.apache.poi:poi-ooxml']) {
+            transitive = false
+        }
+        testCompile(bom['org.apache.poi:ooxml-schemas']) {
+            transitive = false
+        }
+
+        testCompile (bom['org.apache.xmlbeans:xmlbeans']) {
+            transitive = false
+        }
     }
     
     test {

@@ -182,7 +182,6 @@ public class ChartToJsonConverter {
         addField(fields, description.getTitleField());
         chart.put("valueField", description.getValueField());
         addField(fields, description.getValueField());
-        chart.put("pathToImages", "VAADIN/webjars/amcharts/images/");
         exportConfig(chart);
 
         if (Boolean.TRUE.equals(description.getShowLegend())) {

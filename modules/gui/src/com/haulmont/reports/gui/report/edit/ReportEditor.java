@@ -39,6 +39,7 @@ import com.haulmont.reports.app.service.ReportService;
 import com.haulmont.reports.entity.*;
 import com.haulmont.reports.gui.ReportPrintHelper;
 import com.haulmont.reports.gui.definition.edit.BandDefinitionEditor;
+import com.haulmont.yarg.structure.BandOrientation;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.BooleanUtils;
@@ -1053,7 +1054,7 @@ public class ReportEditor extends AbstractEditor<Report> {
             errors.add(getMessage("error.bandNameNull"));
         }
 
-        if (band.getBandOrientation() == null) {
+        if (band.getBandOrientation() == BandOrientation.UNDEFINED) {
             errors.add(formatMessage("error.bandOrientationNull", band.getName()));
         }
 

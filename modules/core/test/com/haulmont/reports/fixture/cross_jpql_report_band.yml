@@ -1,0 +1,24 @@
+name: Root
+children:
+  - name: cross
+    orientation: C
+    queries:
+      - #Horizontal tab
+        name: cross_dynamic_header
+        jpql: select e.name as month_name, e.id as month_id from test$Month e;
+      - #Vertical tab
+        name: cross_master_data
+        jpql: select e.id as user_id, e.login as login from test$User e;
+      - #Cross data tab - one execution for all intersections
+        name: data
+        jpql: "select
+                   u.id as cross_master_data@user_id,
+                   m.id as cross_dynamic_header@month_id,
+                   coalesce((select sum(e.timeInMinutes) / 60
+                      from test$TimeEntry e
+                      where m.id = EXTRACT(month from e.date) and e.user.id = u.id), 0.0) as hours
+                 from
+                    test$Month m,
+                    test$User u
+                 where u.id in ${cross_master_data@user_id} and m.id in ${cross_dynamic_header@month_id};"
+

@@ -78,7 +78,7 @@ public class BandDefinition extends BaseUuidEntity implements ReportBand {
     }
 
     public Orientation getOrientation() {
-        return orientation != null ? Orientation.fromId(orientation) : null;
+        return Orientation.fromId(orientation);
     }
 
     public void setOrientation(Orientation orientation) {
@@ -118,6 +118,6 @@ public class BandDefinition extends BaseUuidEntity implements ReportBand {
 
     @Override
     public BandOrientation  getBandOrientation() {
-        return getOrientation() == Orientation.HORIZONTAL ? BandOrientation.HORIZONTAL : BandOrientation.VERTICAL;
+        return BandOrientation.defaultIfNull(getOrientation() != null ? getOrientation().getBandOrientation(): null);
     }
 }

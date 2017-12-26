@@ -15,6 +15,7 @@ import com.haulmont.reports.app.EntityTree;
 import com.haulmont.reports.app.service.ReportService;
 import com.haulmont.reports.entity.*;
 import com.haulmont.reports.entity.wizard.*;
+import com.haulmont.reports.util.DataSetFactory;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.Transformer;
 import org.apache.commons.lang.StringUtils;
@@ -45,6 +46,8 @@ public class ReportingWizardBean implements ReportingWizardApi {
     protected Configuration configuration;
     @Inject
     protected ExtendedEntities extendedEntities;
+    @Inject
+    protected DataSetFactory dataSetFactory;
     @Inject
     protected Messages messages;
 
@@ -144,18 +147,20 @@ public class ReportingWizardBean implements ReportingWizardApi {
     }
 
     protected void createJpqlDataSet(ReportData reportData, ReportRegion reportRegion, BandDefinition dataBand) {
-        DataSet dataSet = createEmptyDataSet(dataBand);
+        DataSet dataSet =  dataSetFactory.createEmptyDataSet(dataBand);
+        dataSet.setName(messages.getMessage(getClass(), "dataSet"));
         dataSet.setType(DataSetType.JPQL);
 
-        JpqlQueryBuilder jpqlQueryBuilder = new JpqlQueryBuilder(reportData, reportRegion);
-        String query = jpqlQueryBuilder.buildQuery();
+        String query = new JpqlQueryBuilder(reportData, reportRegion).buildQuery();
         dataSet.setText(query);
         dataSet.setDataStore(reportData.getDataStore());
+        dataBand.getDataSets().add(dataSet);
     }
 
     protected void createEntityDataSet(ReportData reportData, ReportRegion reportRegion, BandDefinition dataBand,
                                        ReportInputParameter mainParameter, View parameterView) {
-        DataSet dataSet = createEmptyDataSet(dataBand);
+        DataSet dataSet = dataSetFactory.createEmptyDataSet(dataBand);
+        dataSet.setName(messages.getMessage(getClass(), "dataSet"));
         if (ReportData.ReportType.LIST_OF_ENTITIES == reportData.getReportType()) {
             dataSet.setType(DataSetType.MULTI);
             dataSet.setListEntitiesParamName(mainParameter.getAlias());
@@ -170,14 +175,7 @@ public class ReportingWizardBean implements ReportingWizardApi {
             }
             dataSet.setView(parameterView);
         }
-    }
-
-    protected DataSet createEmptyDataSet(BandDefinition dataBand) {
-        DataSet dataSet = metadata.create(DataSet.class);
-        dataSet.setName(messages.getMessage(getClass(), "dataSet"));
-        dataSet.setBandDefinition(dataBand);
         dataBand.getDataSets().add(dataSet);
-        return dataSet;
     }
 
     protected BandDefinition createRootBand(Report report) {
@@ -357,7 +355,7 @@ public class ReportingWizardBean implements ReportingWizardApi {
 
     /**
      * Search for view for parent node
-     * If does not exists - create it and add property to parent of parent view
+     * If does not exists - createDataSet it and add property to parent of parent view
      */
     @SuppressWarnings("unchecked")
     protected View ensureParentViewsExist(EntityTreeNode entityTreeNode, Map<EntityTreeNode, View> viewsForNodes) {

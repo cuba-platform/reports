@@ -102,7 +102,7 @@ public class DataSet extends BaseUuidEntity implements ReportQuery {
     }
 
     public DataSetType getType() {
-        return type != null ? DataSetType.fromId(type) : null;
+        return DataSetType.fromId(type);
     }
 
     public void setType(DataSetType type) {

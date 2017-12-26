@@ -1,0 +1,30 @@
+name: Root
+children:
+  - name: cross_header
+    orientation: H
+    children:
+      - name: cross_dynamic_header
+        orientation: V
+        queries:
+          - name: cross_dynamic_header
+            jpql: select e.name as month_name, e.id as month_id from test$Month e;
+  - name: cross_master_data
+    orientation: H
+    queries:
+      - name: cross_master_data
+        jpql: select e.id as user_id, e.login as login from test$User e;
+    children:
+      - name: cross
+        orientation: V
+        queries:
+          - name: cross
+            jpql: " select
+              u.id as uid,
+              m.id as mid,
+              coalesce((select sum(e.timeInMinutes) / 60 from test$TimeEntry e where m.id = FUNCTION('DATE_PART', 'month', e.date) and e.user.id = u.id), 0.0) as hours
+            from
+               test$Month m,
+               test$User u
+            where u.id = ${cross_master_data.user_id};"
+
+

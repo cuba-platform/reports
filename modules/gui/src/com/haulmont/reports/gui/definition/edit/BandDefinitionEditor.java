@@ -20,7 +20,8 @@ import com.haulmont.cuba.gui.data.impl.DatasourceImplementation;
 import com.haulmont.reports.app.service.ReportService;
 import com.haulmont.reports.app.service.ReportWizardService;
 import com.haulmont.reports.entity.*;
-import org.apache.commons.collections4.CollectionUtils;
+import com.haulmont.reports.gui.definition.edit.crosstab.CrossTabTableDecorator;
+import com.haulmont.reports.util.DataSetFactory;
 import org.apache.commons.lang.StringUtils;
 
 import javax.annotation.Nullable;
@@ -104,6 +105,10 @@ public class BandDefinitionEditor extends AbstractFrame implements Suggester {
     protected ReportWizardService reportWizardService;
     @Inject
     protected BoxLayout editPane;
+    @Inject
+    protected DataSetFactory dataSetFactory;
+    @Inject
+    protected CrossTabTableDecorator tabOrientationTableDecorator;
 
     public interface Companion {
         void initDatasetsTable(Table table);
@@ -244,21 +249,12 @@ public class BandDefinitionEditor extends AbstractFrame implements Suggester {
 
             @Override
             public void actionPerform(Component component) {
-                DataSet dataset = new DataSet();
                 BandDefinition selectedBand = bandDefinitionDs.getItem();
                 if (selectedBand != null) {
-                    if (CollectionUtils.isEmpty(selectedBand.getDataSets())) {
-                        selectedBand.setDataSets(new ArrayList<>());
-                    }
-                    dataset.setBandDefinition(selectedBand);
-                    dataset.setName(selectedBand.getName() != null ? selectedBand.getName() : "dataset");
-                    dataset.setType(DataSetType.GROOVY);
-                    dataset.setText("return [[:]]");
-
+                    DataSet dataset = dataSetFactory.createEmptyDataSet(selectedBand);
                     selectedBand.getDataSets().add(dataset);
                     dataSetsDs.addItem(dataset);
                     dataSetsDs.setItem(dataset);
-
                     dataSets.setSelected(dataset);
                 }
             }
@@ -302,17 +298,16 @@ public class BandDefinitionEditor extends AbstractFrame implements Suggester {
     }
 
     protected void initDataSetListeners() {
+        tabOrientationTableDecorator.decorate(dataSets, bandDefinitionDs);
+
         dataSetsDs.addItemChangeListener(e -> {
             if (e.getItem() != null) {
                 applyVisibilityRules(e.getItem());
 
-                ReportInputParameter linkedParameter = null;
                 if (e.getItem().getType() == DataSetType.SINGLE) {
-                    linkedParameter = findParameterByAlias(e.getItem().getEntityParamName());
-                    refreshViewNames(linkedParameter);
+                    refreshViewNames(findParameterByAlias(e.getItem().getEntityParamName()));
                 } else if (e.getItem().getType() == DataSetType.MULTI) {
-                    linkedParameter = findParameterByAlias(e.getItem().getListEntitiesParamName());
-                    refreshViewNames(linkedParameter);
+                    refreshViewNames(findParameterByAlias(e.getItem().getListEntitiesParamName()));
                 }
 
                 dataSetScriptField.resetEditHistory();
@@ -391,8 +386,6 @@ public class BandDefinitionEditor extends AbstractFrame implements Suggester {
         if (dataSet.getType() != null) {
             switch (dataSet.getType()) {
                 case SQL:
-                    textParamsBox.add(dataStore);
-                    textBox.add(processTemplate);
                 case JPQL:
                     textParamsBox.add(dataStore);
                     textBox.add(processTemplate);

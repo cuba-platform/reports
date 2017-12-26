@@ -10,9 +10,7 @@ import com.haulmont.cuba.core.Persistence;
 import com.haulmont.cuba.core.Query;
 import com.haulmont.cuba.core.Transaction;
 import com.haulmont.cuba.core.entity.Entity;
-import com.haulmont.cuba.core.global.Stores;
 import com.haulmont.reports.app.EntityMap;
-import com.haulmont.reports.entity.DataSet;
 import com.haulmont.yarg.exception.DataLoadingException;
 import com.haulmont.yarg.loaders.ReportDataLoader;
 import com.haulmont.yarg.loaders.impl.AbstractDbDataLoader;
@@ -34,16 +32,12 @@ public class JpqlDataDataLoader extends AbstractDbDataLoader implements ReportDa
 
     private static final String QUERY_END = "%%END%%";
     private static final String ALIAS_PATTERN = "as\\s+\"?([\\w|\\d|_|\\.]+)\"?\\s*";
-    private static final String OUTPUT_PARAMS_PATTERN = "(?i)" + ALIAS_PATTERN + "[,|from|" + QUERY_END + "]";
+    private static final Pattern OUTPUT_PARAMS_PATTERN =
+            Pattern.compile("(?i)" + ALIAS_PATTERN + "[,|from|" + QUERY_END + "]", Pattern.CASE_INSENSITIVE);
 
     protected List<OutputValue> parseQueryOutputParametersNames(String query) {
-        ArrayList<OutputValue> result = new ArrayList<>();
-        if (!query.endsWith(";"))
-            query += QUERY_END;
-        else
-            query = query.substring(0, query.length() - 1) + QUERY_END;
-        Pattern namePattern = Pattern.compile(OUTPUT_PARAMS_PATTERN, Pattern.CASE_INSENSITIVE);
-        Matcher matcher = namePattern.matcher(query);
+        List<OutputValue> result = new ArrayList<>();
+        final Matcher matcher = OUTPUT_PARAMS_PATTERN.matcher(trimQuery(query) + QUERY_END);
 
         while (matcher.find()) {
             String group = matcher.group(matcher.groupCount());
@@ -55,42 +49,35 @@ public class JpqlDataDataLoader extends AbstractDbDataLoader implements ReportDa
 
     @Override
     public List<Map<String, Object>> loadData(ReportQuery reportQuery, BandData parentBand, Map<String, Object> params) {
-        List<OutputValue> outputParameters = null;
-        List queryResult = null;
         String storeName = StoreUtils.getStoreName(reportQuery);
-        Transaction tx = persistence.createTransaction(storeName);
-        try {
-            String query = reportQuery.getScript();
-            if (StringUtils.isBlank(query)) {
-                return Collections.emptyList();
-            }
-
+        String query = reportQuery.getScript();
+        if (StringUtils.isBlank(query)) {
+            return Collections.emptyList();
+        }
+        try (Transaction tx = persistence.createTransaction(storeName)) {
             if (Boolean.TRUE.equals(reportQuery.getProcessTemplate())) {
                 query = processQueryTemplate(query, parentBand, params);
             }
 
-            outputParameters = parseQueryOutputParametersNames(query);
+            List<OutputValue> outputParameters = parseQueryOutputParametersNames(query);
 
             query = query.replaceAll("(?i)" + ALIAS_PATTERN + ",", ",");//replaces [as alias_name], entries except last
             query = query.replaceAll("(?i)" + ALIAS_PATTERN, " ");//replaces last [as alias_name] entry
 
-            Query select = insertParameters(query, storeName, parentBand, params);
-            queryResult = select.getResultList();
+            Query select = insertParameters(trimQuery(query), storeName, parentBand, params);
+            List queryResult = select.getResultList();
             tx.commit();
+            if (queryResult.size() > 0 && queryResult.get(0) instanceof Entity) {
+                List<Map<String, Object>> wrappedResults = new ArrayList<>();
+                for (Object theResult : queryResult) {
+                    wrappedResults.add(new EntityMap((Entity) theResult));
+                }
+                return wrappedResults;
+            } else {
+                return fillOutputData(queryResult, outputParameters);
+            }
         } catch (Throwable e) {
             throw new DataLoadingException(String.format("An error occurred while loading data for data set [%s]", reportQuery.getName()), e);
-        } finally {
-            tx.end();
-        }
-
-        if (queryResult.size() > 0 && queryResult.get(0) instanceof Entity) {
-            List<Map<String, Object>> wrappedResults = new ArrayList<>();
-            for (Object theResult : queryResult) {
-                wrappedResults.add(new EntityMap((Entity) theResult));
-            }
-            return wrappedResults;
-        } else {
-            return fillOutputData(queryResult, outputParameters);
         }
     }
 
@@ -114,5 +101,13 @@ public class JpqlDataDataLoader extends AbstractDbDataLoader implements ReportDa
     protected String insertParameterToQuery(String query, QueryParameter parameter) {
         query = query.replaceAll(parameter.getParamRegexp(), "?" + parameter.getPosition());
         return query;
+    }
+
+    protected String trimQuery(String query) {
+        if (query.endsWith(";")) {
+            return query.substring(0, query.length() - 1);
+        } else {
+            return query;
+        }
     }
 }

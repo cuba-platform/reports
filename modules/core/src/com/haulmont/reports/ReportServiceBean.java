@@ -6,11 +6,9 @@ package com.haulmont.reports;
 
 import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.cuba.core.entity.FileDescriptor;
-import com.haulmont.cuba.core.global.TimeSource;
 import com.haulmont.reports.app.ParameterPrototype;
 import com.haulmont.reports.app.service.ReportService;
 import com.haulmont.reports.entity.*;
-import com.haulmont.reports.exception.ReportingException;
 import com.haulmont.yarg.reporting.ReportOutputDocument;
 import com.haulmont.yarg.util.converter.ObjectToStringConverter;
 import org.springframework.stereotype.Service;
@@ -26,9 +24,6 @@ public class ReportServiceBean implements ReportService {
 
     @Inject
     protected ObjectToStringConverter objectToStringConverter;
-
-    @Inject
-    protected TimeSource timeSource;
 
     @Override
     public Report storeReportEntity(Report report) {

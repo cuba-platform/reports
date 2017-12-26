@@ -369,9 +369,8 @@ public class ReportWizardCreator extends AbstractWindow implements MainWizardFra
         }
 
         //be sure that reportData.name and reportData.outputFileFormat is not null before generation of template
-        byte[] templateByteArray;
         try {
-            templateByteArray = reportWizardService.generateTemplate(reportData, templateFileFormat.getValue());
+            byte[] templateByteArray = reportWizardService.generateTemplate(reportData, templateFileFormat.getValue());
             reportData.setTemplateContent(templateByteArray);
         } catch (TemplateGenerationException e) {
             showNotification(getMessage("templateGenerationException"), NotificationType.WARNING);

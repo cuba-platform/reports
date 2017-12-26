@@ -5,16 +5,20 @@
 package com.haulmont.reports.entity;
 
 import com.haulmont.chile.core.datatypes.impl.EnumClass;
+import com.haulmont.yarg.structure.BandOrientation;
 import org.apache.commons.lang.ObjectUtils;
 
 public enum Orientation implements EnumClass<Integer> {
-    HORIZONTAL(0),
-    VERTICAL(1);
+    HORIZONTAL(0, BandOrientation.HORIZONTAL),
+    VERTICAL(1, BandOrientation.VERTICAL),
+    CROSS(2, BandOrientation.CROSS);
 
     private Integer id;
+    private BandOrientation bandOrientation;
 
-    Orientation(Integer id) {
+    Orientation(Integer id, BandOrientation bandOrientation) {
         this.id = id;
+        this.bandOrientation = bandOrientation;
     }
 
     @Override
@@ -22,9 +26,22 @@ public enum Orientation implements EnumClass<Integer> {
         return id;
     }
 
+    public BandOrientation getBandOrientation() {
+        return bandOrientation;
+    }
+
     public static Orientation fromId(Integer id) {
         for (Orientation type : Orientation.values()) {
             if (ObjectUtils.equals(type.getId(), id)) {
+                return type;
+            }
+        }
+        return null;
+    }
+
+    public static Orientation fromBandOrientation(BandOrientation orientation) {
+        for (Orientation type : Orientation.values()) {
+            if (type.getBandOrientation() == orientation) {
                 return type;
             }
         }

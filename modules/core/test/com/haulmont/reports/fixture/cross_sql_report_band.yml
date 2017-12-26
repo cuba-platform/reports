@@ -1,0 +1,23 @@
+name: Root
+children:
+  - name: cross
+    orientation: C
+    queries:
+      - #Horizontal tab
+        name: cross_dynamic_header
+        sql: select name as month_name , id as month_id from test_month;
+      - #Vertical tab
+        name: cross_master_data
+        sql: select id as user_id , login from test_user;
+      - #Cross data tab - one execution for all intersections
+        name: data
+        sql: "select
+                	te.user_id as cross_master_data@user_id,
+                	extract('month' from te.date_) as cross_dynamic_header@month_id,
+                	sum(te.TIME_IN_MINUTES) / 60 as hours
+                from test_time_entry te
+                where te.user_id in (${cross_master_data@user_id})
+                  and extract('month' from te.date_) in (${cross_dynamic_header@month_id})
+                group by te.user_id, extract('month' from te.date_)
+                order by te.user_id, extract('month' from te.date_)"
+

@@ -6,6 +6,7 @@
 package com.haulmont.reports.testsupport;
 
 import com.haulmont.cuba.testsupport.TestContainer;
+import org.apache.commons.lang3.ObjectUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,10 +26,10 @@ public class ReportsTestContainer extends TestContainer {
                 "test-app.properties",
                 "reports-test-app.properties"
         ));
-        dbDriver = "org.postgresql.Driver";
-        dbUrl = "jdbc:postgresql://localhost/reports_test";
-        dbUser = "root";
-        dbPassword = "root";
+        dbDriver = ObjectUtils.defaultIfNull(System.getenv("dbDriver"), "org.postgresql.Driver");
+        dbUrl = ObjectUtils.defaultIfNull(System.getenv("dbUrlParam"), "jdbc:postgresql://localhost/reports_test");
+        dbUser = ObjectUtils.defaultIfNull(System.getenv("dbUserParam"), "root");
+        dbPassword = ObjectUtils.defaultIfNull(System.getenv("dbPasswordParam"), "root");
     }
 
     public static class Common extends ReportsTestContainer {

@@ -1,0 +1,54 @@
+name: Root
+children:
+  - name: cross_header
+    orientation: H
+    children:
+      - name: cross_dynamic_header
+        orientation: V
+        queries:
+          - name: cross_dynamic_header
+            groovy: "
+              def result \n
+              transactional { em->
+                      result = em.createQuery('select e.name as month_name, e.id as month_id from test$Month e')
+                      .getResultList().collect { ['month_name': it[0], 'month_id': it[1]] }
+              } \n
+              return result"
+  - name: cross_master_data
+    orientation: H
+    queries:
+      - name: cross_master_data
+        groovy: "
+           def result \n
+           transactional { em->
+                result = em.createQuery('select e.id as user_id, e.login as login from test$User e')
+                .getResultList().collect { ['user_id': it[0], 'login': it[1]] }
+           } \n
+           return result"
+    children:
+      - name: cross
+        orientation: V
+        queries:
+          - name: cross
+            groovy: "
+              def result \n
+              transactional { em->
+                    result = em.createQuery(' select
+                              u.id as uid,
+                              m.id as mid,
+                              coalesce((select sum(e.timeInMinutes) / 60 from test$TimeEntry e
+                              where m.id = EXTRACT(month from e.date) and e.user.id = u.id), 0.0) as hours
+                            from
+                               test$Month m,
+                               test$User u
+                            where u.id = :user_id')
+                         .setParameter('user_id', parentBand.data.user_id)
+                         .getResultList().collect { [
+                            'cross_master_data_user_id': it[0],
+                            'cross_dynamic_header_month_id': it[1],
+                            'hours': it[2]
+                         ]}
+              } \n
+              return result"
+
+

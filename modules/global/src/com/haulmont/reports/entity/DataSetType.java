@@ -52,7 +52,7 @@ public enum DataSetType implements EnumClass<Integer> {
         return code;
     }
 
-    private DataSetType(Integer id, String code) {
+    DataSetType(Integer id, String code) {
         this.id = id;
         this.code = code;
     }
@@ -60,6 +60,15 @@ public enum DataSetType implements EnumClass<Integer> {
     public static DataSetType fromId(Integer id) {
         for (DataSetType type : DataSetType.values()) {
             if (ObjectUtils.equals(type.getId(), id)) {
+                return type;
+            }
+        }
+        return null;
+    }
+
+    public static DataSetType fromCode(String code) {
+        for (DataSetType type : DataSetType.values()) {
+            if (ObjectUtils.equals(type.getCode(), code)) {
                 return type;
             }
         }

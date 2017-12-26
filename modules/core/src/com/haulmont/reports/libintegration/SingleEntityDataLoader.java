@@ -9,6 +9,7 @@ import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.reports.app.EntityMap;
 import com.haulmont.reports.entity.DataSet;
 import com.haulmont.yarg.structure.BandData;
+import com.haulmont.yarg.structure.ProxyWrapper;
 import com.haulmont.yarg.structure.ReportQuery;
 import org.apache.commons.lang.StringUtils;
 
@@ -28,10 +29,7 @@ public class SingleEntityDataLoader extends AbstractEntityDataLoader {
             paramName = DEFAULT_ENTITY_PARAM_NAME;
         }
 
-        Object entity = null;
-        if (params.containsKey(paramName)) {
-            entity = params.get(paramName);
-        }
+        Object entity = params.get(paramName);
 
         if (entity == null) {
             throw new IllegalStateException(
@@ -39,6 +37,7 @@ public class SingleEntityDataLoader extends AbstractEntityDataLoader {
             );
         }
 
+        dataSet = ProxyWrapper.unwrap(dataSet);
         entity = reloadEntityByDataSetView(dataSet, entity);
         params.put(paramName, entity);
 

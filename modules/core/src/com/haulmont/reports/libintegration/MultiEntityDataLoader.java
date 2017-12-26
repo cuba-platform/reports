@@ -9,6 +9,7 @@ import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.reports.app.EntityMap;
 import com.haulmont.reports.entity.DataSet;
 import com.haulmont.yarg.structure.BandData;
+import com.haulmont.yarg.structure.ProxyWrapper;
 import com.haulmont.yarg.structure.ReportQuery;
 import org.apache.commons.lang.StringUtils;
 
@@ -34,6 +35,7 @@ public class MultiEntityDataLoader extends AbstractEntityDataLoader {
         String entityParameterName = StringUtils.substringBefore(paramName, NESTED_COLLECTION_SEPARATOR);
         String nestedCollectionName = StringUtils.substringAfter(paramName, NESTED_COLLECTION_SEPARATOR);
 
+        dataSet = ProxyWrapper.unwrap(dataSet);
         Object entities = null;
         if (params.containsKey(paramName)) {
             entities = params.get(paramName);
@@ -60,7 +62,9 @@ public class MultiEntityDataLoader extends AbstractEntityDataLoader {
 
         Collection<Entity> entitiesList = (Collection) entities;
         params.put(paramName, entitiesList);
+
         List<Map<String, Object>> resultList = new ArrayList<>();
+
         for (Entity entity : entitiesList) {
             if (!hasNestedCollection) {
                 entity = reloadEntityByDataSetView(dataSet, entity);

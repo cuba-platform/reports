@@ -82,8 +82,41 @@
         </property>
     </bean>
 
+    <bean name="reporting_lib_ExtractionControllerFactory"
+          class="com.haulmont.yarg.reporting.extraction.DefaultExtractionControllerFactory">
+        <constructor-arg ref="reporting_lib_LoaderFactory"/>
+        <property name="extractionControllers">
+            <map>
+                <entry key="CROSS" value-ref="reporting_lib_CrossTabExtractionController"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean name="reporting_lib_PreprocessorFactory"
+          class="com.haulmont.yarg.reporting.extraction.DefaultPreprocessorFactory">
+        <property name="preprocessors">
+            <map>
+                <entry key="sql" value-ref="reporting_lib_SqlQueryLoaderPreprocessor"/>
+                <entry key="jpql" value-ref="reporting_lib_SqlQueryLoaderPreprocessor"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean name="reporting_lib_CrossTabExtractionController"
+          class="com.haulmont.yarg.reporting.extraction.controller.CrossTabExtractionController" scope="prototype">
+        <constructor-arg ref="reporting_lib_ExtractionControllerFactory"/>
+        <constructor-arg ref="reporting_lib_LoaderFactory"/>
+
+        <property name="preprocessorFactory" ref="reporting_lib_PreprocessorFactory" />
+    </bean>
+
+    <bean name="reporting_lib_SqlQueryLoaderPreprocessor"
+          class="com.haulmont.yarg.reporting.extraction.preprocessor.SqlCrosstabPreprocessor" scope="prototype">
+    </bean>
+
     <bean name="reporting_lib_DataExtractor" class="com.haulmont.reports.libintegration.CubaDataExtractor">
         <constructor-arg ref="reporting_lib_LoaderFactory"/>
+        <property name="extractionControllerFactory" ref="reporting_lib_ExtractionControllerFactory" />
     </bean>
 
     <bean name="reporting_lib_StringConverter" class="com.haulmont.reports.libintegration.CubaObjectToStringConverter"/>
