@@ -29,7 +29,7 @@ public class ReportsContextLoader implements ContextLoader {
             INSTANCE.before();
             return INSTANCE.getSpringAppContext();
         } catch (Throwable throwable) {
-            throw new RuntimeException(throwable.getMessage(), throwable);
+            throw new RuntimeException("ReportsTestContainer not initialized", throwable);
         }
     }
 }

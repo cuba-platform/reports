@@ -46,13 +46,12 @@ public class ReportsTestContainer extends TestContainer {
             if (!initialized) {
                 super.before();
                 initialized = true;
+                setupContext();
             }
-            setupContext();
         }
 
         @Override
         public void after() {
-            cleanupContext();
             // never stops - do not call super
         }
     }
