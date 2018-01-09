@@ -18,7 +18,8 @@
                 id="reportDs"
                 class="com.haulmont.reports.entity.Report"
                 view="report.edit">
-            <collectionDatasource id="parametersDs" property="inputParameters"/>
+            <collectionDatasource id="parametersDs" property="inputParameters"
+                                  datasourceClass="com.haulmont.reports.gui.datasource.InputParametersDataSource"/>
             <collectionDatasource id="valuesFormatsDs" property="valuesFormats"/>
             <collectionDatasource id="rolesDs" property="roles"/>
             <collectionDatasource id="reportScreensDs" property="reportScreens"/>
@@ -27,7 +28,7 @@
             <hierarchicalDatasource id="treeDs" property="bands" hierarchyProperty="parentBandDefinition"
                                     datasourceClass="com.haulmont.reports.gui.datasource.BandsHierarchicalPropertyDatasource">
                 <collectionDatasource id="dataSetsDs" property="dataSets"
-                    datasourceClass="com.haulmont.reports.gui.datasource.DatasetsDatasource"/>
+                                      datasourceClass="com.haulmont.reports.gui.datasource.DatasetsDatasource"/>
             </hierarchicalDatasource>
             <collectionDatasource id="stringParametersDs"
                                   property="inputParameters"
