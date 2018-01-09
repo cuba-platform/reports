@@ -15,6 +15,7 @@ import com.haulmont.reports.entity.DataSet;
 import com.haulmont.reports.entity.Orientation;
 import com.haulmont.reports.gui.definition.edit.BandDefinitionEditor;
 import com.haulmont.reports.util.DataSetFactory;
+import org.apache.commons.lang.StringUtils;
 
 import javax.inject.Inject;
 import java.util.Objects;
@@ -43,8 +44,10 @@ public class CrossTabTableDecorator {
             textField.setParent(dataSets);
             textField.setHeightAuto();
             textField.setValue(entity.getName());
+            textField.setDatasource(dataSets.getItemDatasource(entity), "name");
 
             if (Orientation.CROSS == entity.getBandDefinition().getOrientation() &&
+                    StringUtils.isNotEmpty(entity.getName()) &&
                     (entity.getName().endsWith(HORIZONTAL_TPL) || entity.getName().endsWith(VERTICAL_TPL))) {
                 textField.setEditable(false);
             }
