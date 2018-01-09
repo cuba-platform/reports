@@ -42,6 +42,7 @@ public class CrossTabTableDecorator {
         dataSets.addGeneratedColumn("name", entity-> {
             TextField textField = componentsFactory.createComponent(TextField.class);
             textField.setParent(dataSets);
+            textField.setWidthFull();
             textField.setHeightAuto();
             textField.setValue(entity.getName());
             textField.setDatasource(dataSets.getItemDatasource(entity), "name");
