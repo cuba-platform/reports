@@ -16,7 +16,6 @@ import com.haulmont.reports.entity.Report;
 import com.haulmont.reports.entity.ReportGroup;
 import com.haulmont.reports.gui.ReportGuiManager;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 
 import javax.inject.Inject;
@@ -130,7 +129,7 @@ public class ReportRun extends AbstractLookup {
                     }
                 }
 
-                if (groupFilterValue != null && !ObjectUtils.equals(report.getGroup(), groupFilterValue)) {
+                if (groupFilterValue != null && !Objects.equals(report.getGroup(), groupFilterValue)) {
                     return false;
                 }
 

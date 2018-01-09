@@ -43,7 +43,6 @@ import com.haulmont.yarg.structure.BandOrientation;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.BooleanUtils;
-import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 
 import javax.inject.Inject;
@@ -453,7 +452,7 @@ public class ReportEditor extends AbstractEditor<Report> {
             if (e.getItem() != null) {
                 for (BandDefinition bandDefinition : bandsDs.getItems()) {
                     if (!isChildOrEqual(e.getItem(), bandDefinition) ||
-                            ObjectUtils.equals(e.getItem().getParentBandDefinition(), bandDefinition)) {
+                            Objects.equals(e.getItem().getParentBandDefinition(), bandDefinition)) {
                         availableParentBandsDs.addItem(bandDefinition);
                     }
                 }
@@ -714,7 +713,7 @@ public class ReportEditor extends AbstractEditor<Report> {
                 if (target != null) {
                     Entity selectedItem = target.getSingleSelected();
                     if (selectedItem != null) {
-                        return !ObjectUtils.equals(getItem().getRootBandDefinition(), selectedItem);
+                        return !Objects.equals(getItem().getRootBandDefinition(), selectedItem);
                     }
                 }
 
@@ -966,7 +965,7 @@ public class ReportEditor extends AbstractEditor<Report> {
                 if (target != null) {
                     Entity selectedItem = target.getSingleSelected();
                     if (selectedItem != null) {
-                        return !ObjectUtils.equals(getItem().getDefaultTemplate(), selectedItem);
+                        return !Objects.equals(getItem().getDefaultTemplate(), selectedItem);
                     }
                 }
 

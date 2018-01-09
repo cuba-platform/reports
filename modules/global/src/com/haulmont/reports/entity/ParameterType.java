@@ -5,7 +5,6 @@
 package com.haulmont.reports.entity;
 
 import com.haulmont.chile.core.datatypes.impl.EnumClass;
-import org.apache.commons.lang.ObjectUtils;
 
 public enum ParameterType implements EnumClass<Integer> {
     DATE(10),
@@ -31,11 +30,10 @@ public enum ParameterType implements EnumClass<Integer> {
 
     public static ParameterType fromId(Integer id) {
         for (ParameterType type : ParameterType.values()) {
-            if (ObjectUtils.equals(type.getId(), id)) {
+            if (type.getId().equals(id)) {
                 return type;
             }
         }
         return null;
     }
-
 }

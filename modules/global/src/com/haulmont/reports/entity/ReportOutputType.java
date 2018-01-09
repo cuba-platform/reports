@@ -5,7 +5,6 @@
 package com.haulmont.reports.entity;
 
 import com.haulmont.chile.core.datatypes.impl.EnumClass;
-import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 
 import javax.annotation.Nullable;
@@ -35,14 +34,14 @@ public enum ReportOutputType implements EnumClass<Integer> {
         return outputType;
     }
 
-    private ReportOutputType(Integer id, com.haulmont.yarg.structure.ReportOutputType outputType) {
+    ReportOutputType(Integer id, com.haulmont.yarg.structure.ReportOutputType outputType) {
         this.id = id;
         this.outputType = outputType;
     }
 
     public static ReportOutputType fromId(Integer id) {
         for (ReportOutputType type : ReportOutputType.values()) {
-            if (ObjectUtils.equals(type.getId(), id)) {
+            if (type.getId().equals(id)) {
                 return type;
             }
         }

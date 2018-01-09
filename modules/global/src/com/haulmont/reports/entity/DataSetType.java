@@ -5,7 +5,8 @@
 package com.haulmont.reports.entity;
 
 import com.haulmont.chile.core.datatypes.impl.EnumClass;
-import org.apache.commons.lang.ObjectUtils;
+
+import java.util.Objects;
 
 public enum DataSetType implements EnumClass<Integer> {
 
@@ -59,7 +60,7 @@ public enum DataSetType implements EnumClass<Integer> {
 
     public static DataSetType fromId(Integer id) {
         for (DataSetType type : DataSetType.values()) {
-            if (ObjectUtils.equals(type.getId(), id)) {
+            if (type.getId().equals(id)) {
                 return type;
             }
         }
@@ -68,7 +69,7 @@ public enum DataSetType implements EnumClass<Integer> {
 
     public static DataSetType fromCode(String code) {
         for (DataSetType type : DataSetType.values()) {
-            if (ObjectUtils.equals(type.getCode(), code)) {
+            if (Objects.equals(type.getCode(), code)) {
                 return type;
             }
         }

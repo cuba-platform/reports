@@ -6,7 +6,6 @@ package com.haulmont.reports.entity;
 
 import com.haulmont.chile.core.datatypes.impl.EnumClass;
 import com.haulmont.yarg.structure.BandOrientation;
-import org.apache.commons.lang.ObjectUtils;
 
 public enum Orientation implements EnumClass<Integer> {
     HORIZONTAL(0, BandOrientation.HORIZONTAL),
@@ -32,7 +31,7 @@ public enum Orientation implements EnumClass<Integer> {
 
     public static Orientation fromId(Integer id) {
         for (Orientation type : Orientation.values()) {
-            if (ObjectUtils.equals(type.getId(), id)) {
+            if (type.getId().equals(id)) {
                 return type;
             }
         }

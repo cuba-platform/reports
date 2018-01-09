@@ -6,7 +6,6 @@
 package com.haulmont.reports.entity;
 
 import com.haulmont.chile.core.datatypes.impl.EnumClass;
-import org.apache.commons.lang.ObjectUtils;
 
 public enum CustomTemplateDefinedBy implements EnumClass<Integer> {
     CLASS(100),
@@ -30,7 +29,7 @@ public enum CustomTemplateDefinedBy implements EnumClass<Integer> {
 
     public static CustomTemplateDefinedBy fromId(Integer id) {
         for (CustomTemplateDefinedBy type : CustomTemplateDefinedBy.values()) {
-            if (ObjectUtils.equals(type.getId(), id)) {
+            if (type.getId().equals(id)) {
                 return type;
             }
         }

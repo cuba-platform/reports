@@ -5,7 +5,6 @@
 package com.haulmont.reports.entity;
 
 import com.haulmont.chile.core.datatypes.impl.EnumClass;
-import org.apache.commons.lang.ObjectUtils;
 
 public enum ReportFileExtension implements EnumClass<String> {
     XLT("xlt"),
@@ -28,7 +27,7 @@ public enum ReportFileExtension implements EnumClass<String> {
 
     public static ReportFileExtension fromId(String id) {
         for (ReportFileExtension type : ReportFileExtension.values()) {
-            if (ObjectUtils.equals(type.getId(), id)) {
+            if (type.getId().equals(id)) {
                 return type;
             }
         }

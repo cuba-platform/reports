@@ -5,7 +5,6 @@
 package com.haulmont.reports.entity.charts;
 
 import com.haulmont.chile.core.datatypes.impl.EnumClass;
-import org.apache.commons.lang.ObjectUtils;
 
 public enum ChartType implements EnumClass<String> {
     PIE("pie"), SERIAL("serial");
@@ -23,7 +22,7 @@ public enum ChartType implements EnumClass<String> {
 
     public static ChartType fromId(String id) {
         for (ChartType type : ChartType.values()) {
-            if (ObjectUtils.equals(type.getId(), id)) {
+            if (type.getId().equals(id)) {
                 return type;
             }
         }

@@ -5,7 +5,6 @@
 package com.haulmont.reports.entity;
 
 import com.haulmont.chile.core.datatypes.impl.EnumClass;
-import org.apache.commons.lang.ObjectUtils;
 
 public enum ReportType implements EnumClass<Integer> {
     SIMPLE(10),
@@ -25,7 +24,7 @@ public enum ReportType implements EnumClass<Integer> {
 
     public static ReportType fromId(Integer id) {
         for (ReportType type : ReportType.values()) {
-            if (ObjectUtils.equals(type.getId(), id)) {
+            if (type.getId().equals(id)) {
                 return type;
             }
         }
