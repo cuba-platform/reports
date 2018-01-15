@@ -275,7 +275,9 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
         if (extension != null) {
             ReportOutputType outputType = ReportOutputType.getTypeFromExtension(extension.toUpperCase());
             if (outputType == ReportOutputType.CSV || outputType == ReportOutputType.HTML) {
-                byte[] bytes = templateFileEditor.getValue().getBytes(StandardCharsets.UTF_8);
+                byte[] bytes = templateFileEditor.getValue() == null ?
+                        new byte[0] :
+                        templateFileEditor.getValue().getBytes(StandardCharsets.UTF_8);
                 reportTemplate.setContent(bytes);
             }
         }
