@@ -22,30 +22,30 @@
 
     <layout spacing="true">
         <hbox id="createTemplateFields" width="100%" expand="chartPreviewBox">
-            <vbox spacing="true" width="AUTO">
-                <grid spacing="true">
+            <vbox id="vBox" spacing="true" width="AUTO">
+                <grid id="grid" spacing="true">
                     <columns>
-                        <column/>
-                        <column flex="1"/>
+                        <column id="column1"/>
+                        <column id="column2" flex="1"/>
                     </columns>
                     <rows>
-                        <row>
+                        <row id="row1">
                             <label value="msg://template.code" align="MIDDLE_LEFT"/>
                             <textField id="code" datasource="templateDs" property="code"
                                        width="${width}" required="true"
                                        requiredMessage="msg://template.codeMsg"/>
                         </row>
-                        <row>
+                        <row id="row2">
                             <label id="templateFileLabel" value="msg://template.file" align="MIDDLE_LEFT"/>
                             <upload id="templateUploadField" dropZone="createTemplateFields" width="${width}" showFileName="true"/>
                         </row>
-                        <row>
+                        <row id="row3">
                             <sourceCodeEditor id="templateFileEditor" width="100%" height="350"
                                               highlightActiveLine="true"
                                               printMargin="true"
                                               showGutter="true" colspan="2"/>
                         </row>
-                        <row>
+                        <row  id="row4">
                             <label value="msg://template.outputType" align="MIDDLE_LEFT"/>
                             <lookupField id="outputType" datasource="templateDs"
                                          textInputAllowed="false"
@@ -54,7 +54,7 @@
                                          width="${width}" required="true"
                                          requiredMessage="msg://template.outputTypeMsg"/>
                         </row>
-                        <row>
+                        <row  id="row5">
                             <label id="outputNamePatternLabel" value="msg://template.outputNamePattern" align="MIDDLE_LEFT"/>
                             <textField id="outputNamePattern" datasource="templateDs" property="outputNamePattern"
                                        width="${width}">
@@ -62,22 +62,22 @@
                                         class="com.haulmont.reports.gui.report.validators.OutputFileNameValidator"/>
                             </textField>
                         </row>
-                        <row>
+                        <row id="row6">
                             <label value="msg://template.isCustom" align="MIDDLE_LEFT"/>
                             <checkBox id="custom" datasource="templateDs" property="custom"
                                       width="${width}"/>
                         </row>
-                        <row>
+                        <row  id="row7">
                             <label id="alterableLabel" value="msg://template.isAlterableOutput" align="MIDDLE_LEFT"/>
                             <checkBox id="alterable" datasource="templateDs" property="alterable"
                                       width="${width}"/>
                         </row>
-                        <row>
+                        <row  id="row8">
                             <label id="customDefinedByLabel" value="msg://template.customDefinedBy" align="MIDDLE_LEFT"/>
                             <lookupField id="customDefinedBy" datasource="templateDs" property="customDefinedBy"
                                          width="${width}"/>
                         </row>
-                        <row>
+                        <row id="row9">
                             <label id="customDefinitionLabel" value="msg://template.customDefinition" align="MIDDLE_LEFT"/>
                             <textField id="customDefinition" datasource="templateDs" property="customDefinition"
                                        width="${width}"/>
