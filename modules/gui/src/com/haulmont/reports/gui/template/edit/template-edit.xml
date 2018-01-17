@@ -30,7 +30,7 @@
                     </columns>
                     <rows>
                         <row id="row1">
-                            <label value="msg://template.code" align="MIDDLE_LEFT"/>
+                            <label id="templateCodeLabel" value="msg://template.code" align="MIDDLE_LEFT"/>
                             <textField id="code" datasource="templateDs" property="code"
                                        width="${width}" required="true"
                                        requiredMessage="msg://template.codeMsg"/>
@@ -46,7 +46,7 @@
                                               showGutter="true" colspan="2"/>
                         </row>
                         <row  id="row4">
-                            <label value="msg://template.outputType" align="MIDDLE_LEFT"/>
+                            <label id="outputTypeLabel" value="msg://template.outputType" align="MIDDLE_LEFT"/>
                             <lookupField id="outputType" datasource="templateDs"
                                          textInputAllowed="false"
                                          nullOptionVisible="true"
@@ -63,7 +63,7 @@
                             </textField>
                         </row>
                         <row id="row6">
-                            <label value="msg://template.isCustom" align="MIDDLE_LEFT"/>
+                            <label id="isCustomLabel" value="msg://template.isCustom" align="MIDDLE_LEFT"/>
                             <checkBox id="custom" datasource="templateDs" property="custom"
                                       width="${width}"/>
                         </row>
