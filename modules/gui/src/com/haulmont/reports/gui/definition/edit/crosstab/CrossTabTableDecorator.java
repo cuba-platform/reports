@@ -89,6 +89,10 @@ public class CrossTabTableDecorator {
 
     protected void initCrossDatasets(CollectionDatasource<DataSet, UUID> dataSetsDs,
                                      Datasource<BandDefinition> bandDefinitionDs) {
+        if (bandDefinitionDs.getItem() == null) {
+            return;
+        }
+
         DataSet horizontal = null;
         DataSet vertical = null;
 
