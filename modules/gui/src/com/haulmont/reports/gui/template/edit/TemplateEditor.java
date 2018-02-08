@@ -5,11 +5,14 @@
 
 package com.haulmont.reports.gui.template.edit;
 
+import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.cuba.core.entity.FileDescriptor;
 import com.haulmont.cuba.core.global.Metadata;
+import com.haulmont.cuba.core.global.Security;
 import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.config.WindowConfig;
 import com.haulmont.cuba.gui.upload.FileUploadingAPI;
+import com.haulmont.cuba.security.entity.EntityOp;
 import com.haulmont.reports.app.service.ReportService;
 import com.haulmont.reports.entity.Report;
 import com.haulmont.reports.entity.ReportOutputType;
@@ -93,6 +96,9 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
     @Inject
     protected Metadata metadata;
 
+    @Inject
+    protected Security security;
+
     public TemplateEditor() {
         showSaveNotification = false;
     }
@@ -149,6 +155,12 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
             fileDescriptor.setName(reportTemplate.getName());
             templateUploadField.setValue(fileDescriptor);
         }
+
+        MetaClass reportTemplateMetaClass = metadata.getClassNN(ReportTemplate.class);
+        boolean updatePermitted = security.isEntityOpPermitted(reportTemplateMetaClass, EntityOp.UPDATE)
+                && security.isEntityAttrUpdatePermitted(reportTemplateMetaClass, "content");
+
+        templateUploadField.setEditable(updatePermitted);
     }
 
     @Override
@@ -187,7 +199,7 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
             chartEdit.hideChartPreviewBox();
         }
 
-       templateUploadField.setVisible(templateOutputVisibility);
+        templateUploadField.setVisible(templateOutputVisibility);
         templateFileLabel.setVisible(templateOutputVisibility);
         outputNamePattern.setVisible(templateOutputVisibility);
         outputNamePatternLabel.setVisible(templateOutputVisibility);
