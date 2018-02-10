@@ -4,10 +4,12 @@
  */
 package com.haulmont.reports.gui.definition.edit;
 
+import com.haulmont.bali.util.ParamsMap;
 import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.cuba.core.global.Metadata;
 import com.haulmont.cuba.core.global.Stores;
 import com.haulmont.cuba.core.global.View;
+import com.haulmont.cuba.gui.WindowManager;
 import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.components.actions.RemoveAction;
 import com.haulmont.cuba.gui.components.autocomplete.AutoCompleteSupport;
@@ -21,6 +23,7 @@ import com.haulmont.reports.app.service.ReportService;
 import com.haulmont.reports.app.service.ReportWizardService;
 import com.haulmont.reports.entity.*;
 import com.haulmont.reports.gui.definition.edit.crosstab.CrossTabTableDecorator;
+import com.haulmont.reports.gui.definition.edit.scripteditordialog.ScriptEditorDialog;
 import com.haulmont.reports.util.DataSetFactory;
 import org.apache.commons.lang.StringUtils;
 
@@ -43,6 +46,10 @@ public class BandDefinitionEditor extends AbstractFrame implements Suggester {
     protected Table<DataSet> dataSets;
     @Named("text")
     protected SourceCodeEditor dataSetScriptField;
+    @Inject
+    protected SourceCodeEditor jsonGroovyCodeEditor;
+    @Inject
+    protected LinkButton jsonSourceGroovyCodeHelp;
     @Named("textHelp")
     protected LinkButton dataSetHelpField;
     @Inject
@@ -110,8 +117,44 @@ public class BandDefinitionEditor extends AbstractFrame implements Suggester {
     @Inject
     protected CrossTabTableDecorator tabOrientationTableDecorator;
 
+    protected SourceCodeEditor.Mode dataSetScriptFieldMode = SourceCodeEditor.Mode.Text;
+
     public interface Companion {
         void initDatasetsTable(Table table);
+    }
+
+    public void showJsonScriptEditorDialog() {
+        ScriptEditorDialog editorDialog = (ScriptEditorDialog) openWindow(
+                "scriptEditorDialog",
+                WindowManager.OpenType.DIALOG,
+                ParamsMap.of(
+                        "scriptValue", jsonGroovyCodeEditor.getValue(),
+                        "helpVisible", jsonSourceGroovyCodeHelp.isVisible(),
+                        "helpMsgKey", "dataSet.jsonSourceGroovyCodeHelp"
+                ));
+        editorDialog.addCloseListener(actionId -> {
+            if (Window.COMMIT_ACTION_ID.equals(actionId)) {
+                jsonGroovyCodeEditor.setValue(editorDialog.getValue());
+            }
+        });
+    }
+
+    public void showDataSetScriptEditorDialog() {
+        ScriptEditorDialog editorDialog = (ScriptEditorDialog) openWindow(
+                "scriptEditorDialog",
+                WindowManager.OpenType.DIALOG,
+                ParamsMap.of(
+                        "mode", dataSetScriptFieldMode,
+                        "suggester", dataSetScriptField.getSuggester(),
+                        "scriptValue", dataSetScriptField.getValue(),
+                        "helpVisible", dataSetHelpField.isVisible(),
+                        "helpMsgKey", "dataSet.textHelp"
+                ));
+        editorDialog.addCloseListener(actionId -> {
+            if (Window.COMMIT_ACTION_ID.equals(actionId)) {
+                dataSetScriptField.setValue(editorDialog.getValue());
+            }
+        });
     }
 
     public void setBandDefinition(BandDefinition bandDefinition) {
@@ -159,7 +202,6 @@ public class BandDefinitionEditor extends AbstractFrame implements Suggester {
     }
 
     protected void initJsonDataSetOptions(DataSet dataSet) {
-
         jsonDataSetTypeVBox.removeAll();
         jsonDataSetTypeVBox.add(jsonSourceTypeField);
         jsonDataSetTypeVBox.add(jsonPathQueryLabel);
@@ -412,24 +454,28 @@ public class BandDefinitionEditor extends AbstractFrame implements Suggester {
 
             switch (dataSet.getType()) {
                 case SQL:
+                    dataSetScriptFieldMode = SourceCodeEditor.Mode.SQL;
                     dataSetScriptField.setMode(SourceCodeEditor.Mode.SQL);
                     dataSetScriptField.setSuggester(null);
                     dataSetHelpField.setVisible(false);
                     break;
 
                 case GROOVY:
+                    dataSetScriptFieldMode = SourceCodeEditor.Mode.Groovy;
                     dataSetScriptField.setSuggester(null);
                     dataSetScriptField.setMode(SourceCodeEditor.Mode.Groovy);
                     dataSetHelpField.setVisible(true);
                     break;
 
                 case JPQL:
+                    dataSetScriptFieldMode = SourceCodeEditor.Mode.Text;
                     dataSetScriptField.setSuggester(processTemplate.isChecked() ? null : this);
                     dataSetScriptField.setMode(SourceCodeEditor.Mode.Text);
                     dataSetHelpField.setVisible(false);
                     break;
 
                 default:
+                    dataSetScriptFieldMode = SourceCodeEditor.Mode.Text;
                     dataSetScriptField.setSuggester(null);
                     dataSetScriptField.setMode(SourceCodeEditor.Mode.Text);
                     dataSetHelpField.setVisible(false);

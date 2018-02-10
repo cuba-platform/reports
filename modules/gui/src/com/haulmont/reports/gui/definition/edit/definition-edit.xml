@@ -53,7 +53,14 @@
             <!-- Split -->
             <vbox id="editPane" margin="false;false;false;true" height="100%" spacing="true">
                 <vbox id="textBox" expand="textHBox" height="100%" spacing="true">
-                    <label id="dataSetTextLabel" value="msg://dataSet.text"/>
+                    <hbox spacing="true"
+                          width="100%">
+                        <label id="dataSetTextLabel"
+                               value="msg://dataSet.text"/>
+                        <linkButton align="MIDDLE_RIGHT"
+                                    caption="Full screen"
+                                    invoke="showDataSetScriptEditorDialog"/>
+                    </hbox>
                     <hbox id="textHBox" width="100%" expand="text">
                         <sourceCodeEditor id="text" datasource="dataSetsDs" property="text"
                                           mode="Text" height="100%"/>
@@ -119,9 +126,16 @@
                                   requiredMessage="msg://dataSet.jsonPathQueryText"/>
                         <linkButton id="jsonPathQueryHelp" icon="icons/question-white.png" invoke="getJsonPathQueryHelp"/>
                     </hbox>
-                    <vbox id="jsonSourceGroovyCodeVBox" expand="jsonSourceGroovyCodeHBox">
-                        <label value="msg://dataSet.text"/>
-                        <hbox id="jsonSourceGroovyCodeHBox" expand="jsonGroovyCodeEditor" spacing="true" width="100%">
+                    <vbox id="jsonSourceGroovyCodeVBox"
+                          expand="jsonSourceGroovyCodeHBox"
+                          spacing="true">
+                        <hbox width="100%">
+                            <label value="msg://dataSet.text"/>
+                            <linkButton align="MIDDLE_RIGHT"
+                                        caption="Full screen"
+                                        invoke="showJsonScriptEditorDialog"/>
+                        </hbox>
+                        <hbox id="jsonSourceGroovyCodeHBox" expand="jsonGroovyCodeEditor" width="100%">
                             <sourceCodeEditor id="jsonGroovyCodeEditor" height="100%"
                                               datasource="dataSetsDs"
                                               property="jsonSourceText"

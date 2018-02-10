@@ -59,4 +59,7 @@
 
     <screen id="report$inputParametersFrame"
             template="/com/haulmont/reports/gui/report/run/input-parameters-frame.xml"/>
+
+    <screen id="scriptEditorDialog"
+            template="/com/haulmont/reports/gui/definition/edit/scripteditordialog/script-editor-dialog.xml"/>
 </screen-config>

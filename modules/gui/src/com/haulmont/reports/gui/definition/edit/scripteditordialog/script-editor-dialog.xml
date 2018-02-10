@@ -1,0 +1,27 @@
+<!--
+  ~ Copyright (c) 2008-2018 Haulmont. All rights reserved.
+  ~ Use is subject to license terms, see http://www.cuba-platform.com/commercial-software-license for details.
+  -->
+
+<window xmlns="http://schemas.haulmont.com/cuba/window.xsd"
+        caption="msg://scriptEditor"
+        class="com.haulmont.reports.gui.definition.edit.scripteditordialog.ScriptEditorDialog"
+        messagesPack="com.haulmont.reports.gui">
+    <dialogMode height="700"
+                resizable="true"
+                width="1200"/>
+    <layout expand="editorBox"
+            spacing="true">
+        <hbox id="editorBox"
+              expand="editor"
+              width="100%">
+            <sourceCodeEditor id="editor"
+                              height="100%"/>
+            <linkButton id="textHelp"
+                        icon="icons/question-white.png"
+                        invoke="getTextHelp"/>
+        </hbox>
+        <frame id="windowActions"
+               screen="editWindowActions"/>
+    </layout>
+</window>
