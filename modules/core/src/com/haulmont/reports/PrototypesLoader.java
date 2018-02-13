@@ -24,7 +24,7 @@ import java.util.Map;
 
 public class PrototypesLoader {
 
-    private final Logger log = LoggerFactory.getLogger(PrototypesLoader.class);
+    private static final Logger log = LoggerFactory.getLogger(PrototypesLoader.class);
 
     /**
      * Load parameter data

@@ -27,7 +27,7 @@ public class ReportTemplatePlaceholder {
     protected static final String HTML_COMMON_MASK = "%4$s${(%1$s.fields('%2$s')%3$s)!?string!}%5$s"; //like ${Task[0].fields('id')!?string!}
     protected static final String HTML_DATE_MASK = "<#if %5$s %1$s.fields('%2$s')%4$s?has_content>${%1$s.fields('%2$s')%4$s?string(\"%3$s\")}</#if>";// /like <#if Task[0].fields('updateTs')?has_content>${Task[0].fields('updateTs')?string("dd.MM.yyyy hh:mm")}</#if>
 
-    private final Logger log = LoggerFactory.getLogger(ReportTemplatePlaceholder.class);
+    private static final Logger log = LoggerFactory.getLogger(ReportTemplatePlaceholder.class);
 
     /**
      * used in doc table fields and sheet reports

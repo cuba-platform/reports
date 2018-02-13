@@ -36,7 +36,7 @@ public class ReportingWizardBean implements ReportingWizardApi {
     protected static final String DEFAULT_SINGLE_ENTITY_ALIAS = "entity";//cause Thesis used it for running reports from screens without selection input params
     protected static final String DEFAULT_LIST_OF_ENTITIES_ALIAS = "entities";//cause Thesis will use it for running reports from screens without selection input params
 
-    private final Logger log = LoggerFactory.getLogger(ReportingBean.class);
+    private static final Logger log = LoggerFactory.getLogger(ReportingBean.class);
 
     @Inject
     protected Metadata metadata;

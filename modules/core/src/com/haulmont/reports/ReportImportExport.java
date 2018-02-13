@@ -39,7 +39,7 @@ import java.util.zip.CRC32;
 public class ReportImportExport implements ReportImportExportAPI, ReportImportExportMBean {
     public static final String ENCODING = "CP866";
 
-    private final Logger log = LoggerFactory.getLogger(ReportImportExport.class);
+    private static final Logger log = LoggerFactory.getLogger(ReportImportExport.class);
 
     @Inject
     protected ReportingApi reportingApi;
