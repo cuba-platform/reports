@@ -5,6 +5,7 @@
 
 package com.haulmont.reports.gui.definition.edit.crosstab;
 
+import com.google.common.base.Strings;
 import com.haulmont.cuba.gui.components.Table;
 import com.haulmont.cuba.gui.components.TextField;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
@@ -48,7 +49,7 @@ public class CrossTabTableDecorator {
             textField.setDatasource(dataSets.getItemDatasource(entity), "name");
 
             if (Orientation.CROSS == entity.getBandDefinition().getOrientation() &&
-                    StringUtils.isNotEmpty(entity.getName()) &&
+                    !Strings.isNullOrEmpty(entity.getName()) &&
                     (entity.getName().endsWith(HORIZONTAL_TPL) || entity.getName().endsWith(VERTICAL_TPL))) {
                 textField.setEditable(false);
             }
@@ -97,11 +98,11 @@ public class CrossTabTableDecorator {
         DataSet vertical = null;
 
         for (DataSet dataSet : dataSetsDs.getItems()) {
-            if (horizontal == null && dataSet.getName().endsWith(HORIZONTAL_TPL)) {
+            if (horizontal == null && !Strings.isNullOrEmpty(dataSet.getName()) && dataSet.getName().endsWith(HORIZONTAL_TPL)) {
                 horizontal = dataSet;
             }
 
-            if (vertical == null && dataSet.getName().endsWith(VERTICAL_TPL)) {
+            if (vertical == null && !Strings.isNullOrEmpty(dataSet.getName()) && dataSet.getName().endsWith(VERTICAL_TPL)) {
                 vertical = dataSet;
             }
 
