@@ -16,7 +16,6 @@ import com.haulmont.reports.entity.DataSet;
 import com.haulmont.reports.entity.Orientation;
 import com.haulmont.reports.gui.definition.edit.BandDefinitionEditor;
 import com.haulmont.reports.util.DataSetFactory;
-import org.apache.commons.lang.StringUtils;
 
 import javax.inject.Inject;
 import java.util.Objects;
@@ -26,6 +25,7 @@ import static com.haulmont.cuba.gui.data.Datasource.State.VALID;
 
 /**
  * Class presents decorator been for add some extra behavior on report band orientation change
+ *
  * @see BandDefinitionEditor#initDataSetListeners()
  */
 public class CrossTabTableDecorator {
@@ -39,8 +39,8 @@ public class CrossTabTableDecorator {
     @Inject
     protected ComponentsFactory componentsFactory;
 
-    public void decorate(Table<DataSet> dataSets, Datasource<BandDefinition> bandDefinitionDs) {
-        dataSets.addGeneratedColumn("name", entity-> {
+    public void decorate(Table<DataSet> dataSets, final Datasource<BandDefinition> bandDefinitionDs) {
+        dataSets.addGeneratedColumn("name", entity -> {
             TextField textField = componentsFactory.createComponent(TextField.class);
             textField.setParent(dataSets);
             textField.setWidthFull();
@@ -48,15 +48,17 @@ public class CrossTabTableDecorator {
             textField.setValue(entity.getName());
             textField.setDatasource(dataSets.getItemDatasource(entity), "name");
 
-            if (Orientation.CROSS == entity.getBandDefinition().getOrientation() &&
-                    !Strings.isNullOrEmpty(entity.getName()) &&
-                    (entity.getName().endsWith(HORIZONTAL_TPL) || entity.getName().endsWith(VERTICAL_TPL))) {
-                textField.setEditable(false);
+            if (bandDefinitionDs.getItem() != null) {
+                if (Orientation.CROSS == bandDefinitionDs.getItem().getOrientation() &&
+                        !Strings.isNullOrEmpty(entity.getName()) &&
+                        (entity.getName().endsWith(HORIZONTAL_TPL) || entity.getName().endsWith(VERTICAL_TPL))) {
+                    textField.setEditable(false);
+                }
             }
             return textField;
         });
 
-        bandDefinitionDs.addItemChangeListener(band-> {
+        bandDefinitionDs.addItemChangeListener(band -> {
             if (VALID == dataSets.getDatasource().getState()) {
                 onTableReady(dataSets, bandDefinitionDs);
             } else {
@@ -125,7 +127,7 @@ public class CrossTabTableDecorator {
     protected void initListeners(CollectionDatasource<DataSet, UUID> dataSetsDs,
                                  Datasource<BandDefinition> bandDefinitionDs,
                                  DataSet horizontal, DataSet vertical) {
-        bandDefinitionDs.addItemPropertyChangeListener(e-> {
+        bandDefinitionDs.addItemPropertyChangeListener(e -> {
             if ("orientation".equals(e.getProperty())) {
                 Orientation orientation = (Orientation) e.getValue();
                 Orientation prevOrientation = (Orientation) e.getPrevValue();
