@@ -63,13 +63,27 @@ public class GsonSerializationSupport {
                             return (TypeAdapter<T>) new TypeAdapter<Class>() {
                                 @Override
                                 public void write(JsonWriter out, Class value) throws IOException {
-                                    out.value(value.getCanonicalName());
+                                    Metadata metadata = AppBeans.get(Metadata.NAME);
+                                    MetaClass metaClass = metadata.getClass(value);
+                                    if (metaClass != null) {
+                                        metaClass = metadata.getExtendedEntities().getOriginalOrThisMetaClass(metaClass);
+                                        out.value(metaClass.getName());
+                                    } else {
+                                        out.value(value.getCanonicalName());
+                                    }
                                 }
 
                                 @Override
                                 public Class read(JsonReader in) throws IOException {
-                                    String className = in.nextString();
-                                    return ReflectionHelper.getClass(className);
+                                    Metadata metadata = AppBeans.get(Metadata.NAME);
+                                    String value = in.nextString();
+                                    MetaClass metaClass = metadata.getClass(value);
+                                    if (metaClass != null) {
+                                        metaClass = metadata.getExtendedEntities().getEffectiveMetaClass(metaClass);
+                                        return metaClass.getJavaClass();
+                                    } else {
+                                        return ReflectionHelper.getClass(value);
+                                    }
                                 }
                             };
                         } else {
