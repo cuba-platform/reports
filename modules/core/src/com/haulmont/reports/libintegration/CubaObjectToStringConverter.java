@@ -11,6 +11,7 @@ import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.global.DataManager;
 import com.haulmont.cuba.core.global.EntityLoadInfo;
 import com.haulmont.cuba.core.global.LoadContext;
+import com.haulmont.cuba.core.global.View;
 import com.haulmont.yarg.exception.ReportingException;
 import com.haulmont.yarg.util.converter.AbstractObjectToStringConverter;
 
@@ -49,10 +50,10 @@ public class CubaObjectToStringConverter extends AbstractObjectToStringConverter
         } else if (Entity.class.isAssignableFrom(parameterClass)) {
             EntityLoadInfo entityLoadInfo = EntityLoadInfo.parse(paramValueStr);
             if (entityLoadInfo != null) {
-                return dataManager.load(new LoadContext(entityLoadInfo.getMetaClass()).setId(entityLoadInfo.getId()));
+                return dataManager.load(new LoadContext(entityLoadInfo.getMetaClass()).setId(entityLoadInfo.getId()).setView(View.BASE));
             } else {
                 UUID id = UUID.fromString(paramValueStr);
-                return dataManager.load(new LoadContext(parameterClass).setId(id));
+                return dataManager.load(new LoadContext(parameterClass).setId(id).setView(View.BASE));
             }
         } else {
             Datatype datatype = Datatypes.get(parameterClass);
