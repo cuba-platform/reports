@@ -280,3 +280,22 @@ configure(desktopModule) {
         compile(group: 'com.haulmont.cuba', name: 'cuba-desktop', version: baseVersion)
     }
 }
+
+task aggregateJavadoc(type: Javadoc,
+        description: 'Generate javadocs from all child projects as if it was a single project',
+        group: 'Documentation') {
+
+    destinationDir = file("$buildDir/docs/javadoc")
+    title = "${project.name.toUpperCase()} $cubaVersion API"
+
+    options.encoding = 'UTF-8'
+    options.addStringOption("sourcepath", "")
+    options.memberLevel = org.gradle.external.javadoc.JavadocMemberLevel.PUBLIC
+
+    subprojects.each { proj ->
+        def javadocTask = proj.tasks.getByPath('javadoc')
+
+        source += javadocTask.source
+        classpath += javadocTask.classpath
+    }
+}
