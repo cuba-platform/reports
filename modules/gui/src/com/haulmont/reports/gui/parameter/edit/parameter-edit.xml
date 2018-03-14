@@ -79,8 +79,11 @@
                 </grid>
             </tab>
             <tab id="localesTab" caption="msg://parameters.localesTab" margin="true">
-                <textArea id="localeTextField" datasource="parameterDs" property="localeNames"
-                          width="100%" height="240px"/>
+                <hbox width="100%" expand="localeTextField">
+                    <textArea id="localeTextField" datasource="parameterDs" property="localeNames"
+                              height="240px"/>
+                    <linkButton id="localeTextHelp" icon="icons/question-white.png" invoke="getLocaleTextHelp"/>
+                </hbox>
             </tab>
             <tab id="processParamTab" caption="msg://parameters.transformationTab" margin="true" spacing="true">
                 <grid id="predefinedTransformationBox" spacing="true">
@@ -97,8 +100,11 @@
                     </rows>
                 </grid>
                 <label id="transformationScriptLabel" value="msg://parameters.groovyScript"/>
-                <sourceCodeEditor id="transformationScript" datasource="parameterDs" property="transformationScript"
-                                  mode="Groovy" width="100%" height="240px"/>
+                <hbox width="100%" expand="transformationScript">
+                    <sourceCodeEditor id="transformationScript" datasource="parameterDs" property="transformationScript"
+                                      mode="Groovy" height="240px"/>
+                    <linkButton id="transformationScriptHelp" icon="icons/question-white.png" invoke="getTransformationScriptHelp"/>
+                </hbox>
             </tab>
             <tab id="validationTab" caption="msg://parameters.validationTab" margin="true" spacing="true">
                 <grid id="includeValidationBox" spacing="true">
@@ -113,7 +119,7 @@
                 <label id="validationScriptLabel" value="msg://parameters.groovyScript"/>
                 <hbox width="100%" expand="validationScript">
                     <sourceCodeEditor id="validationScript" datasource="parameterDs" property="validationScript"
-                                      mode="Groovy" width="100%" height="240px"/>
+                                      mode="Groovy" height="240px"/>
                     <linkButton id="validationScriptHelp" icon="icons/question-white.png" invoke="getValidationScriptHelp"/>
                 </hbox>
             </tab>

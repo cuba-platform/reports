@@ -3,9 +3,14 @@
   ~ Use is subject to license terms, see http://www.cuba-platform.com/commercial-software-license for details.
   -->
 
-<window xmlns="http://schemas.haulmont.com/cuba/window.xsd">
-    <layout expand="localeTextField" margin="true" spacing="true">
-        <textArea id="localeTextField" datasource="reportDs" property="localeNames"
-                   rows="20" cols="30" width="100%"/>
+<window xmlns="http://schemas.haulmont.com/cuba/window.xsd"
+        class="com.haulmont.reports.gui.report.edit.tabs.LocalesFrame"
+        messagesPack="com.haulmont.reports.gui">
+    <layout margin="true" spacing="true">
+        <hbox id="localeTextBox" height="100%" width="100%" expand="localeTextField">
+            <textArea id="localeTextField" datasource="reportDs" property="localeNames"
+                      rows="20" cols="30" height="100%"/>
+            <linkButton id="localeTextHelp" icon="icons/question-white.png" invoke="getLocaleTextHelp"/>
+        </hbox>
     </layout>
 </window>

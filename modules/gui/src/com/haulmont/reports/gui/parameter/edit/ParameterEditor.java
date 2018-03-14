@@ -299,6 +299,20 @@ public class ParameterEditor extends AbstractEditor<ReportInputParameter> {
                         .width(600f));
     }
 
+    public void getLocaleTextHelp() {
+        showMessageDialog(getMessage("localeText"), getMessage("parameter.localeTextHelp"),
+                MessageType.CONFIRMATION_HTML
+                        .modal(false)
+                        .width(560f));
+    }
+
+    public void getTransformationScriptHelp() {
+        showMessageDialog(getMessage("transformationScript"), getMessage("parameter.transformationScriptHelp"),
+                MessageType.CONFIRMATION_HTML
+                        .modal(false)
+                        .width(560f));
+    }
+
     protected boolean isParameterDateOrTime() {
         ReportInputParameter parameter = getItem();
         return Optional.ofNullable(parameter)
