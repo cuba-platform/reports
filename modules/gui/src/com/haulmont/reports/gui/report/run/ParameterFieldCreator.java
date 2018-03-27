@@ -11,6 +11,7 @@ import com.haulmont.chile.core.datatypes.Datatypes;
 import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.cuba.core.global.*;
 import com.haulmont.cuba.gui.AppConfig;
+import com.haulmont.cuba.gui.WindowParams;
 import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.components.Component.Alignment;
 import com.haulmont.cuba.gui.components.validators.DoubleValidator;
@@ -21,6 +22,7 @@ import com.haulmont.cuba.gui.xml.layout.ComponentsFactory;
 import com.haulmont.reports.app.service.ReportService;
 import com.haulmont.reports.entity.ParameterType;
 import com.haulmont.reports.entity.ReportInputParameter;
+import com.haulmont.reports.entity.ReportType;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 
@@ -199,7 +201,15 @@ public class ParameterFieldCreator {
                 pickerLookupAction.setLookupScreenParams(Collections.emptyMap());
             } else {
                 pickerLookupAction.setLookupScreen(COMMON_LOOKUP_SCREEN_ID);
-                pickerLookupAction.setLookupScreenParams(ParamsMap.of(CLASS_PARAMETER, entityMetaClass));
+
+                Map<String, Object> params = new HashMap<>();
+                params.put(CLASS_PARAMETER, entityMetaClass);
+
+                if (parameter.getReport().getReportType() == ReportType.SIMPLE) {
+                    WindowParams.MULTI_SELECT.set(params, false);
+                }
+
+                pickerLookupAction.setLookupScreenParams(params);
             }
 
             return pickerField;
