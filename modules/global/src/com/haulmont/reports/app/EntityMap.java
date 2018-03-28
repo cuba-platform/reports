@@ -7,6 +7,7 @@ package com.haulmont.reports.app;
 import com.haulmont.chile.core.model.Instance;
 import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.chile.core.model.MetaProperty;
+import com.haulmont.chile.core.model.utils.InstanceUtils;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.Metadata;
@@ -130,10 +131,29 @@ public class EntityMap implements Map<String, Object> {
                 }
             }
 
-            explicitData.put(INSTANCE_NAME_KEY, instance.getInstanceName());
+            if (instanceNameAvailable(metaClass))
+                explicitData.put(INSTANCE_NAME_KEY, instance.getInstanceName());
+            else
+                explicitData.put(INSTANCE_NAME_KEY, null);
 
             loaded = true;
         }
+    }
+
+    protected boolean instanceNameAvailable(MetaClass metaClass) {
+        InstanceUtils.NamePatternRec namePattern = InstanceUtils.parseNamePattern(metaClass);
+        String[] fields = new String[0];
+        if (namePattern != null) {
+            fields = namePattern.fields;
+        }
+
+        for (String field : fields) {
+            Object value = getValue(instance, field);
+            if (value == null)
+                return false;
+        }
+
+        return true;
     }
 
     protected Object getValue(Instance instance, Object key) {
