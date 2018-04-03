@@ -202,6 +202,7 @@ configure(coreModule) {
             exclude group: 'org.codehaus.groovy', module: 'groovy-all'
             exclude group: 'commons-dbcp', module: 'commons-dbcp'
         }
+        compile(bom['com.fasterxml.jackson.core:jackson-annotations']) // use the same version as BPM
 		
         testCompile(group: 'com.haulmont.cuba', name: 'cuba-core-tests', version: baseVersion)
         testCompile(bom['org.apache.commons:commons-dbcp2'])
