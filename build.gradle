@@ -215,7 +215,6 @@ configure(coreModule) {
         testRuntime(bom['javax.servlet:javax.servlet-api'])
 
         compile(bom['org.codehaus.groovy:groovy-all'])
-        compile(bom['asm:asm'])
 
         testCompile(bom['org.springframework:spring-test'])
         testCompile(bom['com.fasterxml.jackson.dataformat:jackson-dataformat-yaml'])
