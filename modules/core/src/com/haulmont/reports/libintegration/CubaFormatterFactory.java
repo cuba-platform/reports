@@ -38,6 +38,7 @@ public class CubaFormatterFactory extends DefaultFormatterFactory {
 
         formattersMap.put("docx", docxCreator);
         formattersMap.put("chart", ChartFormatter::new);
+        formattersMap.put("pivot", PivotTableFormatter::new);
 
         FormatterCreator xlsxCreator = factoryInput -> {
             XlsxFormatter xlsxFormatter = new CubaXlsxFormatter(factoryInput);

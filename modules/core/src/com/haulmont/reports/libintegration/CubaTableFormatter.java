@@ -13,7 +13,7 @@ import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.MessageTools;
 import com.haulmont.cuba.core.sys.serialization.SerializationSupport;
 import com.haulmont.reports.app.EntityMap;
-import com.haulmont.reports.entity.tables.dto.CubaTableDTO;
+import com.haulmont.reports.entity.CubaTableData;
 import com.haulmont.yarg.exception.ReportFormattingException;
 import com.haulmont.yarg.formatters.factory.FormatterFactoryInput;
 import com.haulmont.yarg.formatters.impl.AbstractFormatter;
@@ -36,7 +36,7 @@ public class CubaTableFormatter extends AbstractFormatter {
 
     @Override
     public void renderDocument() {
-        CubaTableDTO dto = transformData(rootBand);
+        CubaTableData dto = transformData(rootBand);
         byte[] serializedData = SerializationSupport.serialize(dto);
         try {
             IOUtils.write(serializedData, outputStream);
@@ -45,7 +45,7 @@ public class CubaTableFormatter extends AbstractFormatter {
         }
     }
 
-    protected CubaTableDTO transformData(BandData rootBand) {
+    protected CubaTableData transformData(BandData rootBand) {
         Map<String, List<KeyValueEntity>> transformedData = new LinkedHashMap<>();
         Map<String, Set<Pair<String, Class>>> headerMap = new HashMap<>();
         Map<String, List<BandData>> childrenBands = rootBand.getChildrenBands();
@@ -98,7 +98,7 @@ public class CubaTableFormatter extends AbstractFormatter {
             }
         });
 
-        return new CubaTableDTO(transformedData, headerMap);
+        return new CubaTableData(transformedData, headerMap);
     }
 
     protected boolean containsLowerCaseDuplicate(Pair<String, Class> pair, Set<Pair<String, Class>> headers) {

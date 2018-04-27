@@ -4,7 +4,7 @@
   -->
 
 <window xmlns="http://schemas.haulmont.com/cuba/window.xsd"
-        class="com.haulmont.reports.gui.template.edit.ChartEditFrameController"
+        class="com.haulmont.reports.gui.template.edit.ChartEditFrame"
         messagesPack="com.haulmont.reports.gui">
 
     <dsContext>
@@ -17,6 +17,8 @@
     </dsContext>
 
     <assign name="width" value="400px"/>
+    <assign name="captionWidth" value="200px"/>
+    <assign name="typeCaptionWidth" value="195px"/>
 
     <layout spacing="true">
         <grid width="AUTO" spacing="true">
@@ -24,12 +26,12 @@
             <rows>
                 <row>
                     <label value="msg://com.haulmont.reports.entity.charts/AbstractChartDescription.type"
-                           align="MIDDLE_LEFT"/>
+                           align="MIDDLE_LEFT" width="${typeCaptionWidth}"/>
                     <lookupField id="type" width="${width}" required="true" align="MIDDLE_RIGHT"/>
                 </row>
                 <row>
                     <fieldGroup id="pieChartFieldGroup" datasource="pieChartDs" colspan="2">
-                        <column width="${width}">
+                        <column width="${width}" fieldCaptionWidth="${captionWidth}">
                             <field id="bandName" custom="true"/>
                             <field id="titleField"/>
                             <field id="valueField"/>
@@ -41,7 +43,7 @@
                 </row>
                 <row>
                     <fieldGroup id="serialChartFieldGroup" datasource="serialChartDs" colspan="2">
-                        <column width="${width}">
+                        <column width="${width}" fieldCaptionWidth="${captionWidth}">
                             <field id="bandName" custom="true"/>
                             <field id="categoryField"/>
                             <field id="categoryAxisCaption"/>

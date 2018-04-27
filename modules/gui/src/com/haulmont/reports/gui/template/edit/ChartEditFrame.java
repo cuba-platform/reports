@@ -11,15 +11,18 @@ import com.haulmont.cuba.gui.data.CollectionDatasource;
 import com.haulmont.cuba.gui.data.Datasource;
 import com.haulmont.cuba.gui.xml.layout.ComponentsFactory;
 import com.haulmont.reports.entity.BandDefinition;
+import com.haulmont.reports.entity.ReportOutputType;
+import com.haulmont.reports.entity.ReportTemplate;
 import com.haulmont.reports.entity.charts.*;
 import com.haulmont.reports.gui.report.run.ShowChartController;
+import com.haulmont.reports.gui.template.edit.generator.RandomChartDataGenerator;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class ChartEditFrameController extends AbstractFrame {
+public class ChartEditFrame extends DescriptionEditFrame {
     @Inject
     protected ComponentsFactory componentsFactory;
     @Inject
@@ -39,7 +42,10 @@ public class ChartEditFrameController extends AbstractFrame {
     @Inject
     protected FieldGroup serialChartFieldGroup;
 
+    protected ReportTemplate reportTemplate;
+
     @Override
+    @SuppressWarnings("IncorrectCreateEntity")
     public void init(Map<String, Object> params) {
         super.init(params);
         pieChartDs.setItem(new PieChartDescription());
@@ -50,10 +56,7 @@ public class ChartEditFrameController extends AbstractFrame {
             pieChartFieldGroup.setVisible(ChartType.PIE == e.getValue());
             serialChartFieldGroup.setVisible(ChartType.SERIAL == e.getValue());
             seriesBox.setVisible(ChartType.SERIAL == e.getValue());
-
-            ((Window) getFrame()).getDialogOptions().center();
-
-            showChartPreviewBox();
+            showPreview();
         });
 
         pieChartFieldGroup.setVisible(false);
@@ -63,29 +66,80 @@ public class ChartEditFrameController extends AbstractFrame {
         seriesTable.addAction(new CreateAction(seriesTable) {
             @Override
             public void actionPerform(Component component) {
+                @SuppressWarnings("IncorrectCreateEntity")
                 ChartSeries chartSeries = new ChartSeries();
                 seriesDs.addItem(chartSeries);
-                seriesTable.refresh();
             }
         });
 
-        pieChartDs.addItemPropertyChangeListener(e -> showChartPreviewBox());
+        pieChartDs.addItemPropertyChangeListener(e -> showPreview());
 
-        serialChartDs.addItemPropertyChangeListener(e -> showChartPreviewBox());
+        serialChartDs.addItemPropertyChangeListener(e -> showPreview());
 
-        seriesDs.addItemPropertyChangeListener(e -> showChartPreviewBox());
-        seriesDs.addCollectionChangeListener(e -> showChartPreviewBox());
+        seriesDs.addItemPropertyChangeListener(e -> showPreview());
+        seriesDs.addCollectionChangeListener(e -> showPreview());
 
-        FieldGroup.CustomFieldGenerator bandSelectorGenerator = (datasource, propertyId) -> {
-            LookupField lookupField = componentsFactory.createComponent(LookupField.class);
-            lookupField.setDatasource(datasource, propertyId);
-            return lookupField;
-        };
-        pieChartFieldGroup.addCustomField("bandName", bandSelectorGenerator);
-        serialChartFieldGroup.addCustomField("bandName", bandSelectorGenerator);
+
+        LookupField pieChartBandLookupField = componentsFactory.createComponent(LookupField.class);
+        pieChartBandLookupField.setDatasource(pieChartDs, "bandName");
+
+        LookupField serialChartBandLookupField = componentsFactory.createComponent(LookupField.class);
+        pieChartBandLookupField.setDatasource(serialChartDs, "bandName");
+
+        pieChartFieldGroup.getFieldNN("bandName").setComponent(pieChartBandLookupField);
+        serialChartFieldGroup.getFieldNN("bandName").setComponent(serialChartBandLookupField);
     }
 
-    protected void previewChart(BoxLayout previewBox) {
+    @Override
+    public void setItem(ReportTemplate reportTemplate) {
+        super.setItem(reportTemplate);
+        setBands(reportTemplate.getReport().getBands());
+        if (isApplicable(reportTemplate.getReportOutputType())) {
+            setChartDescription(reportTemplate.getChartDescription());
+        }
+    }
+
+    @Override
+    public boolean applyChanges() {
+        if (validateChart()) {
+            AbstractChartDescription chartDescription = getChartDescription();
+            reportTemplate.setChartDescription(chartDescription);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean isApplicable(ReportOutputType reportOutputType) {
+        return reportOutputType == ReportOutputType.CHART;
+    }
+
+    protected boolean validateChart() {
+        AbstractChartDescription chartDescription = getChartDescription();
+        if (chartDescription != null && chartDescription.getType() == ChartType.SERIAL) {
+            List<ChartSeries> series = ((SerialChartDescription) chartDescription).getSeries();
+            if (series == null || series.size() == 0) {
+                showNotification(getMessage("validationFail.caption"),
+                        getMessage("chartEdit.seriesEmptyMsg"), NotificationType.TRAY);
+                return false;
+            }
+            for (ChartSeries it : series) {
+                if (it.getType() == null) {
+                    showNotification(getMessage("validationFail.caption"),
+                            getMessage("chartEdit.seriesTypeNullMsg"), NotificationType.TRAY);
+                    return false;
+                }
+                if (it.getValueField() == null) {
+                    showNotification(getMessage("validationFail.caption"),
+                            getMessage("chartEdit.seriesValueFieldNullMsg"), NotificationType.TRAY);
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    protected void initPreviewContent(BoxLayout previewBox) {
         List<Map<String, Object>> data;
         String chartJson = null;
         if (ChartType.SERIAL == type.getValue()) {
@@ -99,52 +153,22 @@ public class ChartEditFrameController extends AbstractFrame {
             ChartToJsonConverter chartToJsonConverter = new ChartToJsonConverter();
             chartJson = chartToJsonConverter.convertPieChart(chartDescription, data);
         }
-        if (chartJson == null) {
-            chartJson = "{}";
-        }
+        chartJson = chartJson == null ? "{}" : chartJson;
         openFrame(previewBox, ShowChartController.JSON_CHART_SCREEN_ID,
                 Collections.<String, Object>singletonMap(ShowChartController.CHART_JSON_PARAMETER, chartJson));
     }
 
-    public BoxLayout showChartPreviewBox() {
-        Window parent = (Window) getFrame();
-        BoxLayout previewBox = (BoxLayout) parent.getComponentNN("chartPreviewBox");
-        previewBox.setVisible(true);
-        previewBox.setHeight("100%");
-        previewBox.setWidth("100%");
-        previewBox.removeAll();
-        parent.getDialogOptions()
-                .setWidth("1280px")
-                .setResizable(true)
-                .center();
-        previewChart(previewBox);
-        return previewBox;
-    }
-
-    public void hideChartPreviewBox() {
-        Window parent = (Window) getFrame();
-        BoxLayout previewBox = (BoxLayout) parent.getComponentNN("chartPreviewBox");
-        previewBox.setVisible(false);
-        previewBox.removeAll();
-        parent.getDialogOptions()
-                .setWidthAuto()
-                .setHeightAuto()
-                .setResizable(false)
-                .center();
-    }
-
     @Nullable
-    public AbstractChartDescription getChartDescription() {
+    protected AbstractChartDescription getChartDescription() {
         if (ChartType.SERIAL == type.getValue()) {
             return serialChartDs.getItem();
         } else if (ChartType.PIE == type.getValue()) {
             return pieChartDs.getItem();
         }
-
         return null;
     }
 
-    public void setChartDescription(@Nullable AbstractChartDescription chartDescription) {
+    protected void setChartDescription(@Nullable AbstractChartDescription chartDescription) {
         if (chartDescription != null) {
             if (ChartType.SERIAL == chartDescription.getType()) {
                 serialChartDs.setItem((SerialChartDescription) chartDescription);
@@ -155,14 +179,14 @@ public class ChartEditFrameController extends AbstractFrame {
         }
     }
 
-    public void setBands(Collection<BandDefinition> bands) {
+    protected void setBands(Collection<BandDefinition> bands) {
         List<String> bandNames = bands.stream()
                 .filter(bandDefinition -> bandDefinition.getParentBandDefinition() != null)
                 .map(BandDefinition::getName)
                 .collect(Collectors.toList());
 
-        LookupField pieChartBandName = (LookupField) pieChartFieldGroup.getFieldComponent("bandName");
-        LookupField serialChartBandName = (LookupField) serialChartFieldGroup.getFieldComponent("bandName");
+        LookupField pieChartBandName = (LookupField) pieChartFieldGroup.getComponentNN("bandName");
+        LookupField serialChartBandName = (LookupField) serialChartFieldGroup.getComponentNN("bandName");
 
         pieChartBandName.setOptionsList(bandNames);
         serialChartBandName.setOptionsList(bandNames);

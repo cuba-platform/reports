@@ -16,7 +16,7 @@ public enum ChartType implements EnumClass<String> {
         return id;
     }
 
-    private ChartType(String id) {
+    ChartType(String id) {
         this.id = id;
     }
 

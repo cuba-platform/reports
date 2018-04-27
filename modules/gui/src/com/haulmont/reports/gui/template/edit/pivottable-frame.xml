@@ -1,0 +1,135 @@
+<!--
+  ~ Copyright (c) 2008-2018 Haulmont. All rights reserved.
+  ~ Use is subject to license terms, see http://www.cuba-platform.com/commercial-software-license for details.
+  -->
+
+<window xmlns="http://schemas.haulmont.com/cuba/window.xsd"
+        class="com.haulmont.reports.gui.template.edit.PivotTableEditFrame"
+        messagesPack="com.haulmont.reports.gui">
+
+    <dsContext>
+        <datasource id="pivotTableDs" class="com.haulmont.reports.entity.pivottable.PivotTableDescription"
+                    allowCommit="false">
+            <groupDatasource id="propertyDs" property="properties" allowCommit="false"/>
+            <collectionDatasource id="aggregationsDs" property="aggregations" allowCommit="false"/>
+        </datasource>
+    </dsContext>
+
+    <assign name="width" value="605px"/>
+    <assign name="caption-width" value="100px"/>
+    <assign name="tab-caption-width" value="160px"/>
+    <assign name="height" value="245px"/>
+
+    <layout spacing="true">
+        <vbox>
+            <fieldGroup id="pivotTableGroup" datasource="pivotTableDs" width="${width}">
+                <column fieldCaptionWidth="${caption-width}" width="100%">
+                    <field id="bandName">
+                        <lookupField datasource="pivotTableDs"
+                                     property="bandName"
+                                     required="true"/>
+                    </field>
+                    <field property="editable"/>
+                </column>
+            </fieldGroup>
+            <tabSheet id="pivotTableTabSheet" width="${width}" stylename="framed">
+                <tab id="renderer" caption="msg://pivotTable.rendererOptions" margin="true">
+                    <fieldGroup id="rendererGroup" datasource="pivotTableDs" width="100%">
+                        <column width="100%">
+                            <field id="defaultRenderer" property="defaultRenderer" required="true"/>
+                            <field id="renderers">
+                                <optionsList datasource="pivotTableDs"
+                                             property="renderers"
+                                             required="true"/>
+                            </field>
+                        </column>
+                    </fieldGroup>
+                </tab>
+                <tab id="aggregation" caption="msg://pivotTable.aggregationOptions" margin="true">
+                    <table id="aggregationsTable" width="100%" height="${height}" stylename="small">
+                        <actions>
+                            <action id="create"/>
+                            <action id="edit"/>
+                            <action id="remove"/>
+                        </actions>
+                        <buttonsPanel>
+                            <button action="aggregationsTable.create" stylename="small"/>
+                            <button action="aggregationsTable.edit" stylename="small"/>
+                            <button action="aggregationsTable.remove" stylename="small"/>
+                            <lookupField optionsDatasource="aggregationsDs"
+                                         inputPrompt="msg://pivotTable.defaultAggregation"
+                                         datasource="pivotTableDs" property="defaultAggregation"
+                                         captionProperty="caption" stylename="small"/>
+                        </buttonsPanel>
+                        <columns>
+                            <column id="mode"/>
+                            <column id="caption" collapsed="true"/>
+                            <column id="function" collapsed="true"/>
+                        </columns>
+                        <rows datasource="aggregationsDs"/>
+                    </table>
+                </tab>
+                <tab id="properties" caption="msg://pivotTable.propertiesOptions" margin="true">
+                    <groupTable id="propertyTable" width="100%" height="${height}"
+                                stylename="small"
+                                reorderingAllowed="false"
+                                fixedGrouping="true">
+                        <buttonsPanel>
+                            <button action="propertyTable.create" stylename="small"/>
+                            <button action="propertyTable.edit" stylename="small"/>
+                            <button action="propertyTable.remove" stylename="small"/>
+                        </buttonsPanel>
+                        <columns>
+                            <group>
+                                <column id="type"/>
+                            </group>
+                            <column id="id" visible="false"/>
+                            <column id="caption"/>
+                        </columns>
+                        <rows datasource="propertyDs"/>
+                    </groupTable>
+                </tab>
+                <tab id="custom" caption="msg://pivotTable.customOptions" margin="true">
+                    <scrollBox height="${height}" width="100%">
+                        <groupBox caption="msg://pivotTable.customFunctions" collapsable="true" collapsed="false"
+                                  spacing="true">
+                            <fieldGroup id="customFunctionsGroup" datasource="pivotTableDs" width="100%">
+                                <column fieldCaptionWidth="${tab-caption-width}" width="100%">
+                                    <field id="filterFunction" stylename="small">
+                                        <sourceCodeEditor mode="JavaScript" property="filterFunction"
+                                                          datasource="pivotTableDs"/>
+                                    </field>
+                                    <field id="sortersFunction" stylename="small">
+                                        <sourceCodeEditor mode="JavaScript" property="sortersFunction"
+                                                          datasource="pivotTableDs"/>
+                                    </field>
+                                </column>
+                            </fieldGroup>
+                        </groupBox>
+                        <groupBox id="customC3GroupBox" caption="msg://pivotTable.customC3properties" spacing="true"
+                                  collapsable="true" collapsed="true" visible="false">
+                            <fieldGroup id="customC3Group" datasource="pivotTableDs" width="100%">
+                                <column fieldCaptionWidth="${tab-caption-width}" width="100%">
+                                    <field property="c3Width" stylename="small"/>
+                                    <field property="c3Height" stylename="small"/>
+                                </column>
+                            </fieldGroup>
+                        </groupBox>
+                        <groupBox id="customHeatmapGroupBox" caption="msg://pivotTable.customHeatmapProperties"
+                                  spacing="true"
+                                  collapsable="true" collapsed="true" visible="false">
+                            <fieldGroup id="customHeatmapGroup" datasource="pivotTableDs" width="100%">
+                                <column fieldCaptionWidth="${tab-caption-width}" width="100%">
+                                    <field id="colorScaleGeneratorFunction" stylename="small">
+                                        <sourceCodeEditor mode="JavaScript" property="colorScaleGeneratorFunction"
+                                                          height="200px" datasource="pivotTableDs"/>
+                                    </field>
+                                </column>
+                            </fieldGroup>
+                        </groupBox>
+                    </scrollBox>
+                </tab>
+            </tabSheet>
+        </vbox>
+    </layout>
+</window>

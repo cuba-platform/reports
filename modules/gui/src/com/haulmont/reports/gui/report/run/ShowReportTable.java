@@ -28,7 +28,7 @@ import com.haulmont.cuba.gui.xml.layout.ComponentsFactory;
 import com.haulmont.reports.entity.Report;
 import com.haulmont.reports.entity.ReportOutputType;
 import com.haulmont.reports.entity.ReportTemplate;
-import com.haulmont.reports.entity.tables.dto.CubaTableDTO;
+import com.haulmont.reports.entity.CubaTableData;
 import com.haulmont.reports.gui.ReportGuiManager;
 import com.haulmont.yarg.reporting.ReportOutputDocument;
 import org.dom4j.DocumentHelper;
@@ -95,7 +95,7 @@ public class ShowReportTable extends AbstractWindow {
 
         if (report != null) {
             reportSelectorBox.setVisible(false);
-            CubaTableDTO dto = (CubaTableDTO) SerializationSupport.deserialize((byte[]) params.get(TABLE_DATA_PARAMETER));
+            CubaTableData dto = (CubaTableData) SerializationSupport.deserialize((byte[]) params.get(TABLE_DATA_PARAMETER));
             drawTables(dto);
             openReportParameters(reportParameters);
         }
@@ -130,7 +130,7 @@ public class ShowReportTable extends AbstractWindow {
                 if (templateCode == null || templateCode.isEmpty())
                     templateCode = findTableCode(report);
                 ReportOutputDocument reportResult = reportGuiManager.getReportResult(report, parameters, templateCode);
-                CubaTableDTO dto = (CubaTableDTO) SerializationSupport.deserialize(reportResult.getContent());
+                CubaTableData dto = (CubaTableData) SerializationSupport.deserialize(reportResult.getContent());
                 drawTables(dto);
             }
         }
@@ -144,7 +144,7 @@ public class ShowReportTable extends AbstractWindow {
         return null;
     }
 
-    protected void drawTables(CubaTableDTO dto) {
+    protected void drawTables(CubaTableData dto) {
         Map<String, List<KeyValueEntity>> data = dto.getData();
         Map<String, Set<Pair<String, Class>>> headerMap = dto.getHeaders();
         tablesHolderGroup.removeAll();

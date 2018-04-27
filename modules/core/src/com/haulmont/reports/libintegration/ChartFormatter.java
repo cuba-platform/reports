@@ -13,6 +13,7 @@ import com.haulmont.yarg.structure.BandData;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +37,7 @@ public class ChartFormatter extends AbstractFormatter {
             }
         }
         try {
-            IOUtils.write(chartJson, outputStream);
+            IOUtils.write(chartJson, outputStream, StandardCharsets.UTF_8);
         } catch (IOException e) {
             throw new RuntimeException("An error occurred while rendering chart",e);
         }

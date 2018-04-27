@@ -886,7 +886,8 @@ public class ReportEditor extends AbstractEditor<Report> {
         ReportTemplate template = getItem().getDefaultTemplate();
         if (template != null && !template.isCustom()
                 && template.getReportOutputType() != ReportOutputType.CHART
-                && template.getReportOutputType() != ReportOutputType.TABLE) {
+                && template.getReportOutputType() != ReportOutputType.TABLE
+                && template.getReportOutputType() != ReportOutputType.PIVOT_TABLE) {
             String inputType = template.getExt();
             if (!ReportPrintHelper.getInputOutputTypesMapping().containsKey(inputType) ||
                     !ReportPrintHelper.getInputOutputTypesMapping().get(inputType).contains(template.getReportOutputType())) {

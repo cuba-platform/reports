@@ -1,0 +1,39 @@
+<!--
+  ~ Copyright (c) 2008-2017 Haulmont. All rights reserved.
+  ~ Use is subject to license terms, see http://www.cuba-platform.com/commercial-software-license for details.
+  -->
+
+<window xmlns="http://schemas.haulmont.com/cuba/window.xsd"
+        class="com.haulmont.reports.gui.template.edit.pivottable.property.edit.PivotTablePropertyEdit"
+        messagesPack="com.haulmont.reports.gui" datasource="propertyDs">
+
+    <dsContext>
+        <datasource id="propertyDs" class="com.haulmont.reports.entity.pivottable.PivotTableProperty"
+                    allowCommit="false"/>
+    </dsContext>
+
+    <dialogMode height="500px"
+                width="600px"
+                resizable="true"
+                modal="true"/>
+
+    <layout spacing="true" expand="editBox">
+        <groupBox id="editBox" showAsPanel="true">
+            <fieldGroup id="editGroup" datasource="propertyDs" width="100%">
+                <column width="100%">
+                    <field property="caption"/>
+                    <field property="type" required="true"/>
+                    <field property="hidden"/>
+                    <field id="function" property="function">
+                        <sourceCodeEditor property="function"
+                                          datasource="propertyDs"
+                                          editable="true"
+                                          mode="JavaScript"
+                                          height="300px"/>
+                    </field>
+                </column>
+            </fieldGroup>
+        </groupBox>
+        <frame id="windowActions" screen="editWindowActions" width="AUTO"/>
+    </layout>
+</window>

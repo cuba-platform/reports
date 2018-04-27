@@ -48,7 +48,7 @@ public class ReportData extends BaseUuidEntity {
         }
     }
 
-    public static enum ReportType {
+    public enum ReportType {
         SINGLE_ENTITY(false, true),
         LIST_OF_ENTITIES(true, true),
         LIST_OF_ENTITIES_WITH_QUERY(true, false);

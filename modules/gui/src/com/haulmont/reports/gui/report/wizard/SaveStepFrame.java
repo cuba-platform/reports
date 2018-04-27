@@ -18,7 +18,7 @@ import com.haulmont.reports.entity.charts.*;
 import com.haulmont.reports.exception.TemplateGenerationException;
 import com.haulmont.reports.gui.report.run.ShowChartController;
 import com.haulmont.reports.gui.report.wizard.step.StepFrame;
-import com.haulmont.reports.gui.template.edit.RandomChartDataGenerator;
+import com.haulmont.reports.gui.template.edit.generator.RandomChartDataGenerator;
 import org.apache.commons.lang.StringUtils;
 
 import java.nio.charset.StandardCharsets;

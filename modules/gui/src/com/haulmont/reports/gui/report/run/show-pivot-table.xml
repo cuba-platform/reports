@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+  ~ Copyright (c) 2008-2017 Haulmont. All rights reserved.
+  ~ Use is subject to license terms, see http://www.cuba-platform.com/commercial-software-license for details.
+  -->
+
+<window xmlns="http://schemas.haulmont.com/cuba/window.xsd"
+        caption="msg://showPivotTable.caption"
+        class="com.haulmont.reports.gui.report.run.ShowPivotTableController"
+        messagesPack="com.haulmont.reports.gui.report.run">
+
+    <dsContext>
+        <collectionDatasource id="reportsDs" class="com.haulmont.reports.entity.Report">
+            <query>select r from report$Report r, in (r.templates) t where t.reportOutputType = 100</query>
+        </collectionDatasource>
+    </dsContext>
+
+    <dialogMode height="AUTO"
+                width="AUTO"
+                resizable="true"/>
+
+    <layout expand="reportBox">
+        <hbox id="reportSelectorBox" spacing="true">
+            <label id="reportLookupLabel" align="MIDDLE_CENTER" value="msg://caption.reportForPivotTable"/>
+            <lookupField id="reportLookup" optionsDatasource="reportsDs" width="400px"/>
+        </hbox>
+        <groupBox id="reportParamsBox" collapsable="true" collapsed="false" visible="false"
+                  caption="msg://caption.reportParameters" spacing="true">
+            <vbox id="parametersFrameHolder"/>
+            <button id="printReportBtn" invoke="printReport"
+                    caption="msg://input.printReport" icon="icons/run.png"/>
+        </groupBox>
+        <groupBox id="reportBox" width="100%" spacing="true"/>
+    </layout>
+</window>

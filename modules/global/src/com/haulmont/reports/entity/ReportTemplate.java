@@ -8,7 +8,9 @@ package com.haulmont.reports.entity;
 import com.haulmont.chile.core.annotations.NamePattern;
 import com.haulmont.cuba.core.entity.StandardEntity;
 import com.haulmont.cuba.core.entity.annotation.SystemLevel;
+import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.reports.entity.charts.AbstractChartDescription;
+import com.haulmont.reports.entity.pivottable.PivotTableDescription;
 import com.haulmont.yarg.formatters.CustomReport;
 import org.apache.commons.lang.StringUtils;
 
@@ -70,7 +72,7 @@ public class ReportTemplate extends StandardEntity implements com.haulmont.yarg.
     protected transient CustomReport customReport;
 
     public ReportOutputType getReportOutputType() {
-        return reportOutputType != null ? ReportOutputType.fromId(reportOutputType) : null;
+        return ReportOutputType.fromId(reportOutputType);
     }
 
     public void setReportOutputType(ReportOutputType reportOutputType) {
@@ -206,10 +208,7 @@ public class ReportTemplate extends StandardEntity implements com.haulmont.yarg.
         if (getContent() == null) {
             return null;
         }
-
-        String jsonString;
-        jsonString = new String(getContent(), StandardCharsets.UTF_8);
-        return AbstractChartDescription.fromJsonString(jsonString);
+        return AbstractChartDescription.fromJsonString(new String(getContent(), StandardCharsets.UTF_8));
     }
 
     public void setChartDescription(@Nullable AbstractChartDescription chartDescription) {
@@ -220,9 +219,16 @@ public class ReportTemplate extends StandardEntity implements com.haulmont.yarg.
         }
     }
 
-    public void setTableName() {
-        if (getReportOutputType() == ReportOutputType.TABLE) {
-            setName(".table");
+    public PivotTableDescription getPivotTableDescription() {
+        if (getContent() == null)
+            return null;
+        return PivotTableDescription.fromJsonString(new String(getContent(), StandardCharsets.UTF_8));
+    }
+
+    public void setPivotTableDescription(PivotTableDescription description) {
+        if (description != null && getReportOutputType() == ReportOutputType.PIVOT_TABLE) {
+            setContent(PivotTableDescription.toJsonString(description).getBytes(StandardCharsets.UTF_8));
+            setName(".pivot");
         }
     }
 }

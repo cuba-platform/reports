@@ -20,8 +20,8 @@
 
     <assign name="width" value="500px"/>
 
-    <layout spacing="true">
-        <hbox id="createTemplateFields" width="100%" expand="chartPreviewBox">
+    <layout spacing="true" expand="createTemplateFields">
+        <hbox id="createTemplateFields" width="100%" spacing="true" expand="previewBox">
             <vbox id="vBox" spacing="true" width="AUTO">
                 <grid id="grid" spacing="true">
                     <columns>
@@ -52,6 +52,7 @@
                                          nullOptionVisible="true"
                                          property="reportOutputType"
                                          width="${width}" required="true"
+                                         pageLength="20"
                                          requiredMessage="msg://template.outputTypeMsg"/>
                         </row>
                         <row  id="row5">
@@ -84,15 +85,13 @@
                         </row>
                     </rows>
                 </grid>
-                <hbox id="chartEditBox" visible="false">
-                    <frame id="chartEdit" screen="chartEdit" width="AUTO"/>
+                <hbox id="descriptionEditBox">
+                    <frame id="chartEdit" screen="report$ChartEdit" visible="false" width="100%"/>
+                    <frame id="pivotTableEdit" screen="report$PivotTableEdit" visible="false" width="100%"/>
                 </hbox>
             </vbox>
-            <vbox id="chartPreviewBox" visible="false">
-
-            </vbox>
+            <vbox id="previewBox" visible="false"/>
         </hbox>
-
         <frame id="windowActions" screen="editWindowActions" width="AUTO"/>
     </layout>
 </window>

@@ -20,6 +20,9 @@
         <class>com.haulmont.reports.entity.charts.PieChartDescription</class>
         <class>com.haulmont.reports.entity.charts.SerialChartDescription</class>
         <class>com.haulmont.reports.entity.charts.ChartSeries</class>
+        <class>com.haulmont.reports.entity.pivottable.PivotTableAggregation</class>
+        <class>com.haulmont.reports.entity.pivottable.PivotTableProperty</class>
+        <class>com.haulmont.reports.entity.pivottable.PivotTableDescription</class>
     </metadata-model>
 
 </metadata>

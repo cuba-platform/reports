@@ -48,8 +48,17 @@
     <screen id="report$ReportGroup.edit"
             template="/com/haulmont/reports/gui/group/edit/group-edit.xml"/>
 
-    <screen id="chartEdit"
+    <screen id="report$ChartEdit"
             template="/com/haulmont/reports/gui/template/edit/chart-edit-frame.xml"/>
+
+    <screen id="report$PivotTableEdit"
+            template="/com/haulmont/reports/gui/template/edit/pivottable-frame.xml"/>
+
+    <screen id="report$PivotTableProperty.edit"
+            template="/com/haulmont/reports/gui/template/edit/pivottable/property/edit/pivottable-property-edit.xml"/>
+
+    <screen id="report$PivotTableAggregation.edit"
+            template="/com/haulmont/reports/gui/template/edit/pivottable/aggregation/edit/pivottable-aggregation-edit.xml" />
 
     <screen id="report$showChart"
             template="/com/haulmont/reports/gui/report/run/show-chart.xml"/>
@@ -59,6 +68,9 @@
 
     <screen id="report$inputParametersFrame"
             template="/com/haulmont/reports/gui/report/run/input-parameters-frame.xml"/>
+
+    <screen id="report$showPivotTable"
+            template="/com/haulmont/reports/gui/report/run/show-pivot-table.xml"/>
 
     <screen id="scriptEditorDialog"
             template="/com/haulmont/reports/gui/definition/edit/scripteditordialog/script-editor-dialog.xml"/>

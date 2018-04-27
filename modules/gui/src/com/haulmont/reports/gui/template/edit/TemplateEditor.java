@@ -5,7 +5,6 @@
 
 package com.haulmont.reports.gui.template.edit;
 
-import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.cuba.core.entity.FileDescriptor;
 import com.haulmont.cuba.core.global.Metadata;
 import com.haulmont.cuba.core.global.Security;
@@ -17,13 +16,10 @@ import com.haulmont.reports.app.service.ReportService;
 import com.haulmont.reports.entity.Report;
 import com.haulmont.reports.entity.ReportOutputType;
 import com.haulmont.reports.entity.ReportTemplate;
-import com.haulmont.reports.entity.charts.AbstractChartDescription;
-import com.haulmont.reports.entity.charts.ChartSeries;
-import com.haulmont.reports.entity.charts.ChartType;
-import com.haulmont.reports.entity.charts.SerialChartDescription;
 import com.haulmont.reports.gui.ReportPrintHelper;
 import com.haulmont.reports.gui.datasource.NotPersistenceDatasource;
 import com.haulmont.reports.gui.report.run.ShowChartController;
+import com.haulmont.reports.gui.report.run.ShowPivotTableController;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
@@ -35,10 +31,11 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Collection;
 import java.util.Map;
 
 public class TemplateEditor extends AbstractEditor<ReportTemplate> {
+
     @Inject
     protected Label templateFileLabel;
 
@@ -64,9 +61,6 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
     protected Label alterableLabel;
 
     @Inject
-    protected FileUploadingAPI fileUploading;
-
-    @Inject
     protected LookupField outputType;
 
     @Inject
@@ -76,16 +70,19 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
     protected Label outputNamePatternLabel;
 
     @Inject
-    protected ChartEditFrameController chartEdit;
+    protected ChartEditFrame chartEdit;
+
+    @Inject
+    protected PivotTableEditFrame pivotTableEdit;
 
     @Inject
     protected NotPersistenceDatasource<ReportTemplate> templateDs;
 
     @Inject
-    protected BoxLayout chartEditBox;
+    protected BoxLayout descriptionEditBox;
 
     @Inject
-    protected BoxLayout chartPreviewBox;
+    protected BoxLayout previewBox;
 
     @Inject
     protected SourceCodeEditor templateFileEditor;
@@ -99,8 +96,20 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
     @Inject
     protected Security security;
 
+    @Inject
+    protected FileUploadingAPI fileUploading;
+
     public TemplateEditor() {
         showSaveNotification = false;
+    }
+
+    @Override
+    @SuppressWarnings({"serial", "unchecked"})
+    public void init(Map<String, Object> params) {
+        super.init(params);
+        getDialogOptions()
+                .setWidthAuto()
+                .setResizable(true);
     }
 
     @Override
@@ -108,9 +117,9 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
         if (StringUtils.isEmpty(template.getCode())) {
             Report report = template.getReport();
             if (report != null) {
-                if ((report.getTemplates() == null) || (report.getTemplates().size() == 0)) {
+                if (report.getTemplates() == null || report.getTemplates().isEmpty())
                     template.setCode(ReportService.DEFAULT_TEMPLATE_CODE);
-                } else
+                else
                     template.setCode("Template_" + Integer.toString(report.getTemplates().size()));
             }
         }
@@ -119,64 +128,40 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
     @Override
     protected void postInit() {
         super.postInit();
-
-        ReportTemplate reportTemplate = getItem();
-
         initUploadField();
         templateDs.addItemPropertyChangeListener(e -> {
+            ReportTemplate reportTemplate = getItem();
             if ("reportOutputType".equals(e.getProperty())) {
                 setupVisibility(reportTemplate.getCustom(), (ReportOutputType) e.getValue());
             } else if ("custom".equals(e.getProperty())) {
                 setupVisibility(Boolean.TRUE.equals(e.getValue()), reportTemplate.getReportOutputType());
             }
         });
-
-        chartEdit.setBands(reportTemplate.getReport().getBands());
-        if (reportTemplate.getReportOutputType() == ReportOutputType.CHART) {
-            chartEdit.setChartDescription(reportTemplate.getChartDescription());
-        }
-
-        ArrayList<ReportOutputType> outputTypes = new ArrayList<>(Arrays.asList(ReportOutputType.values()));
-
-        if (!windowConfig.hasWindow(ShowChartController.JSON_CHART_SCREEN_ID)) {
-            outputTypes.remove(ReportOutputType.CHART);
-        }
-
-        outputType.setOptionsList(outputTypes);
-    }
-
-    protected void initUploadField() {
-        ReportTemplate reportTemplate = getItem();
-        byte[] templateFile = reportTemplate.getContent();
-        if (templateFile != null) {
-            templateUploadField.setContentProvider(() ->
-                    new ByteArrayInputStream(templateFile));
-            FileDescriptor fileDescriptor = metadata.create(FileDescriptor.class);
-            fileDescriptor.setName(reportTemplate.getName());
-            templateUploadField.setValue(fileDescriptor);
-        }
-
-        MetaClass reportTemplateMetaClass = metadata.getClassNN(ReportTemplate.class);
-        boolean updatePermitted = security.isEntityOpPermitted(reportTemplateMetaClass, EntityOp.UPDATE)
-                && security.isEntityAttrUpdatePermitted(reportTemplateMetaClass, "content");
-
-        templateUploadField.setEditable(updatePermitted);
+        initOutputTypeList();
     }
 
     @Override
     public void ready() {
         super.ready();
         ReportTemplate reportTemplate = getItem();
-        setupVisibility(reportTemplate.getCustom(), reportTemplate.getReportOutputType());
         initTemplateEditor(reportTemplate);
+        getDescriptionEditFrames().forEach(controller -> controller.setItem(reportTemplate));
+        setupVisibility(reportTemplate.getCustom(), reportTemplate.getReportOutputType());
+    }
+
+    protected Collection<DescriptionEditFrame> getDescriptionEditFrames() {
+        return Arrays.asList(chartEdit, pivotTableEdit);
+    }
+
+    protected boolean hasTemplateOutput(ReportOutputType reportOutputType) {
+        return reportOutputType != ReportOutputType.CHART
+                && reportOutputType != ReportOutputType.TABLE
+                && reportOutputType != ReportOutputType.PIVOT_TABLE;
     }
 
     protected void setupVisibility(boolean customEnabled, ReportOutputType reportOutputType) {
-        boolean tableOutputType = reportOutputType == ReportOutputType.TABLE;
-        boolean chartOutputType = reportOutputType == ReportOutputType.CHART;
-        boolean templateOutputVisibility = !(chartOutputType || tableOutputType);
+        boolean templateOutputVisibility = hasTemplateOutput(reportOutputType);
 
-        templateUploadField.setVisible(!customEnabled);
         customDefinedBy.setVisible(customEnabled);
         customDefinition.setVisible(customEnabled);
         customDefinedByLabel.setVisible(customEnabled);
@@ -191,32 +176,66 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
         alterable.setVisible(supportAlterableForTemplate);
         alterableLabel.setVisible(supportAlterableForTemplate);
 
-        chartEditBox.setVisible(chartOutputType && !customEnabled);
-        chartPreviewBox.setVisible(chartOutputType && !customEnabled);
-        if (chartOutputType && !customEnabled) {
-            chartEdit.showChartPreviewBox();
-        } else {
-            chartEdit.hideChartPreviewBox();
-        }
-
         templateUploadField.setVisible(templateOutputVisibility);
         templateFileLabel.setVisible(templateOutputVisibility);
         outputNamePattern.setVisible(templateOutputVisibility);
         outputNamePatternLabel.setVisible(templateOutputVisibility);
+
+        setupVisibilityDescriptionEdit(customEnabled, reportOutputType);
     }
 
-    @Override
-    @SuppressWarnings({"serial", "unchecked"})
-    public void init(Map<String, Object> params) {
-        super.init(params);
+    protected void setupVisibilityDescriptionEdit(boolean customEnabled, ReportOutputType reportOutputType) {
+        DescriptionEditFrame applicableFrame =
+                getDescriptionEditFrames().stream()
+                        .filter(c -> c.isApplicable(reportOutputType))
+                        .findFirst().orElse(null);
+        if (applicableFrame != null) {
+            descriptionEditBox.setVisible(!customEnabled);
+            applicableFrame.setVisible(!customEnabled);
+            if (!customEnabled) {
+                applicableFrame.showPreview();
+            } else {
+                applicableFrame.hidePreview();
+            }
+        }
 
-        getDialogOptions()
-                .setWidthAuto()
-                .setResizable(true);
+        for (DescriptionEditFrame frame : getDescriptionEditFrames()) {
+            if (applicableFrame != frame) {
+                frame.setVisible(false);
+            }
+            if (applicableFrame == null) {
+                frame.hidePreview();
+                descriptionEditBox.setVisible(false);
+            }
+        }
+    }
 
+    protected void updateOutputType() {
+        if (outputType.getValue() == null) {
+            String extension = FilenameUtils.getExtension(templateUploadField.getFileDescriptor().getName()).toUpperCase();
+            ReportOutputType reportOutputType = ReportOutputType.getTypeFromExtension(extension);
+            if (reportOutputType != null) {
+                outputType.setValue(reportOutputType);
+            }
+        }
+    }
+
+    protected void initOutputTypeList() {
+        ArrayList<ReportOutputType> outputTypes = new ArrayList<>(Arrays.asList(ReportOutputType.values()));
+
+        if (!windowConfig.hasWindow(ShowChartController.JSON_CHART_SCREEN_ID)) {
+            outputTypes.remove(ReportOutputType.CHART);
+        }
+        if (!windowConfig.hasWindow(ShowPivotTableController.PIVOT_TABLE_SCREEN_ID)) {
+            outputTypes.remove(ReportOutputType.PIVOT_TABLE);
+        }
+
+        outputType.setOptionsList(outputTypes);
+    }
+
+    protected void initUploadField() {
         templateUploadField.addFileUploadErrorListener(e ->
                 showNotification(getMessage("templateEditor.uploadUnsuccess"), NotificationType.WARNING));
-
         templateUploadField.addFileUploadSucceedListener(e -> {
             String fileName = templateUploadField.getFileName();
             ReportTemplate reportTemplate = getItem();
@@ -235,18 +254,20 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
 
             showNotification(getMessage("templateEditor.uploadSuccess"), NotificationType.TRAY);
         });
-    }
 
-    protected void updateOutputType() {
-        setupVisibility(getItem().isCustom(), getItem().getReportOutputType());
-
-        if (outputType.getValue() == null) {
-            String extension = FilenameUtils.getExtension(templateUploadField.getFileDescriptor().getName()).toUpperCase();
-            ReportOutputType reportOutputType = ReportOutputType.getTypeFromExtension(extension);
-            if (reportOutputType != null) {
-                outputType.setValue(reportOutputType);
-            }
+        ReportTemplate reportTemplate = getItem();
+        byte[] templateFile = reportTemplate.getContent();
+        if (templateFile != null) {
+            templateUploadField.setContentProvider(() -> new ByteArrayInputStream(templateFile));
+            FileDescriptor fileDescriptor = metadata.create(FileDescriptor.class);
+            fileDescriptor.setName(reportTemplate.getName());
+            templateUploadField.setValue(fileDescriptor);
         }
+
+        boolean updatePermitted = security.isEntityOpPermitted(reportTemplate.getMetaClass(), EntityOp.UPDATE)
+                && security.isEntityAttrUpdatePermitted(reportTemplate.getMetaClass(), "content");
+
+        templateUploadField.setEditable(updatePermitted);
     }
 
     protected void initTemplateEditor(ReportTemplate reportTemplate) {
@@ -267,20 +288,25 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
     }
 
     @Override
-    public boolean commit(boolean validate) {
+    public boolean preCommit() {
         if (!validateTemplateFile() || !validateInputOutputFormats()) {
             return false;
         }
         ReportTemplate reportTemplate = getItem();
-        if (reportTemplate.getReportOutputType() == ReportOutputType.CHART) {
-            if (!validateChart()) {
-                return false;
+        for (DescriptionEditFrame frame : getDescriptionEditFrames()) {
+            if (frame.isApplicable(reportTemplate.getReportOutputType())) {
+                if (!frame.applyChanges()) {
+                    return false;
+                }
             }
-            AbstractChartDescription chartDescription = chartEdit.getChartDescription();
-            reportTemplate.setChartDescription(chartDescription);
         }
+
+        if (!Boolean.TRUE.equals(reportTemplate.getCustom())) {
+            reportTemplate.setCustomDefinition("");
+        }
+
         if (reportTemplate.getReportOutputType() == ReportOutputType.TABLE) {
-            reportTemplate.setTableName();
+            reportTemplate.setName(".table");
         }
 
         String extension = FilenameUtils.getExtension(templateUploadField.getFileName());
@@ -294,15 +320,14 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
             }
         }
 
-        return super.commit(validate);
+        return super.preCommit();
     }
 
     protected boolean validateInputOutputFormats() {
         ReportTemplate reportTemplate = getItem();
         String name = reportTemplate.getName();
         if (!Boolean.TRUE.equals(reportTemplate.getCustom())
-                && reportTemplate.getReportOutputType() != ReportOutputType.CHART
-                && reportTemplate.getReportOutputType() != ReportOutputType.TABLE
+                && hasTemplateOutput(reportTemplate.getReportOutputType())
                 && name != null) {
             String inputType = name.contains(".") ? name.substring(name.lastIndexOf(".") + 1) : "";
 
@@ -319,8 +344,7 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
     protected boolean validateTemplateFile() {
         ReportTemplate template = getItem();
         if (!Boolean.TRUE.equals(template.getCustom())
-                && template.getReportOutputType() != ReportOutputType.CHART
-                && template.getReportOutputType() != ReportOutputType.TABLE
+                && hasTemplateOutput(template.getReportOutputType())
                 && template.getContent() == null) {
             StringBuilder notification = new StringBuilder(getMessage("template.uploadTemplate"));
 
@@ -338,44 +362,5 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
             return false;
         }
         return true;
-    }
-
-    protected boolean validateChart() {
-        AbstractChartDescription chartDescription = chartEdit.getChartDescription();
-        if (chartDescription.getType() == ChartType.SERIAL) {
-            List<ChartSeries> series = ((SerialChartDescription) chartDescription).getSeries();
-            if (series == null || series.size() == 0) {
-                showNotification(getMessage("validationFail.caption"),
-                        getMessage("chartEdit.seriesEmptyMsg"), NotificationType.TRAY);
-                return false;
-            }
-            for (ChartSeries it : series) {
-                if (it.getType() == null) {
-                    showNotification(getMessage("validationFail.caption"),
-                            getMessage("chartEdit.seriesTypeNullMsg"), NotificationType.TRAY);
-                    return false;
-                }
-                if (it.getValueField() == null) {
-                    showNotification(getMessage("validationFail.caption"),
-                            getMessage("chartEdit.seriesValueFieldNullMsg"), NotificationType.TRAY);
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    @Override
-    public void commitAndClose() {
-        if (!validateTemplateFile()) {
-            return;
-        }
-
-        if (!getItem().getCustom()) {
-            getItem().setCustomDefinition("");
-        }
-        if (commit(true)) {
-            close(COMMIT_ACTION_ID);
-        }
     }
 }

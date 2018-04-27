@@ -19,7 +19,8 @@ public enum ReportOutputType implements EnumClass<Integer> {
     CUSTOM(60, CubaReportOutputType.custom),
     CHART(70, CubaReportOutputType.chart),
     CSV(80, CubaReportOutputType.csv),
-    TABLE(90, CubaReportOutputType.table);
+    TABLE(90, CubaReportOutputType.table),
+    PIVOT_TABLE(100, CubaReportOutputType.pivot);
 
     private Integer id;
 

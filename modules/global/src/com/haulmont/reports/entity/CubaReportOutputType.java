@@ -10,10 +10,12 @@ import java.io.ObjectStreamException;
 public class CubaReportOutputType extends com.haulmont.yarg.structure.ReportOutputType {
     public final static CubaReportOutputType chart = new CubaReportOutputType("chart");
     public final static CubaReportOutputType table = new CubaReportOutputType("table");
+    public final static CubaReportOutputType pivot = new CubaReportOutputType("pivot");
 
     static {
        values.put(chart.getId(), chart);
        values.put(table.getId(), table);
+       values.put(pivot.getId(), pivot);
     }
 
     public CubaReportOutputType(String id) {

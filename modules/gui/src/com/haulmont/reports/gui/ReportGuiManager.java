@@ -27,6 +27,7 @@ import com.haulmont.reports.app.ParameterPrototype;
 import com.haulmont.reports.app.service.ReportService;
 import com.haulmont.reports.entity.*;
 import com.haulmont.reports.gui.report.run.ShowChartController;
+import com.haulmont.reports.gui.report.run.ShowPivotTableController;
 import com.haulmont.reports.gui.report.run.ShowReportTable;
 import com.haulmont.yarg.reporting.ReportOutputDocument;
 import org.apache.commons.collections4.CollectionUtils;
@@ -292,6 +293,18 @@ public class ReportGuiManager {
                 WindowInfo windowInfo = windowConfig.getWindowInfo("report$showChart");
                 windowManagerProvider.get().openWindow(windowInfo, OpenType.DIALOG, screenParams);
             }
+        } else if (document.getReportOutputType().getId().equals(CubaReportOutputType.pivot.getId())) {
+            Map<String, Object> screenParams = ParamsMap.of(
+                    ShowPivotTableController.PIVOT_TABLE_DATA_PARAMETER, document.getContent(),
+                    ShowPivotTableController.REPORT_PARAMETER, document.getReport(),
+                    ShowPivotTableController.TEMPLATE_CODE_PARAMETER, templateCode,
+                    ShowPivotTableController.PARAMS_PARAMETER, params);
+            if (window != null) {
+                window.openWindow("report$showPivotTable", OpenType.DIALOG, screenParams);
+            } else {
+                WindowInfo windowInfo = windowConfig.getWindowInfo("report$showPivotTable");
+                windowManagerProvider.get().openWindow(windowInfo, OpenType.DIALOG, screenParams);
+            }
         } else if (document.getReportOutputType().getId().equals(CubaReportOutputType.table.getId())) {
             Map<String, Object> screenParams = new HashMap<>();
             screenParams.put(ShowReportTable.TABLE_DATA_PARAMETER, document.getContent());
@@ -302,7 +315,7 @@ public class ReportGuiManager {
             if (window != null) {
                 window.openWindow("report$showReportTable", OpenType.DIALOG, screenParams);
             } else {
-                WindowInfo windowInfo = windowConfig.getWindowInfo("report$showReportData");
+                WindowInfo windowInfo = windowConfig.getWindowInfo("report$showReportTable");
                 windowManagerProvider.get().openWindow(windowInfo, OpenType.DIALOG, screenParams);
             }
         } else {

@@ -12,6 +12,7 @@
         <item id="report$Report.run"/>
         <item id="report$showChart"/>
         <item id="report$showReportTable"/>
+        <item id="report$showPivotTable"/>
     </menu>
 
 </menu-config>
