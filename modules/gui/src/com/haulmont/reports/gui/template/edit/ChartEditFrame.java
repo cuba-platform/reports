@@ -42,8 +42,6 @@ public class ChartEditFrame extends DescriptionEditFrame {
     @Inject
     protected FieldGroup serialChartFieldGroup;
 
-    protected ReportTemplate reportTemplate;
-
     @Override
     @SuppressWarnings("IncorrectCreateEntity")
     public void init(Map<String, Object> params) {
@@ -103,7 +101,7 @@ public class ChartEditFrame extends DescriptionEditFrame {
     public boolean applyChanges() {
         if (validateChart()) {
             AbstractChartDescription chartDescription = getChartDescription();
-            reportTemplate.setChartDescription(chartDescription);
+            getReportTemplate().setChartDescription(chartDescription);
             return true;
         }
         return false;
