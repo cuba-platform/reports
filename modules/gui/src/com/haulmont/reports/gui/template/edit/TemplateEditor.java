@@ -192,6 +192,7 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
         if (applicableFrame != null) {
             descriptionEditBox.setVisible(!customEnabled);
             applicableFrame.setVisible(!customEnabled);
+            applicableFrame.setItem(getItem());
             if (!customEnabled) {
                 applicableFrame.showPreview();
             } else {

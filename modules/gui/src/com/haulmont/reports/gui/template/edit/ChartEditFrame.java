@@ -24,8 +24,6 @@ import java.util.stream.Collectors;
 
 public class ChartEditFrame extends DescriptionEditFrame {
     @Inject
-    protected ComponentsFactory componentsFactory;
-    @Inject
     protected Datasource<PieChartDescription> pieChartDs;
     @Inject
     protected Datasource<SerialChartDescription> serialChartDs;
@@ -76,16 +74,6 @@ public class ChartEditFrame extends DescriptionEditFrame {
 
         seriesDs.addItemPropertyChangeListener(e -> showPreview());
         seriesDs.addCollectionChangeListener(e -> showPreview());
-
-
-        LookupField pieChartBandLookupField = componentsFactory.createComponent(LookupField.class);
-        pieChartBandLookupField.setDatasource(pieChartDs, "bandName");
-
-        LookupField serialChartBandLookupField = componentsFactory.createComponent(LookupField.class);
-        pieChartBandLookupField.setDatasource(serialChartDs, "bandName");
-
-        pieChartFieldGroup.getFieldNN("bandName").setComponent(pieChartBandLookupField);
-        serialChartFieldGroup.getFieldNN("bandName").setComponent(serialChartBandLookupField);
     }
 
     @Override
@@ -152,8 +140,13 @@ public class ChartEditFrame extends DescriptionEditFrame {
             chartJson = chartToJsonConverter.convertPieChart(chartDescription, data);
         }
         chartJson = chartJson == null ? "{}" : chartJson;
-        openFrame(previewBox, ShowChartController.JSON_CHART_SCREEN_ID,
-                Collections.<String, Object>singletonMap(ShowChartController.CHART_JSON_PARAMETER, chartJson));
+        AbstractFrame frame = openFrame(previewBox, ShowChartController.JSON_CHART_SCREEN_ID,
+                Collections.singletonMap(ShowChartController.CHART_JSON_PARAMETER, chartJson));
+        if (ChartType.SERIAL == type.getValue()) {
+            frame.setHeight("700px");
+        } else if (ChartType.PIE == type.getValue()) {
+            frame.setHeight("350px");
+        }
     }
 
     @Nullable

@@ -6,10 +6,10 @@
 package com.haulmont.reports.gui.template.edit;
 
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.haulmont.bali.util.ParamsMap;
 import com.haulmont.cuba.core.entity.KeyValueEntity;
+import com.haulmont.cuba.gui.WindowManager;
 import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.components.actions.CreateAction;
 import com.haulmont.cuba.gui.components.actions.EditAction;
@@ -65,6 +65,9 @@ public class PivotTableEditFrame extends DescriptionEditFrame {
     @Inject
     protected GroupBoxLayout customHeatmapGroupBox;
 
+    @Inject
+    protected PopupButton propertiesCreateButton;
+
     protected RandomPivotTableDataGenerator dataGenerator;
 
     @Override
@@ -72,12 +75,8 @@ public class PivotTableEditFrame extends DescriptionEditFrame {
     public void init(Map<String, Object> params) {
         super.init(params);
         dataGenerator = new RandomPivotTableDataGenerator();
-        PivotTableDescription description = new PivotTableDescription();
+        PivotTableDescription description = createDefaultPivotTableDescription();
         pivotTableDs.setItem(description);
-        if (description.getDefaultRenderer() == null) {
-            description.setDefaultRenderer(RendererType.TABLE);
-            description.setRenderers(Sets.newHashSet(RendererType.TABLE));
-        }
         initPropertyTable();
         pivotTableDs.addItemPropertyChangeListener(e -> showPreview());
     }
@@ -87,7 +86,11 @@ public class PivotTableEditFrame extends DescriptionEditFrame {
         super.setItem(reportTemplate);
         setBands(reportTemplate.getReport().getBands());
         if (isApplicable(reportTemplate.getReportOutputType())) {
-            pivotTableDs.setItem(reportTemplate.getPivotTableDescription());
+            if (reportTemplate.getPivotTableDescription() == null) {
+                pivotTableDs.setItem(createDefaultPivotTableDescription());
+            } else {
+                pivotTableDs.setItem(reportTemplate.getPivotTableDescription());
+            }
         }
         initRendererTypes();
         propertyTable.expandAll();
@@ -107,6 +110,15 @@ public class PivotTableEditFrame extends DescriptionEditFrame {
     @Override
     public boolean isApplicable(ReportOutputType reportOutputType) {
         return reportOutputType == ReportOutputType.PIVOT_TABLE;
+    }
+
+    protected PivotTableDescription createDefaultPivotTableDescription() {
+        PivotTableDescription description = new PivotTableDescription();
+        if (description.getDefaultRenderer() == null) {
+            description.setDefaultRenderer(RendererType.TABLE);
+            description.setRenderers(Sets.newHashSet(RendererType.TABLE));
+        }
+        return description;
     }
 
     @Override
@@ -214,7 +226,24 @@ public class PivotTableEditFrame extends DescriptionEditFrame {
 
         propertyTable.addAction(createPropertyRemoveAction());
         propertyTable.addAction(createPropertyEditAction());
-        propertyTable.addAction(createPropertyCreateAction());
+
+        propertiesCreateButton.setCaption(messages.getMainMessage("actions.Create"));
+
+        CreateAction createAction = createPropertyCreateAction(PivotTablePropertyType.ROWS);
+        propertyTable.addAction(createAction);
+        propertiesCreateButton.addAction(createAction);
+
+        createAction = createPropertyCreateAction(PivotTablePropertyType.COLUMNS);
+        propertyTable.addAction(createAction);
+        propertiesCreateButton.addAction(createAction);
+
+        createAction = createPropertyCreateAction(PivotTablePropertyType.AGGREGATIONS);
+        propertyTable.addAction(createAction);
+        propertiesCreateButton.addAction(createAction);
+
+        createAction = createPropertyCreateAction(PivotTablePropertyType.DETACHED);
+        propertyTable.addAction(createAction);
+        propertiesCreateButton.addAction(createAction);
     }
 
     protected RemoveAction createPropertyRemoveAction() {
@@ -227,7 +256,12 @@ public class PivotTableEditFrame extends DescriptionEditFrame {
         return action;
     }
 
-    protected CreateAction createPropertyCreateAction() {
-        return new CreateAction(propertyTable);
+    protected CreateAction createPropertyCreateAction(PivotTablePropertyType propertyType) {
+        CreateAction action = CreateAction.create(propertyTable, WindowManager.OpenType.THIS_TAB, "create_" + propertyType.getId());
+        Map<String, Object> values = new HashMap<>();
+        values.put("type", propertyType);
+        action.setInitialValues(values);
+        action.setCaption(messages.getMessage(propertyType));
+        return action;
     }
 }

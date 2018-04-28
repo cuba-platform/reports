@@ -32,7 +32,10 @@
                 <row>
                     <fieldGroup id="pieChartFieldGroup" datasource="pieChartDs" colspan="2">
                         <column width="${width}" fieldCaptionWidth="${captionWidth}">
-                            <field id="bandName" custom="true"/>
+                            <field id="bandName">
+                                <lookupField property="bandName"
+                                             datasource="pieChartDs"/>
+                            </field>
                             <field id="titleField"/>
                             <field id="valueField"/>
                             <field id="colorField"/>
@@ -44,7 +47,10 @@
                 <row>
                     <fieldGroup id="serialChartFieldGroup" datasource="serialChartDs" colspan="2">
                         <column width="${width}" fieldCaptionWidth="${captionWidth}">
-                            <field id="bandName" custom="true"/>
+                            <field id="bandName">
+                                <lookupField property="bandName"
+                                             datasource="serialChartDs"/>
+                            </field>
                             <field id="categoryField"/>
                             <field id="categoryAxisCaption"/>
                             <field id="categoryAxisLabelRotation"/>

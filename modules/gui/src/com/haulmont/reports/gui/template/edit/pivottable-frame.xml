@@ -75,7 +75,7 @@
                                 reorderingAllowed="false"
                                 fixedGrouping="true">
                         <buttonsPanel>
-                            <button action="propertyTable.create" stylename="small"/>
+                            <popupButton id="propertiesCreateButton" stylename="small"/>
                             <button action="propertyTable.edit" stylename="small"/>
                             <button action="propertyTable.remove" stylename="small"/>
                         </buttonsPanel>

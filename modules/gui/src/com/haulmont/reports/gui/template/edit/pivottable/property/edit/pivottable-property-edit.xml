@@ -21,9 +21,9 @@
         <groupBox id="editBox" showAsPanel="true">
             <fieldGroup id="editGroup" datasource="propertyDs" width="100%">
                 <column width="100%">
+                    <field property="name"/>
                     <field property="caption"/>
-                    <field property="type" required="true"/>
-                    <field property="hidden"/>
+                    <field property="type" required="true" editable="false"/>
                     <field id="function" property="function">
                         <sourceCodeEditor property="function"
                                           datasource="propertyDs"

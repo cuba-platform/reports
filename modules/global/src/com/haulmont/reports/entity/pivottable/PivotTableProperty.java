@@ -16,7 +16,7 @@ import javax.persistence.Lob;
 public class PivotTableProperty extends BaseUuidEntity {
 
     @MetaProperty(mandatory = true)
-    protected String name = "property";
+    protected String name;
 
     @MetaProperty
     protected String caption;
@@ -31,13 +31,6 @@ public class PivotTableProperty extends BaseUuidEntity {
     @MetaProperty
     protected PivotTablePropertyType type;
 
-    @SuppressWarnings("IncorrectCreateEntity")
-    public static PivotTableProperty of(String caption) {
-        PivotTableProperty property = new PivotTableProperty();
-        property.setCaption(caption);
-        return property;
-    }
-
     public String getName() {
         return name;
     }
@@ -45,9 +38,7 @@ public class PivotTableProperty extends BaseUuidEntity {
     public void setName(String name) {
         this.name = name;
         if (caption == null && StringUtils.isNotEmpty(name)) {
-            caption = (name.length() > 1 ?
-                    StringUtils.capitalize(name):
-                    name.toUpperCase()).replace('_', ' ');
+            setCaption(name.replace('_', ' '));
         }
     }
 
@@ -57,7 +48,6 @@ public class PivotTableProperty extends BaseUuidEntity {
 
     public void setCaption(String caption) {
         this.caption = caption;
-        setName(caption.toLowerCase().replace(' ', '_'));
     }
 
     public String getFunction() {
