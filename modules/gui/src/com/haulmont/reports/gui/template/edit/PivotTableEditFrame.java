@@ -27,6 +27,7 @@ import com.haulmont.reports.gui.template.edit.generator.RandomPivotTableDataGene
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class PivotTableEditFrame extends DescriptionEditFrame {
@@ -56,6 +57,9 @@ public class PivotTableEditFrame extends DescriptionEditFrame {
     @Named("rendererGroup.defaultRenderer")
     protected LookupField defaultRenderer;
 
+    @Inject
+    protected LookupField defaultAggregation;
+
     @Named("pivotTableGroup.bandName")
     protected LookupField bandName;
 
@@ -77,6 +81,7 @@ public class PivotTableEditFrame extends DescriptionEditFrame {
         dataGenerator = new RandomPivotTableDataGenerator();
         PivotTableDescription description = createDefaultPivotTableDescription();
         pivotTableDs.setItem(description);
+        initAggregationTable();
         initPropertyTable();
         pivotTableDs.addItemPropertyChangeListener(e -> showPreview());
     }
@@ -163,6 +168,13 @@ public class PivotTableEditFrame extends DescriptionEditFrame {
                 || !Collections.disjoint(description.getRowsProperties(), description.getAggregationProperties())
                 || !Collections.disjoint(description.getColumnsProperties(), description.getAggregationProperties())) {
             validationErrors.add(getMessage("pivotTableEdit.propertyIntersection"));
+        } else if (description.getProperties() != null) {
+            Set<String> propertyNames = description.getProperties().stream()
+                    .map(PivotTableProperty::getName)
+                    .collect(Collectors.toSet());
+            if (propertyNames.size() != description.getProperties().size()) {
+                validationErrors.add(getMessage("pivotTableEdit.propertyIntersection"));
+            }
         }
         return validationErrors;
     }
@@ -188,6 +200,23 @@ public class PivotTableEditFrame extends DescriptionEditFrame {
                 }
                 initCustomGroups();
                 initDefaultRenderer();
+            }
+        });
+    }
+
+    protected void initAggregationTable() {
+        Supplier<Map<String, Object>> paramsSupplier = () -> ParamsMap.of("existingItems", aggregationsDs.getItems());
+        CreateAction createAction = CreateAction.create(aggregationsTable);
+        createAction.setWindowParamsSupplier(paramsSupplier);
+        aggregationsTable.addAction(createAction);
+        EditAction editAction = EditAction.create(aggregationsTable);
+        editAction.setWindowParamsSupplier(paramsSupplier);
+        aggregationsTable.addAction(editAction);
+        aggregationsTable.addAction(RemoveAction.create(aggregationsTable));
+
+        aggregationsDs.addCollectionChangeListener(e -> {
+            if (e.getOperation() == CollectionDatasource.Operation.REMOVE) {
+                defaultAggregation.setOptionsDatasource(aggregationsDs);
             }
         });
     }
@@ -241,17 +270,17 @@ public class PivotTableEditFrame extends DescriptionEditFrame {
         propertyTable.addAction(createAction);
         propertiesCreateButton.addAction(createAction);
 
-        createAction = createPropertyCreateAction(PivotTablePropertyType.DETACHED);
+        createAction = createPropertyCreateAction(PivotTablePropertyType.DERIVED);
         propertyTable.addAction(createAction);
         propertiesCreateButton.addAction(createAction);
     }
 
     protected RemoveAction createPropertyRemoveAction() {
-        return new RemoveAction(propertyTable);
+        return RemoveAction.create(propertyTable);
     }
 
     protected EditAction createPropertyEditAction() {
-        EditAction action = new EditAction(propertyTable);
+        EditAction action = EditAction.create(propertyTable);
         action.setAfterCommitHandler(entity -> propertyTable.expandAll());
         return action;
     }

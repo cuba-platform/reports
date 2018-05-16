@@ -37,8 +37,8 @@ public class PivotTableProperty extends BaseUuidEntity {
 
     public void setName(String name) {
         this.name = name;
-        if (caption == null && StringUtils.isNotEmpty(name)) {
-            setCaption(name.replace('_', ' '));
+        if (StringUtils.isNotEmpty(name)) {
+            setCaption(StringUtils.capitalize(name.replace('_', ' ')));
         }
     }
 

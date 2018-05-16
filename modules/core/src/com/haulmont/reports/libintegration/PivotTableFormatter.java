@@ -37,6 +37,7 @@ public class PivotTableFormatter extends AbstractFormatter {
         if (childrenByName == null)
             return Collections.emptyList();
         return childrenByName.stream()
+                .filter(band -> band.getData() != null && !band.getData().isEmpty())
                 .map(band -> {
                     KeyValueEntity entity = new KeyValueEntity();
                     band.getData().forEach(entity::setValue);

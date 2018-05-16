@@ -8,8 +8,8 @@ package com.haulmont.reports.entity.pivottable;
 import com.haulmont.chile.core.datatypes.impl.EnumClass;
 
 public enum PivotTablePropertyType implements EnumClass<String> {
-    DETACHED("detached"),
     AGGREGATIONS("aggregations"),
+    DERIVED("derived"),
     COLUMNS("columns"),
     ROWS("rows");
 

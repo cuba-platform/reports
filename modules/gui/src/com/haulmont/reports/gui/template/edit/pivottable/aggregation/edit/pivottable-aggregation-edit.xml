@@ -5,7 +5,9 @@
 
 <window xmlns="http://schemas.haulmont.com/cuba/window.xsd"
         class="com.haulmont.reports.gui.template.edit.pivottable.aggregation.edit.PivotTableAggregationEdit"
-        messagesPack="com.haulmont.reports.gui" datasource="aggregationDs">
+        messagesPack="com.haulmont.reports.gui"
+        caption="msg://pivotTableAggregationEditor"
+        datasource="aggregationDs">
 
     <dsContext>
         <datasource id="aggregationDs" class="com.haulmont.reports.entity.pivottable.PivotTableAggregation"
@@ -24,11 +26,16 @@
                     <field property="mode"/>
                     <field property="caption"/>
                     <field id="function" property="function">
-                        <sourceCodeEditor property="function"
-                                          datasource="aggregationDs"
-                                          editable="true"
-                                          mode="JavaScript"
-                                          height="300px"/>
+                        <hbox expand="sourceCodeEditor">
+                            <sourceCodeEditor
+                                    id="sourceCodeEditor"
+                                    property="function"
+                                    datasource="aggregationDs"
+                                    editable="true"
+                                    mode="JavaScript"
+                                    height="300px"/>
+                            <linkButton id="functionHelp" icon="icons/question-white.png" invoke="getFunctionHelp"/>
+                        </hbox>
                     </field>
                 </column>
             </fieldGroup>

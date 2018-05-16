@@ -46,24 +46,25 @@
                     </fieldGroup>
                 </tab>
                 <tab id="aggregation" caption="msg://pivotTable.aggregationOptions" margin="true">
-                    <table id="aggregationsTable" width="100%" height="${height}" stylename="small">
+                    <table id="aggregationsTable" width="100%" height="${height}">
                         <actions>
                             <action id="create"/>
                             <action id="edit"/>
                             <action id="remove"/>
                         </actions>
                         <buttonsPanel>
-                            <button action="aggregationsTable.create" stylename="small"/>
-                            <button action="aggregationsTable.edit" stylename="small"/>
-                            <button action="aggregationsTable.remove" stylename="small"/>
-                            <lookupField optionsDatasource="aggregationsDs"
+                            <button action="aggregationsTable.create"/>
+                            <button action="aggregationsTable.edit"/>
+                            <button action="aggregationsTable.remove"/>
+                            <lookupField id="defaultAggregation"
+                                         optionsDatasource="aggregationsDs"
                                          inputPrompt="msg://pivotTable.defaultAggregation"
                                          datasource="pivotTableDs" property="defaultAggregation"
-                                         captionProperty="caption" stylename="small"/>
+                                         captionProperty="caption"/>
                         </buttonsPanel>
                         <columns>
+                            <column id="caption"/>
                             <column id="mode"/>
-                            <column id="caption" collapsed="true"/>
                             <column id="function" collapsed="true"/>
                         </columns>
                         <rows datasource="aggregationsDs"/>
@@ -71,19 +72,18 @@
                 </tab>
                 <tab id="properties" caption="msg://pivotTable.propertiesOptions" margin="true">
                     <groupTable id="propertyTable" width="100%" height="${height}"
-                                stylename="small"
                                 reorderingAllowed="false"
                                 fixedGrouping="true">
                         <buttonsPanel>
-                            <popupButton id="propertiesCreateButton" stylename="small"/>
-                            <button action="propertyTable.edit" stylename="small"/>
-                            <button action="propertyTable.remove" stylename="small"/>
+                            <popupButton id="propertiesCreateButton"/>
+                            <button action="propertyTable.edit"/>
+                            <button action="propertyTable.remove"/>
                         </buttonsPanel>
                         <columns>
                             <group>
                                 <column id="type"/>
                             </group>
-                            <column id="id" visible="false"/>
+                            <column id="name"/>
                             <column id="caption"/>
                         </columns>
                         <rows datasource="propertyDs"/>
@@ -95,11 +95,11 @@
                                   spacing="true">
                             <fieldGroup id="customFunctionsGroup" datasource="pivotTableDs" width="100%">
                                 <column fieldCaptionWidth="${tab-caption-width}" width="100%">
-                                    <field id="filterFunction" stylename="small">
+                                    <field id="filterFunction">
                                         <sourceCodeEditor mode="JavaScript" property="filterFunction"
                                                           datasource="pivotTableDs"/>
                                     </field>
-                                    <field id="sortersFunction" stylename="small">
+                                    <field id="sortersFunction">
                                         <sourceCodeEditor mode="JavaScript" property="sortersFunction"
                                                           datasource="pivotTableDs"/>
                                     </field>
@@ -110,8 +110,8 @@
                                   collapsable="true" collapsed="true" visible="false">
                             <fieldGroup id="customC3Group" datasource="pivotTableDs" width="100%">
                                 <column fieldCaptionWidth="${tab-caption-width}" width="100%">
-                                    <field property="c3Width" stylename="small"/>
-                                    <field property="c3Height" stylename="small"/>
+                                    <field property="c3Width"/>
+                                    <field property="c3Height"/>
                                 </column>
                             </fieldGroup>
                         </groupBox>
@@ -120,7 +120,7 @@
                                   collapsable="true" collapsed="true" visible="false">
                             <fieldGroup id="customHeatmapGroup" datasource="pivotTableDs" width="100%">
                                 <column fieldCaptionWidth="${tab-caption-width}" width="100%">
-                                    <field id="colorScaleGeneratorFunction" stylename="small">
+                                    <field id="colorScaleGeneratorFunction">
                                         <sourceCodeEditor mode="JavaScript" property="colorScaleGeneratorFunction"
                                                           height="200px" datasource="pivotTableDs"/>
                                     </field>
