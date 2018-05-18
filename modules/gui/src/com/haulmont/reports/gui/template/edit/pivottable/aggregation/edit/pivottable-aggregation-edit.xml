@@ -22,10 +22,10 @@
     <layout spacing="true" expand="editBox">
         <groupBox id="editBox" showAsPanel="true">
             <fieldGroup id="editGroup" datasource="aggregationDs" width="100%">
-                <column width="100%">
-                    <field property="mode"/>
-                    <field property="caption"/>
-                    <field id="function" property="function">
+                <column>
+                    <field property="mode" width="337px"/>
+                    <field property="caption" width="337px"/>
+                    <field id="function" property="function" width="355px">
                         <hbox expand="sourceCodeEditor">
                             <sourceCodeEditor
                                     id="sourceCodeEditor"

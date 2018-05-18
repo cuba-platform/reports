@@ -14,7 +14,7 @@
     </dsContext>
 
     <dialogMode height="AUTO"
-                width="600px"
+                width="AUTO"
                 resizable="true"
                 modal="true"/>
 
@@ -22,10 +22,10 @@
         <groupBox id="editBox" showAsPanel="true">
             <fieldGroup id="editGroup" datasource="propertyDs" width="100%">
                 <column width="100%">
-                    <field property="name"/>
-                    <field property="caption"/>
-                    <field property="type" required="true"/>
-                    <field id="function" property="function">
+                    <field property="name" width="337px"/>
+                    <field property="caption" width="337px"/>
+                    <field property="type" required="true" width="337px"/>
+                    <field id="function" property="function" width="355px">
                         <hbox expand="sourceCodeEditor">
                             <sourceCodeEditor id="sourceCodeEditor"
                                               property="function"

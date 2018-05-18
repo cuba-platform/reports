@@ -18,7 +18,7 @@ public enum RendererType implements EnumClass<String> {
     STACKED_BAR_CHART("stackedBarChart"),
     AREA_CHART("areaChart"),
     SCATTER_CHART("scatterChart"),
-    TREEMAP("treemap"),
+    //TREEMAP("treemap"),
     TSV_EXPORT("TSVExport");
 
     private String id;

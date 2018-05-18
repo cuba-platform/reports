@@ -60,7 +60,8 @@
                                          optionsDatasource="aggregationsDs"
                                          inputPrompt="msg://pivotTable.defaultAggregation"
                                          datasource="pivotTableDs" property="defaultAggregation"
-                                         captionProperty="caption"/>
+                                         captionProperty="caption"
+                                         width="220px"/>
                         </buttonsPanel>
                         <columns>
                             <column id="caption"/>
