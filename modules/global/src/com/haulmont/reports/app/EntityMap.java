@@ -167,7 +167,12 @@ public class EntityMap implements Map<String, Object> {
                     return ((Instance) value).getInstanceName();
                 }
             } else {
-                return instance.getInstanceName();
+                try {
+                    return instance.getInstanceName();
+                } catch (Exception e) {
+                    log.trace("Suppressed error from underlying EntityMap instance.getInstanceName", e);
+                    return null;
+                }
             }
         }
 
