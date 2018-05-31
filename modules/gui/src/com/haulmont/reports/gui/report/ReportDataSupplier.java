@@ -8,6 +8,7 @@ package com.haulmont.reports.gui.report;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.CommitContext;
+import com.haulmont.cuba.core.global.EntitySet;
 import com.haulmont.cuba.gui.data.impl.GenericDataSupplier;
 import com.haulmont.reports.app.service.ReportService;
 import com.haulmont.reports.entity.Report;
@@ -18,7 +19,7 @@ import java.util.Set;
 
 public class ReportDataSupplier extends GenericDataSupplier {
     @Override
-    public Set<Entity> commit(CommitContext context) {
+    public EntitySet commit(CommitContext context) {
         Set<Entity> result = new HashSet<>();
         ReportService reportService = AppBeans.get(ReportService.NAME, ReportService.class);
         Report reportToStore = null;
@@ -34,6 +35,6 @@ public class ReportDataSupplier extends GenericDataSupplier {
             result.add(reportService.storeReportEntity(reportToStore));
         }
 
-        return result;
+        return EntitySet.of(result);
     }
 }
