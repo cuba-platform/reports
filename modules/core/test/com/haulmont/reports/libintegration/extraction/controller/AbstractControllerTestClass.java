@@ -26,7 +26,7 @@ import java.net.URISyntaxException;
 import java.util.*;
 
 @Ignore
-public abstract class AbstractControllerTest {
+public abstract class AbstractControllerTestClass {
 
     @Inject
     protected ReportService reportService;

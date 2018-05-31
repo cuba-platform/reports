@@ -19,7 +19,7 @@ import java.util.Arrays;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @BootstrapWith(ReportsContextBootstrapper.class)
-public class CrosstabControllerTest extends AbstractControllerTest {
+public class CrosstabControllerTest extends AbstractControllerTestClass {
 
     @Before
     public void construct() throws SQLException {

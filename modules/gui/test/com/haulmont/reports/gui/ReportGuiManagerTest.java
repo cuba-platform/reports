@@ -11,7 +11,7 @@ import com.haulmont.reports.entity.ParameterType;
 import com.haulmont.reports.entity.ReportInputParameter;
 import junit.framework.Assert;
 import mockit.Mocked;
-import mockit.NonStrictExpectations;
+import mockit.Expectations;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -31,9 +31,9 @@ public class ReportGuiManagerTest {
         final List<String> collection = Arrays.asList(data1, data2, data3);
         final List<String> collection1 = Arrays.asList(data1);
 
-        new NonStrictExpectations() {
+        new Expectations() {
             {
-                reportService.loadDataForParameterPrototype((ParameterPrototype) any); result = collection;
+                reportService.loadDataForParameterPrototype((ParameterPrototype) any); result = collection; minTimes = 0;
             }
         };
 

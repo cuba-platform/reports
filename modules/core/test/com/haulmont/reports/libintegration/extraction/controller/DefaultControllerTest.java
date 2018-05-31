@@ -18,7 +18,7 @@ import java.sql.SQLException;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @BootstrapWith(ReportsContextBootstrapper.class)
-public class DefaultControllerTest extends AbstractControllerTest {
+public class DefaultControllerTest extends AbstractControllerTestClass {
 
     @Before
     public void construct() throws SQLException {
