@@ -12,7 +12,7 @@ import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.reports.entity.charts.AbstractChartDescription;
 import com.haulmont.reports.entity.pivottable.PivotTableDescription;
 import com.haulmont.yarg.formatters.CustomReport;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nullable;
 import javax.persistence.*;

@@ -14,7 +14,6 @@ import com.haulmont.cuba.core.global.filter.*;
 import com.haulmont.cuba.gui.WindowManager.OpenType;
 import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.components.Action.Status;
-import com.haulmont.cuba.gui.components.Component.ValueChangeListener;
 import com.haulmont.cuba.gui.components.DialogAction.Type;
 import com.haulmont.cuba.gui.components.filter.ConditionsTree;
 import com.haulmont.cuba.gui.components.filter.FakeFilterSupport;
@@ -32,7 +31,7 @@ import com.haulmont.reports.entity.wizard.TemplateFileType;
 import com.haulmont.reports.gui.report.run.ParameterClassResolver;
 import com.haulmont.reports.gui.report.run.ShowChartController;
 import com.haulmont.reports.gui.report.wizard.step.StepFrame;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Element;
 
 import java.util.*;
@@ -70,7 +69,7 @@ public class DetailsStepFrame extends StepFrame {
                             wizard.getItem().getReportRegions().clear();
                             wizard.regionsTable.refresh(); //for web6
                             wizard.needUpdateEntityModel = true;
-                            wizard.entity.setValue(newValue);
+                            wizard.entity.setValue((MetaClass) newValue);
 
                             clearQueryAndFilter();
                         }
@@ -105,9 +104,9 @@ public class DetailsStepFrame extends StepFrame {
             return result;
         }
 
-        protected Map<String, Object> getAvailableTemplateFormats() {
+        protected Map<String, TemplateFileType> getAvailableTemplateFormats() {
             Messages messages = AppBeans.get(Messages.NAME);
-            Map<String, Object> result = new LinkedHashMap<>(4);
+            Map<String, TemplateFileType> result = new LinkedHashMap<>(4);
             result.put(messages.getMessage(TemplateFileType.XLSX), TemplateFileType.XLSX);
             result.put(messages.getMessage(TemplateFileType.DOCX), TemplateFileType.DOCX);
             result.put(messages.getMessage(TemplateFileType.HTML), TemplateFileType.HTML);
@@ -119,8 +118,8 @@ public class DetailsStepFrame extends StepFrame {
             return result;
         }
 
-        protected Map<String, Object> getAvailableEntities() {
-            Map<String, Object> result = new TreeMap<>(String::compareTo);
+        protected Map<String, MetaClass> getAvailableEntities() {
+            Map<String, MetaClass> result = new TreeMap<>(String::compareTo);
             Collection<MetaClass> classes = wizard.metadataTools.getAllPersistentMetaClasses();
             for (MetaClass metaClass : classes) {
                 MetaClass effectiveMetaClass = wizard.metadata.getExtendedEntities().getEffectiveMetaClass(metaClass);
@@ -143,13 +142,13 @@ public class DetailsStepFrame extends StepFrame {
         return errors;
     }
 
-    protected class ChangeReportNameListener implements ValueChangeListener {
+    protected class ChangeReportNameListener implements HasValue.ValueChangeListener {
 
         public ChangeReportNameListener() {
         }
 
         @Override
-        public void valueChanged(Component.ValueChangeEvent e) {
+        public void valueChanged(HasValue.ValueChangeEvent e) {
             setGeneratedReportName((MetaClass) e.getPrevValue(), (MetaClass) e.getValue());
             wizard.outputFileName.setValue("");
         }
@@ -354,7 +353,7 @@ public class DetailsStepFrame extends StepFrame {
         }
     }
 
-    protected class ClearRegionListener implements Component.ValueChangeListener {
+    protected class ClearRegionListener implements HasValue.ValueChangeListener {
         protected DialogActionWithChangedValue okAction;
 
         public ClearRegionListener(DialogActionWithChangedValue okAction) {
@@ -362,7 +361,7 @@ public class DetailsStepFrame extends StepFrame {
         }
 
         @Override
-        public void valueChanged(Component.ValueChangeEvent e) {
+        public void valueChanged(HasValue.ValueChangeEvent e) {
             if (!wizard.getItem().getReportRegions().isEmpty()) {
                 wizard.showOptionDialog(
                         wizard.getMessage("dialogs.Confirmation"),

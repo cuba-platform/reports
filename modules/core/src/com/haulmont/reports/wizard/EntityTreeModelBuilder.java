@@ -12,7 +12,7 @@ import com.haulmont.reports.ReportingConfig;
 import com.haulmont.reports.app.EntityTree;
 import com.haulmont.reports.app.EntityTreeStructureInfo;
 import com.haulmont.reports.entity.wizard.EntityTreeNode;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Scope;
 
 import org.springframework.stereotype.Component;

@@ -17,7 +17,7 @@ import com.haulmont.reports.exception.ReportParametersValidationException;
 import com.haulmont.reports.gui.ReportGuiManager;
 import com.haulmont.reports.gui.ReportParameterValidator;
 import com.haulmont.reports.gui.ReportPrintHelper;
-import org.apache.commons.lang.BooleanUtils;
+import org.apache.commons.lang3.BooleanUtils;
 
 import javax.inject.Inject;
 import java.util.Collection;
@@ -62,7 +62,7 @@ public class InputParametersWindow extends AbstractWindow {
     protected HBoxLayout templatesBox;
 
     @Inject
-    protected LookupField templateField;
+    protected LookupField<ReportTemplate> templateField;
 
     @Inject
     protected CollectionDatasource<ReportTemplate, UUID> templateReportsDs;
@@ -71,7 +71,7 @@ public class InputParametersWindow extends AbstractWindow {
     protected HBoxLayout outputTypeBox;
 
     @Inject
-    protected LookupField outputTypeField;
+    protected LookupField<ReportOutputType> outputTypeField;
 
     @Inject
     protected ReportParameterValidator reportParameterValidator;

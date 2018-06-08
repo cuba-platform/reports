@@ -11,7 +11,7 @@ import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.reports.entity.wizard.RegionProperty;
 import com.haulmont.reports.entity.wizard.ReportData;
 import com.haulmont.reports.entity.wizard.ReportRegion;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

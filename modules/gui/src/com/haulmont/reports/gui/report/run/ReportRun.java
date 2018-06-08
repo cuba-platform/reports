@@ -15,11 +15,11 @@ import com.haulmont.reports.app.service.ReportService;
 import com.haulmont.reports.entity.Report;
 import com.haulmont.reports.entity.ReportGroup;
 import com.haulmont.reports.gui.ReportGuiManager;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.inject.Inject;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ReportRun extends AbstractLookup {
 
@@ -40,16 +40,16 @@ public class ReportRun extends AbstractLookup {
     protected UserSessionSource userSessionSource;
 
     @Inject
-    protected TextField nameFilter;
+    protected TextField<String> nameFilter;
 
     @Inject
-    protected TextField codeFilter;
+    protected TextField<String> codeFilter;
 
     @Inject
-    protected LookupField groupFilter;
+    protected LookupField<ReportGroup> groupFilter;
 
     @Inject
-    protected DateField updatedDateFilter;
+    protected DateField<Date> updatedDateFilter;
 
     @Inject
     protected GridLayout gridFilter;
@@ -107,41 +107,36 @@ public class ReportRun extends AbstractLookup {
         ReportGroup groupFilterValue = groupFilter.getValue();
         Date dateFilterValue = updatedDateFilter.getValue();
 
-        List<Report> reports = new ArrayList<>(
+        List<Report> reports =
                 reportGuiManager.getAvailableReports(screenParameter, userSessionSource.getUserSession().getUser(), null)
-        );
+                        .stream()
+                        .filter(report -> {
+                            if (nameFilterValue != null
+                                    && !report.getName().toLowerCase().contains(nameFilterValue)) {
+                                return false;
+                            }
 
-        CollectionUtils.filter(reports, new org.apache.commons.collections4.Predicate() {
-            @Override
-            public boolean evaluate(Object object) {
-                Report report = (Report) object;
+                            if (codeFilterValue != null) {
+                                if (report.getCode() == null
+                                        || (report.getCode() != null
+                                        && !report.getCode().toLowerCase().contains(codeFilterValue))) {
+                                    return false;
+                                }
+                            }
 
-                if (nameFilterValue != null
-                        && !report.getName().toLowerCase().contains(nameFilterValue)) {
-                    return false;
-                }
+                            if (groupFilterValue != null && !Objects.equals(report.getGroup(), groupFilterValue)) {
+                                return false;
+                            }
 
-                if (codeFilterValue != null) {
-                    if (report.getCode() == null
-                            || (report.getCode() != null
-                            && !report.getCode().toLowerCase().contains(codeFilterValue))) {
-                        return false;
-                    }
-                }
+                            if (dateFilterValue != null
+                                    && report.getUpdateTs() != null
+                                    && !report.getUpdateTs().after(dateFilterValue)) {
+                                return false;
+                            }
 
-                if (groupFilterValue != null && !Objects.equals(report.getGroup(), groupFilterValue)) {
-                    return false;
-                }
-
-                if (dateFilterValue != null
-                        && report.getUpdateTs() != null
-                        && !report.getUpdateTs().after(dateFilterValue)) {
-                    return false;
-                }
-
-                return true;
-            }
-        });
+                            return true;
+                        })
+                        .collect(Collectors.toList());
 
         reportDs.clear();
         for (Report report : reports) {

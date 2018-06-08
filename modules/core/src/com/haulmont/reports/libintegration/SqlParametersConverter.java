@@ -12,7 +12,7 @@ import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.entity.IdProxy;
 import com.haulmont.yarg.loaders.ReportParametersConverter;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 
 import javax.inject.Inject;
 import java.util.ArrayList;

@@ -11,13 +11,12 @@ import com.haulmont.cuba.gui.components.Button;
 import com.haulmont.cuba.gui.components.Table;
 import com.haulmont.cuba.gui.components.Tree;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
-import com.haulmont.cuba.web.gui.components.WebComponentsHelper;
 import com.haulmont.cuba.web.gui.data.ItemWrapper;
-import com.haulmont.cuba.web.toolkit.ui.CubaTree;
+import com.haulmont.cuba.web.widgets.CubaTree;
 import com.haulmont.reports.entity.wizard.EntityTreeNode;
 import com.haulmont.reports.entity.wizard.RegionProperty;
 import com.haulmont.reports.gui.report.wizard.region.RegionEditor;
-import com.vaadin.event.ItemClickEvent;
+import com.vaadin.v7.event.ItemClickEvent;
 import org.springframework.cglib.core.CollectionUtils;
 import org.springframework.cglib.core.Transformer;
 
@@ -26,43 +25,40 @@ import java.util.UUID;
 public class WebRegionEditorCompanion implements RegionEditor.Companion {
     @Override
     public void addTreeTableDblClickListener(final Tree entityTree, final CollectionDatasource<RegionProperty, UUID> reportRegionPropertiesTableDs) {
-        final CubaTree webTree = entityTree.unwrap(CubaTree.class);
+        CubaTree webTree = entityTree.unwrap(CubaTree.class);
         webTree.setDoubleClickMode(true);
-        webTree.addItemClickListener(new ItemClickEvent.ItemClickListener() {
-            @Override
-            public void itemClick(ItemClickEvent event) {
-                if (event.isDoubleClick()) {
-                    if (event.getItem() instanceof ItemWrapper
-                            && ((ItemWrapper) event.getItem()).getItem() instanceof EntityTreeNode) {
-                        EntityTreeNode entityTreeNode = (EntityTreeNode) ((ItemWrapper) event.getItem()).getItem();
-                        if (entityTreeNode.getWrappedMetaClass() != null) {
-                            if (webTree.isExpanded(entityTreeNode.getId()))
-                                webTree.collapseItem(entityTreeNode.getId());
-                            else
-                                webTree.expandItem(entityTreeNode.getId());
-                            return;
+        webTree.addItemClickListener(event -> {
+            if (event.isDoubleClick()) {
+                if (event.getItem() instanceof ItemWrapper
+                        && ((ItemWrapper) event.getItem()).getItem() instanceof EntityTreeNode) {
+                    EntityTreeNode entityTreeNode = (EntityTreeNode) ((ItemWrapper) event.getItem()).getItem();
+                    if (entityTreeNode.getWrappedMetaClass() != null) {
+                        if (webTree.isExpanded(entityTreeNode.getId()))
+                            webTree.collapseItem(entityTreeNode.getId());
+                        else
+                            webTree.expandItem(entityTreeNode.getId());
+                        return;
+                    }
+                    if (CollectionUtils.transform(reportRegionPropertiesTableDs.getItems(), new Transformer() {
+                        @Override
+                        public Object transform(Object o) {
+                            return ((RegionProperty) o).getEntityTreeNode();
                         }
-                        if (CollectionUtils.transform(reportRegionPropertiesTableDs.getItems(), new Transformer() {
-                            @Override
-                            public Object transform(Object o) {
-                                return ((RegionProperty) o).getEntityTreeNode();
-                            }
-                        }).contains(entityTreeNode)) {
-                            return;
-                        }
-                        Metadata metadata = AppBeans.get(Metadata.NAME);
-                        RegionProperty regionProperty = metadata.create(RegionProperty.class);
-                        regionProperty.setEntityTreeNode(entityTreeNode);
-                        regionProperty.setOrderNum((long) reportRegionPropertiesTableDs.getItemIds().size() + 1);
-                        //first element must be not zero cause later we do sorting by multiplying that values
-                        reportRegionPropertiesTableDs.addItem(regionProperty);
+                    }).contains(entityTreeNode)) {
+                        return;
+                    }
+                    Metadata metadata = AppBeans.get(Metadata.NAME);
+                    RegionProperty regionProperty = metadata.create(RegionProperty.class);
+                    regionProperty.setEntityTreeNode(entityTreeNode);
+                    regionProperty.setOrderNum((long) reportRegionPropertiesTableDs.getItemIds().size() + 1);
+                    //first element must be not zero cause later we do sorting by multiplying that values
+                    reportRegionPropertiesTableDs.addItem(regionProperty);
 
-                        Table propertiesTable = (Table) entityTree.getFrame().getComponent("propertiesTable");
-                        if (propertiesTable != null) {
-                            propertiesTable.setSelected(regionProperty);
+                    Table propertiesTable = (Table) entityTree.getFrame().getComponent("propertiesTable");
+                    if (propertiesTable != null) {
+                        propertiesTable.setSelected(regionProperty);
 
-                            (propertiesTable.unwrap(com.vaadin.ui.Table.class)).setCurrentPageFirstItemId(regionProperty.getId());
-                        }
+                        (propertiesTable.unwrap(com.vaadin.v7.ui.Table.class)).setCurrentPageFirstItemId(regionProperty.getId());
                     }
                 }
             }
@@ -72,7 +68,7 @@ public class WebRegionEditorCompanion implements RegionEditor.Companion {
     @Override
     public void initControlBtnsActions(Button button, final Table table) {
         button.unwrap(com.vaadin.ui.Button.class).addClickListener((com.vaadin.ui.Button.ClickListener) event -> {
-            com.vaadin.ui.Table vaadinTable = table.unwrap(com.vaadin.ui.Table.class);
+            com.vaadin.v7.ui.Table vaadinTable = table.unwrap(com.vaadin.v7.ui.Table.class);
             vaadinTable.setCurrentPageFirstItemId(vaadinTable.lastItemId());
             vaadinTable.refreshRowCache();
         });

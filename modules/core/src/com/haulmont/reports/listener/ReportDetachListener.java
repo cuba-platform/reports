@@ -10,7 +10,7 @@ import com.haulmont.cuba.core.listener.BeforeDetachEntityListener;
 import com.haulmont.reports.ReportingApi;
 import com.haulmont.reports.entity.*;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import org.springframework.stereotype.Component;
 import javax.inject.Inject;

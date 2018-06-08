@@ -11,7 +11,7 @@ import com.haulmont.reports.entity.Report;
 import com.haulmont.reports.entity.ReportInputParameter;
 import com.haulmont.reports.exception.ReportParametersValidationException;
 import com.haulmont.reports.exception.ReportingException;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.codehaus.groovy.runtime.MethodClosure;
 import org.springframework.stereotype.Component;
 

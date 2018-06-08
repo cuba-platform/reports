@@ -22,7 +22,7 @@ import com.haulmont.reports.gui.report.run.ShowChartController;
 import com.haulmont.reports.gui.report.run.ShowPivotTableController;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.inject.Inject;
 import java.io.ByteArrayInputStream;
@@ -61,7 +61,7 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
     protected Label alterableLabel;
 
     @Inject
-    protected LookupField outputType;
+    protected LookupField<ReportOutputType> outputType;
 
     @Inject
     protected TextField outputNamePattern;

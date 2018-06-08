@@ -14,7 +14,7 @@ import com.haulmont.reports.app.service.ReportService
 import com.haulmont.reports.entity.BandDefinition
 import com.haulmont.reports.entity.Report
 import com.haulmont.reports.entity.ReportTemplate
-import org.apache.commons.lang.StringUtils
+import org.apache.commons.lang3.StringUtils
 import org.mybatis.spring.SqlSessionFactoryBean
 import org.mybatis.spring.SqlSessionTemplate
 import org.springframework.core.io.ByteArrayResource

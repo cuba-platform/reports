@@ -5,7 +5,7 @@
 package com.haulmont.reports.entity;
 
 import com.haulmont.chile.core.datatypes.impl.EnumClass;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nullable;
 

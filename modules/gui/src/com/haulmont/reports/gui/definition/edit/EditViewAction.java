@@ -18,7 +18,7 @@ import com.haulmont.reports.app.EntityTree;
 import com.haulmont.reports.entity.DataSet;
 import com.haulmont.reports.entity.DataSetType;
 import com.haulmont.reports.entity.wizard.ReportRegion;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Collections;
 import java.util.HashMap;

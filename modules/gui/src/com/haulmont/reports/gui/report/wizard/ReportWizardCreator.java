@@ -27,7 +27,7 @@ import com.haulmont.reports.gui.ReportGuiManager;
 import com.haulmont.reports.gui.report.wizard.step.MainWizardFrame;
 import com.haulmont.reports.gui.report.wizard.step.StepFrame;
 import com.haulmont.reports.gui.report.wizard.step.StepFrameManager;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -64,9 +64,9 @@ public class ReportWizardCreator extends AbstractWindow implements MainWizardFra
     protected Button setQueryButton;
 
     protected OptionsGroup reportTypeOptionGroup;//this and following are set during creation
-    protected LookupField templateFileFormat;
-    protected LookupField entity;
-    protected TextField reportName;
+    protected LookupField<TemplateFileType> templateFileFormat;
+    protected LookupField<MetaClass> entity;
+    protected TextField<String> reportName;
 
     @Named("regionsStep.addRegionDisabledBtn")
     protected Button addRegionDisabledBtn;
@@ -90,9 +90,9 @@ public class ReportWizardCreator extends AbstractWindow implements MainWizardFra
     protected BoxLayout buttonsBox;
 
     @Named("saveStep.outputFileFormat")
-    protected LookupField outputFileFormat;
+    protected LookupField<ReportOutputType> outputFileFormat;
     @Named("saveStep.outputFileName")
-    protected TextField outputFileName;
+    protected TextField<String> outputFileName;
     @Named("saveStep.downloadTemplateFile")
     protected Button downloadTemplateFile;
     @Named("saveStep.diagramTypeLabel")
@@ -361,7 +361,7 @@ public class ReportWizardCreator extends AbstractWindow implements MainWizardFra
             //lets generate output report in same format as the template
             reportData.setOutputFileType(outputFileFormat.getValue());
         }
-        reportData.setReportType(reportTypeOptionGroup.getValue());
+        reportData.setReportType((ReportData.ReportType) reportTypeOptionGroup.getValue());
         groupsDs.refresh();
         if (groupsDs.getItemIds() != null) {
             UUID id = groupsDs.getItemIds().iterator().next();
@@ -377,7 +377,7 @@ public class ReportWizardCreator extends AbstractWindow implements MainWizardFra
             return null;
         }
         reportData.setTemplateFileType(templateFileFormat.getValue());
-        reportData.setOutputNamePattern(outputFileName.<String>getValue());
+        reportData.setOutputNamePattern(outputFileName.getValue());
 
         if (query != null) {
             reportData.setQuery(query);
@@ -429,7 +429,7 @@ public class ReportWizardCreator extends AbstractWindow implements MainWizardFra
     protected void setCorrectReportOutputType() {
         ReportOutputType outputFileFormatPrevValue = outputFileFormat.getValue();
         outputFileFormat.setValue(null);
-        Map<String, Object> optionsMap = refreshOutputAvailableFormats(templateFileFormat.getValue());
+        Map<String, ReportOutputType> optionsMap = refreshOutputAvailableFormats(templateFileFormat.getValue());
         outputFileFormat.setOptionsMap(optionsMap);
 
         if (outputFileFormatPrevValue != null) {
@@ -446,33 +446,33 @@ public class ReportWizardCreator extends AbstractWindow implements MainWizardFra
         }
     }
 
-    protected Map<String, Object> refreshOutputAvailableFormats(TemplateFileType templateFileType) {
+    protected Map<String, ReportOutputType> refreshOutputAvailableFormats(TemplateFileType templateFileType) {
         return availableOutputFormats.get(templateFileType);
     }
 
-    protected Map<TemplateFileType, Map<String, Object>> availableOutputFormats;
+    protected Map<TemplateFileType, Map<String, ReportOutputType>> availableOutputFormats;
 
     private void initAvailableFormats() {
-        availableOutputFormats = new ImmutableMap.Builder<TemplateFileType, Map<String, Object>>()
-                .put(TemplateFileType.DOCX, new ImmutableMap.Builder<String, Object>()
+        availableOutputFormats = new ImmutableMap.Builder<TemplateFileType, Map<String, ReportOutputType>>()
+                .put(TemplateFileType.DOCX, new ImmutableMap.Builder<String, ReportOutputType>()
                         .put(messages.getMessage(ReportOutputType.DOCX), ReportOutputType.DOCX)
                         .put(messages.getMessage(ReportOutputType.HTML), ReportOutputType.HTML)
                         .put(messages.getMessage(ReportOutputType.PDF), ReportOutputType.PDF)
                         .build())
-                .put(TemplateFileType.XLSX, new ImmutableMap.Builder<String, Object>()
+                .put(TemplateFileType.XLSX, new ImmutableMap.Builder<String, ReportOutputType>()
                         .put(messages.getMessage(ReportOutputType.XLSX), ReportOutputType.XLSX)
                         .put(messages.getMessage(ReportOutputType.HTML), ReportOutputType.HTML)
                         .put(messages.getMessage(ReportOutputType.PDF), ReportOutputType.PDF)
                         .put(messages.getMessage(ReportOutputType.CSV), ReportOutputType.CSV)
                         .build())
-                .put(TemplateFileType.HTML, new ImmutableMap.Builder<String, Object>()
+                .put(TemplateFileType.HTML, new ImmutableMap.Builder<String, ReportOutputType>()
                         .put(messages.getMessage(ReportOutputType.HTML), ReportOutputType.HTML)
                         .put(messages.getMessage(ReportOutputType.PDF), ReportOutputType.PDF)
                         .build())
-                .put(TemplateFileType.CHART, new ImmutableMap.Builder<String, Object>()
+                .put(TemplateFileType.CHART, new ImmutableMap.Builder<String, ReportOutputType>()
                         .put(messages.getMessage(ReportOutputType.CHART), ReportOutputType.CHART)
                         .build())
-                .put(TemplateFileType.CSV, new ImmutableMap.Builder<String, Object>()
+                .put(TemplateFileType.CSV, new ImmutableMap.Builder<String, ReportOutputType>()
                         .put(messages.getMessage(ReportOutputType.CSV), ReportOutputType.CSV)
                         .build())
                 .build();

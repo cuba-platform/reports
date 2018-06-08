@@ -10,8 +10,8 @@ import com.haulmont.bali.datastruct.Tree;
 import com.haulmont.cuba.gui.components.TextField;
 import com.haulmont.cuba.gui.data.impl.AbstractTreeDatasource;
 import com.haulmont.reports.entity.wizard.EntityTreeNode;
-import org.apache.commons.lang.BooleanUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.text.Collator;
 import java.util.*;
@@ -39,7 +39,7 @@ public class EntityTreeNodeDs extends AbstractTreeDatasource<EntityTreeNode, UUI
 
         Tree<EntityTreeNode> resultTree = new Tree<>();
 
-        TextField reportPropertyField = (TextField) params.get("component$reportPropertyName");
+        TextField<String> reportPropertyField = (TextField) params.get("component$reportPropertyName");
         String searchValue = StringUtils.defaultIfBlank(reportPropertyField.getValue(), "").toLowerCase().trim();
         if (params.get("rootEntity") != null) {
             EntityTreeNode rootNodeObject = (EntityTreeNode) params.get("rootEntity");

@@ -10,7 +10,7 @@ import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.reports.app.EntityMap;
 import com.haulmont.reports.entity.charts.serialization.DateSerializer;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nullable;
 import java.util.*;

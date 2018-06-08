@@ -10,3 +10,7 @@ modules/global/build/*
 modules/gui/build/*
 modules/web/build/*
 modules/desktop/build/*
+
+.idea/
+build/
+classes/

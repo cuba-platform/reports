@@ -31,8 +31,8 @@ import com.haulmont.reports.gui.report.run.ShowPivotTableController;
 import com.haulmont.reports.gui.report.run.ShowReportTable;
 import com.haulmont.yarg.reporting.ReportOutputDocument;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang.BooleanUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Nullable;
@@ -44,7 +44,7 @@ import java.util.concurrent.TimeUnit;
 import static com.haulmont.reports.gui.report.run.InputParametersFrame.PARAMETERS_PARAMETER;
 import static com.haulmont.reports.gui.report.run.InputParametersFrame.REPORT_PARAMETER;
 import static com.haulmont.reports.gui.report.run.InputParametersWindow.*;
-import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 @Component("cuba_ReportGuiManager")
 public class ReportGuiManager {

@@ -42,8 +42,8 @@ import com.haulmont.reports.gui.definition.edit.BandDefinitionEditor;
 import com.haulmont.yarg.structure.BandOrientation;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.BooleanUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -60,7 +60,7 @@ public class ReportEditor extends AbstractEditor<Report> {
     protected BandDefinitionEditor bandEditor;
 
     @Named("securityFrame.screenIdLookup")
-    protected LookupField screenIdLookup;
+    protected LookupField<String> screenIdLookup;
 
     @Named("securityFrame.screenTable")
     protected Table screenTable;
@@ -375,7 +375,7 @@ public class ReportEditor extends AbstractEditor<Report> {
         // sort by screenId
         screensHelper.sortWindowInfos(windowInfoCollection);
 
-        Map<String, Object> screens = new LinkedHashMap<>();
+        Map<String, String> screens = new LinkedHashMap<>();
         for (WindowInfo windowInfo : windowInfoCollection) {
             String id = windowInfo.getId();
             String menuId = "menu-config." + id;

@@ -8,7 +8,7 @@ package com.haulmont.reports.gui.template.edit.generator;
 import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.reports.entity.charts.*;
-import org.apache.commons.lang.math.RandomUtils;
+import org.apache.commons.lang3.RandomUtils;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -39,8 +39,8 @@ public class RandomChartDataGenerator {
                 for (ChartSeries chartSeries : chartDescription.getSeries()) {
                     String valueField = chartSeries.getValueField();
                     String colorField = chartSeries.getColorField();
-                    map.put(valueField, Math.abs(RandomUtils.nextInt(100)));
-                    map.put(colorField, COLORS.get(RandomUtils.nextInt(6)));
+                    map.put(valueField, Math.abs(RandomUtils.nextInt(0, 100)));
+                    map.put(colorField, COLORS.get(RandomUtils.nextInt(0, 6)));
                 }
             }
         } else if (ChartType.PIE == abstractChartDescription.getType()) {
@@ -55,8 +55,8 @@ public class RandomChartDataGenerator {
                 data.add(map);
 
                 map.put(titleField, messages.getMessage(getClass(), "caption.category") + i);
-                map.put(valueField, Math.abs(RandomUtils.nextInt(100)));
-                map.put(colorField, COLORS.get(RandomUtils.nextInt(6)));
+                map.put(valueField, Math.abs(RandomUtils.nextInt(0, 100)));
+                map.put(colorField, COLORS.get(RandomUtils.nextInt(0, 6)));
             }
         }
 

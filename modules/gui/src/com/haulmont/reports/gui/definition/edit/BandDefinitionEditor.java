@@ -25,7 +25,7 @@ import com.haulmont.reports.entity.*;
 import com.haulmont.reports.gui.definition.edit.crosstab.CrossTabTableDecorator;
 import com.haulmont.reports.gui.definition.edit.scripteditordialog.ScriptEditorDialog;
 import com.haulmont.reports.util.DataSetFactory;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;

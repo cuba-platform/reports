@@ -16,7 +16,7 @@ import com.haulmont.yarg.loaders.ReportDataLoader;
 import com.haulmont.yarg.loaders.impl.AbstractDbDataLoader;
 import com.haulmont.yarg.structure.BandData;
 import com.haulmont.yarg.structure.ReportQuery;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.inject.Inject;
 import java.util.ArrayList;

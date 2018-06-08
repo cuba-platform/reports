@@ -11,7 +11,7 @@ import com.haulmont.reports.entity.DataSet;
 import com.haulmont.yarg.structure.BandData;
 import com.haulmont.yarg.structure.ProxyWrapper;
 import com.haulmont.yarg.structure.ReportQuery;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;

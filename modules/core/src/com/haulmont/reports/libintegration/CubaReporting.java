@@ -18,9 +18,9 @@ import com.haulmont.yarg.exception.ReportingException;
 import com.haulmont.yarg.reporting.Reporting;
 import com.haulmont.yarg.structure.*;
 import com.haulmont.yarg.util.groovy.Scripting;
-import org.apache.commons.lang.BooleanUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import java.util.HashMap;
 import java.util.Map;

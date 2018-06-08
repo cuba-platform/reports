@@ -279,6 +279,8 @@ configure(desktopModule) {
         compile(guiModule)
         compile(group: 'com.haulmont.cuba', name: 'cuba-desktop', version: baseVersion)
     }
+
+    compileJava.enabled = false
 }
 
 task aggregateJavadoc(type: Javadoc,

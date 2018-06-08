@@ -10,7 +10,7 @@ import com.haulmont.reports.entity.wizard.RegionProperty;
 import com.haulmont.reports.entity.wizard.ReportData;
 import com.haulmont.reports.entity.wizard.ReportRegion;
 import com.haulmont.reports.entity.wizard.TemplateFileType;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;

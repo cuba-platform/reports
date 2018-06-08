@@ -10,7 +10,7 @@ import com.haulmont.cuba.core.global.Configuration;
 import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.data.impl.AbstractTreeDatasource;
 import com.haulmont.reports.entity.wizard.EntityTreeNode;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -23,7 +23,7 @@ public class EntityTreeLookup extends AbstractLookup {
     @Named("entityTreeFrame.entityTree")
     protected Tree entityTree;
     @Named("entityTreeFrame.reportPropertyName")
-    protected TextField reportPropertyName;
+    protected TextField<String> reportPropertyName;
     @Named("entityTreeFrame.reportPropertyNameSearchButton")
     protected Button reportPropertyNameSearchButton;
 

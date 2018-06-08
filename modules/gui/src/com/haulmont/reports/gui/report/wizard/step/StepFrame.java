@@ -7,12 +7,9 @@ package com.haulmont.reports.gui.report.wizard.step;
 
 import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.Messages;
-import com.haulmont.cuba.gui.components.Component;
-import com.haulmont.cuba.gui.components.Field;
-import com.haulmont.cuba.gui.components.Frame;
-import com.haulmont.cuba.gui.components.ValidationException;
+import com.haulmont.cuba.gui.components.*;
 import com.haulmont.reports.gui.report.wizard.ReportWizardCreator;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -159,8 +156,8 @@ public class StepFrame {
         public List<String> validateAllComponents() {
             List<String> errors = new ArrayList<>();
             for (Component c : frame.getComponents()) {
-                if (c instanceof Component.Validatable) {
-                    Component.Validatable validatable = (Component.Validatable) c;
+                if (c instanceof Validatable) {
+                    Validatable validatable = (Validatable) c;
                     try {
                         validatable.validate();
                     } catch (ValidationException e) {
