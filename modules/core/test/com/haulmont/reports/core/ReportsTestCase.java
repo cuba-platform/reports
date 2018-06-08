@@ -5,7 +5,7 @@
 
 package com.haulmont.reports.core;
 
-import com.haulmont.cuba.core.CubaTestCase;
+import com.haulmont.cuba.testsupport.CubaTestCase;
 import com.haulmont.cuba.testsupport.TestContext;
 import com.haulmont.cuba.testsupport.TestDataSource;
 
