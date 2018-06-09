@@ -71,11 +71,8 @@ public class InputParametersFrame extends AbstractFrame {
                     if (bulkPrint && Objects.equals(inputParameter, parameter)) {
                         continue;
                     }
-
-                    if (BooleanUtils.isNotTrue(parameter.getHidden())) {
-                        createComponent(parameter, currentGridRow);
-                        currentGridRow++;
-                    }
+                    createComponent(parameter, currentGridRow, BooleanUtils.isNotTrue(parameter.getHidden()));
+                    currentGridRow++;
                 }
             }
         }
@@ -91,7 +88,7 @@ public class InputParametersFrame extends AbstractFrame {
         return parameters;
     }
 
-    protected void createComponent(ReportInputParameter parameter, int currentGridRow) {
+    protected void createComponent(ReportInputParameter parameter, int currentGridRow, boolean visible) {
         Field field = parameterFieldCreator.createField(parameter);
         field.setWidth("400px");
 
@@ -126,6 +123,9 @@ public class InputParametersFrame extends AbstractFrame {
         if (currentGridRow == 0) {
             field.requestFocus();
         }
+
+        label.setVisible(visible);
+        field.setVisible(visible);
 
         parameterComponents.put(parameter.getAlias(), field);
         parametersGrid.add(label, 0, currentGridRow);
