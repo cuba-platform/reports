@@ -856,7 +856,6 @@ public class ReportEditor extends AbstractEditor<Report> {
             @Override
             public void actionPerform(Component component) {
                 if (validateAll()) {
-                    getItem().setIsTmp(true);
                     Window runWindow = openWindow("report$inputParameters",
                             OpenType.DIALOG, ParamsMap.of("report", getItem()));
 
