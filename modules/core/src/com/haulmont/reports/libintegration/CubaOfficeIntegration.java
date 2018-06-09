@@ -43,7 +43,7 @@ public class CubaOfficeIntegration extends OfficeIntegration implements CubaOffi
         } catch (ExecutionException ex) {
             connection.close();
             if (ex.getCause() instanceof BootstrapException) {
-                throw new OpenOfficeException("Failed to connect to open office. Please check open office path " + openOfficePath, ex);
+                throw new OpenOfficeException("Failed to connect to LibreOffice. Please check open office path " + openOfficePath, ex);
             }
 
             if (ex.getCause() instanceof OpenOfficeException) {
@@ -63,13 +63,13 @@ public class CubaOfficeIntegration extends OfficeIntegration implements CubaOffi
                 connection.close();
             }
             if (tex.getCause() instanceof BootstrapException) {
-                throw new OpenOfficeException("Failed to connect to open office. Please check open office path " + openOfficePath, tex);
+                throw new OpenOfficeException("Failed to connect to LibreOffice. Please check open office path " + openOfficePath, tex);
             }
             throw new OpenOfficeException(tex);
         } catch (Throwable ex) {
             connection.close();
             if (ex.getCause() instanceof BootstrapException) {
-                throw new OpenOfficeException("Failed to connect to open office. Please check open office path " + openOfficePath, ex);
+                throw new OpenOfficeException("Failed to connect to LibreOffice. Please check open office path " + openOfficePath, ex);
             }
             throw new OpenOfficeException(ex);
         } finally {
