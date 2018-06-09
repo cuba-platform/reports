@@ -7,9 +7,12 @@ package com.haulmont.reports.gui.report.run;
 
 import com.haulmont.bali.datastruct.Pair;
 import com.haulmont.bali.util.ParamsMap;
+import com.haulmont.chile.core.datatypes.Datatypes;
+import com.haulmont.chile.core.datatypes.impl.EnumClass;
 import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.chile.core.model.MetaProperty;
 import com.haulmont.chile.core.model.MetaPropertyPath;
+import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.entity.KeyValueEntity;
 import com.haulmont.cuba.core.global.MessageTools;
 import com.haulmont.cuba.core.global.Metadata;
@@ -25,10 +28,10 @@ import com.haulmont.cuba.gui.data.impl.DsContextImpl;
 import com.haulmont.cuba.gui.data.impl.ValueGroupDatasourceImpl;
 import com.haulmont.cuba.gui.theme.ThemeConstants;
 import com.haulmont.cuba.gui.xml.layout.ComponentsFactory;
+import com.haulmont.reports.entity.CubaTableData;
 import com.haulmont.reports.entity.Report;
 import com.haulmont.reports.entity.ReportOutputType;
 import com.haulmont.reports.entity.ReportTemplate;
-import com.haulmont.reports.entity.CubaTableData;
 import com.haulmont.reports.gui.ReportGuiManager;
 import com.haulmont.yarg.reporting.ReportOutputDocument;
 import org.dom4j.DocumentHelper;
@@ -171,7 +174,14 @@ public class ShowReportTable extends AbstractWindow {
         ds.setRefreshMode(CollectionDatasource.RefreshMode.NEVER);
 
         Set<Pair<String, Class>> headers = headerMap.get(dataSetName);
-        headers.forEach(pair -> ds.addProperty(pair.getFirst(), pair.getSecond()));
+        for (Pair<String, Class> pair : headers) {
+            Class javaClass = pair.getSecond();
+            if (Entity.class.isAssignableFrom(javaClass) ||
+                    EnumClass.class.isAssignableFrom(javaClass) ||
+                    Datatypes.get(javaClass) != null) {
+                ds.addProperty(pair.getFirst(), pair.getSecond());
+            }
+        }
 
         dsContext.register(ds);
         keyValueEntities.forEach(ds::includeItem);
