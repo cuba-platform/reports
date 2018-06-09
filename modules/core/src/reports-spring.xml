@@ -39,12 +39,7 @@
           class="com.haulmont.reports.libintegration.CubaOfficeIntegration">
         <constructor-arg value="${reporting.openoffice.path?:/}"/>
         <constructor-arg>
-            <list>
-                <value>8100</value>
-                <value>8101</value>
-                <value>8102</value>
-                <value>8103</value>
-            </list>
+            <value>#{"${reporting.openoffice.ports?:8100|8101|8102|8103}".split('[,|]')}</value>
         </constructor-arg>
         <property name="displayDeviceAvailable">
             <value>${reporting.displayDeviceAvailable?:false}</value>
