@@ -39,11 +39,11 @@ public class CubaOfficeIntegration extends OfficeIntegration implements CubaOffi
             future = executor.submit(task);
             future.get(timeoutInSeconds, TimeUnit.SECONDS);
         } catch (InterruptedException ex) {
-            throw new ReportingInterruptedException("Open office task interrupted");
+            throw new ReportingInterruptedException("LibreOffice task interrupted");
         } catch (ExecutionException ex) {
             connection.close();
             if (ex.getCause() instanceof BootstrapException) {
-                throw new OpenOfficeException("Failed to connect to LibreOffice. Please check open office path " + openOfficePath, ex);
+                throw new OpenOfficeException("Failed to connect to LibreOffice. Please check LibreOffice path " + openOfficePath, ex);
             }
 
             if (ex.getCause() instanceof OpenOfficeException) {
@@ -57,19 +57,19 @@ public class CubaOfficeIntegration extends OfficeIntegration implements CubaOffi
         } catch (TimeoutException tex) {
             try {
                 if (Thread.interrupted()) {
-                    throw new ReportingInterruptedException("Open office task interrupted");
+                    throw new ReportingInterruptedException("LibreOffice task interrupted");
                 }
             } finally {
                 connection.close();
             }
             if (tex.getCause() instanceof BootstrapException) {
-                throw new OpenOfficeException("Failed to connect to LibreOffice. Please check open office path " + openOfficePath, tex);
+                throw new OpenOfficeException("Failed to connect to LibreOffice. Please check LibreOffice path " + openOfficePath, tex);
             }
             throw new OpenOfficeException(tex);
         } catch (Throwable ex) {
             connection.close();
             if (ex.getCause() instanceof BootstrapException) {
-                throw new OpenOfficeException("Failed to connect to LibreOffice. Please check open office path " + openOfficePath, ex);
+                throw new OpenOfficeException("Failed to connect to LibreOffice. Please check LibreOffice path " + openOfficePath, ex);
             }
             throw new OpenOfficeException(ex);
         } finally {
