@@ -7,15 +7,16 @@ package com.haulmont.reports.app;
 import com.haulmont.chile.core.model.Instance;
 import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.chile.core.model.MetaProperty;
-import com.haulmont.chile.core.model.utils.InstanceUtils;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.Metadata;
+import com.haulmont.cuba.core.global.MetadataTools;
 import com.haulmont.cuba.core.global.View;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import java.util.*;
 
 public class EntityMap implements Map<String, Object> {
@@ -30,8 +31,8 @@ public class EntityMap implements Map<String, Object> {
     protected boolean loaded = false;
 
     public EntityMap(Entity entity) {
-        instance = entity;
-        explicitData = new HashMap<>();
+        this.instance = entity;
+        this.explicitData = new HashMap<>();
     }
 
     public EntityMap(Entity entity, View loadedAttributes) {
@@ -89,7 +90,7 @@ public class EntityMap implements Map<String, Object> {
     }
 
     @Override
-    public void putAll(Map<? extends String, ?> m) {
+    public void putAll(@Nonnull Map<? extends String, ?> m) {
         explicitData.putAll(m);
     }
 
@@ -98,18 +99,21 @@ public class EntityMap implements Map<String, Object> {
         explicitData.clear();
     }
 
+    @Nonnull
     @Override
     public Set<String> keySet() {
         loadAllProperties();
         return explicitData.keySet();
     }
 
+    @Nonnull
     @Override
     public Collection<Object> values() {
         loadAllProperties();
         return explicitData.values();
     }
 
+    @Nonnull
     @Override
     public Set<Entry<String, Object>> entrySet() {
         loadAllProperties();
@@ -117,9 +121,10 @@ public class EntityMap implements Map<String, Object> {
     }
 
     protected void loadAllProperties() {
+        Metadata metadata = AppBeans.get(Metadata.class);
+
         if (!loaded) {
             MetaClass metaClass = instance.getMetaClass();
-            Metadata metadata = AppBeans.get(Metadata.class);
             String pkName = metadata.getTools().getPrimaryKeyName(metaClass);
             for (MetaProperty property : metaClass.getProperties()) {
                 if (view != null && view.getProperty(property.getName()) != null) {
@@ -132,7 +137,7 @@ public class EntityMap implements Map<String, Object> {
             }
 
             if (instanceNameAvailable(metaClass))
-                explicitData.put(INSTANCE_NAME_KEY, instance.getInstanceName());
+                explicitData.put(INSTANCE_NAME_KEY, metadata.getTools().getInstanceName(instance));
             else
                 explicitData.put(INSTANCE_NAME_KEY, null);
 
@@ -141,7 +146,8 @@ public class EntityMap implements Map<String, Object> {
     }
 
     protected boolean instanceNameAvailable(MetaClass metaClass) {
-        InstanceUtils.NamePatternRec namePattern = InstanceUtils.parseNamePattern(metaClass);
+        MetadataTools metadataTools = AppBeans.get(MetadataTools.NAME);
+        MetadataTools.NamePatternRec namePattern = metadataTools.parseNamePattern(metaClass);
         String[] fields = new String[0];
         if (namePattern != null) {
             fields = namePattern.fields;
@@ -157,18 +163,22 @@ public class EntityMap implements Map<String, Object> {
     }
 
     protected Object getValue(Instance instance, Object key) {
-        if (key == null) return null;
+        if (key == null) {
+            return null;
+        }
+
+        MetadataTools metadataTools = AppBeans.get(MetadataTools.NAME);
 
         String path = String.valueOf(key);
         if (path.endsWith(INSTANCE_NAME_KEY)) {
             if (StringUtils.isNotBlank(path.replace(INSTANCE_NAME_KEY, ""))) {
                 Object value = getValue(instance, path.replace("." + INSTANCE_NAME_KEY, ""));
                 if (value instanceof Instance) {
-                    return ((Instance) value).getInstanceName();
+                    return metadataTools.getInstanceName((Instance) value);
                 }
             } else {
                 try {
-                    return instance.getInstanceName();
+                    return metadataTools.getInstanceName(instance);
                 } catch (Exception e) {
                     log.trace("Suppressed error from underlying EntityMap instance.getInstanceName", e);
                     return null;
