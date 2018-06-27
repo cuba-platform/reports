@@ -162,12 +162,17 @@ configure([globalModule, coreModule, guiModule, webModule, desktopModule]) {
 }
 
 configure(globalModule) {
-    task enhance(type: CubaEnhancing)
 
     dependencies {
 		compile(bom['com.google.code.gson:gson'])
 		compile(bom['com.haulmont.yarg:yarg-api']) {
             exclude group: 'org.codehaus.groovy', module: 'groovy-all'
+        }
+    }
+
+    entitiesEnhancing {
+        main {
+            enabled = true
         }
     }
 
