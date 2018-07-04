@@ -99,9 +99,11 @@ public class InputParametersWindow extends AbstractWindow {
         }
 
         report = (Report) params.get(REPORT_PARAMETER);
-        if (report != null && !report.getIsTmp()) {
+        if (report != null) {
             if (report.getTemplates() != null && report.getTemplates().size() > 1) {
-                templateReportsDs.refresh(ParamsMap.of("reportId", report.getId()));
+                if (!report.getIsTmp()) {
+                    templateReportsDs.refresh(ParamsMap.of("reportId", report.getId()));
+                }
                 templateField.setValue(report.getDefaultTemplate());
                 templatesBox.setVisible(true);
             }
