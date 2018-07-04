@@ -76,11 +76,11 @@ public class ShowReportTable extends AbstractWindow {
     protected GroupBoxLayout tablesHolderGroup;
 
 
-    @WindowParam(name = REPORT_PARAMETER, required = true)
+    @WindowParam(name = REPORT_PARAMETER)
     protected Report report;
-    @WindowParam(name = TEMPLATE_CODE_PARAMETER, required = true)
+    @WindowParam(name = TEMPLATE_CODE_PARAMETER)
     protected String templateCode;
-    @WindowParam(name = PARAMS_PARAMETER, required = true)
+    @WindowParam(name = PARAMS_PARAMETER)
     protected Map<String, Object> reportParameters;
 
     protected InputParametersFrame inputParametersFrame;
