@@ -6,6 +6,7 @@
 package com.haulmont.reports.libintegration;
 
 import com.haulmont.cuba.core.entity.Entity;
+import com.haulmont.cuba.core.global.View;
 import com.haulmont.reports.app.EntityMap;
 import com.haulmont.reports.entity.DataSet;
 import com.haulmont.yarg.structure.BandData;
@@ -13,6 +14,7 @@ import com.haulmont.yarg.structure.ProxyWrapper;
 import com.haulmont.yarg.structure.ReportQuery;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -34,6 +36,7 @@ public class MultiEntityDataLoader extends AbstractEntityDataLoader {
         boolean hasNestedCollection = paramName.contains(NESTED_COLLECTION_SEPARATOR);
         String entityParameterName = StringUtils.substringBefore(paramName, NESTED_COLLECTION_SEPARATOR);
         String nestedCollectionName = StringUtils.substringAfter(paramName, NESTED_COLLECTION_SEPARATOR);
+        View nestedCollectionView = null;
 
         dataSet = ProxyWrapper.unwrap(dataSet);
         Object entities = null;
@@ -44,10 +47,17 @@ public class MultiEntityDataLoader extends AbstractEntityDataLoader {
             entity = reloadEntityByDataSetView(dataSet, entity);
             if (entity != null) {
                 entities = entity.getValueEx(nestedCollectionName);
+                if (dataSet instanceof DataSet) {
+                    View entityView = getView(entity, (DataSet) dataSet);
+                    if (entityView != null && entityView.getProperty(nestedCollectionName) != null) {
+                        //noinspection ConstantConditions
+                        nestedCollectionView = entityView.getProperty(nestedCollectionName).getView();
+                    }
+                }
             }
         }
 
-        if (entities == null || !(entities instanceof Collection)) {
+        if (!(entities instanceof Collection)) {
             if (hasNestedCollection) {
                 throw new IllegalStateException(
                         String.format("Input parameters do not contain '%s' parameter, " +
@@ -70,7 +80,15 @@ public class MultiEntityDataLoader extends AbstractEntityDataLoader {
                 entity = reloadEntityByDataSetView(dataSet, entity);
             }
             if (dataSet instanceof DataSet) {
-                resultList.add(new EntityMap(entity, getView(entity, (DataSet) dataSet)));
+                if (hasNestedCollection) {
+                    if (nestedCollectionView != null) {
+                        resultList.add(new EntityMap(entity, nestedCollectionView));
+                    } else {
+                        resultList.add(new EntityMap(entity));
+                    }
+                } else {
+                    resultList.add(new EntityMap(entity, getView(entity, (DataSet) dataSet)));
+                }
             } else {
                 resultList.add(new EntityMap(entity));
             }
