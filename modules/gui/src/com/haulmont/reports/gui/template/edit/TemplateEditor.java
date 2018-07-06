@@ -132,7 +132,12 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
         templateDs.addItemPropertyChangeListener(e -> {
             ReportTemplate reportTemplate = getItem();
             if ("reportOutputType".equals(e.getProperty())) {
-                setupVisibility(reportTemplate.getCustom(), (ReportOutputType) e.getValue());
+                ReportOutputType prevOutputType = (ReportOutputType) e.getPrevValue();
+                ReportOutputType newOutputType = (ReportOutputType) e.getValue();
+                setupVisibility(reportTemplate.getCustom(), newOutputType);
+                if (hasHtmlCsvTemplateOutput(prevOutputType) && !hasTemplateOutput(newOutputType)) {
+                    showMessageDialog(getMessage("templateEditor.warning"), getMessage("templateEditor.clearTemplateMessage"), MessageType.CONFIRMATION);
+                }
             } else if ("custom".equals(e.getProperty())) {
                 setupVisibility(Boolean.TRUE.equals(e.getValue()), reportTemplate.getReportOutputType());
             }
@@ -159,6 +164,10 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
                 && reportOutputType != ReportOutputType.PIVOT_TABLE;
     }
 
+    protected boolean hasHtmlCsvTemplateOutput(ReportOutputType reportOutputType) {
+        return reportOutputType == ReportOutputType.CSV || reportOutputType == ReportOutputType.HTML;
+    }
+
     protected void setupVisibility(boolean customEnabled, ReportOutputType reportOutputType) {
         boolean templateOutputVisibility = hasTemplateOutput(reportOutputType);
 
@@ -180,6 +189,8 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
         templateFileLabel.setVisible(templateOutputVisibility);
         outputNamePattern.setVisible(templateOutputVisibility);
         outputNamePatternLabel.setVisible(templateOutputVisibility);
+
+        visibleTemplateEditor(reportOutputType);
 
         setupVisibilityDescriptionEdit(customEnabled, reportOutputType);
     }
@@ -275,17 +286,24 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
         templateFileEditor.setMode(SourceCodeEditor.Mode.HTML);
         String extension = FilenameUtils.getExtension(templateUploadField.getFileName());
         if (extension == null) {
-            templateFileEditor.setVisible(false);
+            visibleTemplateEditor(null);
             return;
         }
         ReportOutputType outputType = ReportOutputType.getTypeFromExtension(extension.toUpperCase());
-        if (outputType == ReportOutputType.CSV || outputType == ReportOutputType.HTML) {
-            templateFileEditor.setVisible(true);
+        visibleTemplateEditor(outputType);
+        if (hasHtmlCsvTemplateOutput(outputType)) {
             String templateContent = new String(reportTemplate.getContent(), StandardCharsets.UTF_8);
             templateFileEditor.setValue(templateContent);
-        } else {
-            templateFileEditor.setVisible(false);
         }
+    }
+
+    protected void visibleTemplateEditor(ReportOutputType outputType) {
+        String extension = FilenameUtils.getExtension(templateUploadField.getFileName());
+        if (extension == null) {
+            templateFileEditor.setVisible(false);
+            return;
+        }
+        templateFileEditor.setVisible(hasHtmlCsvTemplateOutput(outputType));
     }
 
     @Override
@@ -313,7 +331,7 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
         String extension = FilenameUtils.getExtension(templateUploadField.getFileName());
         if (extension != null) {
             ReportOutputType outputType = ReportOutputType.getTypeFromExtension(extension.toUpperCase());
-            if (outputType == ReportOutputType.CSV || outputType == ReportOutputType.HTML) {
+            if (hasHtmlCsvTemplateOutput(outputType)) {
                 byte[] bytes = templateFileEditor.getValue() == null ?
                         new byte[0] :
                         templateFileEditor.getValue().getBytes(StandardCharsets.UTF_8);
