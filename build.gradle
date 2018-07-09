@@ -211,7 +211,7 @@ configure(coreModule) {
 		
         testCompile(group: 'com.haulmont.cuba', name: 'cuba-core-tests', version: baseVersion)
         testCompile(bom['org.apache.commons:commons-dbcp2'])
-        provided(bom['javax.servlet:javax.servlet-api'])
+        compileOnly(bom['javax.servlet:javax.servlet-api'])
         jdbc(bom['org.postgresql:postgresql'])
 
         dbscripts(group: 'com.haulmont.cuba', name: 'cuba-core', version: baseVersion, classifier: 'db', ext: 'zip')
@@ -260,7 +260,7 @@ configure(guiModule) {
     dependencies {
         compile(globalModule)
         compile(group: 'com.haulmont.cuba', name: 'cuba-gui', version: baseVersion)
-        provided(bom['javax.servlet:javax.servlet-api'])
+        compileOnly(bom['javax.servlet:javax.servlet-api'])
     }
 }
 
