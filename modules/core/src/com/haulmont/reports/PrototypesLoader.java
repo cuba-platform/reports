@@ -64,7 +64,7 @@ public class PrototypesLoader {
             }
         }
 
-        query.setFirstResult(parameterPrototype.getFirstResult());
+        query.setFirstResult(parameterPrototype.getFirstResult() == null ? 0 : parameterPrototype.getFirstResult());
 
         if (parameterPrototype.getMaxResults() != null && !parameterPrototype.getMaxResults().equals(0)) {
             query.setMaxResults(parameterPrototype.getMaxResults());
