@@ -8,20 +8,7 @@
         messagesPack="com.haulmont.reports.gui.report.run"
         caption="msg://inputParameters">
 
-    <dsContext>
-        <collectionDatasource id="templateReportsDs" class="com.haulmont.reports.entity.ReportTemplate" view="_local">
-            <query>select e from report$ReportTemplate e where e.report.id = :custom$reportId</query>
-        </collectionDatasource>
-    </dsContext>
     <layout spacing="true">
-        <hbox id="templatesBox" spacing="true" visible="false">
-            <label value="msg://caption.reportTemplate" align="MIDDLE_CENTER" width="80"/>
-            <lookupField id="templateField" optionsDatasource="templateReportsDs" width="400"/>
-        </hbox>
-        <hbox id="outputTypeBox" spacing="true" visible="false">
-            <label value="msg://caption.reportOutputType" align="MIDDLE_CENTER" width="80"/>
-            <lookupField id="outputTypeField" width="400"/>
-        </hbox>
         <frame id="inputParametersFrame" screen="report$inputParametersFrame"/>
 
         <hbox spacing="true">

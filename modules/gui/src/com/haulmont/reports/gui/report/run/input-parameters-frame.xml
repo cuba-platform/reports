@@ -8,6 +8,11 @@
         messagesPack="com.haulmont.reports.gui.report.run"
         caption="msg://inputParameters">
 
+    <dsContext>
+        <collectionDatasource id="templateReportsDs" class="com.haulmont.reports.entity.ReportTemplate" view="_local">
+            <query>select e from report$ReportTemplate e where e.report.id = :custom$reportId and :custom$reportId is not null</query>
+        </collectionDatasource>
+    </dsContext>
     <layout spacing="true">
         <grid id="parametersGrid" spacing="true" width="100%">
             <columns>
@@ -15,6 +20,14 @@
                 <column flex="1"/>
             </columns>
             <rows>
+                <row>
+                    <label id="templateLbl" value="msg://caption.reportTemplate" align="MIDDLE_LEFT" visible="false"/>
+                    <lookupField id="templateField" optionsDatasource="templateReportsDs" width="400" visible="false"/>
+                </row>
+                <row>
+                    <label id="outputTypeLbl" value="msg://caption.reportOutputType" align="MIDDLE_LEFT" visible="false"/>
+                    <lookupField id="outputTypeField" width="400" visible="false"/>
+                </row>
                 <row>
                 </row>
             </rows>

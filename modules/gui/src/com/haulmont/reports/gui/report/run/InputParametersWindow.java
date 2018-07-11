@@ -52,22 +52,7 @@ public class InputParametersWindow extends AbstractWindow {
     protected Button printReportBtn;
 
     @Inject
-    private InputParametersFrame inputParametersFrame;
-
-    @Inject
-    protected HBoxLayout templatesBox;
-
-    @Inject
-    protected LookupField<ReportTemplate> templateField;
-
-    @Inject
-    protected CollectionDatasource<ReportTemplate, UUID> templateReportsDs;
-
-    @Inject
-    protected HBoxLayout outputTypeBox;
-
-    @Inject
-    protected LookupField<ReportOutputType> outputTypeField;
+    protected InputParametersFrame inputParametersFrame;
 
     @Inject
     protected ReportParameterValidator reportParameterValidator;
@@ -95,18 +80,6 @@ public class InputParametersWindow extends AbstractWindow {
         }
 
         report = (Report) params.get(REPORT_PARAMETER);
-        if (report != null) {
-            if (report.getTemplates() != null && report.getTemplates().size() > 1) {
-                if (!report.getIsTmp()) {
-                    templateReportsDs.refresh(ParamsMap.of("reportId", report.getId()));
-                }
-                templateField.setValue(report.getDefaultTemplate());
-                templatesBox.setVisible(true);
-            }
-        }
-
-        templateField.addValueChangeListener(e -> updateOutputTypes());
-        updateOutputTypes();
 
         Action printReportAction = printReportBtn.getAction();
         String commitShortcut = clientConfig.getCommitShortcut();
@@ -114,51 +87,25 @@ public class InputParametersWindow extends AbstractWindow {
         addAction(printReportAction);
     }
 
-    protected void updateOutputTypes() {
-        if (!reportGuiManager.containsAlterableTemplate(report)) {
-            outputTypeBox.setVisible(false);
-            return;
-        }
-
-        ReportTemplate template;
-        if (report.getTemplates() != null && report.getTemplates().size() > 1) {
-            template = templateField.getValue();
-        }
-        else {
-            template = report.getDefaultTemplate();
-        }
-
-        if (template != null && reportGuiManager.supportAlterableForTemplate(template)) {
-            List<ReportOutputType> outputTypes = ReportPrintHelper.getInputOutputTypesMapping().get(template.getExt());
-            if (outputTypes != null && !outputTypes.isEmpty()) {
-                outputTypeField.setOptionsList(outputTypes);
-                if (outputTypeField.getValue() == null) {
-                    outputTypeField.setValue(template.getReportOutputType());
-                }
-                outputTypeBox.setVisible(true);
-            } else {
-                outputTypeField.setValue(null);
-                outputTypeBox.setVisible(false);
-            }
-        } else {
-            outputTypeField.setValue(null);
-            outputTypeBox.setVisible(false);
-        }
+    @Override
+    public void ready() {
+        super.ready();
+        inputParametersFrame.initTemplateAndOutputSelect();
     }
 
     public void printReport() {
         if (inputParametersFrame.getReport() != null) {
             if (validateAll()) {
-                ReportTemplate template = templateField.getValue();
+                ReportTemplate template = inputParametersFrame.getReportTemplate();
                 if (template != null) {
                     templateCode = template.getCode();
                 }
                 Report report = inputParametersFrame.getReport();
                 Map<String, Object> parameters = inputParametersFrame.collectParameters();
                 if (bulkPrint) {
-                    reportGuiManager.bulkPrint(report, templateCode, outputTypeField.getValue(), inputParameter.getAlias(), selectedEntities, this, parameters);
+                    reportGuiManager.bulkPrint(report, templateCode, inputParametersFrame.getOutputType(), inputParameter.getAlias(), selectedEntities, this, parameters);
                 } else {
-                    reportGuiManager.printReport(report, parameters, templateCode, outputFileName, outputTypeField.getValue(), this);
+                    reportGuiManager.printReport(report, parameters, templateCode, outputFileName, inputParametersFrame.getOutputType(), this);
                 }
             }
         }
