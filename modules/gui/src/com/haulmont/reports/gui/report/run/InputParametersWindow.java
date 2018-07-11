@@ -4,26 +4,22 @@
  */
 package com.haulmont.reports.gui.report.run;
 
-import com.haulmont.bali.util.ParamsMap;
 import com.haulmont.bali.util.Preconditions;
 import com.haulmont.cuba.client.ClientConfig;
-import com.haulmont.cuba.gui.components.*;
-import com.haulmont.cuba.gui.data.CollectionDatasource;
+import com.haulmont.cuba.gui.components.AbstractWindow;
+import com.haulmont.cuba.gui.components.Action;
+import com.haulmont.cuba.gui.components.Button;
 import com.haulmont.reports.entity.Report;
 import com.haulmont.reports.entity.ReportInputParameter;
-import com.haulmont.reports.entity.ReportOutputType;
 import com.haulmont.reports.entity.ReportTemplate;
 import com.haulmont.reports.exception.ReportParametersValidationException;
 import com.haulmont.reports.gui.ReportGuiManager;
 import com.haulmont.reports.gui.ReportParameterValidator;
-import com.haulmont.reports.gui.ReportPrintHelper;
 import org.apache.commons.lang3.BooleanUtils;
 
 import javax.inject.Inject;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import static com.haulmont.reports.gui.report.run.InputParametersFrame.PARAMETERS_PARAMETER;
 import static com.haulmont.reports.gui.report.run.InputParametersFrame.REPORT_PARAMETER;
