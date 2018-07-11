@@ -11,6 +11,8 @@ import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.entity.KeyValueEntity;
 import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.MessageTools;
+import com.haulmont.cuba.core.global.Metadata;
+import com.haulmont.cuba.core.global.View;
 import com.haulmont.cuba.core.sys.serialization.SerializationSupport;
 import com.haulmont.reports.app.EntityMap;
 import com.haulmont.reports.entity.CubaTableData;
@@ -28,10 +30,12 @@ import static com.haulmont.reports.entity.wizard.ReportRegion.HEADER_BAND_PREFIX
 
 public class CubaTableFormatter extends AbstractFormatter {
     protected MessageTools messageTools;
+    protected Metadata metadata;
 
     public CubaTableFormatter(FormatterFactoryInput formatterFactoryInput) {
         super(formatterFactoryInput);
         messageTools = AppBeans.get(MessageTools.class);
+        metadata = AppBeans.get(Metadata.class);
     }
 
     @Override
@@ -57,29 +61,45 @@ public class CubaTableFormatter extends AbstractFormatter {
 
                 bandDataList.forEach(bandData -> {
                     Map<String, Object> data = bandData.getData();
-                    Instance instance = (data instanceof EntityMap) ? ((EntityMap) data).getInstance() : null;
+                    final Instance instance;
+                    final String pkName;
+                    final boolean pkInView;
+                    if (data instanceof EntityMap) {
+                        instance = ((EntityMap) data).getInstance();
+                        pkName = metadata.getTools().getPrimaryKeyName(instance.getMetaClass());
+                        View view = ((EntityMap) data).getView();
+                        pkInView = view != null && pkName != null && view.containsProperty(pkName);
+                    } else {
+                        instance = null;
+                        pkName = null;
+                        pkInView = false;
+                    }
                     KeyValueEntity entityRow = new KeyValueEntity();
 
                     checkInstanceNameLoaded(data);
                     data.forEach((name, value) -> {
                         if (!INSTANCE_NAME_KEY.equals(name)) {
-                            if (instance != null)
-                                name = messageTools.getPropertyCaption(instance.getMetaClass(), name);
-                            checkInstanceNameLoaded(value);
-                            entityRow.setValue(name, value);
+                            if (pkName == null || !pkName.equals(name) || pkInView) {
+                                if (instance != null)
+                                    name = messageTools.getPropertyCaption(instance.getMetaClass(), name);
+                                checkInstanceNameLoaded(value);
+                                entityRow.setValue(name, value);
+                            }
                         }
                     });
 
                     if (headers.isEmpty() || headers.size() < data.size()) {
                         data.forEach((name, value) -> {
                             if (!INSTANCE_NAME_KEY.equals(name)) {
-                                if (instance != null)
-                                    name = messageTools.getPropertyCaption(instance.getMetaClass(), name);
+                                if (pkName == null || !pkName.equals(name) || pkInView) {
+                                    if (instance != null)
+                                        name = messageTools.getPropertyCaption(instance.getMetaClass(), name);
 
-                                if (name != null && value != null)
-                                    headers.add(new Pair<>(name, value.getClass()));
-                                if (name != null && value == null)
-                                    emptyHeaders.add(name);
+                                    if (name != null && value != null)
+                                        headers.add(new Pair<>(name, value.getClass()));
+                                    if (name != null && value == null)
+                                        emptyHeaders.add(name);
+                                }
                             }
                         });
                     }

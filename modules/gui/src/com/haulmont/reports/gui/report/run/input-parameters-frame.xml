@@ -10,7 +10,7 @@
 
     <dsContext>
         <collectionDatasource id="templateReportsDs" class="com.haulmont.reports.entity.ReportTemplate" view="_local">
-            <query>select e from report$ReportTemplate e where e.report.id = :custom$reportId and :custom$reportId is not null</query>
+            <query>select e from report$ReportTemplate e where e.report.id = :custom$reportId</query>
         </collectionDatasource>
     </dsContext>
     <layout spacing="true">

@@ -206,4 +206,8 @@ public class EntityMap implements Map<String, Object> {
     public Instance getInstance() {
         return instance;
     }
+
+    public View getView() {
+        return view;
+    }
 }
