@@ -12,7 +12,6 @@ info:
     * Getting list of avaliable reports
     * Getting report metadata (parameters, templates)
     * Execution of report
-    *
 
     The Reports REST API is available at the URL `/rest/reports/v1` in the web module, e.g. `http://localhost:8080/app/rest/reports/v1/report`
 
