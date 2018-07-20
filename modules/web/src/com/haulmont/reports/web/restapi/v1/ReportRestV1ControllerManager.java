@@ -5,7 +5,9 @@
 
 package com.haulmont.reports.web.restapi.v1;
 
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.cuba.core.entity.*;
 import com.haulmont.cuba.core.global.*;
@@ -23,10 +25,8 @@ import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
 import java.lang.reflect.Method;
-import java.lang.reflect.Type;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Component("report_ReportRestV1ControllerManager")
 public class ReportRestV1ControllerManager {
@@ -74,7 +74,15 @@ public class ReportRestV1ControllerManager {
 
     public ReportRestResult runReport(String entityId, String bodyJson) {
         Report report = loadReportInternal(entityId);
-        ReportRunRestBody body = createGson().fromJson(bodyJson, ReportRunRestBody.class);
+        final ReportRunRestBody body;
+        try {
+            body = createGson().fromJson(bodyJson, ReportRunRestBody.class);
+        } catch (JsonSyntaxException e) {
+            throw new RestAPIException("Invalid JSON body",
+                    e.getMessage(),
+                    HttpStatus.BAD_REQUEST,
+                    e);
+        }
         if (body.template != null) {
             report.getTemplates().stream()
                     .filter(t -> Objects.equals(t.getCode(), body.template))
@@ -152,9 +160,7 @@ public class ReportRestV1ControllerManager {
     }
 
     protected Gson createGson() {
-        return new GsonBuilder()
-                .registerTypeAdapter(ParameterValueInfo.class,
-                        ParameterValueInfoDeserializer.INSTANCE).create();
+        return new GsonBuilder().create();
     }
 
     protected ReportInfo mapToReportInfo(Report report) {
@@ -311,27 +317,5 @@ public class ReportRestV1ControllerManager {
         protected String template;
         protected boolean attachment;
         protected List<ParameterValueInfo> parameters;
-    }
-
-    protected static class ParameterValueInfoDeserializer implements JsonDeserializer<ParameterValueInfo> {
-        public static final ParameterValueInfoDeserializer INSTANCE = new ParameterValueInfoDeserializer();
-
-        @Override
-        public ParameterValueInfo deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-            ParameterValueInfo info = new ParameterValueInfo();
-            JsonObject jsonObject = json.getAsJsonObject();
-            info.name = jsonObject.get("name").getAsString();
-            JsonElement jsonValue = jsonObject.get("value");
-            if (jsonValue.isJsonArray()) {
-                List<String> values = new ArrayList<>();
-                for (JsonElement item : jsonValue.getAsJsonArray()) {
-                    values.add(item.getAsString());
-                }
-                info.values = values;
-            } else {
-                info.value = jsonValue.getAsString();
-            }
-            return info;
-        }
     }
 }

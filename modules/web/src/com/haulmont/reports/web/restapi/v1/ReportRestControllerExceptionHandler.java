@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @ControllerAdvice("com.haulmont.reports.web.restapi.v1")
-public class ReportsRestControllerExceptionHandler {
+public class ReportRestControllerExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(com.haulmont.restapi.controllers.RestControllerExceptionHandler.class);
 

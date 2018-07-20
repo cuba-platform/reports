@@ -18,7 +18,10 @@
                    entry-point-ref="oauthAuthenticationEntryPoint"
                    xmlns="http://www.springframework.org/schema/security">
         <!-- Specify one or more protected URL patterns-->
-        <intercept-url pattern="/rest/reports/**" access="isAuthenticated()"/>
+        <intercept-url pattern="/rest/reports/v1/report" access="isAuthenticated()"/>
+        <intercept-url pattern="/rest/reports/v1/report/**" access="isAuthenticated()"/>
+        <intercept-url pattern="/rest/reports/v1/run/**" access="isAuthenticated()"/>
+        <intercept-url pattern="/rest/reports/v1/run" access="isAuthenticated()"/>
         <anonymous enabled="false"/>
         <csrf disabled="true"/>
         <cors configuration-source-ref="cuba_RestCorsSource"/>
