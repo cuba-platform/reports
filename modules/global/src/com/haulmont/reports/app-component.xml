@@ -33,6 +33,7 @@
         <property name="cuba.mainMessagePack" value="+com.haulmont.reports.web"/>
         <property name="cuba.windowConfig" value="+reports-web-screens.xml"/>
         <property name="cuba.menuConfig" value="+reports-web-menu.xml"/>
+        <property name="cuba.restSpringContextConfig" value="+reports-rest-dispatcher-spring.xml"/>
     </module>
 
     <module name="desktop" dependsOn="gui" blocks="desktop">

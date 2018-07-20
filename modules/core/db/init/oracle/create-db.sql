@@ -35,6 +35,7 @@ create table REPORT_REPORT (
     ROLES_IDX varchar2(1000),
     SCREENS_IDX varchar2(1000),
     INPUT_ENTITY_TYPES_IDX varchar2(1000),
+    REST_ACCESS char(1),
 
     REPORT_TYPE integer,
     primary key(ID)

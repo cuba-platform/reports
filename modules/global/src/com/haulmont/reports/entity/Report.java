@@ -68,6 +68,9 @@ public class Report extends StandardEntity implements com.haulmont.yarg.structur
     @Column(name = "INPUT_ENTITY_TYPES_IDX", length = 1000)
     protected String inputEntityTypesIdx;
 
+    @Column(name = "REST_ACCESS")
+    protected Boolean restAccess;
+
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "report")
     @Composition
     protected List<ReportTemplate> templates;
@@ -280,6 +283,14 @@ public class Report extends StandardEntity implements com.haulmont.yarg.structur
 
     public void setInputEntityTypesIdx(String inputEntityTypesIdx) {
         this.inputEntityTypesIdx = inputEntityTypesIdx;
+    }
+
+    public Boolean getRestAccess() {
+        return restAccess;
+    }
+
+    public void setRestAccess(Boolean restAccess) {
+        this.restAccess = restAccess;
     }
 
     @MetaProperty

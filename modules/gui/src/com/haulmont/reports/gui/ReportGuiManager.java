@@ -20,9 +20,7 @@ import com.haulmont.cuba.gui.executors.TaskLifeCycle;
 import com.haulmont.cuba.gui.export.ByteArrayDataProvider;
 import com.haulmont.cuba.gui.export.ExportDisplay;
 import com.haulmont.cuba.gui.export.ExportFormat;
-import com.haulmont.cuba.security.entity.RoleType;
 import com.haulmont.cuba.security.entity.User;
-import com.haulmont.cuba.security.entity.UserRole;
 import com.haulmont.reports.app.ParameterPrototype;
 import com.haulmont.reports.app.service.ReportService;
 import com.haulmont.reports.entity.*;
@@ -71,7 +69,7 @@ public class ReportGuiManager {
     protected WindowConfig windowConfig;
 
     @Inject
-    protected QueryTransformerFactory queryTransformerFactory;
+    protected ReportSecurityManager reportSecurityManager;
 
     @Inject
     protected UserSessionSource userSessionSource;
@@ -404,8 +402,8 @@ public class ReportGuiManager {
                 .addProperty("code")
                 .addProperty("group", metadata.getViewRepository().getView(ReportGroup.class, View.LOCAL)));
         lc.setQueryString("select r from report$Report r");
-        applySecurityPolicies(lc, screenId, user);
-        filterReportsByEntityParameters(lc, inputValueMetaClass);
+        reportSecurityManager.applySecurityPolicies(lc, screenId, user);
+        reportSecurityManager.applyPoliciesByEntityParameters(lc, inputValueMetaClass);
         return dataService.loadList(lc);
     }
 
@@ -414,12 +412,12 @@ public class ReportGuiManager {
      * Each entity is passed  to report as parameter with certain alias.
      * Synchronously or asynchronously, depending on configurations
      *
-     * @param report           - target report
-     * @param templateCode     - target template code
-     * @param outputType       - output type for file
-     * @param alias            - parameter alias
-     * @param selectedEntities - list of selected entities
-     * @param window           - caller window
+     * @param report               - target report
+     * @param templateCode         - target template code
+     * @param outputType           - output type for file
+     * @param alias                - parameter alias
+     * @param selectedEntities     - list of selected entities
+     * @param window               - caller window
      * @param additionalParameters - user-defined parameters
      */
     public void bulkPrint(Report report, @Nullable String templateCode, @Nullable ReportOutputType outputType, String alias,
@@ -437,10 +435,10 @@ public class ReportGuiManager {
      * Each entity is passed  to report as parameter with certain alias.
      * Synchronously or asynchronously, depending on configurations
      *
-     * @param report           - target report
-     * @param alias            - parameter alias
-     * @param selectedEntities - list of selected entities
-     * @param window           - caller window
+     * @param report               - target report
+     * @param alias                - parameter alias
+     * @param selectedEntities     - list of selected entities
+     * @param window               - caller window
      * @param additionalParameters - user-defined parameters
      */
     public void bulkPrint(Report report, String alias, Collection selectedEntities, @Nullable Frame window,
@@ -480,10 +478,10 @@ public class ReportGuiManager {
      * Each entity is passed  to report as parameter with certain alias.
      * Synchronously.
      *
-     * @param report           - target report
-     * @param alias            - parameter alias
-     * @param selectedEntities - list of selected entities
-     * @param window           - caller window
+     * @param report               - target report
+     * @param alias                - parameter alias
+     * @param selectedEntities     - list of selected entities
+     * @param window               - caller window
      * @param additionalParameters - user-defined parameters
      */
     public void bulkPrintSync(Report report, String alias, Collection selectedEntities, @Nullable Frame window,
@@ -496,12 +494,12 @@ public class ReportGuiManager {
      * Each entity is passed  to report as parameter with certain alias.
      * Synchronously.
      *
-     * @param report           - target report
-     * @param templateCode     - target template code
-     * @param outputType       - output type for file
-     * @param alias            - parameter alias
-     * @param selectedEntities - list of selected entities
-     * @param window           - caller window
+     * @param report               - target report
+     * @param templateCode         - target template code
+     * @param outputType           - output type for file
+     * @param alias                - parameter alias
+     * @param selectedEntities     - list of selected entities
+     * @param window               - caller window
      * @param additionalParameters - user-defined parameters
      */
     public void bulkPrintSync(Report report, @Nullable String templateCode, @Nullable ReportOutputType outputType,
@@ -542,10 +540,10 @@ public class ReportGuiManager {
      * Each entity is passed  to report as parameter with certain alias.
      * Asynchronously.
      *
-     * @param report           - target report
-     * @param alias            - parameter alias
-     * @param selectedEntities - list of selected entities
-     * @param window           - caller window
+     * @param report               - target report
+     * @param alias                - parameter alias
+     * @param selectedEntities     - list of selected entities
+     * @param window               - caller window
      * @param additionalParameters - user-defined parameters
      */
     public void bulkPrintBackground(Report report, String alias, Collection selectedEntities, final Frame window,
@@ -558,12 +556,12 @@ public class ReportGuiManager {
      * Each entity is passed  to report as parameter with certain alias.
      * Asynchronously.
      *
-     * @param report           - target report
-     * @param templateCode     - target template code
-     * @param outputType       - output type for file
-     * @param alias            - parameter alias
-     * @param selectedEntities - list of selected entities
-     * @param window           - caller window
+     * @param report               - target report
+     * @param templateCode         - target template code
+     * @param outputType           - output type for file
+     * @param alias                - parameter alias
+     * @param selectedEntities     - list of selected entities
+     * @param window               - caller window
      * @param additionalParameters - user-defined parameters
      */
     public void bulkPrintBackground(Report report, @Nullable String templateCode, @Nullable ReportOutputType outputType, String alias, Collection selectedEntities, final Frame window,
@@ -641,52 +639,6 @@ public class ReportGuiManager {
         return copy;
     }
 
-    /**
-     * Apply constraints for query to select reports which have input parameter with class matching inputValueMetaClass
-     */
-    protected void filterReportsByEntityParameters(LoadContext lc, @Nullable MetaClass inputValueMetaClass) {
-        if (inputValueMetaClass != null) {
-            QueryTransformer transformer = queryTransformerFactory.transformer(lc.getQuery().getQueryString());
-            StringBuilder parameterTypeCondition = new StringBuilder("r.inputEntityTypesIdx like :type escape '\\'");
-            lc.getQuery().setParameter("type", wrapIdxParameterForSearch(inputValueMetaClass.getName()));
-            List<MetaClass> ancestors = inputValueMetaClass.getAncestors();
-            for (int i = 0; i < ancestors.size(); i++) {
-                MetaClass metaClass = ancestors.get(i);
-                String paramName = "type" + (i + 1);
-                parameterTypeCondition.append(" or r.inputEntityTypesIdx like :").append(paramName).append(" escape '\\'");
-                lc.getQuery().setParameter(paramName, wrapIdxParameterForSearch(metaClass.getName()));
-            }
-            transformer.addWhereAsIs(String.format("(%s)", parameterTypeCondition.toString()));
-            lc.getQuery().setQueryString(transformer.getResult());
-        }
-    }
-
-    /**
-     * Apply security constraints for query to select reports available by roles and screen restrictions
-     */
-    protected void applySecurityPolicies(LoadContext lc, @Nullable String screen, @Nullable User user) {
-        QueryTransformer transformer = queryTransformerFactory.transformer(lc.getQuery().getQueryString());
-        if (screen != null) {
-            transformer.addWhereAsIs("r.screensIdx like :screen escape '\\'");
-            lc.getQuery().setParameter("screen", wrapIdxParameterForSearch(screen));
-        }
-        if (user != null) {
-            List<UserRole> userRoles = user.getUserRoles();
-            boolean superRole = userRoles.stream().anyMatch(userRole -> userRole.getRole().getType() == RoleType.SUPER);
-            if (!superRole) {
-                StringBuilder roleCondition = new StringBuilder("r.rolesIdx is null");
-                for (int i = 0; i < userRoles.size(); i++) {
-                    UserRole ur = userRoles.get(i);
-                    String paramName = "role" + (i + 1);
-                    roleCondition.append(" or r.rolesIdx like :").append(paramName).append(" escape '\\'");
-                    lc.getQuery().setParameter(paramName, wrapIdxParameterForSearch(ur.getRole().getId().toString()));
-                }
-                transformer.addWhereAsIs(roleCondition.toString());
-            }
-        }
-        lc.getQuery().setQueryString(transformer.getResult());
-    }
-
     protected void openReportParamsDialog(Frame window, Report report, @Nullable Map<String, Object> parameters,
                                           @Nullable ReportInputParameter inputParameter, @Nullable String templateCode,
                                           @Nullable String outputFileName,
@@ -747,10 +699,6 @@ public class ReportGuiManager {
         }
 
         return paramValueWithCollection;
-    }
-
-    protected String wrapIdxParameterForSearch(String value) {
-        return "%," + QueryUtils.escapeForLike(value) + ",%";
     }
 
     public boolean inputParametersRequiredByTemplates(Report report) {
