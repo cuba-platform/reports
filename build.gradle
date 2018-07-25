@@ -5,7 +5,7 @@
 
 buildscript {
     ext.cubaVersion = '7.0-SNAPSHOT'
-    ext.cubaVersion = rootProject.hasProperty('buildVersion') ? rootProject['buildVersion'] : cubaVersion
+    ext.cubaVersion = rootProject.hasProperty('cubaVersion') ? rootProject['cubaVersion'] : cubaVersion
     
     println("CUBA Platform - Reports Version ${ext.cubaVersion}")
     println("")
@@ -58,8 +58,6 @@ def guiModule = project(':reports-gui')
 def webModule = project(':reports-web')
 def desktopModule = project(':reports-desktop')
 
-def baseVersion = cuba.artifact.version + (cuba.artifact.isSnapshot ? '-SNAPSHOT' : '')
-
 configure([globalModule, coreModule, guiModule, webModule, desktopModule]) {
     apply(plugin: 'java')
     apply(plugin: 'idea')
@@ -69,7 +67,7 @@ configure([globalModule, coreModule, guiModule, webModule, desktopModule]) {
     apply(plugin: 'cuba')
 
     dependencies {
-        compile(group: 'com.haulmont.cuba', name: 'cuba-global', version: baseVersion)
+        compile(group: 'com.haulmont.cuba', name: 'cuba-global', version: project.cubaVersion)
         testCompile(bom['org.jmockit:jmockit'])
         testCompile(bom['junit:junit'])
         testCompile(bom['org.hsqldb:hsqldb'])
@@ -202,19 +200,19 @@ configure(coreModule) {
 
     dependencies {
         compile(globalModule)
-        compile(group: 'com.haulmont.cuba', name: 'cuba-core', version: baseVersion)
+        compile(group: 'com.haulmont.cuba', name: 'cuba-core', version: project.cubaVersion)
 		compile(bom['com.haulmont.yarg:yarg']) {
             exclude group: 'org.codehaus.groovy', module: 'groovy-all'
             exclude group: 'commons-dbcp', module: 'commons-dbcp'
         }
         compile(bom['com.fasterxml.jackson.core:jackson-annotations']) // use the same version as BPM
 		
-        testCompile(group: 'com.haulmont.cuba', name: 'cuba-core-tests', version: baseVersion)
+        testCompile(group: 'com.haulmont.cuba', name: 'cuba-core-tests', version: project.cubaVersion)
         testCompile(bom['org.apache.commons:commons-dbcp2'])
         compileOnly(bom['javax.servlet:javax.servlet-api'])
         jdbc(bom['org.postgresql:postgresql'])
 
-        dbscripts(group: 'com.haulmont.cuba', name: 'cuba-core', version: baseVersion, classifier: 'db', ext: 'zip')
+        dbscripts(group: 'com.haulmont.cuba', name: 'cuba-core', version: project.cubaVersion, classifier: 'db', ext: 'zip')
 
         testRuntime(bom['org.postgresql:postgresql'])
         testRuntime(bom['javax.servlet:javax.servlet-api'])
@@ -259,7 +257,7 @@ configure(coreModule) {
 configure(guiModule) {
     dependencies {
         compile(globalModule)
-        compile(group: 'com.haulmont.cuba', name: 'cuba-gui', version: baseVersion)
+        compile(group: 'com.haulmont.cuba', name: 'cuba-gui', version: project.cubaVersion)
         compileOnly(bom['javax.servlet:javax.servlet-api'])
     }
 }
@@ -268,7 +266,7 @@ configure(webModule) {
     dependencies {
         compile(globalModule)
         compile(guiModule)
-        compile(group: 'com.haulmont.cuba', name: 'cuba-web', version: baseVersion)
+        compile(group: 'com.haulmont.cuba', name: 'cuba-web', version: project.cubaVersion)
     }
 
     task deploy(dependsOn: assemble, type: CubaDeployment) {
@@ -282,7 +280,7 @@ configure(desktopModule) {
     dependencies {
         compile(globalModule)
         compile(guiModule)
-        compile(group: 'com.haulmont.cuba', name: 'cuba-desktop', version: baseVersion)
+        compile(group: 'com.haulmont.cuba', name: 'cuba-desktop', version: project.cubaVersion)
     }
 
     compileJava.enabled = false
