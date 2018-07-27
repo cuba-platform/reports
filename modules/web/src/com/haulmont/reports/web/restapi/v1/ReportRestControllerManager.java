@@ -28,8 +28,8 @@ import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Component("report_ReportRestV1ControllerManager")
-public class ReportRestV1ControllerManager {
+@Component("report_ReportRestControllerManager")
+public class ReportRestControllerManager {
     @Inject
     protected DataManager dataManager;
     @Inject
@@ -92,9 +92,19 @@ public class ReportRestV1ControllerManager {
         }
         Map<String, Object> preparedValues = prepareValues(report, body.parameters);
         if (body.template != null) {
-            return new ReportRestResult(reportService.createReport(report, body.template, preparedValues), body.attachment);
+            try {
+                return new ReportRestResult(reportService.createReport(report, body.template, preparedValues), body.attachment);
+            } catch (RemoteException e) {
+                throw new RestAPIException("Run report error",
+                        e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            }
         } else {
-            return new ReportRestResult(reportService.createReport(report, preparedValues), body.attachment);
+            try {
+                return new ReportRestResult(reportService.createReport(report, preparedValues), body.attachment);
+            } catch (RemoteException e) {
+                throw new RestAPIException("Run report error",
+                        e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            }
         }
     }
 
@@ -117,43 +127,9 @@ public class ReportRestV1ControllerManager {
         Map<String, Object> preparedValues = new HashMap<>();
         if (paramValues != null) {
             for (ReportInputParameter inputParam : report.getInputParameters()) {
-                ParameterType parameterType = inputParam.getType();
                 paramValues.stream().filter(paramValue -> Objects.equals(paramValue.name, inputParam.getAlias()))
                         .findFirst()
-                        .ifPresent(paramValue -> {
-                            if (parameterType == ParameterType.ENTITY) {
-                                if (paramValue.value != null) {
-                                    MetaClass entityClass = metadata.getClassNN(inputParam.getEntityMetaClass());
-                                    checkCanReadEntity(entityClass);
-                                    Object entityId = getIdFromString(paramValue.value, entityClass);
-                                    //noinspection unchecked
-                                    Entity entity = dataManager.load(entityClass.getJavaClass())
-                                            .view(View.MINIMAL)
-                                            .id(entityId).one();
-                                    checkEntityIsNotNull(entityClass.getName(), paramValue.value, entity);
-                                    preparedValues.put(paramValue.name, entity);
-                                }
-                            } else if (parameterType == ParameterType.ENTITY_LIST) {
-                                if (paramValue.values != null) {
-                                    MetaClass entityClass = metadata.getClassNN(inputParam.getEntityMetaClass());
-                                    checkCanReadEntity(entityClass);
-                                    List<Entity> entities = new ArrayList<>();
-                                    for (String value : paramValue.values) {
-                                        Object entityId = getIdFromString(value, entityClass);
-                                        //noinspection unchecked
-                                        Entity entity = dataManager.load(entityClass.getJavaClass())
-                                                .view(View.MINIMAL)
-                                                .id(entityId).one();
-                                        checkEntityIsNotNull(entityClass.getName(), value, entity);
-                                        entities.add(entity);
-                                    }
-                                    preparedValues.put(paramValue.name, entities);
-                                }
-                            } else if (paramValue.value != null) {
-                                Class paramClass = parameterClassResolver.resolveClass(inputParam);
-                                preparedValues.put(paramValue.name, reportService.convertFromString(paramClass, paramValue.value));
-                            }
-                        });
+                        .ifPresent(paramValue -> preparedValues.put(paramValue.name, prepareValue(inputParam, paramValue)));
             }
         }
         return preparedValues;
@@ -161,6 +137,44 @@ public class ReportRestV1ControllerManager {
 
     protected Gson createGson() {
         return new GsonBuilder().create();
+    }
+
+
+    private Object prepareValue(ReportInputParameter inputParam, ParameterValueInfo paramValue) {
+        ParameterType parameterType = inputParam.getType();
+        if (parameterType == ParameterType.ENTITY) {
+            if (paramValue.value != null) {
+                MetaClass entityClass = metadata.getClassNN(inputParam.getEntityMetaClass());
+                checkCanReadEntity(entityClass);
+                Object entityId = getIdFromString(paramValue.value, entityClass);
+                //noinspection unchecked
+                Entity entity = dataManager.load(entityClass.getJavaClass())
+                        .view(View.MINIMAL)
+                        .id(entityId).one();
+                checkEntityIsNotNull(entityClass.getName(), paramValue.value, entity);
+                return entity;
+            }
+        } else if (parameterType == ParameterType.ENTITY_LIST) {
+            if (paramValue.values != null) {
+                MetaClass entityClass = metadata.getClassNN(inputParam.getEntityMetaClass());
+                checkCanReadEntity(entityClass);
+                List<Entity> entities = new ArrayList<>();
+                for (String value : paramValue.values) {
+                    Object entityId = getIdFromString(value, entityClass);
+                    //noinspection unchecked
+                    Entity entity = dataManager.load(entityClass.getJavaClass())
+                            .view(View.MINIMAL)
+                            .id(entityId).one();
+                    checkEntityIsNotNull(entityClass.getName(), value, entity);
+                    entities.add(entity);
+                }
+                return entities;
+            }
+        } else if (paramValue.value != null) {
+            Class paramClass = parameterClassResolver.resolveClass(inputParam);
+            return reportService.convertFromString(paramClass, paramValue.value);
+        }
+        return null;
     }
 
     protected ReportInfo mapToReportInfo(Report report) {

@@ -24,14 +24,14 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
-@RestController("report_ReportRestV1Controller")
+@RestController("report_ReportRestController")
 @RequestMapping("/reports/v1")
-public class ReportRestV1Controller {
+public class ReportRestController {
 
-    private static final Logger log = LoggerFactory.getLogger(ReportRestV1Controller.class);
+    private static final Logger log = LoggerFactory.getLogger(ReportRestController.class);
 
     @Inject
-    protected ReportRestV1ControllerManager controllerManager;
+    protected ReportRestControllerManager controllerManager;
 
     @GetMapping(value = "/report", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public String loadReportsList() {
