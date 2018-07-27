@@ -13,6 +13,7 @@
                 <button action="templatesTable.edit" icon="icons/edit.png"/>
                 <button action="templatesTable.remove" icon="icons/remove.png"/>
                 <button action="templatesTable.defaultTemplate" icon="icons/ok.png"/>
+                <button action="templatesTable.copy" icon="icons/copy.png"/>
             </buttonsPanel>
             <columns>
                 <column id="name"/>

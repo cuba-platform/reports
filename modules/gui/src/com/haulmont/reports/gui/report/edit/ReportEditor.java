@@ -14,6 +14,7 @@ import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.core.global.Metadata;
 import com.haulmont.cuba.core.global.PersistenceHelper;
+import com.haulmont.cuba.core.global.UuidSource;
 import com.haulmont.cuba.gui.AppConfig;
 import com.haulmont.cuba.gui.ScreensHelper;
 import com.haulmont.cuba.gui.WindowManager.OpenType;
@@ -50,6 +51,7 @@ import javax.inject.Named;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ReportEditor extends AbstractEditor<Report> {
 
@@ -163,6 +165,9 @@ public class ReportEditor extends AbstractEditor<Report> {
 
     @Inject
     private Metadata metadata;
+
+    @Inject
+    protected UuidSource uuidSource;
 
     @Inject
     protected HBoxLayout reportFields;
@@ -971,6 +976,38 @@ public class ReportEditor extends AbstractEditor<Report> {
                 }
 
                 return false;
+            }
+        });
+        templatesTable.addAction(new ItemTrackingAction("copy") {
+            @Override
+            public void actionPerform(Component component) {
+                ReportTemplate template = (ReportTemplate) target.getSingleSelected();
+                if (template != null) {
+
+                    ReportTemplate copy = metadata.getTools().copy(template);
+                    copy.setId(uuidSource.createUuid());
+
+                    String copyNamingPattern = getMessage("template.copyNamingPattern");
+                    String copyCode = String.format(copyNamingPattern, StringUtils.isEmpty(copy.getCode()) ? StringUtils.EMPTY : copy.getCode());
+                    //noinspection unchecked
+                    List<String> codes = (List<String>) target.getDatasource().getItems().stream()
+                            .map(o -> ((ReportTemplate) o).getCode())
+                            .filter(o -> !StringUtils.isEmpty((String) o))
+                            .collect(Collectors.toList());
+                    if (codes.contains(copyCode)) {
+                        String code = copyCode;
+                        int i = 0;
+                        while ((codes.contains(code))) {
+                            i += 1;
+                            code = copyCode + " " + i;
+                        }
+                        copyCode = code;
+                    }
+                    copy.setCode(copyCode);
+
+                    //noinspection unchecked
+                    target.getDatasource().addItem(copy);
+                }
             }
         });
     }
