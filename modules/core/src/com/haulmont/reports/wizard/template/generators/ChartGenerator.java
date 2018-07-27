@@ -53,6 +53,7 @@ public class ChartGenerator implements Generator {
                         chartSeries.setName(regionProperty.getLocalizedName());
                         chartSeries.setValueField(wrappedMetaProperty.getName());
                         chartSeries.setType(SeriesType.COLUMN);
+                        chartSeries.setOrder(serialChartDescription.getSeries().size() + 1);
                         serialChartDescription.getSeries().add(chartSeries);
                     }
                 }

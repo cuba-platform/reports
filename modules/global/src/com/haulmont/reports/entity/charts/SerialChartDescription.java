@@ -9,6 +9,7 @@ import com.haulmont.chile.core.annotations.MetaClass;
 import com.haulmont.chile.core.annotations.MetaProperty;
 import com.haulmont.cuba.core.entity.annotation.SystemLevel;
 
+import javax.persistence.OrderBy;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +28,7 @@ public class SerialChartDescription extends AbstractChartDescription {
     protected String valueAxisUnits;
     @MetaProperty
     protected String valueStackType;
+    @OrderBy("order")
     @MetaProperty
     protected List<ChartSeries> series = new ArrayList<>();
     @MetaProperty

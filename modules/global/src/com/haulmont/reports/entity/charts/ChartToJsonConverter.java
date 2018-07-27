@@ -111,6 +111,7 @@ public class ChartToJsonConverter {
 
             graph.put("balloonText", join(series.getName(), series.getName() != null ? " : " : "", "[[value]]"));
             graph.put("title", series.getName());
+            graph.put("order", series.getOrder() == null ? 1 : series.getOrder());
 
             graphs.add(graph);
         }

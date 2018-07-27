@@ -63,16 +63,21 @@
                 </row>
                 <row>
                     <groupBox id="seriesBox" caption="msg://chartEdit.series" colspan="2">
-                        <table id="seriesTable" editable="true" height="200px" width="100%">
+                        <table id="seriesTable" editable="true" height="200px" width="100%" sortable="false">
                             <actions>
                                 <action id="create"/>
                                 <action id="remove"/>
+                                <action id="up"/>
+                                <action id="down"/>
                             </actions>
                             <buttonsPanel>
                                 <button action="seriesTable.create"/>
                                 <button action="seriesTable.remove"/>
+                                <button action="seriesTable.up" icon="CARET_UP" caption=""/>
+                                <button action="seriesTable.down" icon="CARET_DOWN" caption=""/>
                             </buttonsPanel>
                             <columns>
+                                <column id="order" editable="false"/>
                                 <column id="name" editable="true"/>
                                 <column id="valueField" editable="true"/>
                                 <column id="type" editable="true"/>

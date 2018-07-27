@@ -5,17 +5,20 @@
 
 package com.haulmont.reports.gui.template.edit;
 
+import com.haulmont.chile.core.model.MetaPropertyPath;
 import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.components.actions.CreateAction;
+import com.haulmont.cuba.gui.components.actions.ItemTrackingAction;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
 import com.haulmont.cuba.gui.data.Datasource;
-import com.haulmont.cuba.gui.xml.layout.ComponentsFactory;
 import com.haulmont.reports.entity.BandDefinition;
 import com.haulmont.reports.entity.ReportOutputType;
 import com.haulmont.reports.entity.ReportTemplate;
 import com.haulmont.reports.entity.charts.*;
 import com.haulmont.reports.gui.report.run.ShowChartController;
 import com.haulmont.reports.gui.template.edit.generator.RandomChartDataGenerator;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.IterableUtils;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -28,7 +31,7 @@ public class ChartEditFrame extends DescriptionEditFrame {
     @Inject
     protected Datasource<SerialChartDescription> serialChartDs;
     @Inject
-    protected CollectionDatasource<ChartSeries, UUID> seriesDs;
+    protected CollectionDatasource.Sortable<ChartSeries, UUID> seriesDs;
     @Inject
     protected LookupField type;
     @Inject
@@ -64,16 +67,24 @@ public class ChartEditFrame extends DescriptionEditFrame {
             public void actionPerform(Component component) {
                 @SuppressWarnings("IncorrectCreateEntity")
                 ChartSeries chartSeries = new ChartSeries();
+                chartSeries.setOrder(seriesDs.getItems().size() + 1);
                 seriesDs.addItem(chartSeries);
             }
         });
+        seriesTable.addAction(new ChartSeriesMoveAction(true));
+        seriesTable.addAction(new ChartSeriesMoveAction(false));
 
         pieChartDs.addItemPropertyChangeListener(e -> showPreview());
 
         serialChartDs.addItemPropertyChangeListener(e -> showPreview());
 
         seriesDs.addItemPropertyChangeListener(e -> showPreview());
-        seriesDs.addCollectionChangeListener(e -> showPreview());
+        seriesDs.addCollectionChangeListener(e -> {
+            checkSeriesOrder();
+            showPreview();
+        });
+
+        sortSeriesByOrder();
     }
 
     @Override
@@ -181,5 +192,64 @@ public class ChartEditFrame extends DescriptionEditFrame {
 
         pieChartBandName.setOptionsList(bandNames);
         serialChartBandName.setOptionsList(bandNames);
+    }
+
+    protected void checkSeriesOrder() {
+        Collection<ChartSeries> items = seriesDs.getItems();
+        int i = 1;
+        for (ChartSeries item : items) {
+            if (!Objects.equals(i, item.getOrder())) {
+                item.setOrder(i);
+            }
+            i += 1;
+        }
+    }
+
+    protected class ChartSeriesMoveAction extends ItemTrackingAction {
+        private final boolean up;
+
+        ChartSeriesMoveAction(boolean up) {
+            super(seriesTable, up ? "up" : "down");
+            setCaption(getMessage(up ? "generalFrame.up" : "generalFrame.down"));
+            this.up = up;
+        }
+
+        @Override
+        public void actionPerform(Component component) {
+            ChartSeries selected = seriesTable.getSingleSelected();
+            //noinspection ConstantConditions
+            Integer currentOrder = selected.getOrder();
+            Integer newOrder = up ? currentOrder - 1 : currentOrder + 1;
+
+            Collection<ChartSeries> items = seriesDs.getItems();
+
+            ChartSeries changing = IterableUtils.get(items, currentOrder - 1);
+            ChartSeries neighbor = IterableUtils.get(items, newOrder - 1);
+            changing.setOrder(newOrder);
+            neighbor.setOrder(currentOrder);
+
+            sortSeriesByOrder();
+        }
+
+        @Override
+        public boolean isPermitted() {
+            if (super.isPermitted()) {
+                Set<ChartSeries> items = seriesTable.getSelected();
+                if (!CollectionUtils.isEmpty(items) && items.size() == 1) {
+                    Integer order = (IterableUtils.get(items, 0)).getOrder();
+                    if (order != null) {
+                        return up ? order > 1 : order < seriesDs.size();
+                    }
+                }
+            }
+            return false;
+        }
+    }
+
+    protected void sortSeriesByOrder() {
+        CollectionDatasource.Sortable.SortInfo<MetaPropertyPath> sortInfo = new CollectionDatasource.Sortable.SortInfo<>();
+        sortInfo.setOrder(CollectionDatasource.Sortable.Order.ASC);
+        sortInfo.setPropertyPath(seriesDs.getMetaClass().getPropertyPath("order"));
+        seriesDs.sort(new CollectionDatasource.Sortable.SortInfo[]{sortInfo});
     }
 }

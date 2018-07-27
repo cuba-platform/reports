@@ -24,6 +24,8 @@ public class ChartSeries extends BaseUuidEntity {
     protected String valueField;
     @MetaProperty
     protected String colorField;
+    @MetaProperty
+    protected Integer order;
 
     public String getName() {
         return name;
@@ -55,5 +57,13 @@ public class ChartSeries extends BaseUuidEntity {
 
     public void setColorField(String colorField) {
         this.colorField = colorField;
+    }
+
+    public Integer getOrder() {
+        return order;
+    }
+
+    public void setOrder(Integer order) {
+        this.order = order;
     }
 }
