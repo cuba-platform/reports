@@ -58,7 +58,8 @@ def guiModule = project(':reports-gui')
 def webModule = project(':reports-web')
 def desktopModule = project(':reports-desktop')
 
-def baseVersion = rootProject.hasProperty('cuba.version') ? rootProject['cuba.version'] : cuba.artifact.version + (cuba.artifact.isSnapshot ? '-SNAPSHOT' : '')
+def artifactVersion = cuba.artifact.version + (cuba.artifact.isSnapshot ? '-SNAPSHOT' : '')
+def baseVersion = rootProject.hasProperty('cuba.version') ? rootProject['cuba.version'] : artifactVersion
 
 configure([globalModule, coreModule, guiModule, webModule, desktopModule]) {
     apply(plugin: 'java')
@@ -179,7 +180,7 @@ configure(globalModule) {
     jar {
         manifest {
             attributes('App-Component-Id': cuba.artifact.group)
-            attributes('App-Component-Version': cubaVersion)
+            attributes('App-Component-Version': artifactVersion)
         }
     }
 }
