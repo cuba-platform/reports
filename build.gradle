@@ -87,7 +87,7 @@ configure([globalModule, coreModule, guiModule, webModule, desktopModule]) {
 
     jar {
         manifest {
-            attributes("Implementation-Version": cuba.artifact.version + (cuba.artifact.isSnapshot ? '-SNAPSHOT' : ''))
+            attributes("Implementation-Version": artifactVersion)
         }
     }
 
