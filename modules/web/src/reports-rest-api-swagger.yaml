@@ -236,7 +236,7 @@ paths:
         - Run report
       summary: Run report
       description: |
-        Runs report and returns report document. The method expects a JSON with by selected parameters and report template
+        Runs report and returns report document. The method expects a JSON with selected parameters and report template
         in the request body
       parameters:
         - name: runObject
