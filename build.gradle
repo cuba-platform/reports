@@ -230,6 +230,8 @@ configure(coreModule) {
         testCompile (bom['org.apache.xmlbeans:xmlbeans']) {
             transitive = false
         }
+
+        testCompile(bom['org.codehaus.groovy:groovy-json'])
     }
     
     test {
