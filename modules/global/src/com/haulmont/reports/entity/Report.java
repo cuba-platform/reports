@@ -75,6 +75,9 @@ public class Report extends StandardEntity implements com.haulmont.yarg.structur
     @Composition
     protected List<ReportTemplate> templates;
 
+    @Column(name = "IS_SYSTEM")
+    protected Boolean system = false;
+
     @Transient
     protected BandDefinition rootBandDefinition;
 
@@ -188,6 +191,14 @@ public class Report extends StandardEntity implements com.haulmont.yarg.structur
 
     public void setTemplates(List<ReportTemplate> templates) {
         this.templates = templates;
+    }
+
+    public Boolean getSystem() {
+        return system;
+    }
+
+    public void setSystem(Boolean system) {
+        this.system = system;
     }
 
     public ReportTemplate getDefaultTemplate() {

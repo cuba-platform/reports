@@ -43,6 +43,7 @@ create table REPORT_REPORT
   SCREENS_IDX varchar(1000),
   INPUT_ENTITY_TYPES_IDX varchar(1000),
   REST_ACCESS tinyint default 0,
+  IS_SYSTEM tinyint default 0,
   --
   primary key (ID),
   constraint FK_REPORT_REPORT_TO_REPORT_GROUP foreign key (GROUP_ID)

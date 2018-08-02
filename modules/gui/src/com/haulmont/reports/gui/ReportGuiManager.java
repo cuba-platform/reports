@@ -401,7 +401,7 @@ public class ReportGuiManager {
                 .addProperty("description")
                 .addProperty("code")
                 .addProperty("group", metadata.getViewRepository().getView(ReportGroup.class, View.LOCAL)));
-        lc.setQueryString("select r from report$Report r");
+        lc.setQueryString("select r from report$Report r where r.system <> true");
         reportSecurityManager.applySecurityPolicies(lc, screenId, user);
         reportSecurityManager.applyPoliciesByEntityParameters(lc, inputValueMetaClass);
         return dataService.loadList(lc);

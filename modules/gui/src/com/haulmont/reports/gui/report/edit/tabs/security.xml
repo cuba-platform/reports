@@ -28,6 +28,7 @@
                 <fieldGroup datasource="reportDs">
                     <column>
                         <field property="restAccess"/>
+                        <field property="system"/>
                     </column>
                 </fieldGroup>
             </vbox>
