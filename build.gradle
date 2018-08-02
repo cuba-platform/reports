@@ -33,7 +33,6 @@ dependencies {
 }
 
 apply(plugin: 'maven')
-apply(plugin: 'idea')
 apply(plugin: 'cuba')
 
 bom.load file('modules/global/src/com/haulmont/reports/bom.properties')
@@ -63,7 +62,6 @@ def baseVersion = rootProject.hasProperty('cuba.version') ? rootProject['cuba.ve
 
 configure([globalModule, coreModule, guiModule, webModule, desktopModule]) {
     apply(plugin: 'java')
-    apply(plugin: 'idea')
     apply(plugin: 'maven')
     apply(plugin: 'findbugs')
     apply(plugin: 'pmd')
@@ -219,8 +217,6 @@ configure(coreModule) {
 
         testRuntime(bom['org.postgresql:postgresql'])
         testRuntime(bom['javax.servlet:javax.servlet-api'])
-
-        compile(bom['org.codehaus.groovy:groovy-all'])
 
         testCompile(bom['org.springframework:spring-test'])
         testCompile(bom['com.fasterxml.jackson.dataformat:jackson-dataformat-yaml'])
