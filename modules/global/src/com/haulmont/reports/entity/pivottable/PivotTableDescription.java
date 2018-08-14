@@ -208,7 +208,11 @@ public class PivotTableDescription extends BaseUuidEntity {
     }
 
     public static PivotTableDescription fromJsonString(String json) {
-        return gson.fromJson(json, PivotTableDescription.class);
+        try {
+            return gson.fromJson(json, PivotTableDescription.class);
+        } catch (JsonSyntaxException e) {
+            return null;
+        }
     }
 
     protected static class RendererTypeAdapter implements JsonSerializer<RendererType>, JsonDeserializer<RendererType> {

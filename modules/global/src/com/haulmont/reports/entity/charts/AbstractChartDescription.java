@@ -8,6 +8,7 @@ package com.haulmont.reports.entity.charts;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSyntaxException;
 import com.haulmont.bali.util.Preconditions;
 import com.haulmont.chile.core.annotations.MetaClass;
 import com.haulmont.chile.core.annotations.MetaProperty;
@@ -19,7 +20,7 @@ import javax.annotation.Nullable;
 @MetaClass(name = "report$AbstractChartDescription")
 @SystemLevel
 public abstract class AbstractChartDescription extends BaseUuidEntity {
-    
+
     private static final long serialVersionUID = 3418759346397067914L;
 
     @MetaProperty
@@ -31,9 +32,21 @@ public abstract class AbstractChartDescription extends BaseUuidEntity {
     public static AbstractChartDescription fromJsonString(String jsonString) {
         Preconditions.checkNotNullArgument(jsonString);
         Gson gson = new Gson();
-        JsonObject jsonElement = gson.fromJson(jsonString, JsonObject.class);
+        JsonObject jsonElement;
+
+        try {
+            jsonElement = gson.fromJson(jsonString, JsonObject.class);
+        } catch (JsonSyntaxException e) {
+            return null;
+        }
+
         if (jsonElement != null) {
             JsonPrimitive type = jsonElement.getAsJsonPrimitive("type");
+
+            if (type == null) {
+                return null;
+            }
+
             if (ChartType.PIE.getId().equals(type.getAsString())) {
                 return gson.fromJson(jsonString, PieChartDescription.class);
             } else if (ChartType.SERIAL.getId().equals(type.getAsString())) {
