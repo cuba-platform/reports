@@ -218,7 +218,7 @@ public class DetailsStepFrame extends StepFrame {
 
             FilterEditor filterEditor = (FilterEditor) wizard.openWindow("filterEditor", OpenType.DIALOG, params);
             filterEditor.addCloseListener(new Window.CloseListener() {
-                private ParameterClassResolver parameterClassResolver = new ParameterClassResolver();
+                private ParameterClassResolver parameterClassResolver = AppBeans.get(ParameterClassResolver.NAME);
 
                 @Override
                 public void windowClosed(String actionId) {

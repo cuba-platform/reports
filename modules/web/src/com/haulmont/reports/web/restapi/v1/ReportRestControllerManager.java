@@ -44,8 +44,8 @@ public class ReportRestControllerManager {
     protected ReportSecurityManager reportSecurityManager;
     @Inject
     protected UserSessionSource userSessionSource;
-
-    protected ParameterClassResolver parameterClassResolver = new ParameterClassResolver();
+    @Inject
+    protected ParameterClassResolver parameterClassResolver;
 
     public String loadReportsList() {
         checkCanReadEntity(metadata.getClassNN(Report.class));
@@ -140,7 +140,7 @@ public class ReportRestControllerManager {
     }
 
 
-    private Object prepareValue(ReportInputParameter inputParam, ParameterValueInfo paramValue) {
+    protected Object prepareValue(ReportInputParameter inputParam, ParameterValueInfo paramValue) {
         ParameterType parameterType = inputParam.getType();
         if (parameterType == ParameterType.ENTITY) {
             if (paramValue.value != null) {
@@ -230,7 +230,7 @@ public class ReportRestControllerManager {
         return (UUID) getIdFromString(entityId, metadata.getClassNN(Report.class));
     }
 
-    private Object getIdFromString(String entityId, MetaClass metaClass) {
+    protected Object getIdFromString(String entityId, MetaClass metaClass) {
         try {
             if (BaseDbGeneratedIdEntity.class.isAssignableFrom(metaClass.getJavaClass())) {
                 if (BaseIdentityIdEntity.class.isAssignableFrom(metaClass.getJavaClass())) {

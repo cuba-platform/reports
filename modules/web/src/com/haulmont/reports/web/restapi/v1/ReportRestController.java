@@ -5,6 +5,7 @@
 
 package com.haulmont.reports.web.restapi.v1;
 
+import com.haulmont.bali.util.URLEncodeUtils;
 import com.haulmont.cuba.core.global.FileTypesHelper;
 import com.haulmont.cuba.gui.export.ExportFormat;
 import com.haulmont.reports.gui.ReportPrintHelper;
@@ -14,6 +15,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -50,12 +52,14 @@ public class ReportRestController {
         ReportRestResult result = controllerManager.runReport(entityId, body);
 
         try {
-            response.setHeader("Cache-Control", "no-cache");
-            response.setHeader("Pragma", "no-cache");
-            response.setDateHeader("Expires", 0);
-            response.setHeader("Content-Type", getContentType(result.getReportOutputType()));
-            response.setHeader("Content-Disposition", (BooleanUtils.isTrue(result.attachment) ? "attachment" : "inline")
-                    + "; filename=\"" + result.getDocumentName() + "\"");
+            String fileName = URLEncodeUtils.encodeUtf8(result.getDocumentName());
+
+            response.setHeader(HttpHeaders.CACHE_CONTROL, "no-cache");
+            response.setHeader(HttpHeaders.PRAGMA, "no-cache");
+            response.setDateHeader(HttpHeaders.EXPIRES, 0);
+            response.setHeader(HttpHeaders.CONTENT_TYPE, getContentType(result.getReportOutputType()));
+            response.setHeader(HttpHeaders.CONTENT_DISPOSITION, (BooleanUtils.isTrue(result.attachment) ? "attachment" : "inline")
+                    + "; filename=\"" + fileName + "\"");
 
             ServletOutputStream os = response.getOutputStream();
             IOUtils.copy(new ByteArrayInputStream(result.getContent()), os);

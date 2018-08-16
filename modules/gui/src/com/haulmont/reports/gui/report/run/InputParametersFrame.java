@@ -63,11 +63,12 @@ public class InputParametersFrame extends AbstractFrame {
     @Inject
     protected ReportGuiManager reportGuiManager;
 
+    @Inject
+    protected ParameterClassResolver parameterClassResolver;
+
     protected HashMap<String, Field> parameterComponents = new HashMap<>();
 
     protected ParameterFieldCreator parameterFieldCreator = new ParameterFieldCreator(this);
-
-    protected ParameterClassResolver parameterClassResolver = new ParameterClassResolver();
 
     @Override
     public void init(Map<String, Object> params) {

@@ -14,14 +14,20 @@ import com.haulmont.cuba.core.global.Scripting;
 import com.haulmont.reports.entity.ParameterType;
 import com.haulmont.reports.entity.ReportInputParameter;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.Nullable;
+import javax.inject.Inject;
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
 
+@Component(ParameterClassResolver.NAME)
 public class ParameterClassResolver {
+
+    public static final String NAME = "report_ParameterClassResolver";
+
     protected Map<ParameterType, Class> primitiveParameterTypeMapping = new ImmutableMap.Builder<ParameterType, Class>()
             .put(ParameterType.BOOLEAN, Boolean.class)
             .put(ParameterType.DATE, Date.class)
@@ -42,9 +48,11 @@ public class ParameterClassResolver {
             .put(Long.class, ParameterType.NUMERIC)
             .build();
 
-    private Scripting scripting = AppBeans.get(Scripting.class);
+    @Inject
+    protected Scripting scripting;
 
-    private Metadata metadata = AppBeans.get(Metadata.class);
+    @Inject
+    protected Metadata metadata;
 
     @Nullable
     public Class resolveClass(ReportInputParameter parameter) {

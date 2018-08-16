@@ -92,11 +92,12 @@ public class ParameterEditor extends AbstractEditor<ReportInputParameter> {
     @Inject
     protected ScreensHelper screensHelper;
 
+    @Inject
+    protected ParameterClassResolver parameterClassResolver;
+
     protected ReportInputParameter parameter;
 
     protected ParameterFieldCreator parameterFieldCreator = new ParameterFieldCreator(this);
-
-    protected ParameterClassResolver parameterClassResolver = new ParameterClassResolver();
 
     @Override
     public void setItem(Entity item) {
