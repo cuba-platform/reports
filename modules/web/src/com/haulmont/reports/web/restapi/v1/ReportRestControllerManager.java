@@ -13,10 +13,10 @@ import com.haulmont.cuba.core.entity.*;
 import com.haulmont.cuba.core.global.*;
 import com.haulmont.cuba.security.entity.EntityOp;
 import com.haulmont.reports.app.service.ReportService;
-import com.haulmont.reports.entity.ParameterType;
-import com.haulmont.reports.entity.Report;
-import com.haulmont.reports.entity.ReportInputParameter;
-import com.haulmont.reports.entity.ReportTemplate;
+import com.haulmont.reports.entity.*;
+import com.haulmont.reports.exception.FailedToConnectToOpenOfficeException;
+import com.haulmont.reports.exception.NoOpenOfficeFreePortsException;
+import com.haulmont.reports.exception.ReportingException;
 import com.haulmont.reports.gui.ReportSecurityManager;
 import com.haulmont.reports.gui.report.run.ParameterClassResolver;
 import com.haulmont.restapi.exception.RestAPIException;
@@ -84,24 +84,39 @@ public class ReportRestControllerManager {
                     e);
         }
         if (body.template != null) {
-            report.getTemplates().stream()
+            ReportTemplate reportTemplate = report.getTemplates().stream()
                     .filter(t -> Objects.equals(t.getCode(), body.template))
                     .findFirst()
                     .orElseThrow(() -> new RestAPIException("Template not found",
                             String.format("Template with code %s not found for report %s", body.template, entityId), HttpStatus.BAD_REQUEST));
+            checkReportOutputType(reportTemplate);
+        } else {
+            checkReportOutputType(report.getDefaultTemplate());
         }
         Map<String, Object> preparedValues = prepareValues(report, body.parameters);
         if (body.template != null) {
             try {
                 return new ReportRestResult(reportService.createReport(report, body.template, preparedValues), body.attachment);
-            } catch (RemoteException e) {
+            } catch (FailedToConnectToOpenOfficeException e) {
+                throw new RestAPIException("Run report error", "Couldn't find LibreOffice instance",
+                        HttpStatus.INTERNAL_SERVER_ERROR);
+            } catch (NoOpenOfficeFreePortsException e) {
+                throw new RestAPIException("Run report error", "Couldn't connect to LibreOffice instance. No free ports available.",
+                        HttpStatus.INTERNAL_SERVER_ERROR);
+            } catch (RemoteException | ReportingException e) {
                 throw new RestAPIException("Run report error",
                         e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
             }
         } else {
             try {
                 return new ReportRestResult(reportService.createReport(report, preparedValues), body.attachment);
-            } catch (RemoteException e) {
+            } catch (FailedToConnectToOpenOfficeException e) {
+                throw new RestAPIException("Run report error", "Couldn't find LibreOffice instance",
+                        HttpStatus.INTERNAL_SERVER_ERROR);
+            } catch (NoOpenOfficeFreePortsException e) {
+                throw new RestAPIException("Run report error", "Couldn't connect to LibreOffice instance. No free ports available.",
+                        HttpStatus.INTERNAL_SERVER_ERROR);
+            } catch (RemoteException | ReportingException e) {
                 throw new RestAPIException("Run report error",
                         e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
             }
@@ -148,9 +163,9 @@ public class ReportRestControllerManager {
                 checkCanReadEntity(entityClass);
                 Object entityId = getIdFromString(paramValue.value, entityClass);
                 //noinspection unchecked
-                Entity entity = dataManager.load(entityClass.getJavaClass())
+                Entity entity = (Entity) dataManager.load(entityClass.getJavaClass())
                         .view(View.MINIMAL)
-                        .id(entityId).one();
+                        .id(entityId).optional().orElse(null);
                 checkEntityIsNotNull(entityClass.getName(), paramValue.value, entity);
                 return entity;
             }
@@ -162,9 +177,9 @@ public class ReportRestControllerManager {
                 for (String value : paramValue.values) {
                     Object entityId = getIdFromString(value, entityClass);
                     //noinspection unchecked
-                    Entity entity = dataManager.load(entityClass.getJavaClass())
+                    Entity entity = (Entity) dataManager.load(entityClass.getJavaClass())
                             .view(View.MINIMAL)
-                            .id(entityId).one();
+                            .id(entityId).optional().orElse(null);
                     checkEntityIsNotNull(entityClass.getName(), value, entity);
                     entities.add(entity);
                 }
@@ -294,6 +309,18 @@ public class ReportRestControllerManager {
             throw new RestAPIException("Entity not found",
                     String.format("Entity %s with id %s not found", entityName, entityId),
                     HttpStatus.NOT_FOUND);
+        }
+    }
+
+    protected void checkReportOutputType(ReportTemplate reportTemplate) {
+        if (reportTemplate != null) {
+            ReportOutputType outputType = reportTemplate.getReportOutputType();
+            if (outputType == ReportOutputType.CHART || outputType == ReportOutputType.TABLE
+                || outputType == ReportOutputType.PIVOT_TABLE) {
+                throw new RestAPIException("Run report error",
+                        String.format("%s report output type is not supported by Reporting REST API", outputType.toString()),
+                        HttpStatus.BAD_REQUEST);
+            }
         }
     }
 

@@ -5,6 +5,7 @@
 
 package com.haulmont.reports.web.restapi.v1;
 
+import com.google.common.base.Strings;
 import com.haulmont.bali.util.URLEncodeUtils;
 import com.haulmont.cuba.core.global.FileTypesHelper;
 import com.haulmont.cuba.gui.export.ExportFormat;
@@ -47,7 +48,10 @@ public class ReportRestController {
 
     @PostMapping(value = "/run/{entityId}")
     public void runReport(@PathVariable String entityId,
-                          @RequestBody String body, HttpServletResponse response) {
+                          @RequestBody(required = false) String body, HttpServletResponse response) {
+        if (Strings.isNullOrEmpty(body)) {
+            throw new RestAPIException("Run report error", "Required request body is missing", HttpStatus.BAD_REQUEST);
+        }
 
         ReportRestResult result = controllerManager.runReport(entityId, body);
 
