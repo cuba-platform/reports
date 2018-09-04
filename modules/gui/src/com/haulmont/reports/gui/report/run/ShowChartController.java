@@ -38,7 +38,7 @@ public class ShowChartController extends AbstractWindow {
     protected ThemeConstants themeConstants;
 
     @Inject
-    protected LookupField reportLookup;
+    protected LookupField<Report> reportLookup;
 
     @Inject
     protected ComponentsFactory componentsFactory;

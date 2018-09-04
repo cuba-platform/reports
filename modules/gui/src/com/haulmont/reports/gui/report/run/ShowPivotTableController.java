@@ -48,7 +48,7 @@ public class ShowPivotTableController extends AbstractWindow {
     protected BoxLayout parametersFrameHolder;
 
     @Inject
-    protected LookupField reportLookup;
+    protected LookupField<Report> reportLookup;
 
     @Inject
     protected HBoxLayout reportSelectorBox;

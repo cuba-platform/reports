@@ -36,7 +36,7 @@ public class ParameterEditor extends AbstractEditor<ReportInputParameter> {
     protected LookupField enumeration;
 
     @Inject
-    protected LookupField type;
+    protected LookupField<ParameterType> type;
 
     @Inject
     protected LookupField metaClass;
@@ -209,7 +209,7 @@ public class ParameterEditor extends AbstractEditor<ReportInputParameter> {
         defaultValueBox.removeAll();
         ReportInputParameter parameter = getItem();
         if (canHaveDefaultValue()) {
-            Field field = parameterFieldCreator.createField(parameter);
+            Field<Object> field = parameterFieldCreator.createField(parameter);
             field.addValueChangeListener(e -> {
                 if (e.getValue() != null) {
                     parameter.setDefaultValue(reportService.convertToString(e.getValue().getClass(), e.getValue()));

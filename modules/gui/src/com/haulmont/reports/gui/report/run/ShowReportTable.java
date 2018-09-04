@@ -65,7 +65,7 @@ public class ShowReportTable extends AbstractWindow {
     protected MessageTools messageTools;
 
     @Inject
-    protected LookupField reportLookup;
+    protected LookupField<Report> reportLookup;
     @Inject
     protected Button printReportBtn;
     @Inject

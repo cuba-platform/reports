@@ -35,6 +35,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Element;
 
 import java.util.*;
+import java.util.function.Consumer;
 
 public class DetailsStepFrame extends StepFrame {
     protected ConditionsTree conditionsTree;
@@ -142,13 +143,13 @@ public class DetailsStepFrame extends StepFrame {
         return errors;
     }
 
-    protected class ChangeReportNameListener implements HasValue.ValueChangeListener {
+    protected class ChangeReportNameListener implements Consumer<HasValue.ValueChangeEvent> {
 
         public ChangeReportNameListener() {
         }
 
         @Override
-        public void valueChanged(HasValue.ValueChangeEvent e) {
+        public void accept(HasValue.ValueChangeEvent e) {
             setGeneratedReportName((MetaClass) e.getPrevValue(), (MetaClass) e.getValue());
             wizard.outputFileName.setValue("");
         }
@@ -353,7 +354,7 @@ public class DetailsStepFrame extends StepFrame {
         }
     }
 
-    protected class ClearRegionListener implements HasValue.ValueChangeListener {
+    protected class ClearRegionListener implements Consumer<HasValue.ValueChangeEvent> {
         protected DialogActionWithChangedValue okAction;
 
         public ClearRegionListener(DialogActionWithChangedValue okAction) {
@@ -361,7 +362,7 @@ public class DetailsStepFrame extends StepFrame {
         }
 
         @Override
-        public void valueChanged(HasValue.ValueChangeEvent e) {
+        public void accept(HasValue.ValueChangeEvent e) {
             if (!wizard.getItem().getReportRegions().isEmpty()) {
                 wizard.showOptionDialog(
                         wizard.getMessage("dialogs.Confirmation"),

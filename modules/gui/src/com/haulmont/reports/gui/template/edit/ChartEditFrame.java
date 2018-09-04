@@ -33,7 +33,7 @@ public class ChartEditFrame extends DescriptionEditFrame {
     @Inject
     protected CollectionDatasource.Sortable<ChartSeries, UUID> seriesDs;
     @Inject
-    protected LookupField type;
+    protected LookupField<ChartType> type;
     @Inject
     protected Table<ChartSeries> seriesTable;
     @Inject

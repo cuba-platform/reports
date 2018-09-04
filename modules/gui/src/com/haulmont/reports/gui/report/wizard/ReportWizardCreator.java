@@ -19,6 +19,7 @@ import com.haulmont.reports.app.service.ReportWizardService;
 import com.haulmont.reports.entity.Report;
 import com.haulmont.reports.entity.ReportGroup;
 import com.haulmont.reports.entity.ReportOutputType;
+import com.haulmont.reports.entity.charts.ChartType;
 import com.haulmont.reports.entity.wizard.ReportData;
 import com.haulmont.reports.entity.wizard.ReportRegion;
 import com.haulmont.reports.entity.wizard.TemplateFileType;
@@ -98,7 +99,7 @@ public class ReportWizardCreator extends AbstractWindow implements MainWizardFra
     @Named("saveStep.diagramTypeLabel")
     protected Label diagramTypeLabel;
     @Named("saveStep.diagramType")
-    protected LookupField diagramType;
+    protected LookupField<ChartType> diagramType;
     @Named("saveStep.chartPreviewBox")
     protected BoxLayout chartPreviewBox;
 
