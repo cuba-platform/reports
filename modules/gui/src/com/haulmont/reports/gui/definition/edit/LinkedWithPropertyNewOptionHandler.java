@@ -5,12 +5,13 @@
 
 package com.haulmont.reports.gui.definition.edit;
 
-import com.haulmont.cuba.gui.components.LookupField;
 import com.haulmont.cuba.gui.data.Datasource;
+
+import java.util.function.Consumer;
 
 /**
  */
-class LinkedWithPropertyNewOptionHandler implements LookupField.NewOptionHandler {
+class LinkedWithPropertyNewOptionHandler implements Consumer<String> {
     protected Datasource datasource;
     protected String fieldName;
 
@@ -24,7 +25,7 @@ class LinkedWithPropertyNewOptionHandler implements LookupField.NewOptionHandler
     }
 
     @Override
-    public void addNewOption(String caption) {
+    public void accept(String caption) {
         datasource.getItem().setValue(fieldName, caption);
     }
 }

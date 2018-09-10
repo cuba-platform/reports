@@ -34,7 +34,7 @@ public class ValueFormatEditor extends AbstractEditor<ReportValueFormat> {
             "${html}"
     };
 
-    protected LookupField formatField = null;
+    protected LookupField<String> formatField = null;
 
     @Inject
     protected FieldGroup formatFields;
@@ -59,7 +59,7 @@ public class ValueFormatEditor extends AbstractEditor<ReportValueFormat> {
             @Override
             public Component generateField(Datasource datasource, String propertyId) {
                 formatField = componentsFactory.createComponent(LookupField.class);
-                Map<String, Object> options = new HashMap<>();
+                Map<String, String> options = new HashMap<>();
                 for (String format : defaultFormats) {
                     options.put(format, format);
                 }
@@ -67,12 +67,9 @@ public class ValueFormatEditor extends AbstractEditor<ReportValueFormat> {
                 formatField.setDatasource(datasource, propertyId);
                 formatField.setOptionsMap(options);
                 formatField.setNewOptionAllowed(true);
-                formatField.setNewOptionHandler(new LookupField.NewOptionHandler() {
-                    @Override
-                    public void addNewOption(String caption) {
-                        addFormatItem(caption);
-                        formatField.setValue(caption);
-                    }
+                formatField.setNewOptionHandler(caption -> {
+                    addFormatItem(caption);
+                    formatField.setValue(caption);
                 });
                 return formatField;
             }
@@ -84,7 +81,9 @@ public class ValueFormatEditor extends AbstractEditor<ReportValueFormat> {
     }
 
     protected void addFormatItem(String caption) {
-        Map<String, Object> optionsMap = new HashMap<>(formatField.getOptionsMap());
+        //noinspection unchecked
+        Map<String, String> optionsMap =
+                new HashMap<>((Map<? extends String, ? extends String>) formatField.getOptionsMap());
         optionsMap.put(caption, caption);
 
         formatField.setOptionsMap(optionsMap);
@@ -92,10 +91,10 @@ public class ValueFormatEditor extends AbstractEditor<ReportValueFormat> {
 
     @Override
     protected void postInit() {
-        Object value = formatField.getValue();
+        String value = formatField.getValue();
         if (value != null) {
             if (!formatField.getOptionsMap().containsValue(value)) {
-                addFormatItem((String) value);
+                addFormatItem(value);
             }
             formatField.setValue(value);
         }
