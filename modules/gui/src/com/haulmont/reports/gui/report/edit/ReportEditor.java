@@ -16,7 +16,6 @@ import com.haulmont.cuba.core.global.Metadata;
 import com.haulmont.cuba.core.global.PersistenceHelper;
 import com.haulmont.cuba.core.global.UuidSource;
 import com.haulmont.cuba.gui.AppConfig;
-import com.haulmont.cuba.gui.ScreensHelper;
 import com.haulmont.cuba.gui.WindowManager.OpenType;
 import com.haulmont.cuba.gui.app.core.file.FileUploadDialog;
 import com.haulmont.cuba.gui.components.*;
@@ -33,6 +32,7 @@ import com.haulmont.cuba.gui.data.impl.HierarchicalPropertyDatasourceImpl;
 import com.haulmont.cuba.gui.export.ByteArrayDataProvider;
 import com.haulmont.cuba.gui.export.ExportDisplay;
 import com.haulmont.cuba.gui.export.ExportFormat;
+import com.haulmont.cuba.gui.sys.ScreensHelper;
 import com.haulmont.cuba.gui.upload.FileUploadingAPI;
 import com.haulmont.cuba.gui.xml.layout.ComponentsFactory;
 import com.haulmont.cuba.security.entity.Role;
@@ -1014,7 +1014,7 @@ public class ReportEditor extends AbstractEditor<Report> {
 
     protected void orderParameters() {
         if (getItem().getInputParameters() == null) {
-            getItem().setInputParameters(new ArrayList<ReportInputParameter>());
+            getItem().setInputParameters(new ArrayList<>());
         }
 
         for (int i = 0; i < getItem().getInputParameters().size(); i++) {
@@ -1048,12 +1048,10 @@ public class ReportEditor extends AbstractEditor<Report> {
         getItem().setXml(xml);
 
         reportDs.getDsContext().addBeforeCommitListener(context -> {
-            for (Iterator<Entity> iterator = context.getCommitInstances().iterator(); iterator.hasNext(); ) {
-                Entity entity = iterator.next();
-                if (!(entity instanceof Report || entity instanceof ReportTemplate)) {
-                    iterator.remove();
-                }
-            }
+            context.getCommitInstances()
+                    .removeIf(entity ->
+                            !(entity instanceof Report || entity instanceof ReportTemplate)
+                    );
         });
     }
 

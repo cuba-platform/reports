@@ -20,6 +20,7 @@ import com.haulmont.cuba.gui.executors.TaskLifeCycle;
 import com.haulmont.cuba.gui.export.ByteArrayDataProvider;
 import com.haulmont.cuba.gui.export.ExportDisplay;
 import com.haulmont.cuba.gui.export.ExportFormat;
+import com.haulmont.cuba.gui.screen.compatibility.LegacyFrame;
 import com.haulmont.cuba.security.entity.User;
 import com.haulmont.reports.app.ParameterPrototype;
 import com.haulmont.reports.app.service.ReportService;
@@ -97,12 +98,12 @@ public class ReportGuiManager {
      * Open input parameters dialog if report has parameters otherwise print report.
      * The method allows to select target template code, pass single parameter to report, and set output file name.
      *
-     * @param report         - target report
-     * @param window         - caller window
-     * @param parameter      - input parameter linked with passed parameter value
-     * @param parameterValue -
-     * @param templateCode   - target template code
-     * @param outputFileName - name for output file
+     * @param report         target report
+     * @param window         caller window
+     * @param parameter      input parameter linked with passed parameter value
+     * @param parameterValue parameter value
+     * @param templateCode   target template code
+     * @param outputFileName name for output file
      */
     public void runReport(Report report, Frame window, final ReportInputParameter parameter, final Object parameterValue,
                           @Nullable String templateCode, @Nullable String outputFileName) {
@@ -286,7 +287,7 @@ public class ReportGuiManager {
             screenParams.put(ShowChartController.PARAMS_PARAMETER, params);
 
             if (window != null) {
-                window.openWindow("report$showChart", OpenType.DIALOG, screenParams);
+                ((LegacyFrame) window).openWindow("report$showChart", OpenType.DIALOG, screenParams);
             } else {
                 WindowInfo windowInfo = windowConfig.getWindowInfo("report$showChart");
                 windowManagerProvider.get().openWindow(windowInfo, OpenType.DIALOG, screenParams);
@@ -298,7 +299,7 @@ public class ReportGuiManager {
                     ShowPivotTableController.TEMPLATE_CODE_PARAMETER, templateCode,
                     ShowPivotTableController.PARAMS_PARAMETER, params);
             if (window != null) {
-                window.openWindow("report$showPivotTable", OpenType.DIALOG, screenParams);
+                ((LegacyFrame) window).openWindow("report$showPivotTable", OpenType.DIALOG, screenParams);
             } else {
                 WindowInfo windowInfo = windowConfig.getWindowInfo("report$showPivotTable");
                 windowManagerProvider.get().openWindow(windowInfo, OpenType.DIALOG, screenParams);
@@ -311,7 +312,7 @@ public class ReportGuiManager {
             screenParams.put(ShowReportTable.PARAMS_PARAMETER, params);
 
             if (window != null) {
-                window.openWindow("report$showReportTable", OpenType.DIALOG, screenParams);
+                ((LegacyFrame) window).openWindow("report$showReportTable", OpenType.DIALOG, screenParams);
             } else {
                 WindowInfo windowInfo = windowConfig.getWindowInfo("report$showReportTable");
                 windowManagerProvider.get().openWindow(windowInfo, OpenType.DIALOG, screenParams);
@@ -651,7 +652,7 @@ public class ReportGuiManager {
                 OUTPUT_FILE_NAME_PARAMETER, outputFileName,
                 BULK_PRINT, bulkPrint
         );
-        window.openWindow("report$inputParameters", OpenType.DIALOG, params);
+        ((LegacyFrame) window).openWindow("report$inputParameters", OpenType.DIALOG, params);
     }
 
     protected void openReportParamsDialog(Frame window, Report report, @Nullable Map<String, Object> parameters,

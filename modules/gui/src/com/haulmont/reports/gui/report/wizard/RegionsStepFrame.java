@@ -5,14 +5,15 @@
 
 package com.haulmont.reports.gui.report.wizard;
 
-import com.haulmont.cuba.gui.WindowManager;
+import com.haulmont.cuba.gui.WindowManager.OpenType;
 import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.components.DialogAction.Type;
 import com.haulmont.reports.entity.wizard.EntityTreeNode;
 import com.haulmont.reports.entity.wizard.RegionProperty;
-import com.haulmont.reports.entity.wizard.ReportData;
+import com.haulmont.reports.entity.wizard.ReportData.ReportType;
 import com.haulmont.reports.entity.wizard.ReportRegion;
 import com.haulmont.reports.gui.components.actions.OrderableItemMoveAction;
+import com.haulmont.reports.gui.components.actions.OrderableItemMoveAction.Direction;
 import com.haulmont.reports.gui.report.wizard.step.StepFrame;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -25,6 +26,7 @@ import java.util.Map;
 public class RegionsStepFrame extends StepFrame {
     protected static final String ADD_TABULATED_REGION_ACTION_ID = "tabulatedRegion";
     protected static final String ADD_SIMPLE_REGION_ACTION_ID = "simpleRegion";
+
     protected AddSimpleRegionAction addSimpleRegionAction;
     protected AddTabulatedRegionAction addTabulatedRegionAction;
     protected EditRegionAction editRegionAction;
@@ -54,7 +56,7 @@ public class RegionsStepFrame extends StepFrame {
         }
 
         protected void openTabulatedRegionEditor(final ReportRegion item) {
-            if (ReportData.ReportType.SINGLE_ENTITY == wizard.reportTypeOptionGroup.getValue()) {
+            if (ReportType.SINGLE_ENTITY == wizard.reportTypeOptionGroup.getValue()) {
                 openRegionEditorOnlyWithNestedCollections(item);
 
             } else {
@@ -66,20 +68,22 @@ public class RegionsStepFrame extends StepFrame {
             final Map<String, Object> lookupParams = new HashMap<>();
             lookupParams.put("rootEntity", wizard.getItem().getEntityTreeRootNode());
             lookupParams.put("collectionsOnly", Boolean.TRUE);
-            lookupParams.put("persistentOnly", ReportData.ReportType.LIST_OF_ENTITIES_WITH_QUERY == wizard.reportTypeOptionGroup.getValue());
+            lookupParams.put("persistentOnly", ReportType.LIST_OF_ENTITIES_WITH_QUERY == wizard.reportTypeOptionGroup.getValue());
             wizard.openLookup("report$ReportEntityTree.lookup", items -> {
                 if (items.size() == 1) {
                     EntityTreeNode regionPropertiesRootNode = (EntityTreeNode) CollectionUtils.get(items, 0);
 
                     Map<String, Object> editorParams = new HashMap<>();
                     editorParams.put("scalarOnly", Boolean.TRUE);
-                    editorParams.put("persistentOnly", ReportData.ReportType.LIST_OF_ENTITIES_WITH_QUERY == wizard.reportTypeOptionGroup.getValue());
+                    editorParams.put("persistentOnly", ReportType.LIST_OF_ENTITIES_WITH_QUERY == wizard.reportTypeOptionGroup.getValue());
                     editorParams.put("rootEntity", regionPropertiesRootNode);
                     item.setRegionPropertiesRootNode(regionPropertiesRootNode);
-                    Window.Editor regionEditor = wizard.openEditor("report$Report.regionEditor", item, WindowManager.OpenType.DIALOG, editorParams, wizard.reportRegionsDs);
+
+                    Window.Editor regionEditor = wizard.openEditor("report$Report.regionEditor", item,
+                            OpenType.DIALOG, editorParams, wizard.reportRegionsDs);
                     regionEditor.addCloseListener(new RegionEditorCloseListener());
                 }
-            }, WindowManager.OpenType.DIALOG, lookupParams);
+            }, OpenType.DIALOG, lookupParams);
         }
 
         protected void openRegionEditor(ReportRegion item) {
@@ -88,9 +92,10 @@ public class RegionsStepFrame extends StepFrame {
             Map<String, Object> editorParams = new HashMap<>();
             editorParams.put("rootEntity", wizard.getItem().getEntityTreeRootNode());
             editorParams.put("scalarOnly", Boolean.TRUE);
-            editorParams.put("persistentOnly", ReportData.ReportType.LIST_OF_ENTITIES_WITH_QUERY == wizard.reportTypeOptionGroup.getValue());
+            editorParams.put("persistentOnly", ReportType.LIST_OF_ENTITIES_WITH_QUERY == wizard.reportTypeOptionGroup.getValue());
 
-            Window.Editor regionEditor = wizard.openEditor("report$Report.regionEditor", item, WindowManager.OpenType.DIALOG, editorParams, wizard.reportRegionsDs);
+            Window.Editor regionEditor = wizard.openEditor("report$Report.regionEditor", item,
+                    OpenType.DIALOG, editorParams, wizard.reportRegionsDs);
             regionEditor.addCloseListener(new AddRegionAction.RegionEditorCloseListener());
         }
 
@@ -131,6 +136,7 @@ public class RegionsStepFrame extends StepFrame {
         protected static final String WIDTH_PERCENT_100 = "100%";
         protected static final int MAX_ATTRS_BTN_CAPTION_WIDTH = 95;
         protected static final String BOLD_LABEL_STYLE = "semi-bold-label";
+
         private ReportRegion currentReportRegionGeneratedColumn;
 
         @Override
@@ -214,9 +220,11 @@ public class RegionsStepFrame extends StepFrame {
 
         private String generateAttrsBtnCaption() {
 
-            return StringUtils.abbreviate(StringUtils.join(CollectionUtils.collect(currentReportRegionGeneratedColumn.getRegionProperties(), input -> {
-                return ((RegionProperty) input).getHierarchicalLocalizedNameExceptRoot();
-            }), ", "), MAX_ATTRS_BTN_CAPTION_WIDTH);
+            return StringUtils.abbreviate(StringUtils.join(
+                    CollectionUtils.collect(currentReportRegionGeneratedColumn.getRegionProperties(),
+                            RegionProperty::getHierarchicalLocalizedNameExceptRoot), ", "
+                    ), MAX_ATTRS_BTN_CAPTION_WIDTH
+            );
         }
     }
 
@@ -230,12 +238,12 @@ public class RegionsStepFrame extends StepFrame {
             if (wizard.regionsTable.getSingleSelected() != null) {
                 wizard.showOptionDialog(
                         wizard.getMessage("dialogs.Confirmation"),
-                        wizard.formatMessage("deleteRegion", ((ReportRegion) wizard.regionsTable.getSingleSelected()).getName()),
+                        wizard.formatMessage("deleteRegion", wizard.regionsTable.getSingleSelected().getName()),
                         Frame.MessageType.CONFIRMATION, new Action[]{
                                 new DialogAction(Type.YES) {
                                     @Override
                                     public void actionPerform(Component component) {
-                                        wizard.reportRegionsDs.removeItem((ReportRegion) wizard.regionsTable.getSingleSelected());
+                                        wizard.reportRegionsDs.removeItem(wizard.regionsTable.getSingleSelected());
                                         normalizeRegionPropertiesOrderNum();
                                         wizard.regionsTable.refresh();
                                         wizard.setupButtonsVisibility();
@@ -269,12 +277,12 @@ public class RegionsStepFrame extends StepFrame {
         public void actionPerform(Component component) {
             if (wizard.regionsTable.getSingleSelected() != null) {
                 Map<String, Object> editorParams = new HashMap<>();
-                editorParams.put("rootEntity", ((ReportRegion) wizard.regionsTable.getSingleSelected()).getRegionPropertiesRootNode());
+                editorParams.put("rootEntity", wizard.regionsTable.getSingleSelected().getRegionPropertiesRootNode());
                 editorParams.put("scalarOnly", Boolean.TRUE);
-                editorParams.put("persistentOnly", ReportData.ReportType.LIST_OF_ENTITIES_WITH_QUERY == wizard.reportTypeOptionGroup.getValue());
+                editorParams.put("persistentOnly", ReportType.LIST_OF_ENTITIES_WITH_QUERY == wizard.reportTypeOptionGroup.getValue());
                 Window.Editor regionEditor = wizard.openEditor("report$Report.regionEditor",
                         wizard.regionsTable.getSingleSelected(),
-                        WindowManager.OpenType.DIALOG,
+                        OpenType.DIALOG,
                         editorParams,
                         wizard.reportRegionsDs);
                 regionEditor.addCloseListener(new RegionEditorCloseListener());
@@ -300,8 +308,8 @@ public class RegionsStepFrame extends StepFrame {
             editRegionAction = new EditRegionAction();
             removeRegionAction = new RemoveRegionAction();
 
-            wizard.moveDownBtn.setAction(new OrderableItemMoveAction<>("downItem", OrderableItemMoveAction.Direction.DOWN, wizard.regionsTable));
-            wizard.moveUpBtn.setAction(new OrderableItemMoveAction<>("upItem", OrderableItemMoveAction.Direction.UP, wizard.regionsTable));
+            wizard.moveDownBtn.setAction(new OrderableItemMoveAction<>("downItem", Direction.DOWN, wizard.regionsTable));
+            wizard.moveUpBtn.setAction(new OrderableItemMoveAction<>("upItem", Direction.UP, wizard.regionsTable));
             wizard.removeBtn.setAction(removeRegionAction);
         }
     }
@@ -333,7 +341,7 @@ public class RegionsStepFrame extends StepFrame {
 
         private void showAddRegion() {
             if (wizard.reportRegionsDs.getItems().isEmpty()) {
-                if (((ReportData.ReportType) wizard.reportTypeOptionGroup.getValue()).isList()) {
+                if (((ReportType) wizard.reportTypeOptionGroup.getValue()).isList()) {
                     if (wizard.entityTreeHasSimpleAttrs) {
                         addTabulatedRegionAction.actionPerform(wizard.regionsStepFrame.getFrame());
                     }

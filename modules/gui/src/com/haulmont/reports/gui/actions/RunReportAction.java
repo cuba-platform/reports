@@ -7,9 +7,11 @@ package com.haulmont.reports.gui.actions;
 
 import com.haulmont.bali.util.ParamsMap;
 import com.haulmont.cuba.core.global.AppBeans;
+import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.gui.ComponentsHelper;
 import com.haulmont.cuba.gui.WindowManager.OpenType;
 import com.haulmont.cuba.gui.components.*;
+import com.haulmont.cuba.gui.screen.compatibility.LegacyFrame;
 import com.haulmont.reports.entity.Report;
 import com.haulmont.reports.gui.ReportGuiManager;
 import com.haulmont.reports.gui.report.run.ReportRun;
@@ -44,6 +46,7 @@ public class RunReportAction extends AbstractAction implements Action.HasBeforeA
         checkArgument(window != null, "Can not create RunReportAction with null window");
 
         this.window = window;
+        Messages messages = AppBeans.get(Messages.NAME);
         this.caption = messages.getMessage(getClass(), "actions.Report");
         this.icon = "icons/reports-print.png";
     }
@@ -55,6 +58,7 @@ public class RunReportAction extends AbstractAction implements Action.HasBeforeA
     public RunReportAction(String id) {
         super(id);
 
+        Messages messages = AppBeans.get(Messages.NAME);
         this.caption = messages.getMessage(getClass(), "actions.Report");
         this.icon = "icons/reports-print.png";
     }
@@ -76,10 +80,10 @@ public class RunReportAction extends AbstractAction implements Action.HasBeforeA
     }
 
     protected void openLookup(Frame window) {
-        window.openLookup("report$Report.run", items -> {
+        ((LegacyFrame) window).openLookup("report$Report.run", items -> {
             if (items != null && items.size() > 0) {
                 Report report = (Report) items.iterator().next();
-                report = window.getDsContext().getDataSupplier().reload(report, "report.edit");
+                report = ((LegacyFrame) window).getDsContext().getDataSupplier().reload(report, "report.edit");
                 if (report.getInputParameters() != null && report.getInputParameters().size() > 0
                         || reportGuiManager.inputParametersRequiredByTemplates(report)) {
                     openReportParamsDialog(report, window);
@@ -91,7 +95,7 @@ public class RunReportAction extends AbstractAction implements Action.HasBeforeA
     }
 
     protected void openReportParamsDialog(Report report, Frame window) {
-        window.openWindow("report$inputParameters", OpenType.DIALOG, ParamsMap.of("report", report));
+        ((LegacyFrame) window).openWindow("report$inputParameters", OpenType.DIALOG, ParamsMap.of("report", report));
     }
 
     public void setWindow(Frame window) {

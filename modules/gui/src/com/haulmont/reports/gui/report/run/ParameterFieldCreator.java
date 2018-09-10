@@ -18,6 +18,7 @@ import com.haulmont.cuba.gui.components.validators.DoubleValidator;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
 import com.haulmont.cuba.gui.data.CollectionDatasource.RefreshMode;
 import com.haulmont.cuba.gui.data.DsBuilder;
+import com.haulmont.cuba.gui.screen.compatibility.LegacyFrame;
 import com.haulmont.cuba.gui.xml.layout.ComponentsFactory;
 import com.haulmont.reports.app.service.ReportService;
 import com.haulmont.reports.entity.ParameterType;
@@ -41,7 +42,7 @@ public class ParameterFieldCreator {
     protected Scripting scripting = AppBeans.get(Scripting.class);
     protected ReportService reportService = AppBeans.get(ReportService.class);
 
-    protected AbstractFrame frame;
+    protected LegacyFrame frame;
 
     protected Map<ParameterType, FieldCreator> fieldCreationMapping = new ImmutableMap.Builder<ParameterType, FieldCreator>()
             .put(ParameterType.BOOLEAN, new CheckBoxCreator())
@@ -55,7 +56,7 @@ public class ParameterFieldCreator {
             .put(ParameterType.TIME, new TimeFieldCreator())
             .build();
 
-    public ParameterFieldCreator(AbstractFrame frame) {
+    public ParameterFieldCreator(LegacyFrame frame) {
         this.frame = frame;
     }
 
@@ -73,7 +74,7 @@ public class ParameterFieldCreator {
 
         field.setId("param_" + parameter.getAlias());
         field.setWidth("100%");
-        field.setFrame(frame);
+        field.setFrame(frame.getWrappedFrame());
         field.setEditable(true);
 
         field.setRequired(parameter.getRequired());

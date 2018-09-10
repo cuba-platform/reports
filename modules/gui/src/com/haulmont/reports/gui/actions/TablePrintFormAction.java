@@ -7,12 +7,15 @@ package com.haulmont.reports.gui.actions;
 
 import com.google.common.base.Preconditions;
 import com.haulmont.chile.core.model.MetaClass;
+import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.LoadContext;
+import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.gui.ComponentsHelper;
 import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.components.DialogAction.Type;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
 import com.haulmont.cuba.gui.data.Datasource;
+import com.haulmont.cuba.gui.screen.compatibility.LegacyFrame;
 import com.haulmont.reports.app.ParameterPrototype;
 import com.haulmont.reports.gui.ReportGuiManager;
 import org.apache.commons.collections4.CollectionUtils;
@@ -41,6 +44,8 @@ public class TablePrintFormAction extends AbstractPrintFormAction {
 
         this.window = window;
         this.table = table;
+
+        Messages messages = AppBeans.get(Messages.NAME);
         this.caption = messages.getMessage(TablePrintFormAction.class, "actions.Report");
         this.icon = "icons/reports-print.png";
     }
@@ -53,6 +58,8 @@ public class TablePrintFormAction extends AbstractPrintFormAction {
         super(id);
 
         this.table = table;
+
+        Messages messages = AppBeans.get(Messages.NAME);
         this.caption = messages.getMessage(TablePrintFormAction.class, "actions.Report");
         this.icon = "icons/reports-print.png";
     }
@@ -88,7 +95,9 @@ public class TablePrintFormAction extends AbstractPrintFormAction {
                 };
                 printAllAction.setIcon("icons/reports-print-all.png");
 
-                window.showOptionDialog(messages.getMessage(ReportGuiManager.class, "notifications.confirmPrintSelectedheader"),
+                Messages messages = AppBeans.get(Messages.NAME);
+
+                ((LegacyFrame) window).showOptionDialog(messages.getMessage(ReportGuiManager.class, "notifications.confirmPrintSelectedheader"),
                         messages.getMessage(ReportGuiManager.class, "notifications.confirmPrintSelected"),
                         Frame.MessageType.CONFIRMATION,
                         new Action[]{printAllAction, printSelectedAction, cancelAction});
@@ -97,6 +106,8 @@ public class TablePrintFormAction extends AbstractPrintFormAction {
             }
         } else {
             CollectionDatasource ds = table.getDatasource();
+
+            Messages messages = AppBeans.get(Messages.NAME);
 
             if ((ds.getState() == Datasource.State.VALID) && (ds.size() > 0)) {
                 Action yesAction = new DialogAction(Type.OK) {
@@ -108,11 +119,11 @@ public class TablePrintFormAction extends AbstractPrintFormAction {
 
                 cancelAction.setPrimary(true);
 
-                window.showOptionDialog(messages.getMessage(TablePrintFormAction.class, "notifications.confirmPrintAllheader"),
+                ((LegacyFrame) window).showOptionDialog(messages.getMessage(TablePrintFormAction.class, "notifications.confirmPrintAllheader"),
                         messages.getMessage(TablePrintFormAction.class, "notifications.confirmPrintAll"),
                         Frame.MessageType.CONFIRMATION, new Action[]{yesAction, cancelAction});
             } else {
-                window.showNotification(messages.getMessage(ReportGuiManager.class, "notifications.noSelectedEntity"),
+                ((LegacyFrame) window).showNotification(messages.getMessage(ReportGuiManager.class, "notifications.noSelectedEntity"),
                         Frame.NotificationType.HUMANIZED);
             }
         }

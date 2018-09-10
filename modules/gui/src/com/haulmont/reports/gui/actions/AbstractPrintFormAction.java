@@ -6,15 +6,13 @@
 package com.haulmont.reports.gui.actions;
 
 import com.haulmont.chile.core.model.MetaClass;
-import com.haulmont.cuba.core.global.AppBeans;
-import com.haulmont.cuba.core.global.DataManager;
-import com.haulmont.cuba.core.global.UserSessionSource;
-import com.haulmont.cuba.core.global.View;
+import com.haulmont.cuba.core.global.*;
 import com.haulmont.cuba.gui.WindowManager;
 import com.haulmont.cuba.gui.components.AbstractAction;
 import com.haulmont.cuba.gui.components.Action;
 import com.haulmont.cuba.gui.components.Frame;
 import com.haulmont.cuba.gui.components.Window;
+import com.haulmont.cuba.gui.screen.compatibility.LegacyFrame;
 import com.haulmont.cuba.security.entity.User;
 import com.haulmont.reports.app.ParameterPrototype;
 import com.haulmont.reports.entity.Report;
@@ -40,11 +38,11 @@ public abstract class AbstractPrintFormAction extends AbstractAction implements 
         super(id);
     }
 
-    protected void openRunReportScreen(final Window window, final Object selectedValue, MetaClass inputValueMetaClass) {
+    protected void openRunReportScreen(Window window, final Object selectedValue, MetaClass inputValueMetaClass) {
         openRunReportScreen(window, selectedValue, inputValueMetaClass, null);
     }
 
-    protected void openRunReportScreen(final Window window, final Object selectedValue, final MetaClass inputValueMetaClass,
+    protected void openRunReportScreen(Window window, final Object selectedValue, final MetaClass inputValueMetaClass,
                                        @Nullable final String outputFileName) {
         User user = AppBeans.get(UserSessionSource.class).getUserSession().getUser();
         List<Report> reports = reportGuiManager.getAvailableReports(window.getId(), user, inputValueMetaClass);
@@ -52,7 +50,7 @@ public abstract class AbstractPrintFormAction extends AbstractAction implements 
         if (reports.size() > 1) {
             Map<String, Object> params = Collections.<String, Object>singletonMap(ReportRun.REPORTS_PARAMETER, reports);
 
-            window.openLookup("report$Report.run", items -> {
+            ((LegacyFrame) window).openLookup("report$Report.run", items -> {
                 if (CollectionUtils.isNotEmpty(items)) {
                     Report report = (Report) items.iterator().next();
                     Report reloadedReport = reloadReport(report);
@@ -72,7 +70,8 @@ public abstract class AbstractPrintFormAction extends AbstractAction implements 
             }
             reportGuiManager.runReport(reloadedReport, window, parameter, selectedValue, null, outputFileName);
         } else {
-            window.showNotification(messages.getMessage(ReportGuiManager.class, "report.notFoundReports"),
+            Messages messages = AppBeans.get(Messages.NAME);
+            ((LegacyFrame) window).showNotification(messages.getMessage(ReportGuiManager.class, "report.notFoundReports"),
                     Frame.NotificationType.HUMANIZED);
         }
     }
