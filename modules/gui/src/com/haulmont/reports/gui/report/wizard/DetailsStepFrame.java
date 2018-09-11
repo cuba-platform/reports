@@ -44,6 +44,7 @@ public class DetailsStepFrame extends StepFrame {
 
     public DetailsStepFrame(ReportWizardCreator wizard) {
         super(wizard, wizard.getMessage("reportDetails"), "detailsStep");
+
         isFirst = true;
         initFrameHandler = new InitDetailsStepFrameHandler();
         beforeShowFrameHandler = new BeforeShowDetailsStepFrameHandler();
@@ -143,7 +144,7 @@ public class DetailsStepFrame extends StepFrame {
         return errors;
     }
 
-    protected class ChangeReportNameListener implements Consumer<HasValue.ValueChangeEvent> {
+    protected class ChangeReportNameListener implements Consumer<HasValue.ValueChangeEvent<MetaClass>> {
 
         public ChangeReportNameListener() {
         }
@@ -354,7 +355,7 @@ public class DetailsStepFrame extends StepFrame {
         }
     }
 
-    protected class ClearRegionListener implements Consumer<HasValue.ValueChangeEvent> {
+    protected class ClearRegionListener implements Consumer<HasValue.ValueChangeEvent<MetaClass>> {
         protected DialogActionWithChangedValue okAction;
 
         public ClearRegionListener(DialogActionWithChangedValue okAction) {
