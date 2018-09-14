@@ -192,10 +192,17 @@ public class ReportEditor extends AbstractEditor<Report> {
     }
 
     @Override
-    protected void postInit() {
+    public void ready() {
+        super.ready();
+
         if (!StringUtils.isEmpty(getItem().getName())) {
             setCaption(AppBeans.get(Messages.class).formatMessage(getClass(), "reportEditor.format", getItem().getName()));
         }
+    }
+
+    @Override
+    protected void postInit() {
+        super.postInit();
 
         ((CollectionPropertyDatasourceImpl) treeDs).setModified(false);
         ((DatasourceImpl) reportDs).setModified(false);
