@@ -83,8 +83,6 @@ public class ChartEditFrame extends DescriptionEditFrame {
             checkSeriesOrder();
             showPreview();
         });
-
-        sortSeriesByOrder();
     }
 
     @Override
@@ -93,6 +91,7 @@ public class ChartEditFrame extends DescriptionEditFrame {
         setBands(reportTemplate.getReport().getBands());
         if (isApplicable(reportTemplate.getReportOutputType())) {
             setChartDescription(reportTemplate.getChartDescription());
+            sortSeriesByOrder();
         }
     }
 
