@@ -16,7 +16,6 @@ import com.haulmont.cuba.web.widgets.CubaTree;
 import com.haulmont.reports.entity.wizard.EntityTreeNode;
 import com.haulmont.reports.entity.wizard.RegionProperty;
 import com.haulmont.reports.gui.report.wizard.region.RegionEditor;
-import com.vaadin.v7.event.ItemClickEvent;
 import org.springframework.cglib.core.CollectionUtils;
 import org.springframework.cglib.core.Transformer;
 
@@ -26,17 +25,17 @@ public class WebRegionEditorCompanion implements RegionEditor.Companion {
     @Override
     public void addTreeTableDblClickListener(final Tree entityTree, final CollectionDatasource<RegionProperty, UUID> reportRegionPropertiesTableDs) {
         CubaTree webTree = entityTree.unwrap(CubaTree.class);
-        webTree.setDoubleClickMode(true);
         webTree.addItemClickListener(event -> {
-            if (event.isDoubleClick()) {
+            if (event.getMouseEventDetails().isDoubleClick()) {
+                // TODO: gg, fix
                 if (event.getItem() instanceof ItemWrapper
                         && ((ItemWrapper) event.getItem()).getItem() instanceof EntityTreeNode) {
                     EntityTreeNode entityTreeNode = (EntityTreeNode) ((ItemWrapper) event.getItem()).getItem();
                     if (entityTreeNode.getWrappedMetaClass() != null) {
-                        if (webTree.isExpanded(entityTreeNode.getId()))
-                            webTree.collapseItem(entityTreeNode.getId());
+                        if (webTree.isExpanded(entityTreeNode))
+                            webTree.collapse(entityTreeNode);
                         else
-                            webTree.expandItem(entityTreeNode.getId());
+                            webTree.expand(entityTreeNode);
                         return;
                     }
                     if (CollectionUtils.transform(reportRegionPropertiesTableDs.getItems(), new Transformer() {
