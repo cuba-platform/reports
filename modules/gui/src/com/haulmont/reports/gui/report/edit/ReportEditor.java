@@ -65,10 +65,10 @@ public class ReportEditor extends AbstractEditor<Report> {
     protected LookupField<String> screenIdLookup;
 
     @Named("securityFrame.screenTable")
-    protected Table screenTable;
+    protected Table<ReportScreen> screenTable;
 
     @Named("templatesFrame.templatesTable")
-    protected Table templatesTable;
+    protected Table<ReportTemplate> templatesTable;
 
     @Named("run")
     protected Button run;
@@ -92,13 +92,13 @@ public class ReportEditor extends AbstractEditor<Report> {
     protected Button addRoleBtn;
 
     @Named("securityFrame.rolesTable")
-    protected Table rolesTable;
+    protected Table<Role> rolesTable;
 
     @Named("parametersFrame.inputParametersTable")
-    protected Table parametersTable;
+    protected Table<ReportInputParameter> parametersTable;
 
     @Named("formatsFrame.valuesFormatsTable")
-    protected Table formatsTable;
+    protected Table<ReportValueFormat> formatsTable;
 
     @Named("parametersFrame.up")
     protected Button paramUpButton;
@@ -176,7 +176,7 @@ public class ReportEditor extends AbstractEditor<Report> {
     protected void initNewItem(Report report) {
         report.setReportType(ReportType.SIMPLE);
 
-        BandDefinition rootDefinition = new BandDefinition();
+        BandDefinition rootDefinition = metadata.create(BandDefinition.class);
         rootDefinition.setName("Root");
         rootDefinition.setPosition(0);
         report.setBands(new HashSet<>());
@@ -211,7 +211,7 @@ public class ReportEditor extends AbstractEditor<Report> {
         bandTree.expandTree();
         bandTree.setSelected(reportDs.getItem().getRootBandDefinition());
 
-        bandEditor.setBandDefinition(bandTree.<BandDefinition>getSingleSelected());
+        bandEditor.setBandDefinition(bandTree.getSingleSelected());
         if (bandTree.getSingleSelected() == null) {
             bandEditor.setEnabled(false);
         }
@@ -260,7 +260,7 @@ public class ReportEditor extends AbstractEditor<Report> {
         });
         parametersTable.addAction(new EditAction(parametersTable, OpenType.DIALOG));
 
-        paramUpButton.setAction(new BaseAction("generalFrame.up") {
+        paramUpButton.setAction(new ListAction("generalFrame.up") {
             @Override
             public void actionPerform(Component component) {
                 ReportInputParameter parameter = (ReportInputParameter) target.getSingleSelected();
@@ -298,7 +298,7 @@ public class ReportEditor extends AbstractEditor<Report> {
             }
         });
 
-        paramDownButton.setAction(new BaseAction("generalFrame.down") {
+        paramDownButton.setAction(new ListAction("generalFrame.down") {
             @Override
             public void actionPerform(Component component) {
                 ReportInputParameter parameter = (ReportInputParameter) target.getSingleSelected();
@@ -413,7 +413,7 @@ public class ReportEditor extends AbstractEditor<Report> {
                     }
 
                     if (!exists) {
-                        ReportScreen reportScreen = new ReportScreen();
+                        ReportScreen reportScreen = metadata.create(ReportScreen.class);
                         reportScreen.setReport(getItem());
                         reportScreen.setScreenId(screenId);
                         reportScreensDs.addItem(reportScreen);
@@ -438,7 +438,7 @@ public class ReportEditor extends AbstractEditor<Report> {
             final ReportTemplate defaultTemplate = getItem().getDefaultTemplate();
             if (defaultTemplate != null) {
                 if (defaultTemplate.getOutputType() != CubaReportOutputType.chart) {
-                     File file = fileUpload.getFile(invisibleFileUpload.getFileId());
+                    File file = fileUpload.getFile(invisibleFileUpload.getFileId());
                     try {
                         byte[] data = FileUtils.readFileToByteArray(file);
                         defaultTemplate.setContent(data);
@@ -536,7 +536,7 @@ public class ReportEditor extends AbstractEditor<Report> {
                             showNotification(getMessage("notification.defaultTemplateIsEmpty"), NotificationType.HUMANIZED);
                         }
 
-                        lookupPickerField.requestFocus();
+                        lookupPickerField.focus();
                     }
                 });
 
@@ -561,7 +561,7 @@ public class ReportEditor extends AbstractEditor<Report> {
                         final ReportTemplate defaultTemplate = getItem().getDefaultTemplate();
                         if (defaultTemplate != null) {
                             if (defaultTemplate.getOutputType() != CubaReportOutputType.chart) {
-                                final FileUploadDialog dialog = (FileUploadDialog) openWindow("fileUploadDialog", OpenType.DIALOG);
+                                FileUploadDialog dialog = (FileUploadDialog) openWindow("fileUploadDialog", OpenType.DIALOG);
                                 dialog.addCloseListener(actionId -> {
                                     if (COMMIT_ACTION_ID.equals(actionId)) {
                                         File file = fileUpload.getFile(dialog.getFileId());
@@ -576,7 +576,7 @@ public class ReportEditor extends AbstractEditor<Report> {
                                                     defaultTemplate.getCode()));
                                         }
                                     }
-                                    lookupPickerField.requestFocus();
+                                    lookupPickerField.focus();
                                 });
                             } else {
                                 showNotification(getMessage("notification.fileIsNotAllowedForChart"), NotificationType.HUMANIZED);
@@ -613,7 +613,7 @@ public class ReportEditor extends AbstractEditor<Report> {
                                 Action defaultTemplate = templatesTable.getAction("defaultTemplate");
                                 defaultTemplate.refreshState();
                             }
-                            lookupPickerField.requestFocus();
+                            lookupPickerField.focus();
                         });
                     }
                 });
@@ -642,7 +642,7 @@ public class ReportEditor extends AbstractEditor<Report> {
                                     getItem().setDefaultTemplate(item);
                                     templatesDs.modifyItem(item);
                                 }
-                                lookupPickerField.requestFocus();
+                                lookupPickerField.focus();
                             });
                         } else {
                             showNotification(getMessage("notification.defaultTemplateIsEmpty"), NotificationType.HUMANIZED);
@@ -681,7 +681,7 @@ public class ReportEditor extends AbstractEditor<Report> {
                     parentDefinition = report.getRootBandDefinition();
                 }
                 if (parentDefinition.getChildrenBandDefinitions() == null) {
-                    parentDefinition.setChildrenBandDefinitions(new ArrayList<BandDefinition>());
+                    parentDefinition.setChildrenBandDefinitions(new ArrayList<>());
                 }
 
                 //
@@ -705,7 +705,7 @@ public class ReportEditor extends AbstractEditor<Report> {
                 bandTree.expandTree();
                 bandTree.setSelected(newBandDefinition);//let's try and see if it increases usability
 
-                bandTree.requestFocus();
+                bandTree.focus();
             }
         });
 
@@ -771,7 +771,7 @@ public class ReportEditor extends AbstractEditor<Report> {
             }
         });
 
-        bandUpButton.setAction(new BaseAction("generalFrame.up") {
+        bandUpButton.setAction(new ListAction("generalFrame.up") {
             @Override
             public String getDescription() {
                 return getMessage("description.moveUp");
@@ -813,7 +813,7 @@ public class ReportEditor extends AbstractEditor<Report> {
             }
         });
 
-        bandDownButton.setAction(new BaseAction("generalFrame.down") {
+        bandDownButton.setAction(new ListAction("generalFrame.down") {
             @Override
             public String getDescription() {
                 return getMessage("description.moveDown");
@@ -873,7 +873,7 @@ public class ReportEditor extends AbstractEditor<Report> {
                             OpenType.DIALOG, ParamsMap.of("report", getItem()));
 
                     runWindow.addCloseListener(actionId -> {
-                        bandTree.requestFocus();
+                        bandTree.focus();
                     });
                 }
             }
@@ -956,7 +956,7 @@ public class ReportEditor extends AbstractEditor<Report> {
             }
         });
 
-        templatesTable.addAction(new BaseAction("defaultTemplate") {
+        templatesTable.addAction(new ListAction("defaultTemplate") {
             @Override
             public String getCaption() {
                 return getMessage("report.defaultTemplate");
@@ -970,7 +970,8 @@ public class ReportEditor extends AbstractEditor<Report> {
                 }
 
                 refreshState();
-                templatesTable.requestFocus();
+
+                templatesTable.focus();
             }
 
             @Override
