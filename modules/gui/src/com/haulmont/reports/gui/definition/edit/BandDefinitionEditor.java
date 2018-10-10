@@ -6,6 +6,7 @@ package com.haulmont.reports.gui.definition.edit;
 
 import com.haulmont.bali.util.ParamsMap;
 import com.haulmont.chile.core.model.MetaClass;
+import com.haulmont.cuba.core.global.Configuration;
 import com.haulmont.cuba.core.global.Metadata;
 import com.haulmont.cuba.core.global.Stores;
 import com.haulmont.cuba.core.global.View;
@@ -22,6 +23,7 @@ import com.haulmont.cuba.gui.data.impl.DatasourceImplementation;
 import com.haulmont.reports.app.service.ReportService;
 import com.haulmont.reports.app.service.ReportWizardService;
 import com.haulmont.reports.entity.*;
+import com.haulmont.reports.gui.ReportingClientConfig;
 import com.haulmont.reports.gui.definition.edit.crosstab.CrossTabTableDecorator;
 import com.haulmont.reports.gui.definition.edit.scripteditordialog.ScriptEditorDialog;
 import com.haulmont.reports.util.DataSetFactory;
@@ -116,6 +118,8 @@ public class BandDefinitionEditor extends AbstractFrame implements Suggester {
     protected DataSetFactory dataSetFactory;
     @Inject
     protected CrossTabTableDecorator tabOrientationTableDecorator;
+    @Inject
+    protected Configuration configuration;
 
     protected SourceCodeEditor.Mode dataSetScriptFieldMode = SourceCodeEditor.Mode.Text;
 
@@ -199,6 +203,15 @@ public class BandDefinitionEditor extends AbstractFrame implements Suggester {
         initActions();
 
         initDataStoreField();
+
+        initSourceCodeOptions();
+    }
+
+    protected void initSourceCodeOptions() {
+        ReportingClientConfig config = configuration.getConfig(ReportingClientConfig.class);
+        boolean enableTabSymbolInDataSetEditor = config.getEnableTabSymbolInDataSetEditor();
+        jsonGroovyCodeEditor.setHandleTabKey(enableTabSymbolInDataSetEditor);
+        dataSetScriptField.setHandleTabKey(enableTabSymbolInDataSetEditor);
     }
 
     protected void initJsonDataSetOptions(DataSet dataSet) {

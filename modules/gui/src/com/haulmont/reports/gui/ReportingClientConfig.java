@@ -24,4 +24,14 @@ public interface ReportingClientConfig extends Config {
     @DefaultLong(10000)
     long getBackgroundReportProcessingTimeoutMs();
     void setBackgroundReportProcessingTimeoutMs(long backgroundReportProcessingTimeoutMs);
+
+    /**
+     * @return true if Script fields in report editor should handle TAB key as \t symbol instead of focus navigation
+     *
+     * @see com.haulmont.reports.gui.definition.edit.BandDefinitionEditor
+     */
+    @Property("reporting.enableTabSymbolInDataSetEditor")
+    @DefaultBoolean(false)
+    boolean getEnableTabSymbolInDataSetEditor();
+    void setEnableTabSymbolInDataSetEditor(boolean enableTabSymbolInDataSetEditor);
 }
