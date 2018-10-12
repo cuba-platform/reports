@@ -29,7 +29,6 @@ import com.haulmont.reports.entity.Report;
 import com.haulmont.reports.gui.ReportGuiManager;
 import com.haulmont.reports.gui.report.edit.ReportEditor;
 import com.haulmont.reports.gui.report.wizard.ReportWizardCreator;
-import org.apache.commons.lang3.StringUtils;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -74,74 +73,69 @@ public class ReportBrowser extends AbstractLookup {
         boolean hasPermissionsToCreateReports = security.isEntityOpPermitted(
                 metadata.getClassNN(Report.class), EntityOp.CREATE);
 
-        ItemTrackingAction copyAction = new ItemTrackingAction("copy") {
-            @Override
-            public void actionPerform(Component component) {
-                Report report = (Report) target.getSingleSelected();
-                if (report != null) {
-                    reportService.copyReport(report);
-                    target.getDatasource().refresh();
-                } else {
-                    showNotification(getMessage("notification.selectReport"), NotificationType.HUMANIZED);
-                }
-            }
-        };
+        Action copyAction = new ItemTrackingAction("copy")
+                .withCaption(getMessage("copy"))
+                .withHandler(event -> {
+                    Report report = reportsTable.getSingleSelected();
+                    if (report != null) {
+                        reportService.copyReport(report);
+                        reportsTable.getDatasource().refresh();
+                    } else {
+                        showNotification(getMessage("notification.selectReport"), NotificationType.HUMANIZED);
+                    }
+                });
         copyAction.setEnabled(hasPermissionsToCreateReports);
         copyReport.setAction(copyAction);
 
-        runReport.setAction(new ItemTrackingAction("runReport") {
-            @Override
-            public void actionPerform(Component component) {
-                Report report = (Report) target.getSingleSelected();
-                if (report != null) {
-                    report = getDsContext().getDataSupplier().reload(report, "report.edit");
-                    if (report.getInputParameters() != null && report.getInputParameters().size() > 0 ||
-                            reportGuiManager.inputParametersRequiredByTemplates(report)) {
-                        Window paramsWindow = openWindow("report$inputParameters", OpenType.DIALOG,
-                                ParamsMap.of("report", report));
-                        paramsWindow.addCloseListener(actionId ->
-                                target.requestFocus()
-                        );
-                    } else {
-                        reportGuiManager.printReport(report, Collections.emptyMap(), ReportBrowser.this);
+        runReport.setAction(new ItemTrackingAction("runReport")
+                .withCaption(getMessage("runReport"))
+                .withHandler(event -> {
+                    Report report = reportsTable.getSingleSelected();
+                    if (report != null) {
+                        report = getDsContext().getDataSupplier().reload(report, "report.edit");
+                        if (report.getInputParameters() != null && report.getInputParameters().size() > 0 ||
+                                reportGuiManager.inputParametersRequiredByTemplates(report)) {
+                            Window paramsWindow = openWindow("report$inputParameters", OpenType.DIALOG,
+                                    ParamsMap.of("report", report));
+                            paramsWindow.addCloseListener(actionId ->
+                                    reportsTable.focus()
+                            );
+                        } else {
+                            reportGuiManager.printReport(report, Collections.emptyMap(), ReportBrowser.this);
+                        }
                     }
-                }
-            }
-        });
+                }));
 
-        BaseAction importAction = new BaseAction("import") {
-            @Override
-            public void actionPerform(Component component) {
-                openWindow("report$Report.importDialog", OpenType.DIALOG)
-                        .addCloseListener(actionId -> {
-                            if (COMMIT_ACTION_ID.equals(actionId)) {
-                                reportsTable.getDatasource().refresh();
-                            }
-                            reportsTable.requestFocus();
-                        });
-            }
-        };
+        BaseAction importAction = new BaseAction("import")
+                .withHandler(event -> {
+                    openWindow("report$Report.importDialog", OpenType.DIALOG)
+                            .addCloseListener(actionId -> {
+                                if (COMMIT_ACTION_ID.equals(actionId)) {
+                                    reportsTable.getDatasource().refresh();
+                                }
+                                reportsTable.requestFocus();
+                            });
+                });
+
         importAction.setEnabled(hasPermissionsToCreateReports);
-        importAction.setCaption(StringUtils.EMPTY);
         importReport.setAction(importAction);
 
-        ItemTrackingAction exportAction = new ItemTrackingAction("export") {
-            @Override
-            public void actionPerform(Component component) {
-                Set<Report> reports = target.getSelected();
-                if ((reports != null) && (!reports.isEmpty())) {
-                    ExportDisplay exportDisplay = AppConfig.createExportDisplay(ReportBrowser.this);
-                    ByteArrayDataProvider provider = new ByteArrayDataProvider(reportService.exportReports(reports));
-                    if (reports.size() > 1) {
-                        exportDisplay.show(provider, "Reports", ExportFormat.ZIP);
-                    } else if (reports.size() == 1) {
-                        exportDisplay.show(provider, reports.iterator().next().getName(), ExportFormat.ZIP);
+        Action exportAction = new ItemTrackingAction("export")
+                .withHandler(event -> {
+                    Set<Report> reports = reportsTable.getSelected();
+                    if ((reports != null) && (!reports.isEmpty())) {
+                        ExportDisplay exportDisplay = AppConfig.createExportDisplay(ReportBrowser.this);
+                        ByteArrayDataProvider provider = new ByteArrayDataProvider(reportService.exportReports(reports));
+                        if (reports.size() > 1) {
+                            exportDisplay.show(provider, "Reports", ExportFormat.ZIP);
+                        } else if (reports.size() == 1) {
+                            exportDisplay.show(provider, reports.iterator().next().getName(), ExportFormat.ZIP);
+                        }
                     }
-                }
-            }
-        };
-        exportAction.setCaption(StringUtils.EMPTY);
+                });
+
         exportReport.setAction(exportAction);
+
         reportsTable.addAction(copyReport.getAction());
         reportsTable.addAction(exportReport.getAction());
         reportsTable.addAction(runReport.getAction());
