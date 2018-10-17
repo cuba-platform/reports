@@ -9,6 +9,7 @@ import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.cuba.core.app.DataService;
 import com.haulmont.cuba.core.global.*;
 import com.haulmont.cuba.gui.AppConfig;
+import com.haulmont.cuba.gui.WindowManager;
 import com.haulmont.cuba.gui.WindowManager.OpenType;
 import com.haulmont.cuba.gui.WindowManagerProvider;
 import com.haulmont.cuba.gui.backgroundwork.BackgroundWorkWindow;
@@ -20,7 +21,6 @@ import com.haulmont.cuba.gui.executors.TaskLifeCycle;
 import com.haulmont.cuba.gui.export.ByteArrayDataProvider;
 import com.haulmont.cuba.gui.export.ExportDisplay;
 import com.haulmont.cuba.gui.export.ExportFormat;
-import com.haulmont.cuba.gui.screen.compatibility.LegacyFrame;
 import com.haulmont.cuba.security.entity.User;
 import com.haulmont.reports.app.ParameterPrototype;
 import com.haulmont.reports.app.service.ReportService;
@@ -278,7 +278,11 @@ public class ReportGuiManager {
     }
 
     protected void showReportResult(ReportOutputDocument document, Map<String, Object> params,
-                                    @Nullable String templateCode, @Nullable String outputFileName, @Nullable ReportOutputType outputType, @Nullable Frame window) {
+                                    @Nullable String templateCode, @Nullable String outputFileName,
+                                    @Nullable ReportOutputType outputType, @Nullable Frame window) {
+
+        WindowManager wm = windowManagerProvider.get();
+
         if (document.getReportOutputType().getId().equals(CubaReportOutputType.chart.getId())) {
             Map<String, Object> screenParams = new HashMap<>();
             screenParams.put(ShowChartController.CHART_JSON_PARAMETER, new String(document.getContent(), StandardCharsets.UTF_8));
@@ -286,11 +290,13 @@ public class ReportGuiManager {
             screenParams.put(ShowChartController.TEMPLATE_CODE_PARAMETER, templateCode);
             screenParams.put(ShowChartController.PARAMS_PARAMETER, params);
 
+            WindowInfo windowInfo = windowConfig.getWindowInfo("report$showChart");
+
             if (window != null) {
-                ((LegacyFrame) window).openWindow("report$showChart", OpenType.DIALOG, screenParams);
+                WindowManager screens = (WindowManager) window.getFrameOwner().getScreenContext().getScreens();
+                screens.openWindow(windowInfo, OpenType.DIALOG, screenParams);
             } else {
-                WindowInfo windowInfo = windowConfig.getWindowInfo("report$showChart");
-                windowManagerProvider.get().openWindow(windowInfo, OpenType.DIALOG, screenParams);
+                wm.openWindow(windowInfo, OpenType.DIALOG, screenParams);
             }
         } else if (document.getReportOutputType().getId().equals(CubaReportOutputType.pivot.getId())) {
             Map<String, Object> screenParams = ParamsMap.of(
@@ -298,11 +304,14 @@ public class ReportGuiManager {
                     ShowPivotTableController.REPORT_PARAMETER, document.getReport(),
                     ShowPivotTableController.TEMPLATE_CODE_PARAMETER, templateCode,
                     ShowPivotTableController.PARAMS_PARAMETER, params);
+
+            WindowInfo windowInfo = windowConfig.getWindowInfo("report$showPivotTable");
+
             if (window != null) {
-                ((LegacyFrame) window).openWindow("report$showPivotTable", OpenType.DIALOG, screenParams);
+                WindowManager screens = (WindowManager) window.getFrameOwner().getScreenContext().getScreens();
+                screens.openWindow(windowInfo, OpenType.DIALOG, screenParams);
             } else {
-                WindowInfo windowInfo = windowConfig.getWindowInfo("report$showPivotTable");
-                windowManagerProvider.get().openWindow(windowInfo, OpenType.DIALOG, screenParams);
+                wm.openWindow(windowInfo, OpenType.DIALOG, screenParams);
             }
         } else if (document.getReportOutputType().getId().equals(CubaReportOutputType.table.getId())) {
             Map<String, Object> screenParams = new HashMap<>();
@@ -311,11 +320,13 @@ public class ReportGuiManager {
             screenParams.put(ShowReportTable.TEMPLATE_CODE_PARAMETER, templateCode);
             screenParams.put(ShowReportTable.PARAMS_PARAMETER, params);
 
+            WindowInfo windowInfo = windowConfig.getWindowInfo("report$showReportTable");
+
             if (window != null) {
-                ((LegacyFrame) window).openWindow("report$showReportTable", OpenType.DIALOG, screenParams);
+                WindowManager screens = (WindowManager) window.getFrameOwner().getScreenContext().getScreens();
+                screens.openWindow(windowInfo, OpenType.DIALOG, screenParams);
             } else {
-                WindowInfo windowInfo = windowConfig.getWindowInfo("report$showReportTable");
-                windowManagerProvider.get().openWindow(windowInfo, OpenType.DIALOG, screenParams);
+                wm.openWindow(windowInfo, OpenType.DIALOG, screenParams);
             }
         } else {
             byte[] byteArr = document.getContent();
@@ -363,7 +374,7 @@ public class ReportGuiManager {
 
             @SuppressWarnings("UnnecessaryLocalVariable")
             @Override
-            public ReportOutputDocument run(TaskLifeCycle<Void> taskLifeCycle) throws Exception {
+            public ReportOutputDocument run(TaskLifeCycle<Void> taskLifeCycle) {
                 ReportOutputDocument result = getReportResult(targetReport, params, templateCode, outputType);
                 return result;
             }
@@ -652,7 +663,11 @@ public class ReportGuiManager {
                 OUTPUT_FILE_NAME_PARAMETER, outputFileName,
                 BULK_PRINT, bulkPrint
         );
-        ((LegacyFrame) window).openWindow("report$inputParameters", OpenType.DIALOG, params);
+
+        WindowManager wm = (WindowManager) window.getFrameOwner().getScreenContext().getScreens();
+        WindowInfo windowInfo = AppBeans.get(WindowConfig.class).getWindowInfo("report$inputParameters");
+
+        wm.openWindow(windowInfo, OpenType.DIALOG, params);
     }
 
     protected void openReportParamsDialog(Frame window, Report report, @Nullable Map<String, Object> parameters,

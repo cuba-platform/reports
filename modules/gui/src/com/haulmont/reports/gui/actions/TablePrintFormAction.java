@@ -11,6 +11,7 @@ import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.LoadContext;
 import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.gui.ComponentsHelper;
+import com.haulmont.cuba.gui.WindowManager;
 import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.components.DialogAction.Type;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
@@ -76,7 +77,9 @@ public class TablePrintFormAction extends AbstractPrintFormAction {
                 return;
         }
 
-        final Set selected = table.getSelected();
+        WindowManager wm = (WindowManager) window.getScreenContext().getScreens();
+
+        Set selected = table.getSelected();
         if (CollectionUtils.isNotEmpty(selected)) {
             if (selected.size() > 1) {
                 Action printSelectedAction = new AbstractAction("actions.printSelected", Status.PRIMARY) {
@@ -97,7 +100,7 @@ public class TablePrintFormAction extends AbstractPrintFormAction {
 
                 Messages messages = AppBeans.get(Messages.NAME);
 
-                ((LegacyFrame) window).showOptionDialog(messages.getMessage(ReportGuiManager.class, "notifications.confirmPrintSelectedheader"),
+                wm.showOptionDialog(messages.getMessage(ReportGuiManager.class, "notifications.confirmPrintSelectedheader"),
                         messages.getMessage(ReportGuiManager.class, "notifications.confirmPrintSelected"),
                         Frame.MessageType.CONFIRMATION,
                         new Action[]{printAllAction, printSelectedAction, cancelAction});
@@ -119,11 +122,11 @@ public class TablePrintFormAction extends AbstractPrintFormAction {
 
                 cancelAction.setPrimary(true);
 
-                ((LegacyFrame) window).showOptionDialog(messages.getMessage(TablePrintFormAction.class, "notifications.confirmPrintAllheader"),
+                wm.showOptionDialog(messages.getMessage(TablePrintFormAction.class, "notifications.confirmPrintAllheader"),
                         messages.getMessage(TablePrintFormAction.class, "notifications.confirmPrintAll"),
                         Frame.MessageType.CONFIRMATION, new Action[]{yesAction, cancelAction});
             } else {
-                ((LegacyFrame) window).showNotification(messages.getMessage(ReportGuiManager.class, "notifications.noSelectedEntity"),
+                wm.showNotification(messages.getMessage(ReportGuiManager.class, "notifications.noSelectedEntity"),
                         Frame.NotificationType.HUMANIZED);
             }
         }

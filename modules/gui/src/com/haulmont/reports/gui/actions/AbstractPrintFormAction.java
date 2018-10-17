@@ -5,6 +5,7 @@
 
 package com.haulmont.reports.gui.actions;
 
+import com.haulmont.bali.util.ParamsMap;
 import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.cuba.core.global.*;
 import com.haulmont.cuba.gui.WindowManager;
@@ -12,7 +13,8 @@ import com.haulmont.cuba.gui.components.AbstractAction;
 import com.haulmont.cuba.gui.components.Action;
 import com.haulmont.cuba.gui.components.Frame;
 import com.haulmont.cuba.gui.components.Window;
-import com.haulmont.cuba.gui.screen.compatibility.LegacyFrame;
+import com.haulmont.cuba.gui.config.WindowConfig;
+import com.haulmont.cuba.gui.config.WindowInfo;
 import com.haulmont.cuba.security.entity.User;
 import com.haulmont.reports.app.ParameterPrototype;
 import com.haulmont.reports.entity.Report;
@@ -23,7 +25,6 @@ import com.haulmont.reports.gui.report.run.ReportRun;
 import org.apache.commons.collections4.CollectionUtils;
 
 import javax.annotation.Nullable;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -48,9 +49,12 @@ public abstract class AbstractPrintFormAction extends AbstractAction implements 
         List<Report> reports = reportGuiManager.getAvailableReports(window.getId(), user, inputValueMetaClass);
 
         if (reports.size() > 1) {
-            Map<String, Object> params = Collections.<String, Object>singletonMap(ReportRun.REPORTS_PARAMETER, reports);
+            Map<String, Object> params = ParamsMap.of(ReportRun.REPORTS_PARAMETER, reports);
 
-            ((LegacyFrame) window).openLookup("report$Report.run", items -> {
+            WindowManager wm = (WindowManager) window.getFrameOwner().getScreenContext().getScreens();
+            WindowInfo windowInfo = AppBeans.get(WindowConfig.class).getWindowInfo("report$Report.run");
+
+            wm.openLookup(windowInfo, items -> {
                 if (CollectionUtils.isNotEmpty(items)) {
                     Report report = (Report) items.iterator().next();
                     Report reloadedReport = reloadReport(report);
@@ -71,7 +75,11 @@ public abstract class AbstractPrintFormAction extends AbstractAction implements 
             reportGuiManager.runReport(reloadedReport, window, parameter, selectedValue, null, outputFileName);
         } else {
             Messages messages = AppBeans.get(Messages.NAME);
-            ((LegacyFrame) window).showNotification(messages.getMessage(ReportGuiManager.class, "report.notFoundReports"),
+
+            WindowManager wm = (WindowManager) window.getFrameOwner().getScreenContext().getScreens();
+
+            wm.showNotification(
+                    messages.getMessage(ReportGuiManager.class, "report.notFoundReports"),
                     Frame.NotificationType.HUMANIZED);
         }
     }

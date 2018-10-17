@@ -7,10 +7,15 @@ package com.haulmont.reports.gui.actions;
 
 import com.haulmont.bali.util.ParamsMap;
 import com.haulmont.cuba.core.global.AppBeans;
+import com.haulmont.cuba.core.global.DataManager;
 import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.gui.ComponentsHelper;
+import com.haulmont.cuba.gui.WindowManager;
 import com.haulmont.cuba.gui.WindowManager.OpenType;
 import com.haulmont.cuba.gui.components.*;
+import com.haulmont.cuba.gui.config.WindowConfig;
+import com.haulmont.cuba.gui.config.WindowInfo;
+import com.haulmont.cuba.gui.data.DataSupplier;
 import com.haulmont.cuba.gui.screen.compatibility.LegacyFrame;
 import com.haulmont.reports.entity.Report;
 import com.haulmont.reports.gui.ReportGuiManager;
@@ -71,7 +76,7 @@ public class RunReportAction extends AbstractAction implements Action.HasBeforeA
         }
         if (window != null) {
             openLookup(window);
-        } else if (component != null && component instanceof Component.BelongToFrame) {
+        } else if (component instanceof Component.BelongToFrame) {
             Window window = ComponentsHelper.getWindow((Component.BelongToFrame) component);
             openLookup(window);
         } else {
@@ -80,10 +85,21 @@ public class RunReportAction extends AbstractAction implements Action.HasBeforeA
     }
 
     protected void openLookup(Frame window) {
-        ((LegacyFrame) window).openLookup("report$Report.run", items -> {
+        WindowManager wm = (WindowManager) window.getFrameOwner().getScreenContext().getScreens();
+        WindowInfo windowInfo = AppBeans.get(WindowConfig.class).getWindowInfo("report$Report.run");
+
+        wm.openLookup(windowInfo, items -> {
             if (items != null && items.size() > 0) {
                 Report report = (Report) items.iterator().next();
-                report = ((LegacyFrame) window).getDsContext().getDataSupplier().reload(report, "report.edit");
+
+                if (window.getFrameOwner() instanceof LegacyFrame) {
+                    DataSupplier dataSupplier = ((LegacyFrame) window.getFrameOwner()).getDsContext().getDataSupplier();
+                    report = dataSupplier.reload(report, "report.edit");
+                } else {
+                    DataManager dataManager = AppBeans.get(DataManager.NAME);
+                    report = dataManager.reload(report, "report.edit");
+                }
+
                 if (report.getInputParameters() != null && report.getInputParameters().size() > 0
                         || reportGuiManager.inputParametersRequiredByTemplates(report)) {
                     openReportParamsDialog(report, window);
@@ -95,7 +111,10 @@ public class RunReportAction extends AbstractAction implements Action.HasBeforeA
     }
 
     protected void openReportParamsDialog(Report report, Frame window) {
-        ((LegacyFrame) window).openWindow("report$inputParameters", OpenType.DIALOG, ParamsMap.of("report", report));
+        WindowManager wm = (WindowManager) window.getFrameOwner().getScreenContext().getScreens();
+        WindowInfo windowInfo = AppBeans.get(WindowConfig.class).getWindowInfo("report$inputParameters");
+
+        wm.openWindow(windowInfo, OpenType.DIALOG, ParamsMap.of("report", report));
     }
 
     public void setWindow(Frame window) {
