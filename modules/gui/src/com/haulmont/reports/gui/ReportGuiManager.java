@@ -722,6 +722,8 @@ public class ReportGuiManager {
     }
 
     public boolean containsAlterableTemplate(Report report) {
+        if (report.getTemplates() == null)
+            return false;
         for (ReportTemplate template : report.getTemplates()) {
             if (supportAlterableForTemplate(template)) {
                 return true;
