@@ -163,7 +163,7 @@ public class ReportRestControllerManager {
                 checkCanReadEntity(entityClass);
                 Object entityId = getIdFromString(paramValue.value, entityClass);
                 //noinspection unchecked
-                Entity entity = (Entity) dataManager.load(entityClass.getJavaClass())
+                Entity entity = dataManager.load(entityClass.getJavaClass())
                         .view(View.MINIMAL)
                         .id(entityId).optional().orElse(null);
                 checkEntityIsNotNull(entityClass.getName(), paramValue.value, entity);

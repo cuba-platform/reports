@@ -320,8 +320,8 @@ public class ReportWizardCreator extends AbstractWindow implements MainWizardFra
         buttonsBox.remove(addRegionPopupBtn);
         if (((ReportData.ReportType) reportTypeOptionGroup.getValue()).isList()) {
             tipLabel.setValue(formatMessage("regionTabulatedMessage",
-                    messages.getMessage(((MetaClass) entity.getValue()).getJavaClass(),
-                            ((MetaClass) entity.getValue()).getJavaClass().getSimpleName())
+                    messages.getMessage(entity.getValue().getJavaClass(),
+                            entity.getValue().getJavaClass().getSimpleName())
             ));
             if (entityTreeHasSimpleAttrs && getItem().getReportRegions().isEmpty()) {
                 buttonsBox.add(addTabulatedRegionBtn);

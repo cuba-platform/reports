@@ -282,7 +282,6 @@ public class ReportingWizardBean implements ReportingWizardApi {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public View createViewByReportRegions(EntityTreeNode entityTreeRootNode, List<ReportRegion> reportRegions) {
         View view = new View(entityTreeRootNode.getWrappedMetaClass().getJavaClass(), false);
 
@@ -357,7 +356,6 @@ public class ReportingWizardBean implements ReportingWizardApi {
      * Search for view for parent node
      * If does not exists - createDataSet it and add property to parent of parent view
      */
-    @SuppressWarnings("unchecked")
     protected View ensureParentViewsExist(EntityTreeNode entityTreeNode, Map<EntityTreeNode, View> viewsForNodes) {
         EntityTreeNode parentNode = entityTreeNode.getParent();
         View parentView = viewsForNodes.get(parentNode);
