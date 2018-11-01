@@ -7,6 +7,7 @@ package com.haulmont.reports.gui.report.run;
 
 import com.haulmont.bali.util.ParamsMap;
 import com.haulmont.cuba.gui.components.*;
+import com.haulmont.cuba.gui.config.WindowConfig;
 import com.haulmont.cuba.gui.theme.ThemeConstants;
 import com.haulmont.cuba.gui.xml.layout.ComponentsFactory;
 import com.haulmont.reports.entity.Report;
@@ -48,8 +49,12 @@ public class ShowChartController extends AbstractWindow {
 
     @Inject
     protected BoxLayout parametersFrameHolder;
+
     @Inject
     protected HBoxLayout reportSelectorBox;
+
+    @Inject
+    protected WindowConfig windowConfig;
 
     protected InputParametersFrame inputParametersFrame;
 
@@ -71,6 +76,11 @@ public class ShowChartController extends AbstractWindow {
         templateCode = (String) params.get(TEMPLATE_CODE_PARAMETER);
         @SuppressWarnings("unchecked")
         Map<String, Object> reportParameters = (Map<String, Object>) params.get(PARAMS_PARAMETER);
+
+        if (!windowConfig.hasWindow(JSON_CHART_SCREEN_ID)) {
+            showChartsNotIncluded();
+            return;
+        }
 
         if (report != null) {
             reportSelectorBox.setVisible(false);
@@ -126,6 +136,16 @@ public class ShowChartController extends AbstractWindow {
             label.setStyleName("h1");
             chartBox.add(label);
         }
+    }
+
+    protected void showChartsNotIncluded() {
+        reportLookup.setEditable(false);
+        chartBox.removeAll();
+        Label label = componentsFactory.createComponent(Label.class);
+        label.setValue(getMessage("showChart.noChartComponent"));
+        label.setAlignment(Alignment.MIDDLE_CENTER);
+        label.setStyleName("h1");
+        chartBox.add(label);
     }
 
     public void printReport() {
