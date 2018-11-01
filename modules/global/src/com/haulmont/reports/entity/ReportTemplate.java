@@ -57,6 +57,9 @@ public class ReportTemplate extends StandardEntity implements com.haulmont.yarg.
     @Column(name = "CODE")
     protected String code;
 
+    @Column(name = "IS_GROOVY")
+    protected Boolean groovy = false;
+
     @Column(name = "IS_CUSTOM")
     protected Boolean custom = false;
 
@@ -121,6 +124,14 @@ public class ReportTemplate extends StandardEntity implements com.haulmont.yarg.
 
     public void setAlterable(Boolean alterable) {
         this.alterable = alterable;
+    }
+
+    public Boolean getGroovy() {
+        return groovy;
+    }
+
+    public void setGroovy(Boolean groovy) {
+        this.groovy = groovy;
     }
 
     public String getCustomDefinition() {
@@ -190,6 +201,11 @@ public class ReportTemplate extends StandardEntity implements com.haulmont.yarg.
     @Override
     public String getOutputNamePattern() {
         return outputNamePattern;
+    }
+
+    @Override
+    public boolean isGroovy() {
+        return Boolean.TRUE.equals(groovy);
     }
 
     @Override

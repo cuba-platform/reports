@@ -54,6 +54,12 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
     protected FileUploadField templateUploadField;
 
     @Inject
+    private Label isGroovyLabel;
+
+    @Inject
+    private CheckBox groovy;
+
+    @Inject
     protected TextField customDefinition;
 
     @Inject
@@ -214,6 +220,12 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
         outputNamePatternLabel.setVisible(templateOutputVisibility);
         namePatternTextHelp.setVisible(templateOutputVisibility);
 
+        String extension = "";
+        if (getItem().getDocumentName() != null) {
+            extension = FilenameUtils.getExtension(getItem().getDocumentName()).toUpperCase();
+        }
+        groovy.setVisible(templateOutputVisibility && ReportOutputType.HTML.equals(ReportOutputType.getTypeFromExtension(extension)));
+        isGroovyLabel.setVisible(templateOutputVisibility && ReportOutputType.HTML.equals(ReportOutputType.getTypeFromExtension(extension)));
 
         visibleTemplateEditor(reportOutputType);
 

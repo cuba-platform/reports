@@ -279,39 +279,44 @@ public class CubaHtmlFormatter extends HtmlFormatter {
     @SuppressWarnings("unchecked")
     protected Map getTemplateModel(BandData rootBand) {
         Map model = super.getTemplateModel(rootBand);
-        model.put("getMessage", (TemplateMethodModelEx) arguments -> {
-            checkArgsCount("getMessage", arguments, 1, 2);
-            if (arguments.size() == 1) {
+        if (reportTemplate.isGroovy()){
+            model.put("messages", messages);
+        }
+        else {
+            model.put("getMessage", (TemplateMethodModelEx) arguments -> {
+                checkArgsCount("getMessage", arguments, 1, 2);
+                if (arguments.size() == 1) {
+                    Object arg = arguments.get(0);
+                    if (arg instanceof WrapperTemplateModel && ((WrapperTemplateModel) arg).getWrappedObject() instanceof Enum) {
+                        return messages.getMessage((Enum) ((WrapperTemplateModel) arg).getWrappedObject());
+                    } else {
+                        throwIncorrectArgType("getMessage", 1, "Enum");
+                    }
+                }
+                if (arguments.size() == 2) {
+                    Object arg1 = arguments.get(0);
+                    Object arg2 = arguments.get(1);
+                    if (!(arg1 instanceof TemplateScalarModel)) {
+                        throwIncorrectArgType("getMessage", 1, "String");
+                    }
+                    if (!(arg2 instanceof TemplateScalarModel)) {
+                        throwIncorrectArgType("getMessage", 2, "String");
+                    }
+                    return messages.getMessage(((TemplateScalarModel) arg1).getAsString(), ((TemplateScalarModel) arg2).getAsString());
+                }
+                return null;
+            });
+            model.put("getMainMessage", (TemplateMethodModelEx) arguments -> {
+                checkArgsCount("getMainMessage", arguments, 1);
                 Object arg = arguments.get(0);
-                if (arg instanceof WrapperTemplateModel && ((WrapperTemplateModel) arg).getWrappedObject() instanceof Enum) {
-                    return messages.getMessage((Enum) ((WrapperTemplateModel) arg).getWrappedObject());
+                if (arg instanceof TemplateScalarModel) {
+                    return messages.getMainMessage(((TemplateScalarModel) arg).getAsString());
                 } else {
-                    throwIncorrectArgType("getMessage", 1, "Enum");
+                    throwIncorrectArgType("getMainMessage", 1, "String");
                 }
-            }
-            if (arguments.size() == 2) {
-                Object arg1 = arguments.get(0);
-                Object arg2 = arguments.get(1);
-                if (!(arg1 instanceof TemplateScalarModel)) {
-                    throwIncorrectArgType("getMessage", 1, "String");
-                }
-                if (!(arg2 instanceof TemplateScalarModel)) {
-                    throwIncorrectArgType("getMessage", 2, "String");
-                }
-                return messages.getMessage(((TemplateScalarModel) arg1).getAsString(), ((TemplateScalarModel) arg2).getAsString());
-            }
-            return null;
-        });
-        model.put("getMainMessage", (TemplateMethodModelEx) arguments -> {
-            checkArgsCount("getMainMessage", arguments, 1);
-            Object arg = arguments.get(0);
-            if (arg instanceof TemplateScalarModel) {
-                return messages.getMainMessage(((TemplateScalarModel) arg).getAsString());
-            } else {
-                throwIncorrectArgType("getMainMessage", 1, "String");
-            }
-            return null;
-        });
+                return null;
+            });
+        }
 
         return model;
     }

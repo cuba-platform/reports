@@ -69,6 +69,7 @@ create table REPORT_TEMPLATE
   CODE varchar(50),
   OUTPUT_TYPE integer default 0 not null,
   IS_DEFAULT tinyint default 0,
+  IS_GROOVY tinyint default 0,
   IS_CUSTOM tinyint default 0,
   IS_ALTERABLE_OUTPUT tinyint default 0,
   CUSTOM_DEFINED_BY integer default 100,

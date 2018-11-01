@@ -78,21 +78,26 @@
                             </textField>
                         </row>
                         <row id="row6">
+                            <label id="isGroovyLabel" value="msg://template.isGroovy" align="MIDDLE_LEFT"/>
+                            <checkBox id="groovy" datasource="templateDs" property="groovy"
+                                      width="${width}"/>
+                        </row>
+                        <row id="row7">
                             <label id="isCustomLabel" value="msg://template.isCustom" align="MIDDLE_LEFT"/>
                             <checkBox id="custom" datasource="templateDs" property="custom"
                                       width="${width}"/>
                         </row>
-                        <row  id="row7">
+                        <row  id="row8">
                             <label id="alterableLabel" value="msg://template.isAlterableOutput" align="MIDDLE_LEFT"/>
                             <checkBox id="alterable" datasource="templateDs" property="alterable"
                                       width="${width}"/>
                         </row>
-                        <row  id="row8">
+                        <row  id="row9">
                             <label id="customDefinedByLabel" value="msg://template.customDefinedBy" align="MIDDLE_LEFT"/>
                             <lookupField id="customDefinedBy" datasource="templateDs" property="customDefinedBy"
                                          width="${width}"/>
                         </row>
-                        <row id="row9">
+                        <row id="row10">
                             <label id="customDefinitionLabel" value="msg://template.customDefinition" align="MIDDLE_LEFT"/>
                             <textField id="customDefinition" datasource="templateDs" property="customDefinition"
                                        width="${width}"/>

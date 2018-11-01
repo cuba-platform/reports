@@ -71,6 +71,7 @@ create table REPORT_TEMPLATE
   IS_DEFAULT boolean default false,
   IS_CUSTOM boolean default false,
   IS_ALTERABLE_OUTPUT boolean default false,
+  IS_GROOVY boolean default false,
   CUSTOM_DEFINED_BY integer default 100,
   CUSTOM_CLASS varchar,
   OUTPUT_NAME_PATTERN varchar(255),

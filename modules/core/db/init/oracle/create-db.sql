@@ -57,6 +57,7 @@ create table REPORT_TEMPLATE (
     CODE varchar2(50),
     OUTPUT_TYPE integer not null,
     IS_DEFAULT char(1),
+    IS_GROOVY char(1),
     IS_CUSTOM char(1),
     IS_ALTERABLE_OUTPUT char(1),
     CUSTOM_DEFINED_BY integer default 100,
