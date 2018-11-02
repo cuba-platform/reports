@@ -16,7 +16,7 @@ import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.components.DialogAction.Type;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
 import com.haulmont.cuba.gui.data.Datasource;
-import com.haulmont.cuba.gui.screen.compatibility.LegacyFrame;
+import com.haulmont.cuba.gui.screen.ScreenContext;
 import com.haulmont.reports.app.ParameterPrototype;
 import com.haulmont.reports.gui.ReportGuiManager;
 import org.apache.commons.collections4.CollectionUtils;
@@ -69,7 +69,7 @@ public class TablePrintFormAction extends AbstractPrintFormAction {
     public void actionPerform(Component component) {
         DialogAction cancelAction = new DialogAction(Type.CANCEL);
 
-        Window window = ComponentsHelper.getWindow(table);
+        ScreenContext screenContext = ComponentsHelper.getScreenContext(table);
         Preconditions.checkState(window != null, "Table is not attached to window");
 
         if (beforeActionPerformedHandler != null) {
@@ -77,7 +77,7 @@ public class TablePrintFormAction extends AbstractPrintFormAction {
                 return;
         }
 
-        WindowManager wm = (WindowManager) window.getScreenContext().getScreens();
+        WindowManager wm = (WindowManager) screenContext.getScreens();
 
         Set selected = table.getSelected();
         if (CollectionUtils.isNotEmpty(selected)) {

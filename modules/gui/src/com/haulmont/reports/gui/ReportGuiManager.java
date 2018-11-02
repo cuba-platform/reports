@@ -9,6 +9,7 @@ import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.cuba.core.app.DataService;
 import com.haulmont.cuba.core.global.*;
 import com.haulmont.cuba.gui.AppConfig;
+import com.haulmont.cuba.gui.ComponentsHelper;
 import com.haulmont.cuba.gui.WindowManager;
 import com.haulmont.cuba.gui.WindowManager.OpenType;
 import com.haulmont.cuba.gui.WindowManagerProvider;
@@ -21,6 +22,7 @@ import com.haulmont.cuba.gui.executors.TaskLifeCycle;
 import com.haulmont.cuba.gui.export.ByteArrayDataProvider;
 import com.haulmont.cuba.gui.export.ExportDisplay;
 import com.haulmont.cuba.gui.export.ExportFormat;
+import com.haulmont.cuba.gui.screen.ScreenContext;
 import com.haulmont.cuba.security.entity.User;
 import com.haulmont.reports.app.ParameterPrototype;
 import com.haulmont.reports.app.service.ReportService;
@@ -293,7 +295,9 @@ public class ReportGuiManager {
             WindowInfo windowInfo = windowConfig.getWindowInfo("report$showChart");
 
             if (window != null) {
-                WindowManager screens = (WindowManager) window.getFrameOwner().getScreenContext().getScreens();
+                ScreenContext screenContext = ComponentsHelper.getScreenContext(window);
+
+                WindowManager screens = (WindowManager) screenContext.getScreens();
                 screens.openWindow(windowInfo, OpenType.DIALOG, screenParams);
             } else {
                 wm.openWindow(windowInfo, OpenType.DIALOG, screenParams);
@@ -308,7 +312,9 @@ public class ReportGuiManager {
             WindowInfo windowInfo = windowConfig.getWindowInfo("report$showPivotTable");
 
             if (window != null) {
-                WindowManager screens = (WindowManager) window.getFrameOwner().getScreenContext().getScreens();
+                ScreenContext screenContext = ComponentsHelper.getScreenContext(window);
+
+                WindowManager screens = (WindowManager) screenContext.getScreens();
                 screens.openWindow(windowInfo, OpenType.DIALOG, screenParams);
             } else {
                 wm.openWindow(windowInfo, OpenType.DIALOG, screenParams);
@@ -323,7 +329,9 @@ public class ReportGuiManager {
             WindowInfo windowInfo = windowConfig.getWindowInfo("report$showReportTable");
 
             if (window != null) {
-                WindowManager screens = (WindowManager) window.getFrameOwner().getScreenContext().getScreens();
+                ScreenContext screenContext = ComponentsHelper.getScreenContext(window);
+
+                WindowManager screens = (WindowManager) screenContext.getScreens();
                 screens.openWindow(windowInfo, OpenType.DIALOG, screenParams);
             } else {
                 wm.openWindow(windowInfo, OpenType.DIALOG, screenParams);
@@ -664,7 +672,9 @@ public class ReportGuiManager {
                 BULK_PRINT, bulkPrint
         );
 
-        WindowManager wm = (WindowManager) window.getFrameOwner().getScreenContext().getScreens();
+        ScreenContext screenContext = ComponentsHelper.getScreenContext(window);
+
+        WindowManager wm = (WindowManager) screenContext.getScreens();
         WindowInfo windowInfo = AppBeans.get(WindowConfig.class).getWindowInfo("report$inputParameters");
 
         wm.openWindow(windowInfo, OpenType.DIALOG, params);

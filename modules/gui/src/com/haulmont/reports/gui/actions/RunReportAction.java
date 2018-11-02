@@ -16,6 +16,7 @@ import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.config.WindowConfig;
 import com.haulmont.cuba.gui.config.WindowInfo;
 import com.haulmont.cuba.gui.data.DataSupplier;
+import com.haulmont.cuba.gui.screen.ScreenContext;
 import com.haulmont.cuba.gui.screen.compatibility.LegacyFrame;
 import com.haulmont.reports.entity.Report;
 import com.haulmont.reports.gui.ReportGuiManager;
@@ -85,7 +86,9 @@ public class RunReportAction extends AbstractAction implements Action.HasBeforeA
     }
 
     protected void openLookup(Frame window) {
-        WindowManager wm = (WindowManager) window.getFrameOwner().getScreenContext().getScreens();
+        ScreenContext screenContext = ComponentsHelper.getScreenContext(window);
+
+        WindowManager wm = (WindowManager) screenContext.getScreens();
         WindowInfo windowInfo = AppBeans.get(WindowConfig.class).getWindowInfo("report$Report.run");
 
         wm.openLookup(windowInfo, items -> {
@@ -111,7 +114,9 @@ public class RunReportAction extends AbstractAction implements Action.HasBeforeA
     }
 
     protected void openReportParamsDialog(Report report, Frame window) {
-        WindowManager wm = (WindowManager) window.getFrameOwner().getScreenContext().getScreens();
+        ScreenContext screenContext = ComponentsHelper.getScreenContext(window);
+
+        WindowManager wm = (WindowManager) screenContext.getScreens();
         WindowInfo windowInfo = AppBeans.get(WindowConfig.class).getWindowInfo("report$inputParameters");
 
         wm.openWindow(windowInfo, OpenType.DIALOG, ParamsMap.of("report", report));

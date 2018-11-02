@@ -8,6 +8,7 @@ package com.haulmont.reports.gui.actions;
 import com.haulmont.bali.util.ParamsMap;
 import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.cuba.core.global.*;
+import com.haulmont.cuba.gui.ComponentsHelper;
 import com.haulmont.cuba.gui.WindowManager;
 import com.haulmont.cuba.gui.components.AbstractAction;
 import com.haulmont.cuba.gui.components.Action;
@@ -15,6 +16,7 @@ import com.haulmont.cuba.gui.components.Frame;
 import com.haulmont.cuba.gui.components.Window;
 import com.haulmont.cuba.gui.config.WindowConfig;
 import com.haulmont.cuba.gui.config.WindowInfo;
+import com.haulmont.cuba.gui.screen.ScreenContext;
 import com.haulmont.cuba.security.entity.User;
 import com.haulmont.reports.app.ParameterPrototype;
 import com.haulmont.reports.entity.Report;
@@ -48,10 +50,12 @@ public abstract class AbstractPrintFormAction extends AbstractAction implements 
         User user = AppBeans.get(UserSessionSource.class).getUserSession().getUser();
         List<Report> reports = reportGuiManager.getAvailableReports(window.getId(), user, inputValueMetaClass);
 
+        ScreenContext screenContext = ComponentsHelper.getScreenContext(window);
+
         if (reports.size() > 1) {
             Map<String, Object> params = ParamsMap.of(ReportRun.REPORTS_PARAMETER, reports);
 
-            WindowManager wm = (WindowManager) window.getFrameOwner().getScreenContext().getScreens();
+            WindowManager wm = (WindowManager) screenContext.getScreens();
             WindowInfo windowInfo = AppBeans.get(WindowConfig.class).getWindowInfo("report$Report.run");
 
             wm.openLookup(windowInfo, items -> {
@@ -76,7 +80,7 @@ public abstract class AbstractPrintFormAction extends AbstractAction implements 
         } else {
             Messages messages = AppBeans.get(Messages.NAME);
 
-            WindowManager wm = (WindowManager) window.getFrameOwner().getScreenContext().getScreens();
+            WindowManager wm = (WindowManager) screenContext.getScreens();
 
             wm.showNotification(
                     messages.getMessage(ReportGuiManager.class, "report.notFoundReports"),
