@@ -6,6 +6,5 @@
 
 <screen-config xmlns="http://schemas.haulmont.com/cuba/screens.xsd">
 
-    <include file="/reports-screens.xml"/>
-
+    <include file="/com/haulmont/reports/screens.xml"/>
 </screen-config>

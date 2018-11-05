@@ -22,9 +22,9 @@ public class ReportsTestContainer extends TestContainer {
                 "com.haulmont.cuba"
         ));
         appPropertiesFiles = new ArrayList<>(Arrays.asList(
-                "cuba-app.properties",
-                "test-app.properties",
-                "reports-test-app.properties"
+                "com/haulmont/cuba/app.properties",
+                "com/haulmont/cuba/testsupport/test-app.properties",
+                "com/haulmont/reports/test-app.properties"
         ));
         dbDriver = ObjectUtils.defaultIfNull(System.getenv("dbDriver"), "org.postgresql.Driver");
         dbUrl = ObjectUtils.defaultIfNull(System.getenv("dbUrlParam"), "jdbc:postgresql://localhost/reports_test");
