@@ -217,6 +217,8 @@ configure(coreModule) {
         testCompile(group: 'com.haulmont.cuba', name: 'cuba-core-tests', version: baseVersion)
         testCompile(bom['org.apache.commons:commons-dbcp2'])
         compileOnly(bom['javax.servlet:javax.servlet-api'])
+        testCompile('javax.xml.bind:jaxb-api:2.3.1')
+        testCompile('org.glassfish.jaxb:jaxb-runtime:2.3.1')
         jdbc(bom['org.postgresql:postgresql'])
 
         dbscripts(group: 'com.haulmont.cuba', name: 'cuba-core', version: baseVersion, classifier: 'db', ext: 'zip')
