@@ -13,8 +13,14 @@ import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.gui.ComponentsHelper;
 import com.haulmont.cuba.gui.WindowManager;
 import com.haulmont.cuba.gui.components.*;
+import com.haulmont.cuba.gui.components.data.BindingState;
+import com.haulmont.cuba.gui.components.data.meta.ContainerDataUnit;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
 import com.haulmont.cuba.gui.data.Datasource;
+import com.haulmont.cuba.gui.model.CollectionContainer;
+import com.haulmont.cuba.gui.model.CollectionLoader;
+import com.haulmont.cuba.gui.model.HasLoader;
+import com.haulmont.cuba.gui.model.InstanceContainer;
 import com.haulmont.cuba.gui.screen.ScreenContext;
 import com.haulmont.reports.app.ParameterPrototype;
 import com.haulmont.reports.gui.ReportGuiManager;
@@ -24,7 +30,6 @@ import java.util.Set;
 
 public class ListPrintFormAction extends AbstractPrintFormAction {
 
-    protected Window window;
     protected ListComponent listComponent;
 
     public ListPrintFormAction(ListComponent listComponent) {
@@ -45,7 +50,7 @@ public class ListPrintFormAction extends AbstractPrintFormAction {
         DialogAction cancelAction = new DialogAction(DialogAction.Type.CANCEL);
 
         ScreenContext screenContext = ComponentsHelper.getScreenContext(listComponent);
-        Preconditions.checkState(window != null, "Component is not attached to window");
+        Preconditions.checkState(screenContext != null, "Component is not attached to window");
 
         if (beforeActionPerformedHandler != null) {
             if (!beforeActionPerformedHandler.beforeActionPerformed())
@@ -82,9 +87,7 @@ public class ListPrintFormAction extends AbstractPrintFormAction {
             }
         } else {
             Messages messages = AppBeans.get(Messages.NAME);
-            CollectionDatasource ds = listComponent.getDatasource();
-
-            if ((ds.getState() == Datasource.State.VALID) && (ds.size() > 0)) {
+            if (isDataAvailable()) {
                 Action yesAction = new DialogAction(DialogAction.Type.OK) {
                     @Override
                     public void actionPerform(Component component) {
@@ -101,21 +104,53 @@ public class ListPrintFormAction extends AbstractPrintFormAction {
                 wm.showNotification(messages.getMessage(ReportGuiManager.class, "notifications.noSelectedEntity"),
                         Frame.NotificationType.HUMANIZED);
             }
+
         }
     }
 
+    protected boolean isDataAvailable() {
+        if (listComponent.getItems() instanceof ContainerDataUnit) {
+            ContainerDataUnit unit = (ContainerDataUnit) listComponent.getItems();
+            CollectionContainer container = unit.getContainer();
+            return container instanceof HasLoader && unit.getState() == BindingState.ACTIVE && container.getItems().size() > 0;
+        } else {
+            CollectionDatasource ds = listComponent.getDatasource();
+            if (ds != null)
+                return ds.getState() == Datasource.State.VALID && ds.size() > 0;
+        }
+        return false;
+    }
+
     protected void printSelected(Set selected) {
-        CollectionDatasource datasource = listComponent.getDatasource();
-        MetaClass metaClass = datasource.getMetaClass();
+        MetaClass metaClass;
+        if (listComponent.getItems() instanceof ContainerDataUnit) {
+            ContainerDataUnit unit = (ContainerDataUnit) listComponent.getItems();
+            InstanceContainer container = unit.getContainer();
+            metaClass = container.getEntityMetaClass();
+        } else {
+            CollectionDatasource ds = listComponent.getDatasource();
+            metaClass = ds.getMetaClass();
+        }
         openRunReportScreen(ComponentsHelper.getWindow(listComponent), selected, metaClass);
     }
 
     protected void printAll() {
-        CollectionDatasource datasource = listComponent.getDatasource();
 
-        MetaClass metaClass = datasource.getMetaClass();
 
-        LoadContext loadContext = datasource.getCompiledLoadContext();
+        MetaClass metaClass;
+        LoadContext loadContext;
+
+        if (listComponent.getItems() instanceof ContainerDataUnit) {
+            ContainerDataUnit unit = (ContainerDataUnit) listComponent.getItems();
+            CollectionContainer container = unit.getContainer();
+            CollectionLoader loader = (CollectionLoader) ((HasLoader) unit.getContainer()).getLoader();
+            metaClass = container.getEntityMetaClass();
+            loadContext = loader.createLoadContext();
+        } else {
+            CollectionDatasource ds = listComponent.getDatasource();
+            metaClass = ds.getMetaClass();
+            loadContext = ds.getCompiledLoadContext();
+        }
 
         ParameterPrototype parameterPrototype = new ParameterPrototype(metaClass.getName());
         parameterPrototype.setMetaClassName(metaClass.getName());

@@ -24,8 +24,6 @@ public class TablePrintFormAction extends ListPrintFormAction {
     @Deprecated
     public TablePrintFormAction(String id, Window window, Table table) {
         super(id, table);
-
-        this.window = window;
     }
 
     public TablePrintFormAction(Table table) {
