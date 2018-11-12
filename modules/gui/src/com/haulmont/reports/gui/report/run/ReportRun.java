@@ -142,6 +142,12 @@ public class ReportRun extends AbstractLookup {
         for (Report report : reports) {
             reportDs.includeItem(report);
         }
+
+        Table.SortInfo sortInfo = reportsTable.getSortInfo();
+        if (sortInfo != null) {
+            Table.SortDirection direction = sortInfo.getAscending() ? Table.SortDirection.ASCENDING : Table.SortDirection.DESCENDING;
+            reportsTable.sort(sortInfo.getPropertyId().toString(), direction);
+        }
     }
 
     public void clearFilter() {
