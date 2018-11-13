@@ -76,7 +76,6 @@ public class CubaTableFormatter extends AbstractFormatter {
                     }
                     KeyValueEntity entityRow = new KeyValueEntity();
 
-                    checkInstanceNameLoaded(data);
                     data.forEach((name, value) -> {
                         if (!INSTANCE_NAME_KEY.equals(name)) {
                             if (pkName == null || !pkName.equals(name) || pkInView) {
