@@ -70,7 +70,7 @@ public class ReportGroup extends StandardEntity {
         return localeName;
     }
 
-    @MetaProperty
+    @MetaProperty(related = "code")
     public Boolean getSystemFlag() {
         return StringUtils.isNotEmpty(code);
     }
