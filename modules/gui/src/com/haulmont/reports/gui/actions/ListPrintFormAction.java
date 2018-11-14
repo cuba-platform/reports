@@ -112,7 +112,7 @@ public class ListPrintFormAction extends AbstractPrintFormAction {
         if (listComponent.getItems() instanceof ContainerDataUnit) {
             ContainerDataUnit unit = (ContainerDataUnit) listComponent.getItems();
             CollectionContainer container = unit.getContainer();
-            return container instanceof HasLoader && unit.getState() == BindingState.ACTIVE && container.getItems().size() > 0;
+            return container instanceof HasLoader && unit.getState() == BindingState.ACTIVE && !container.getItems().isEmpty();
         } else {
             CollectionDatasource ds = listComponent.getDatasource();
             if (ds != null)
