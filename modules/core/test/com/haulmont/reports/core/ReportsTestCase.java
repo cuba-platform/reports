@@ -24,7 +24,7 @@ public abstract class ReportsTestCase extends CubaTestCase {
     @Override
     protected List<String> getTestAppProperties() {
         String[] files = {
-                "com/haulmont/cuba/cuba-app.properties",
+                "com/haulmont/cuba/app.properties",
                 "com/haulmont/reports/test-app.properties",
                 "test-app.properties",
         };
