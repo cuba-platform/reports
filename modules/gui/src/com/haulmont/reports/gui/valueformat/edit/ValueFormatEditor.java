@@ -6,6 +6,7 @@ package com.haulmont.reports.gui.valueformat.edit;
 
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.global.Metadata;
+import com.haulmont.cuba.core.global.Security;
 import com.haulmont.cuba.gui.components.AbstractEditor;
 import com.haulmont.cuba.gui.components.Component;
 import com.haulmont.cuba.gui.components.FieldGroup;
@@ -13,6 +14,7 @@ import com.haulmont.cuba.gui.components.LookupField;
 import com.haulmont.cuba.gui.data.Datasource;
 import com.haulmont.cuba.gui.data.impl.DatasourceImplementation;
 import com.haulmont.cuba.gui.xml.layout.ComponentsFactory;
+import com.haulmont.cuba.security.entity.EntityOp;
 import com.haulmont.reports.entity.ReportValueFormat;
 
 import javax.inject.Inject;
@@ -48,6 +50,9 @@ public class ValueFormatEditor extends AbstractEditor<ReportValueFormat> {
     @Inject
     protected Metadata metadata;
 
+    @Inject
+    protected Security security;
+
     @Override
     public void init(Map<String, Object> params) {
         super.init(params);
@@ -71,6 +76,7 @@ public class ValueFormatEditor extends AbstractEditor<ReportValueFormat> {
                     addFormatItem(caption);
                     formatField.setValue(caption);
                 });
+                formatField.setEditable(security.isEntityOpPermitted(ReportValueFormat.class, EntityOp.UPDATE));
                 return formatField;
             }
         });

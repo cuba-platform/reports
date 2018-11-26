@@ -8,6 +8,7 @@ package com.haulmont.reports;
 import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.cuba.core.EntityManager;
 import com.haulmont.cuba.core.Persistence;
+import com.haulmont.cuba.core.PersistenceSecurity;
 import com.haulmont.cuba.core.Transaction;
 import com.haulmont.cuba.core.app.FileStorageAPI;
 import com.haulmont.cuba.core.app.dynamicattributes.DynamicAttributesManagerAPI;
@@ -16,6 +17,8 @@ import com.haulmont.cuba.core.app.execution.ResourceCanceledException;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.entity.FileDescriptor;
 import com.haulmont.cuba.core.global.*;
+import com.haulmont.cuba.security.entity.EntityOp;
+import com.haulmont.cuba.security.entity.PermissionType;
 import com.haulmont.cuba.security.entity.Role;
 import com.haulmont.reports.app.ParameterPrototype;
 import com.haulmont.reports.converter.GsonConverter;
@@ -81,6 +84,10 @@ public class ReportingBean implements ReportingApi {
     protected ViewRepository viewRepository;
     @Inject
     protected Executions executions;
+    @Inject
+    protected PersistenceSecurity security;
+    @Inject
+    protected EntityStates entityStates;
 
     protected PrototypesLoader prototypesLoader = new PrototypesLoader();
 
@@ -91,6 +98,7 @@ public class ReportingBean implements ReportingApi {
     @Override
     public Report storeReportEntity(Report report) {
         Report savedReport = null;
+        checkPermission(report);
         Transaction tx = persistence.createTransaction();
         try {
             EntityManager em = persistence.getEntityManager();
@@ -227,7 +235,7 @@ public class ReportingBean implements ReportingApi {
 
             ReportTemplate reportTemplate = getDefaultTemplate(report);
             ReportTemplate template = report.getTemplateByCode(templateCode);
-            reportTemplate = (template != null ) ? template : reportTemplate;
+            reportTemplate = (template != null) ? template : reportTemplate;
 
             Map<String, Integer> alreadyUsedNames = new HashMap<>();
 
@@ -278,6 +286,16 @@ public class ReportingBean implements ReportingApi {
     public ReportOutputDocument createReport(Report report, ReportTemplate template, Map<String, Object> params) {
         report = reloadEntity(report, REPORT_EDIT_VIEW_NAME);
         return createReportDocument(report, template, params);
+    }
+
+    protected void checkPermission(Report report) {
+        if (entityStates.isNew(report)) {
+            if (!security.isEntityOpPermitted(metadata.getClassNN(Report.class), EntityOp.CREATE))
+                throw new AccessDeniedException(PermissionType.ENTITY_OP, EntityOp.CREATE, metadata.getClassNN(Report.class).getName());
+        } else {
+            if (!security.isEntityOpPermitted(metadata.getClassNN(Report.class), EntityOp.UPDATE))
+                throw new AccessDeniedException(PermissionType.ENTITY_OP, EntityOp.UPDATE, metadata.getClassNN(Report.class).getName());
+        }
     }
 
     protected ReportOutputDocument createReportDocument(Report report, ReportTemplate template, Map<String, Object> params) {

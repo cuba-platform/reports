@@ -295,6 +295,7 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
             String templateContent = new String(reportTemplate.getContent(), StandardCharsets.UTF_8);
             templateFileEditor.setValue(templateContent);
         }
+        templateFileEditor.setEditable(security.isEntityOpPermitted(reportTemplate.getMetaClass(), EntityOp.UPDATE));
     }
 
     protected void visibleTemplateEditor(ReportOutputType outputType) {

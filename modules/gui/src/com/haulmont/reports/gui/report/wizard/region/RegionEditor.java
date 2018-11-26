@@ -59,16 +59,18 @@ public class RegionEditor extends AbstractEditor<ReportRegion> {
     protected int regionEditorWindowWidth = 950;
     protected boolean asViewEditor;
     protected EntityTreeNode rootNode;
+    protected boolean updatePermission;
 
     @Override
     public void init(Map<String, Object> params) {
         super.init(params);
+
+        updatePermission =  !Boolean.TRUE.equals(params.get("updateDisabled"));
         Companion companion = getCompanion();
         if (companion != null) {
-            companion.addTreeTableDblClickListener(entityTree, reportRegionPropertiesTableDs);
+            if (updatePermission) companion.addTreeTableDblClickListener(entityTree, reportRegionPropertiesTableDs);
             companion.initControlBtnsActions(addItem, propertiesTable);
         }
-
         isTabulated = ((ReportRegion) WindowParams.ITEM.getEntity(params)).getIsTabulatedRegion();
         asViewEditor = BooleanUtils.isTrue((Boolean) params.get("asViewEditor"));
         params.put("component$reportPropertyName", reportPropertyName);
@@ -130,6 +132,10 @@ public class RegionEditor extends AbstractEditor<ReportRegion> {
         }
     }
 
+    protected boolean isUpdatePermitted() {
+        return updatePermission;
+    }
+
     protected void setTabulatedRegionEditorCaption(String collectionEntityName) {
         setCaption(getMessage("tabulatedRegionEditor"));
     }
@@ -149,8 +155,8 @@ public class RegionEditor extends AbstractEditor<ReportRegion> {
             upItem.setEnabled(false);
             downItem.setEnabled(false);
         } else {
-            upItem.setEnabled(true);
-            downItem.setEnabled(true);
+            upItem.setEnabled(isUpdatePermitted());
+            downItem.setEnabled(isUpdatePermitted());
         }
     }
 
@@ -197,6 +203,11 @@ public class RegionEditor extends AbstractEditor<ReportRegion> {
             public String getCaption() {
                 return "";
             }
+
+            @Override
+            public boolean isEnabled() {
+                return super.isEnabled() && isUpdatePermitted();
+            }
         };
         entityTree.addAction(addAction);
         addItem.setAction(addAction);
@@ -214,12 +225,27 @@ public class RegionEditor extends AbstractEditor<ReportRegion> {
             public String getCaption() {
                 return "";
             }
+
+            @Override
+            public boolean isEnabled() {
+                return super.isEnabled() && isUpdatePermitted();
+            }
         };
         propertiesTable.addAction(removeAction);
         removeItem.setAction(removeAction);
 
-        upItem.setAction(new OrderableItemMoveAction<>("upItem", OrderableItemMoveAction.Direction.UP, propertiesTable));
-        downItem.setAction(new OrderableItemMoveAction<>("downItem", OrderableItemMoveAction.Direction.DOWN, propertiesTable));
+        upItem.setAction(new OrderableItemMoveAction<Table<RegionProperty>, RegionProperty>("upItem", OrderableItemMoveAction.Direction.UP, propertiesTable) {
+            @Override
+            public boolean isEnabled() {
+                return super.isEnabled() && isUpdatePermitted();
+            }
+        });
+        downItem.setAction(new OrderableItemMoveAction<Table<RegionProperty>, RegionProperty>("downItem", OrderableItemMoveAction.Direction.DOWN, propertiesTable) {
+            @Override
+            public boolean isEnabled() {
+                return super.isEnabled() && isUpdatePermitted();
+            }
+        });
     }
 
     protected void normalizeRegionPropertiesOrderNum() {

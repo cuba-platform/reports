@@ -10,11 +10,7 @@ import com.haulmont.bali.util.ParamsMap;
 import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.chile.core.model.MetaPropertyPath;
 import com.haulmont.cuba.core.entity.Entity;
-import com.haulmont.cuba.core.global.AppBeans;
-import com.haulmont.cuba.core.global.Messages;
-import com.haulmont.cuba.core.global.Metadata;
-import com.haulmont.cuba.core.global.PersistenceHelper;
-import com.haulmont.cuba.core.global.UuidSource;
+import com.haulmont.cuba.core.global.*;
 import com.haulmont.cuba.gui.AppConfig;
 import com.haulmont.cuba.gui.WindowManager.OpenType;
 import com.haulmont.cuba.gui.app.core.file.FileUploadDialog;
@@ -35,6 +31,7 @@ import com.haulmont.cuba.gui.export.ExportFormat;
 import com.haulmont.cuba.gui.sys.ScreensHelper;
 import com.haulmont.cuba.gui.upload.FileUploadingAPI;
 import com.haulmont.cuba.gui.xml.layout.ComponentsFactory;
+import com.haulmont.cuba.security.entity.EntityOp;
 import com.haulmont.cuba.security.entity.Role;
 import com.haulmont.reports.app.service.ReportService;
 import com.haulmont.reports.entity.*;
@@ -164,13 +161,16 @@ public class ReportEditor extends AbstractEditor<Report> {
     protected FileUploadField invisibleFileUpload;
 
     @Inject
-    private Metadata metadata;
+    protected Metadata metadata;
 
     @Inject
     protected UuidSource uuidSource;
 
     @Inject
     protected HBoxLayout reportFields;
+
+    @Inject
+    protected Security security;
 
     @Override
     protected void initNewItem(Report report) {
@@ -290,7 +290,7 @@ public class ReportEditor extends AbstractEditor<Report> {
                 if (target != null) {
                     ReportInputParameter item = (ReportInputParameter) target.getSingleSelected();
                     if (item != null && parametersDs.getItem() == item) {
-                        return item.getPosition() > 0;
+                        return item.getPosition() > 0 && isUpdatePermitted();
                     }
                 }
 
@@ -328,7 +328,7 @@ public class ReportEditor extends AbstractEditor<Report> {
                 if (target != null) {
                     ReportInputParameter item = (ReportInputParameter) target.getSingleSelected();
                     if (item != null && parametersDs.getItem() == item) {
-                        return item.getPosition() < parametersDs.size() - 1;
+                        return item.getPosition() < parametersDs.size() - 1 && isUpdatePermitted();
                     }
                 }
 
@@ -344,6 +344,10 @@ public class ReportEditor extends AbstractEditor<Report> {
                 ((DatasourceImplementation) parametersDs).modified(e.getItem());
             }
         });
+    }
+
+    protected boolean isUpdatePermitted() {
+        return security.isEntityOpPermitted(metadata.getClassNN(Report.class), EntityOp.UPDATE);
     }
 
     protected void sortParametersByPosition() {
@@ -369,7 +373,12 @@ public class ReportEditor extends AbstractEditor<Report> {
     }
 
     protected void initRoles() {
-        rolesTable.addAction(new ExcludeAction(rolesTable, false, true));
+        rolesTable.addAction(new ExcludeAction(rolesTable, false, true) {
+            @Override
+            public boolean isEnabled() {
+                return super.isEnabled() && isUpdatePermitted();
+            }
+        });
 
         addRoleBtn.setAction(new AbstractAction("actions.Add") {
             @Override
@@ -377,6 +386,11 @@ public class ReportEditor extends AbstractEditor<Report> {
                 if (lookupRolesDs.getItem() != null && !rolesDs.containsItem(lookupRolesDs.getItem().getId())) {
                     rolesDs.addItem(lookupRolesDs.getItem());
                 }
+            }
+
+            @Override
+            public boolean isEnabled() {
+                return super.isEnabled() && isUpdatePermitted();
             }
         });
     }
@@ -419,6 +433,11 @@ public class ReportEditor extends AbstractEditor<Report> {
                         reportScreensDs.addItem(reportScreen);
                     }
                 }
+            }
+
+            @Override
+            public boolean isEnabled() {
+                return super.isEnabled() && isUpdatePermitted();
             }
         });
     }
@@ -585,6 +604,11 @@ public class ReportEditor extends AbstractEditor<Report> {
                             showNotification(getMessage("notification.defaultTemplateIsEmpty"), NotificationType.HUMANIZED);
                         }
                     }
+
+                    @Override
+                    public boolean isEnabled() {
+                        return super.isEnabled() && isUpdatePermitted();
+                    }
                 });
 
                 lookupPickerField.addAction(new AbstractAction("create") {
@@ -615,6 +639,11 @@ public class ReportEditor extends AbstractEditor<Report> {
                             }
                             lookupPickerField.focus();
                         });
+                    }
+
+                    @Override
+                    public boolean isEnabled() {
+                        return super.isEnabled() && isUpdatePermitted();
                     }
                 });
 
@@ -648,11 +677,18 @@ public class ReportEditor extends AbstractEditor<Report> {
                             showNotification(getMessage("notification.defaultTemplateIsEmpty"), NotificationType.HUMANIZED);
                         }
                     }
+
+                    @Override
+                    public boolean isEnabled() {
+                        return super.isEnabled() && isUpdatePermitted();
+                    }
                 });
 
                 lookupPickerField.addValueChangeListener(event -> {
                     setupDropZoneForTemplate();
                 });
+
+                lookupPickerField.setEditable(isUpdatePermitted());
 
                 return lookupPickerField;
             }
@@ -706,6 +742,11 @@ public class ReportEditor extends AbstractEditor<Report> {
                 bandTree.setSelected(newBandDefinition);//let's try and see if it increases usability
 
                 bandTree.focus();
+            }
+
+            @Override
+            public boolean isEnabled() {
+                return super.isEnabled() && isUpdatePermitted();
             }
         });
 
@@ -806,7 +847,7 @@ public class ReportEditor extends AbstractEditor<Report> {
             protected boolean isApplicable() {
                 if (target != null) {
                     BandDefinition selectedItem = (BandDefinition) target.getSingleSelected();
-                    return selectedItem != null && selectedItem.getPosition() > 0;
+                    return selectedItem != null && selectedItem.getPosition() > 0 && isUpdatePermitted();
                 }
 
                 return false;
@@ -852,7 +893,8 @@ public class ReportEditor extends AbstractEditor<Report> {
                         BandDefinition parent = bandDefinition.getParentBandDefinition();
                         return parent != null &&
                                 parent.getChildrenBandDefinitions() != null &&
-                                bandDefinition.getPosition() < parent.getChildrenBandDefinitions().size() - 1;
+                                bandDefinition.getPosition() < parent.getChildrenBandDefinitions().size() - 1
+                                && isUpdatePermitted();
                     }
                 }
                 return false;
@@ -926,7 +968,7 @@ public class ReportEditor extends AbstractEditor<Report> {
 
         templatesTable.addAction(templateCreateAction);
 
-        templatesTable.addAction(new EditAction(templatesTable, OpenType.DIALOG){
+        templatesTable.addAction(new EditAction(templatesTable, OpenType.DIALOG) {
             @Override
             protected void afterCommit(Entity entity) {
                 ReportTemplate reportTemplate = (ReportTemplate) entity;
@@ -985,6 +1027,11 @@ public class ReportEditor extends AbstractEditor<Report> {
 
                 return false;
             }
+
+            @Override
+            public boolean isEnabled() {
+                return super.isEnabled() && isUpdatePermitted();
+            }
         });
         templatesTable.addAction(new ItemTrackingAction("copy") {
             @Override
@@ -1016,6 +1063,11 @@ public class ReportEditor extends AbstractEditor<Report> {
                     //noinspection unchecked
                     target.getDatasource().addItem(copy);
                 }
+            }
+
+            @Override
+            public boolean isEnabled() {
+                return super.isEnabled() && isUpdatePermitted();
             }
         });
     }

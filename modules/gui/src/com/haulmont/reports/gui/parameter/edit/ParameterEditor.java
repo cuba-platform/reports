@@ -7,10 +7,12 @@ package com.haulmont.reports.gui.parameter.edit;
 import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.global.Metadata;
+import com.haulmont.cuba.core.global.Security;
 import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.data.Datasource;
 import com.haulmont.cuba.gui.data.impl.DatasourceImplementation;
 import com.haulmont.cuba.gui.sys.ScreensHelper;
+import com.haulmont.cuba.security.entity.EntityOp;
 import com.haulmont.reports.app.service.ReportService;
 import com.haulmont.reports.entity.ParameterType;
 import com.haulmont.reports.entity.ReportInputParameter;
@@ -82,6 +84,9 @@ public class ParameterEditor extends AbstractEditor<ReportInputParameter> {
 
     @Inject
     protected Metadata metadata;
+
+    @Inject
+    protected Security security;
 
     @Inject
     protected ReportService reportService;
@@ -226,6 +231,7 @@ public class ParameterEditor extends AbstractEditor<ReportInputParameter> {
             defaultValueBox.add(field);
             defaultValueLabel.setVisible(true);
         }
+        defaultValueBox.setEnabled(security.isEntityOpPermitted(metadata.getClassNN(ReportInputParameter.class), EntityOp.UPDATE));
     }
 
     protected void initCurrentDateTimeField() {
@@ -284,6 +290,7 @@ public class ParameterEditor extends AbstractEditor<ReportInputParameter> {
                 parameter.setPredefinedTransformation(null);
             }
         });
+        predefinedTransformation.setEditable(security.isEntityOpPermitted(metadata.getClassNN(ReportInputParameter.class), EntityOp.UPDATE));
     }
 
     protected void enableControlsByTransformationType(boolean hasPredefinedTransformation) {

@@ -6,10 +6,7 @@ package com.haulmont.reports.gui.definition.edit;
 
 import com.haulmont.bali.util.ParamsMap;
 import com.haulmont.chile.core.model.MetaClass;
-import com.haulmont.cuba.core.global.Configuration;
-import com.haulmont.cuba.core.global.Metadata;
-import com.haulmont.cuba.core.global.Stores;
-import com.haulmont.cuba.core.global.View;
+import com.haulmont.cuba.core.global.*;
 import com.haulmont.cuba.gui.WindowManager;
 import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.components.actions.RemoveAction;
@@ -20,6 +17,7 @@ import com.haulmont.cuba.gui.components.autocomplete.Suggestion;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
 import com.haulmont.cuba.gui.data.Datasource;
 import com.haulmont.cuba.gui.data.impl.DatasourceImplementation;
+import com.haulmont.cuba.security.entity.EntityOp;
 import com.haulmont.reports.app.service.ReportService;
 import com.haulmont.reports.app.service.ReportWizardService;
 import com.haulmont.reports.entity.*;
@@ -120,6 +118,8 @@ public class BandDefinitionEditor extends AbstractFrame implements Suggester {
     protected CrossTabTableDecorator tabOrientationTableDecorator;
     @Inject
     protected Configuration configuration;
+    @Inject
+    private Security security;
 
     protected SourceCodeEditor.Mode dataSetScriptFieldMode = SourceCodeEditor.Mode.Text;
 
@@ -163,7 +163,8 @@ public class BandDefinitionEditor extends AbstractFrame implements Suggester {
 
     public void setBandDefinition(BandDefinition bandDefinition) {
         bandDefinitionDs.setItem(bandDefinition);
-        name.setEditable(bandDefinition == null || bandDefinition.getParent() != null);
+        name.setEditable((bandDefinition == null || bandDefinition.getParent() != null)
+                && isUpdatePermitted());
     }
 
     public Datasource<BandDefinition> getBandDefinitionDs() {
@@ -313,6 +314,11 @@ public class BandDefinitionEditor extends AbstractFrame implements Suggester {
                     dataSets.setSelected(dataset);
                 }
             }
+
+            @Override
+            public boolean isEnabled() {
+                return super.isEnabled() && isUpdatePermitted();
+            }
         });
 
         Action editDataSetViewAction = new EditViewAction(this);
@@ -390,6 +396,10 @@ public class BandDefinitionEditor extends AbstractFrame implements Suggester {
         dataSetScriptField.resetEditHistory();
 
         hideAllDataSetEditComponents();
+    }
+
+    protected boolean isUpdatePermitted() {
+        return security.isEntityOpPermitted(metadata.getClassNN(Report.class), EntityOp.UPDATE);
     }
 
     protected void updateRequiredIndicators(BandDefinition item) {

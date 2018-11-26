@@ -56,6 +56,7 @@ public class EditViewAction extends AbstractAction {
                             editorParams.put("asViewEditor", Boolean.TRUE);
                             editorParams.put("rootEntity", reportRegion.getRegionPropertiesRootNode());
                             editorParams.put("scalarOnly", Boolean.TRUE);
+                            editorParams.put("updateDisabled", !bandDefinitionEditor.isUpdatePermitted());
 
                             Window.Editor regionEditor =
                                     bandDefinitionEditor.openEditor("report$Report.regionEditor",

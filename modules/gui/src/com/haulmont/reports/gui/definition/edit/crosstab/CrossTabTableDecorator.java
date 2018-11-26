@@ -6,14 +6,18 @@
 package com.haulmont.reports.gui.definition.edit.crosstab;
 
 import com.google.common.base.Strings;
+import com.haulmont.cuba.core.global.Metadata;
+import com.haulmont.cuba.core.global.Security;
 import com.haulmont.cuba.gui.components.Table;
 import com.haulmont.cuba.gui.components.TextField;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
 import com.haulmont.cuba.gui.data.Datasource;
 import com.haulmont.cuba.gui.xml.layout.ComponentsFactory;
+import com.haulmont.cuba.security.entity.EntityOp;
 import com.haulmont.reports.entity.BandDefinition;
 import com.haulmont.reports.entity.DataSet;
 import com.haulmont.reports.entity.Orientation;
+import com.haulmont.reports.entity.Report;
 import com.haulmont.reports.gui.definition.edit.BandDefinitionEditor;
 import com.haulmont.reports.util.DataSetFactory;
 
@@ -39,6 +43,12 @@ public class CrossTabTableDecorator {
     @Inject
     protected ComponentsFactory componentsFactory;
 
+    @Inject
+    protected Security security;
+
+    @Inject
+    protected Metadata metadata;
+
     public void decorate(Table<DataSet> dataSets, final Datasource<BandDefinition> bandDefinitionDs) {
         dataSets.addGeneratedColumn("name", entity -> {
             TextField textField = componentsFactory.createComponent(TextField.class);
@@ -55,6 +65,7 @@ public class CrossTabTableDecorator {
                     textField.setEditable(false);
                 }
             }
+            textField.setEditable(isUpdatePermitted());
             return textField;
         });
 
@@ -73,6 +84,10 @@ public class CrossTabTableDecorator {
                 });
             }
         });
+    }
+
+    protected boolean isUpdatePermitted() {
+        return security.isEntityOpPermitted(metadata.getClassNN(Report.class), EntityOp.UPDATE);
     }
 
     protected void onHorizontalSetChange(DataSet dataSet) {
