@@ -99,6 +99,9 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
     @Inject
     protected FileUploadingAPI fileUploading;
 
+    @Inject
+    private LinkButton namePatternTextHelp;
+
     public TemplateEditor() {
         showSaveNotification = false;
     }
@@ -110,6 +113,15 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
         getDialogOptions()
                 .setWidthAuto()
                 .setResizable(true);
+        namePatternTextHelp.setAction(new AbstractAction("") {
+            @Override
+            public void actionPerform(Component component) {
+                showMessageDialog(getMessage("template.namePatternText"), getMessage("template.namePatternTextHelp"),
+                        MessageType.CONFIRMATION_HTML
+                                .modal(false)
+                                .width(560f));
+            }
+        });
     }
 
     @Override
@@ -189,6 +201,8 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
         templateFileLabel.setVisible(templateOutputVisibility);
         outputNamePattern.setVisible(templateOutputVisibility);
         outputNamePatternLabel.setVisible(templateOutputVisibility);
+        namePatternTextHelp.setVisible(templateOutputVisibility);
+
 
         visibleTemplateEditor(reportOutputType);
 

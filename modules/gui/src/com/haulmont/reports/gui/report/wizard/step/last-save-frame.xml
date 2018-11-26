@@ -18,7 +18,10 @@
                                 description="msg://templateHintMsg" align="MIDDLE_LEFT"/>
                     </row>
                     <row>
-                        <label value="msg://outputFileName" align="MIDDLE_LEFT"/>
+                        <hbox align="MIDDLE_LEFT">
+                            <label value="msg://outputFileName"/>
+                            <linkButton id="namePatternTextHelp" icon="icons/question-white.png"/>
+                        </hbox>
                         <textField id="outputFileName" width="100%" required="true"
                                    description="msg://outputFileNameHintMsg" maxLength="255">
                             <validator

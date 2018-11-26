@@ -102,6 +102,8 @@ public class ReportWizardCreator extends AbstractWindow implements MainWizardFra
     protected LookupField<ChartType> diagramType;
     @Named("saveStep.chartPreviewBox")
     protected BoxLayout chartPreviewBox;
+    @Named("saveStep.namePatternTextHelp")
+    protected LinkButton namePatternTextHelpButton;
 
     @Inject
     protected Metadata metadata;
@@ -168,6 +170,16 @@ public class ReportWizardCreator extends AbstractWindow implements MainWizardFra
                 moveUpBtn.setEnabled(true);
                 removeBtn.setEnabled(true);
             }
+        });
+
+        namePatternTextHelpButton.setAction(new AbstractAction("") {
+            @Override
+            public void actionPerform(Component component) {
+                showMessageDialog(getMessage("template.namePatternText"), getMessage("template.namePatternTextHelp"),
+                        MessageType.CONFIRMATION_HTML
+                                .modal(false)
+                                .width(560f));
+        }
         });
     }
 
