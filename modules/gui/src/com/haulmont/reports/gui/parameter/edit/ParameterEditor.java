@@ -15,6 +15,7 @@ import com.haulmont.cuba.gui.sys.ScreensHelper;
 import com.haulmont.cuba.security.entity.EntityOp;
 import com.haulmont.reports.app.service.ReportService;
 import com.haulmont.reports.entity.ParameterType;
+import com.haulmont.reports.entity.PredefinedTransformation;
 import com.haulmont.reports.entity.ReportInputParameter;
 import com.haulmont.reports.gui.report.run.ParameterClassResolver;
 import com.haulmont.reports.gui.report.run.ParameterFieldCreator;
@@ -26,31 +27,27 @@ import java.util.*;
 
 public class ParameterEditor extends AbstractEditor<ReportInputParameter> {
     @Inject
-    protected Label defaultValueLabel;
-
+    protected Label<String> defaultValueLabel;
     @Inject
     protected BoxLayout defaultValueBox;
 
     @Inject
-    protected LookupField screen;
-
+    protected LookupField<String> screen;
     @Inject
-    protected LookupField enumeration;
-
+    protected LookupField<String> enumeration;
     @Inject
     protected LookupField<ParameterType> type;
+    @Inject
+    protected LookupField<String> metaClass;
 
     @Inject
-    protected LookupField metaClass;
+    protected Label<String> enumerationLabel;
 
     @Inject
-    protected Label enumerationLabel;
+    protected Label<String> screenLabel;
 
     @Inject
-    protected Label screenLabel;
-
-    @Inject
-    protected Label metaClassLabel;
+    protected Label<String> metaClassLabel;
 
     @Inject
     protected GridLayout predefinedTransformationBox;
@@ -62,29 +59,28 @@ public class ParameterEditor extends AbstractEditor<ReportInputParameter> {
     protected SourceCodeEditor transformationScript;
 
     @Inject
-    protected Label transformationScriptLabel;
+    protected Label<String> transformationScriptLabel;
 
     @Inject
-    protected LookupField wildcards;
+    protected LookupField<PredefinedTransformation> wildcards;
 
     @Inject
-    protected Label wildcardsLabel;
+    protected Label<String> wildcardsLabel;
 
     @Inject
     protected CheckBox defaultDateIsCurrentCheckBox;
 
     @Inject
-    protected Label defaultDateIsCurrentLabel;
+    protected Label<String> defaultDateIsCurrentLabel;
 
     @Inject
-    protected Label requiredLabel;
+    protected Label<String> requiredLabel;
 
     @Inject
     protected CheckBox required;
 
     @Inject
     protected Metadata metadata;
-
     @Inject
     protected Security security;
 
@@ -120,7 +116,6 @@ public class ParameterEditor extends AbstractEditor<ReportInputParameter> {
     }
 
     @Override
-    @SuppressWarnings({"unchecked", "serial"})
     public void init(Map<String, Object> params) {
         super.init(params);
 
@@ -144,7 +139,9 @@ public class ParameterEditor extends AbstractEditor<ReportInputParameter> {
     }
 
     protected void initListeners() {
-        type.addValueChangeListener(e -> enableControlsByParamType((ParameterType) e.getValue()));
+        type.addValueChangeListener(e ->
+                enableControlsByParamType(e.getValue())
+        );
 
         parameterDs.addItemPropertyChangeListener(e -> {
             boolean typeChanged = e.getProperty().equalsIgnoreCase("type");
@@ -182,14 +179,14 @@ public class ParameterEditor extends AbstractEditor<ReportInputParameter> {
         if (parameter.getType() == ParameterType.ENTITY ||  parameter.getType() == ParameterType.ENTITY_LIST) {
             Class clazz = parameterClassResolver.resolveClass(parameter);
             if (clazz != null) {
-                Map<String, Object> screensMap = screensHelper.getAvailableBrowserScreens(clazz);
+                Map<String, String> screensMap = screensHelper.getAvailableBrowserScreens(clazz);
                 screen.setOptionsMap(screensMap);
             }
         }
     }
 
     protected void initEnumsLookup() {
-        Map<String, Object> enumsOptionsMap = new TreeMap<>();
+        Map<String, String> enumsOptionsMap = new TreeMap<>();
         for (Class enumClass : metadata.getTools().getAllEnums()) {
             String enumLocalizedName = messages.getMessage(enumClass, enumClass.getSimpleName());
             enumsOptionsMap.put(enumLocalizedName + " (" + enumClass.getSimpleName() + ")", enumClass.getCanonicalName());
@@ -198,7 +195,7 @@ public class ParameterEditor extends AbstractEditor<ReportInputParameter> {
     }
 
     protected void initMetaClassLookup() {
-        Map<String, Object> metaClassesOptionsMap = new TreeMap<>();
+        Map<String, String> metaClassesOptionsMap = new TreeMap<>();
         Collection<MetaClass> classes = metadata.getSession().getClasses();
         for (MetaClass clazz : classes) {
             if (!metadata.getTools().isSystemLevel(clazz)) {
@@ -282,7 +279,8 @@ public class ParameterEditor extends AbstractEditor<ReportInputParameter> {
         predefinedTransformation.setValue(parameter.getPredefinedTransformation() != null);
         enableControlsByTransformationType(parameter.getPredefinedTransformation() != null);
         predefinedTransformation.addValueChangeListener(e -> {
-            boolean hasPredefinedTransformation = e.getValue() != null && (Boolean)e.getValue() ;
+            boolean hasPredefinedTransformation = e.getValue() != null && e.getValue();
+
             enableControlsByTransformationType(hasPredefinedTransformation);
             if (hasPredefinedTransformation) {
                 parameter.setTransformationScript(null);
@@ -290,7 +288,7 @@ public class ParameterEditor extends AbstractEditor<ReportInputParameter> {
                 parameter.setPredefinedTransformation(null);
             }
         });
-        predefinedTransformation.setEditable(security.isEntityOpPermitted(metadata.getClassNN(ReportInputParameter.class), EntityOp.UPDATE));
+        predefinedTransformation.setEditable(security.isEntityOpPermitted(ReportInputParameter.class, EntityOp.UPDATE));
     }
 
     protected void enableControlsByTransformationType(boolean hasPredefinedTransformation) {
