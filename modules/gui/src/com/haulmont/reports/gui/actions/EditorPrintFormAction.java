@@ -18,8 +18,8 @@ import javax.annotation.Nullable;
 
 public class EditorPrintFormAction extends AbstractPrintFormAction {
 
-    private final Window.Editor editor;
-    private final String reportOutputName;
+    protected final Window.Editor editor;
+    protected final String reportOutputName;
 
     public EditorPrintFormAction(Window.Editor editor, @Nullable String reportOutputName) {
         this("editorReport", editor, reportOutputName);
