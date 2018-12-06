@@ -12,6 +12,7 @@ import com.haulmont.chile.core.model.MetaPropertyPath;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.global.*;
 import com.haulmont.cuba.gui.AppConfig;
+import com.haulmont.cuba.gui.UiComponents;
 import com.haulmont.cuba.gui.WindowManager.OpenType;
 import com.haulmont.cuba.gui.app.core.file.FileUploadDialog;
 import com.haulmont.cuba.gui.components.*;
@@ -30,7 +31,6 @@ import com.haulmont.cuba.gui.export.ExportDisplay;
 import com.haulmont.cuba.gui.export.ExportFormat;
 import com.haulmont.cuba.gui.sys.ScreensHelper;
 import com.haulmont.cuba.gui.upload.FileUploadingAPI;
-import com.haulmont.cuba.gui.xml.layout.ComponentsFactory;
 import com.haulmont.cuba.security.entity.EntityOp;
 import com.haulmont.cuba.security.entity.Role;
 import com.haulmont.reports.app.service.ReportService;
@@ -106,6 +106,12 @@ public class ReportEditor extends AbstractEditor<Report> {
     @Named("generalFrame.serviceTree")
     protected Tree<BandDefinition> bandTree;
 
+    @Named("generalFrame.invisibleFileUpload")
+    protected FileUploadField invisibleFileUpload;
+
+    @Named("generalFrame.reportFields")
+    protected HBoxLayout reportFields;
+
     @Named("parametersFrame.validationScriptGroupBox")
     protected GroupBoxLayout validationScriptGroupBox;
 
@@ -140,7 +146,7 @@ public class ReportEditor extends AbstractEditor<Report> {
     protected CollectionDatasource<ReportTemplate, UUID> templatesDs;
 
     @Inject
-    protected ComponentsFactory componentsFactory;
+    protected UiComponents uiComponents;
 
     @Inject
     protected FileUploadingAPI fileUpload;
@@ -158,16 +164,10 @@ public class ReportEditor extends AbstractEditor<Report> {
     protected ScreensHelper screensHelper;
 
     @Inject
-    protected FileUploadField invisibleFileUpload;
-
-    @Inject
     protected Metadata metadata;
 
     @Inject
     protected UuidSource uuidSource;
-
-    @Inject
-    protected HBoxLayout reportFields;
 
     @Inject
     protected Security security;
@@ -517,7 +517,7 @@ public class ReportEditor extends AbstractEditor<Report> {
         propertiesFieldGroup.addCustomField("defaultTemplate", new FieldGroup.CustomFieldGenerator() {
             @Override
             public Component generateField(Datasource datasource, String propertyId) {
-                final LookupPickerField lookupPickerField = componentsFactory.createComponent(LookupPickerField.class);
+                LookupPickerField lookupPickerField = uiComponents.create(LookupPickerField.class);
 
                 lookupPickerField.setOptionsDatasource(templatesDs);
                 lookupPickerField.setDatasource(datasource, propertyId);
@@ -627,6 +627,7 @@ public class ReportEditor extends AbstractEditor<Report> {
                     public void actionPerform(Component component) {
                         ReportTemplate template = metadata.create(ReportTemplate.class);
                         template.setReport(getItem());
+
                         Editor editor = openEditor("report$ReportTemplate.edit", template, OpenType.DIALOG, templatesDs);
                         editor.addCloseListener(actionId -> {
                             if (COMMIT_ACTION_ID.equals(actionId)) {
@@ -634,7 +635,7 @@ public class ReportEditor extends AbstractEditor<Report> {
                                 templatesDs.addItem(item);
                                 getItem().setDefaultTemplate(item);
                                 //Workaround to disable button after default template setting
-                                Action defaultTemplate = templatesTable.getAction("defaultTemplate");
+                                Action defaultTemplate = templatesTable.getActionNN("defaultTemplate");
                                 defaultTemplate.refreshState();
                             }
                             lookupPickerField.focus();
@@ -723,7 +724,7 @@ public class ReportEditor extends AbstractEditor<Report> {
                 //
                 orderBandDefinitions(parentDefinition);
 
-                BandDefinition newBandDefinition = new BandDefinition();
+                BandDefinition newBandDefinition = metadata.create(BandDefinition.class);
                 newBandDefinition.setName("newBand" + (parentDefinition.getChildrenBandDefinitions().size() + 1));
                 newBandDefinition.setOrientation(Orientation.HORIZONTAL);
                 newBandDefinition.setParentBandDefinition(parentDefinition);
@@ -784,7 +785,7 @@ public class ReportEditor extends AbstractEditor<Report> {
                         }
                     }
                 }
-                bandTree.requestFocus();
+                bandTree.focus();
             }
 
             private void removeChildrenCascade(Collection selected) {
