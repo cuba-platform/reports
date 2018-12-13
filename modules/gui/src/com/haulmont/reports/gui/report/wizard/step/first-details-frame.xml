@@ -16,7 +16,7 @@
                    width="100%"/>
             <field id="reportType" caption="msg://reportBuildType"
                    width="-1px" custom="true"
-                   description="msg://singleMultiEntityHintMsg"/>
+                   description="msg://singleMultiEntityHintMsg" descriptionAsHtml="true"/>
         </fieldGroup>
         <linkButton id="setQuery" caption="msg://setQuery"/>
         <label id="spacer"/>
