@@ -9,12 +9,10 @@ import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.cuba.core.app.DataService;
 import com.haulmont.cuba.core.global.*;
 import com.haulmont.cuba.gui.AppConfig;
-import com.haulmont.cuba.gui.ComponentsHelper;
 import com.haulmont.cuba.gui.WindowManager;
 import com.haulmont.cuba.gui.WindowManager.OpenType;
 import com.haulmont.cuba.gui.WindowManagerProvider;
 import com.haulmont.cuba.gui.backgroundwork.BackgroundWorkWindow;
-import com.haulmont.cuba.gui.components.Frame;
 import com.haulmont.cuba.gui.config.WindowConfig;
 import com.haulmont.cuba.gui.config.WindowInfo;
 import com.haulmont.cuba.gui.executors.BackgroundTask;
@@ -22,7 +20,10 @@ import com.haulmont.cuba.gui.executors.TaskLifeCycle;
 import com.haulmont.cuba.gui.export.ByteArrayDataProvider;
 import com.haulmont.cuba.gui.export.ExportDisplay;
 import com.haulmont.cuba.gui.export.ExportFormat;
+import com.haulmont.cuba.gui.screen.FrameOwner;
+import com.haulmont.cuba.gui.screen.Screen;
 import com.haulmont.cuba.gui.screen.ScreenContext;
+import com.haulmont.cuba.gui.screen.UiControllerUtils;
 import com.haulmont.cuba.security.entity.User;
 import com.haulmont.reports.app.ParameterPrototype;
 import com.haulmont.reports.app.service.ReportService;
@@ -81,18 +82,18 @@ public class ReportGuiManager {
      * Open input parameters dialog if report has parameters otherwise print report
      *
      * @param report - target report
-     * @param window - caller window
+     * @param screen - caller window
      */
-    public void runReport(Report report, Frame window) {
+    public void runReport(Report report, FrameOwner screen) {
         if (report == null) {
             throw new IllegalArgumentException("Can not run null report");
         }
 
         if (report.getInputParameters() != null && report.getInputParameters().size() > 0
                 || inputParametersRequiredByTemplates(report)) {
-            openReportParamsDialog(window, report, null, null, null);
+            openReportParamsDialog(screen, report, null, null, null);
         } else {
-            printReport(report, ParamsMap.empty(), window);
+            printReport(report, ParamsMap.empty(), screen);
         }
     }
 
@@ -101,13 +102,13 @@ public class ReportGuiManager {
      * The method allows to select target template code, pass single parameter to report, and set output file name.
      *
      * @param report         target report
-     * @param window         caller window
+     * @param screen         caller window
      * @param parameter      input parameter linked with passed parameter value
      * @param parameterValue parameter value
      * @param templateCode   target template code
      * @param outputFileName name for output file
      */
-    public void runReport(Report report, Frame window, final ReportInputParameter parameter, final Object parameterValue,
+    public void runReport(Report report, FrameOwner screen, final ReportInputParameter parameter, final Object parameterValue,
                           @Nullable String templateCode, @Nullable String outputFileName) {
         if (report == null) {
             throw new IllegalArgumentException("Can not run null report");
@@ -125,18 +126,19 @@ public class ReportGuiManager {
 
         if (reportHasMoreThanOneParameter || inputParametersRequiredByTemplates) {
             boolean bulkPrint = reportTypeIsSingleEntity && moreThanOneEntitySelected;
-            openReportParamsDialog(window, report, ParamsMap.of(parameter.getAlias(), resultingParamValue), parameter, templateCode, outputFileName,
-                    bulkPrint);
+            openReportParamsDialog(screen, report,
+                    ParamsMap.of(parameter.getAlias(), resultingParamValue),
+                    parameter, templateCode, outputFileName,bulkPrint);
         } else {
             if (reportTypeIsSingleEntity) {
                 Collection selectedEntities = (Collection) resultingParamValue;
                 if (moreThanOneEntitySelected) {
-                    bulkPrint(report, parameter.getAlias(), selectedEntities, window);
+                    bulkPrint(report, parameter.getAlias(), selectedEntities, screen);
                 } else if (selectedEntities.size() == 1) {
-                    printReport(report, ParamsMap.of(parameter.getAlias(), selectedEntities.iterator().next()), templateCode, outputFileName, window);
+                    printReport(report, ParamsMap.of(parameter.getAlias(), selectedEntities.iterator().next()), templateCode, outputFileName, screen);
                 }
             } else {
-                printReport(report, ParamsMap.of(parameter.getAlias(), resultingParamValue), templateCode, outputFileName, window);
+                printReport(report, ParamsMap.of(parameter.getAlias(), resultingParamValue), templateCode, outputFileName, screen);
             }
         }
     }
@@ -168,10 +170,10 @@ public class ReportGuiManager {
      *
      * @param report - target report
      * @param params - report parameters (map keys should match with parameter aliases)
-     * @param window - caller window
+     * @param screen - caller window
      */
-    public void printReport(Report report, Map<String, Object> params, Frame window) {
-        printReport(report, params, null, null, window);
+    public void printReport(Report report, Map<String, Object> params, FrameOwner screen) {
+        printReport(report, params, null, null, screen);
     }
 
     /**
@@ -181,10 +183,11 @@ public class ReportGuiManager {
      * @param params         - report parameters (map keys should match with parameter aliases)
      * @param templateCode   - target template code
      * @param outputFileName - name for output file
-     * @param window         - caller window
+     * @param screen         - caller window
      */
-    public void printReport(Report report, Map<String, Object> params, @Nullable String templateCode, @Nullable String outputFileName, @Nullable Frame window) {
-        printReport(report, params, templateCode, outputFileName, null, window);
+    public void printReport(Report report, Map<String, Object> params, @Nullable String templateCode,
+                            @Nullable String outputFileName, @Nullable FrameOwner screen) {
+        printReport(report, params, templateCode, outputFileName, null, screen);
     }
 
     /**
@@ -195,17 +198,18 @@ public class ReportGuiManager {
      * @param templateCode   - target template code
      * @param outputFileName - name for output file
      * @param outputType     - output type for file
-     * @param window         - caller window
+     * @param screen         - caller window
      */
-    public void printReport(Report report, Map<String, Object> params, @Nullable String templateCode, @Nullable String outputFileName, @Nullable ReportOutputType outputType, Frame window) {
+    public void printReport(Report report, Map<String, Object> params, @Nullable String templateCode,
+                            @Nullable String outputFileName, @Nullable ReportOutputType outputType, FrameOwner screen) {
 
         Configuration configuration = AppBeans.get(Configuration.NAME);
         ReportingClientConfig reportingClientConfig = configuration.getConfig(ReportingClientConfig.class);
 
-        if (window != null && reportingClientConfig.getUseBackgroundReportProcessing()) {
-            printReportBackground(report, params, templateCode, outputFileName, outputType, window);
+        if (screen != null && reportingClientConfig.getUseBackgroundReportProcessing()) {
+            printReportBackground(report, params, templateCode, outputFileName, outputType, screen);
         } else {
-            printReportSync(report, params, templateCode, outputFileName, outputType, window);
+            printReportSync(report, params, templateCode, outputFileName, outputType, screen);
         }
     }
 
@@ -216,10 +220,11 @@ public class ReportGuiManager {
      * @param params         - report parameters (map keys should match with parameter aliases)
      * @param templateCode   - target template code
      * @param outputFileName - name for output file
-     * @param window         - caller window
+     * @param screen         - caller window
      */
-    public void printReportSync(Report report, Map<String, Object> params, @Nullable String templateCode, @Nullable String outputFileName, @Nullable Frame window) {
-        printReportSync(report, params, templateCode, outputFileName, null, window);
+    public void printReportSync(Report report, Map<String, Object> params, @Nullable String templateCode,
+                                @Nullable String outputFileName, @Nullable FrameOwner screen) {
+        printReportSync(report, params, templateCode, outputFileName, null, screen);
     }
 
     /**
@@ -230,13 +235,14 @@ public class ReportGuiManager {
      * @param templateCode   - target template code
      * @param outputFileName - name for output file
      * @param outputType     - output type for file
-     * @param window         - caller window
+     * @param screen         - caller window
      */
     public void printReportSync(Report report, Map<String, Object> params, @Nullable String templateCode,
-                                @Nullable String outputFileName, @Nullable ReportOutputType outputType, @Nullable Frame window) {
+                                @Nullable String outputFileName, @Nullable ReportOutputType outputType,
+                                @Nullable FrameOwner screen) {
         ReportOutputDocument document = getReportResult(report, params, templateCode, outputType);
 
-        showReportResult(document, params, templateCode, outputFileName, window);
+        showReportResult(document, params, templateCode, outputFileName, screen);
     }
 
     /**
@@ -275,13 +281,13 @@ public class ReportGuiManager {
     }
 
     protected void showReportResult(ReportOutputDocument document, Map<String, Object> params,
-                                    @Nullable String templateCode, @Nullable String outputFileName, @Nullable Frame window) {
-        showReportResult(document, params, templateCode, outputFileName, null, window);
+                                    @Nullable String templateCode, @Nullable String outputFileName, @Nullable FrameOwner screen) {
+        showReportResult(document, params, templateCode, outputFileName, null, screen);
     }
 
     protected void showReportResult(ReportOutputDocument document, Map<String, Object> params,
                                     @Nullable String templateCode, @Nullable String outputFileName,
-                                    @Nullable ReportOutputType outputType, @Nullable Frame window) {
+                                    @Nullable ReportOutputType outputType, @Nullable FrameOwner screen) {
 
         WindowManager wm = windowManagerProvider.get();
 
@@ -294,8 +300,8 @@ public class ReportGuiManager {
 
             WindowInfo windowInfo = windowConfig.getWindowInfo("report$showChart");
 
-            if (window != null) {
-                ScreenContext screenContext = ComponentsHelper.getScreenContext(window);
+            if (screen != null) {
+                ScreenContext screenContext = UiControllerUtils.getScreenContext(screen);
 
                 WindowManager screens = (WindowManager) screenContext.getScreens();
                 screens.openWindow(windowInfo, OpenType.DIALOG, screenParams);
@@ -311,8 +317,8 @@ public class ReportGuiManager {
 
             WindowInfo windowInfo = windowConfig.getWindowInfo("report$showPivotTable");
 
-            if (window != null) {
-                ScreenContext screenContext = ComponentsHelper.getScreenContext(window);
+            if (screen != null) {
+                ScreenContext screenContext = UiControllerUtils.getScreenContext(screen);
 
                 WindowManager screens = (WindowManager) screenContext.getScreens();
                 screens.openWindow(windowInfo, OpenType.DIALOG, screenParams);
@@ -328,8 +334,8 @@ public class ReportGuiManager {
 
             WindowInfo windowInfo = windowConfig.getWindowInfo("report$showReportTable");
 
-            if (window != null) {
-                ScreenContext screenContext = ComponentsHelper.getScreenContext(window);
+            if (screen != null) {
+                ScreenContext screenContext = UiControllerUtils.getScreenContext(screen);
 
                 WindowManager screens = (WindowManager) screenContext.getScreens();
                 screens.openWindow(windowInfo, OpenType.DIALOG, screenParams);
@@ -338,9 +344,14 @@ public class ReportGuiManager {
             }
         } else {
             byte[] byteArr = document.getContent();
-            com.haulmont.yarg.structure.ReportOutputType finalOutputType = (outputType != null) ? outputType.getOutputType() : document.getReportOutputType();
+            com.haulmont.yarg.structure.ReportOutputType finalOutputType =
+                    (outputType != null) ? outputType.getOutputType() : document.getReportOutputType();
+
             ExportFormat exportFormat = ReportPrintHelper.getExportFormat(finalOutputType);
-            ExportDisplay exportDisplay = AppConfig.createExportDisplay(window);
+
+            Screen hostScreen = UiControllerUtils.getScreen(screen);
+            ExportDisplay exportDisplay = AppConfig.createExportDisplay(hostScreen.getWindow());
+
             String documentName = isNotBlank(outputFileName) ? outputFileName : document.getDocumentName();
             exportDisplay.show(new ByteArrayDataProvider(byteArr), documentName, exportFormat);
         }
@@ -353,11 +364,11 @@ public class ReportGuiManager {
      * @param params         - report parameters (map keys should match with parameter aliases)
      * @param templateCode   - target template code
      * @param outputFileName - name for output file
-     * @param window         - caller window
+     * @param screen         - caller window
      */
-    public void printReportBackground(Report report, final Map<String, Object> params,
-                                      final @Nullable String templateCode, final @Nullable String outputFileName, final Frame window) {
-        printReportBackground(report, params, templateCode, outputFileName, null, window);
+    public void printReportBackground(Report report, Map<String, Object> params,
+                                      @Nullable String templateCode, @Nullable String outputFileName, FrameOwner screen) {
+        printReportBackground(report, params, templateCode, outputFileName, null, screen);
     }
 
     /**
@@ -368,17 +379,21 @@ public class ReportGuiManager {
      * @param templateCode   - target template code
      * @param outputFileName - name for output file
      * @param outputType     - output type for file
-     * @param window         - caller window
+     * @param screen         - caller window
      */
-    public void printReportBackground(Report report, final Map<String, Object> params, final @Nullable String templateCode,
-                                      final @Nullable String outputFileName, final @Nullable ReportOutputType outputType, final Frame window) {
+    public void printReportBackground(Report report, final Map<String, Object> params, @Nullable String templateCode,
+                                      @Nullable String outputFileName, @Nullable ReportOutputType outputType, FrameOwner screen) {
         ReportingClientConfig reportingClientConfig = configuration.getConfig(ReportingClientConfig.class);
 
         Report targetReport = getReportForPrinting(report);
 
         long timeout = reportingClientConfig.getBackgroundReportProcessingTimeoutMs();
-        final UUID userSessionId = userSessionSource.getUserSession().getId();
-        BackgroundTask<Void, ReportOutputDocument> task = new BackgroundTask<Void, ReportOutputDocument>(timeout, TimeUnit.MILLISECONDS, window) {
+        UUID userSessionId = userSessionSource.getUserSession().getId();
+
+        Screen hostScreen = UiControllerUtils.getScreen(screen);
+
+        BackgroundTask<Void, ReportOutputDocument> task =
+                new BackgroundTask<Void, ReportOutputDocument>(timeout, TimeUnit.MILLISECONDS, hostScreen) {
 
             @SuppressWarnings("UnnecessaryLocalVariable")
             @Override
@@ -389,7 +404,7 @@ public class ReportGuiManager {
 
             @Override
             public void done(ReportOutputDocument document) {
-                showReportResult(document, params, templateCode, outputFileName, outputType, window);
+                showReportResult(document, params, templateCode, outputFileName, outputType, screen);
             }
 
             @Override
@@ -437,16 +452,16 @@ public class ReportGuiManager {
      * @param outputType           - output type for file
      * @param alias                - parameter alias
      * @param selectedEntities     - list of selected entities
-     * @param window               - caller window
+     * @param screen               - caller window
      * @param additionalParameters - user-defined parameters
      */
     public void bulkPrint(Report report, @Nullable String templateCode, @Nullable ReportOutputType outputType, String alias,
-                          Collection selectedEntities, @Nullable Frame window, @Nullable Map<String, Object> additionalParameters) {
+                          Collection selectedEntities, @Nullable FrameOwner screen, @Nullable Map<String, Object> additionalParameters) {
         ReportingClientConfig reportingClientConfig = configuration.getConfig(ReportingClientConfig.class);
-        if (window != null && reportingClientConfig.getUseBackgroundReportProcessing()) {
-            bulkPrintBackground(report, templateCode, outputType, alias, selectedEntities, window, additionalParameters);
+        if (screen != null && reportingClientConfig.getUseBackgroundReportProcessing()) {
+            bulkPrintBackground(report, templateCode, outputType, alias, selectedEntities, screen, additionalParameters);
         } else {
-            bulkPrintSync(report, templateCode, outputType, alias, selectedEntities, window, additionalParameters);
+            bulkPrintSync(report, templateCode, outputType, alias, selectedEntities, screen, additionalParameters);
         }
     }
 
@@ -455,15 +470,15 @@ public class ReportGuiManager {
      * Each entity is passed  to report as parameter with certain alias.
      * Synchronously or asynchronously, depending on configurations
      *
-     * @param report               - target report
-     * @param alias                - parameter alias
-     * @param selectedEntities     - list of selected entities
-     * @param window               - caller window
-     * @param additionalParameters - user-defined parameters
+     * @param report               target report
+     * @param alias                parameter alias
+     * @param selectedEntities     list of selected entities
+     * @param screen               caller window
+     * @param additionalParameters user-defined parameters
      */
-    public void bulkPrint(Report report, String alias, Collection selectedEntities, @Nullable Frame window,
+    public void bulkPrint(Report report, String alias, Collection selectedEntities, @Nullable FrameOwner screen,
                           @Nullable Map<String, Object> additionalParameters) {
-        bulkPrint(report, null, null, alias, selectedEntities, window, additionalParameters);
+        bulkPrint(report, null, null, alias, selectedEntities, screen, additionalParameters);
     }
 
     /**
@@ -474,10 +489,10 @@ public class ReportGuiManager {
      * @param report           - target report
      * @param alias            - inputParameter alias
      * @param selectedEntities - list of selected entities
-     * @param window           - caller window
+     * @param screen           - caller window
      */
-    public void bulkPrint(Report report, String alias, Collection selectedEntities, @Nullable Frame window) {
-        bulkPrint(report, alias, selectedEntities, window, null);
+    public void bulkPrint(Report report, String alias, Collection selectedEntities, @Nullable FrameOwner screen) {
+        bulkPrint(report, alias, selectedEntities, screen, null);
     }
 
     /**
@@ -501,12 +516,12 @@ public class ReportGuiManager {
      * @param report               - target report
      * @param alias                - parameter alias
      * @param selectedEntities     - list of selected entities
-     * @param window               - caller window
+     * @param screen               - caller window
      * @param additionalParameters - user-defined parameters
      */
-    public void bulkPrintSync(Report report, String alias, Collection selectedEntities, @Nullable Frame window,
+    public void bulkPrintSync(Report report, String alias, Collection selectedEntities, @Nullable FrameOwner screen,
                               Map<String, Object> additionalParameters) {
-        bulkPrintSync(report, null, null, alias, selectedEntities, window, additionalParameters);
+        bulkPrintSync(report, null, null, alias, selectedEntities, screen, additionalParameters);
     }
 
     /**
@@ -519,11 +534,11 @@ public class ReportGuiManager {
      * @param outputType           - output type for file
      * @param alias                - parameter alias
      * @param selectedEntities     - list of selected entities
-     * @param window               - caller window
+     * @param screen               - caller window
      * @param additionalParameters - user-defined parameters
      */
     public void bulkPrintSync(Report report, @Nullable String templateCode, @Nullable ReportOutputType outputType,
-                              String alias, Collection selectedEntities, @Nullable Frame window,
+                              String alias, Collection selectedEntities, @Nullable FrameOwner screen,
                               Map<String, Object> additionalParameters) {
         List<Map<String, Object>> paramsList = new ArrayList<>();
         for (Object selectedEntity : selectedEntities) {
@@ -535,8 +550,10 @@ public class ReportGuiManager {
             paramsList.add(map);
         }
 
+        Screen hostScreen = UiControllerUtils.getScreen(screen);
+
         ReportOutputDocument reportOutputDocument = reportService.bulkPrint(report, templateCode, outputType, paramsList);
-        ExportDisplay exportDisplay = AppConfig.createExportDisplay(window);
+        ExportDisplay exportDisplay = AppConfig.createExportDisplay(hostScreen.getWindow());
         String documentName = reportOutputDocument.getDocumentName();
         exportDisplay.show(new ByteArrayDataProvider(reportOutputDocument.getContent()), documentName, ExportFormat.ZIP);
     }
@@ -549,10 +566,10 @@ public class ReportGuiManager {
      * @param report           - target report
      * @param alias            - inputParameter alias
      * @param selectedEntities - list of selected entities
-     * @param window           - caller window
+     * @param screen           - caller window
      */
-    public void bulkPrintSync(Report report, String alias, Collection selectedEntities, @Nullable Frame window) {
-        bulkPrintSync(report, alias, selectedEntities, window, null);
+    public void bulkPrintSync(Report report, String alias, Collection selectedEntities, @Nullable FrameOwner screen) {
+        bulkPrintSync(report, alias, selectedEntities, screen, null);
     }
 
     /**
@@ -566,7 +583,7 @@ public class ReportGuiManager {
      * @param window               - caller window
      * @param additionalParameters - user-defined parameters
      */
-    public void bulkPrintBackground(Report report, String alias, Collection selectedEntities, final Frame window,
+    public void bulkPrintBackground(Report report, String alias, Collection selectedEntities, FrameOwner window,
                                     Map<String, Object> additionalParameters) {
         bulkPrintBackground(report, null, null, alias, selectedEntities, window, additionalParameters);
     }
@@ -581,14 +598,15 @@ public class ReportGuiManager {
      * @param outputType           - output type for file
      * @param alias                - parameter alias
      * @param selectedEntities     - list of selected entities
-     * @param window               - caller window
+     * @param screen               - caller window
      * @param additionalParameters - user-defined parameters
      */
-    public void bulkPrintBackground(Report report, @Nullable String templateCode, @Nullable ReportOutputType outputType, String alias, Collection selectedEntities, final Frame window,
+    public void bulkPrintBackground(Report report, @Nullable String templateCode, @Nullable ReportOutputType outputType,
+                                    String alias, Collection selectedEntities, FrameOwner screen,
                                     Map<String, Object> additionalParameters) {
         ReportingClientConfig reportingClientConfig = configuration.getConfig(ReportingClientConfig.class);
 
-        final Report targetReport = getReportForPrinting(report);
+        Report targetReport = getReportForPrinting(report);
 
         long timeout = reportingClientConfig.getBackgroundReportProcessingTimeoutMs();
 
@@ -602,17 +620,20 @@ public class ReportGuiManager {
             paramsList.add(map);
         }
 
-        BackgroundTask<Void, ReportOutputDocument> task = new BackgroundTask<Void, ReportOutputDocument>(timeout, TimeUnit.MILLISECONDS, window) {
+        Screen hostScreen = UiControllerUtils.getScreen(screen);
+
+        BackgroundTask<Void, ReportOutputDocument> task =
+                new BackgroundTask<Void, ReportOutputDocument>(timeout, TimeUnit.MILLISECONDS, hostScreen) {
             @SuppressWarnings("UnnecessaryLocalVariable")
             @Override
-            public ReportOutputDocument run(TaskLifeCycle<Void> taskLifeCycle) throws Exception {
+            public ReportOutputDocument run(TaskLifeCycle<Void> taskLifeCycle) {
                 ReportOutputDocument result = reportService.bulkPrint(targetReport, templateCode, outputType, paramsList);
                 return result;
             }
 
             @Override
             public void done(ReportOutputDocument result) {
-                ExportDisplay exportDisplay = AppConfig.createExportDisplay(window);
+                ExportDisplay exportDisplay = AppConfig.createExportDisplay(hostScreen.getWindow());
                 String documentName = result.getDocumentName();
                 exportDisplay.show(new ByteArrayDataProvider(result.getContent()), documentName, ExportFormat.ZIP);
             }
@@ -632,10 +653,10 @@ public class ReportGuiManager {
      * @param report           - target report
      * @param alias            - parameter alias
      * @param selectedEntities - list of selected entities
-     * @param window           - caller window
+     * @param screen           - caller window
      */
-    public void bulkPrintBackground(Report report, String alias, Collection selectedEntities, final Frame window) {
-        bulkPrintBackground(report, alias, selectedEntities, window, null);
+    public void bulkPrintBackground(Report report, String alias, Collection selectedEntities, FrameOwner screen) {
+        bulkPrintBackground(report, alias, selectedEntities, screen, null);
     }
 
     /**
@@ -659,7 +680,7 @@ public class ReportGuiManager {
         return copy;
     }
 
-    protected void openReportParamsDialog(Frame window, Report report, @Nullable Map<String, Object> parameters,
+    protected void openReportParamsDialog(FrameOwner screen, Report report, @Nullable Map<String, Object> parameters,
                                           @Nullable ReportInputParameter inputParameter, @Nullable String templateCode,
                                           @Nullable String outputFileName,
                                           boolean bulkPrint) {
@@ -672,7 +693,7 @@ public class ReportGuiManager {
                 BULK_PRINT, bulkPrint
         );
 
-        ScreenContext screenContext = ComponentsHelper.getScreenContext(window);
+        ScreenContext screenContext = UiControllerUtils.getScreenContext(screen);
 
         WindowManager wm = (WindowManager) screenContext.getScreens();
         WindowInfo windowInfo = AppBeans.get(WindowConfig.class).getWindowInfo("report$inputParameters");
@@ -680,9 +701,9 @@ public class ReportGuiManager {
         wm.openWindow(windowInfo, OpenType.DIALOG, params);
     }
 
-    protected void openReportParamsDialog(Frame window, Report report, @Nullable Map<String, Object> parameters,
+    protected void openReportParamsDialog(FrameOwner screen, Report report, @Nullable Map<String, Object> parameters,
                                           @Nullable String templateCode, @Nullable String outputFileName) {
-        openReportParamsDialog(window, report, parameters, null, templateCode, outputFileName, false);
+        openReportParamsDialog(screen, report, parameters, null, templateCode, outputFileName, false);
     }
 
     @Nullable

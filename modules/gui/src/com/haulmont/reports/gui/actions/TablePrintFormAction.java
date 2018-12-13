@@ -6,7 +6,7 @@
 package com.haulmont.reports.gui.actions;
 
 import com.haulmont.cuba.gui.components.Table;
-import com.haulmont.cuba.gui.components.Window;
+import com.haulmont.cuba.gui.screen.Screen;
 
 public class TablePrintFormAction extends ListPrintFormAction {
 
@@ -14,15 +14,15 @@ public class TablePrintFormAction extends ListPrintFormAction {
      * @deprecated Use {@link TablePrintFormAction#TablePrintFormAction(Table)} instead.
      */
     @Deprecated
-    public TablePrintFormAction(Window window, Table table) {
-        this("tableReport", window, table);
+    public TablePrintFormAction(Screen screen, Table table) {
+        this("tableReport", screen, table);
     }
 
     /**
      * @deprecated Use {@link TablePrintFormAction#TablePrintFormAction(String, Table)} instead.
      */
     @Deprecated
-    public TablePrintFormAction(String id, Window window, Table table) {
+    public TablePrintFormAction(String id, Screen screen, Table table) {
         super(id, table);
     }
 

@@ -9,23 +9,26 @@ import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.Messages;
+import com.haulmont.cuba.gui.Notifications;
 import com.haulmont.cuba.gui.components.Component;
-import com.haulmont.cuba.gui.components.Frame;
-import com.haulmont.cuba.gui.components.Window;
+import com.haulmont.cuba.gui.screen.EditorScreen;
+import com.haulmont.cuba.gui.screen.FrameOwner;
+import com.haulmont.cuba.gui.screen.Screen;
+import com.haulmont.cuba.gui.screen.UiControllerUtils;
 import com.haulmont.reports.gui.ReportGuiManager;
 
 import javax.annotation.Nullable;
 
 public class EditorPrintFormAction extends AbstractPrintFormAction {
 
-    protected final Window.Editor editor;
+    protected final EditorScreen editor;
     protected final String reportOutputName;
 
-    public EditorPrintFormAction(Window.Editor editor, @Nullable String reportOutputName) {
+    public EditorPrintFormAction(EditorScreen editor, @Nullable String reportOutputName) {
         this("editorReport", editor, reportOutputName);
     }
 
-    public EditorPrintFormAction(String id, Window.Editor editor, @Nullable String reportOutputName) {
+    public EditorPrintFormAction(String id, EditorScreen editor, @Nullable String reportOutputName) {
         super(id);
 
         Messages messages = AppBeans.get(Messages.NAME);
@@ -42,16 +45,18 @@ public class EditorPrintFormAction extends AbstractPrintFormAction {
             if (!beforeActionPerformedHandler.beforeActionPerformed())
                 return;
         }
-        final Entity entity = editor.getItem();
+        Entity entity = editor.getEditedEntity();
         if (entity != null) {
             MetaClass metaClass = entity.getMetaClass();
-            openRunReportScreen(editor, entity, metaClass, reportOutputName);
+            openRunReportScreen((Screen) editor, entity, metaClass, reportOutputName);
         } else {
             Messages messages = AppBeans.get(Messages.NAME);
 
-            editor.showNotification(
-                    messages.getMessage(ReportGuiManager.class, "notifications.noSelectedEntity"),
-                    Frame.NotificationType.HUMANIZED);
+            Notifications notifications = UiControllerUtils.getScreenContext((FrameOwner) editor).getNotifications();
+
+            notifications.create()
+                    .withCaption(messages.getMessage(ReportGuiManager.class, "notifications.noSelectedEntity"))
+                    .show();
         }
     }
 }

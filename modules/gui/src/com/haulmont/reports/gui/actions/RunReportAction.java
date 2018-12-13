@@ -12,11 +12,13 @@ import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.gui.ComponentsHelper;
 import com.haulmont.cuba.gui.WindowManager;
 import com.haulmont.cuba.gui.WindowManager.OpenType;
-import com.haulmont.cuba.gui.components.*;
+import com.haulmont.cuba.gui.components.AbstractAction;
+import com.haulmont.cuba.gui.components.Action;
+import com.haulmont.cuba.gui.components.Component;
 import com.haulmont.cuba.gui.config.WindowConfig;
 import com.haulmont.cuba.gui.config.WindowInfo;
 import com.haulmont.cuba.gui.data.DataSupplier;
-import com.haulmont.cuba.gui.screen.ScreenContext;
+import com.haulmont.cuba.gui.screen.*;
 import com.haulmont.cuba.gui.screen.compatibility.LegacyFrame;
 import com.haulmont.reports.entity.Report;
 import com.haulmont.reports.gui.ReportGuiManager;
@@ -28,7 +30,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 public class RunReportAction extends AbstractAction implements Action.HasBeforeActionPerformedHandler {
 
-    protected Frame window;
+    protected FrameOwner screen;
 
     protected ReportGuiManager reportGuiManager = AppBeans.get(ReportGuiManager.class);
 
@@ -38,20 +40,20 @@ public class RunReportAction extends AbstractAction implements Action.HasBeforeA
      * @deprecated Use {@link RunReportAction#RunReportAction()} instead
      * */
     @Deprecated
-    public RunReportAction(Frame window) {
-        this("runReport", window);
+    public RunReportAction(FrameOwner screen) {
+        this("runReport", screen);
     }
 
     /**
      * @deprecated Use {@link RunReportAction#RunReportAction(String)} instead
      * */
     @Deprecated
-    public RunReportAction(String id, Frame window) {
+    public RunReportAction(String id, FrameOwner screen) {
         super(id);
 
-        checkArgument(window != null, "Can not create RunReportAction with null window");
+        checkArgument(screen != null, "Can not create RunReportAction with null window");
 
-        this.window = window;
+        this.screen = screen;
         Messages messages = AppBeans.get(Messages.NAME);
         this.caption = messages.getMessage(getClass(), "actions.Report");
         this.icon = "icons/reports-print.png";
@@ -75,28 +77,35 @@ public class RunReportAction extends AbstractAction implements Action.HasBeforeA
             if (!beforeActionPerformedHandler.beforeActionPerformed())
                 return;
         }
-        if (window != null) {
-            openLookup(window);
+        if (screen != null) {
+            openLookup(screen);
         } else if (component instanceof Component.BelongToFrame) {
-            Window window = ComponentsHelper.getWindow((Component.BelongToFrame) component);
-            openLookup(window);
+            FrameOwner screen = ComponentsHelper.getWindowNN((Component.BelongToFrame) component).getFrameOwner();
+            openLookup(screen);
         } else {
             throw new IllegalStateException("Please set window or specified component for performAction call");
         }
     }
 
-    protected void openLookup(Frame window) {
-        ScreenContext screenContext = ComponentsHelper.getScreenContext(window);
+    protected void openLookup(FrameOwner screen) {
+        ScreenContext screenContext = UiControllerUtils.getScreenContext(screen);
 
         WindowManager wm = (WindowManager) screenContext.getScreens();
         WindowInfo windowInfo = AppBeans.get(WindowConfig.class).getWindowInfo("report$Report.run");
+
+        Screen hostScreen;
+        if (screen instanceof Screen) {
+            hostScreen = (Screen) screen;
+        } else {
+            hostScreen = UiControllerUtils.getHostScreen((ScreenFragment) screen);
+        }
 
         wm.openLookup(windowInfo, items -> {
             if (items != null && items.size() > 0) {
                 Report report = (Report) items.iterator().next();
 
-                if (window.getFrameOwner() instanceof LegacyFrame) {
-                    DataSupplier dataSupplier = ((LegacyFrame) window.getFrameOwner()).getDsContext().getDataSupplier();
+                if (screen instanceof LegacyFrame) {
+                    DataSupplier dataSupplier = ((LegacyFrame) screen).getDsContext().getDataSupplier();
                     report = dataSupplier.reload(report, "report.edit");
                 } else {
                     DataManager dataManager = AppBeans.get(DataManager.NAME);
@@ -105,16 +114,16 @@ public class RunReportAction extends AbstractAction implements Action.HasBeforeA
 
                 if (report.getInputParameters() != null && report.getInputParameters().size() > 0
                         || reportGuiManager.inputParametersRequiredByTemplates(report)) {
-                    openReportParamsDialog(report, window);
+                    openReportParamsDialog(report, screen);
                 } else {
-                    reportGuiManager.printReport(report, Collections.emptyMap(), window);
+                    reportGuiManager.printReport(report, Collections.emptyMap(), screen);
                 }
             }
-        }, OpenType.DIALOG, ParamsMap.of(ReportRun.SCREEN_PARAMETER, window.getId()));
+        }, OpenType.DIALOG, ParamsMap.of(ReportRun.SCREEN_PARAMETER, hostScreen.getId()));
     }
 
-    protected void openReportParamsDialog(Report report, Frame window) {
-        ScreenContext screenContext = ComponentsHelper.getScreenContext(window);
+    protected void openReportParamsDialog(Report report, FrameOwner screen) {
+        ScreenContext screenContext = UiControllerUtils.getScreenContext(screen);
 
         WindowManager wm = (WindowManager) screenContext.getScreens();
         WindowInfo windowInfo = AppBeans.get(WindowConfig.class).getWindowInfo("report$inputParameters");
@@ -122,8 +131,16 @@ public class RunReportAction extends AbstractAction implements Action.HasBeforeA
         wm.openWindow(windowInfo, OpenType.DIALOG, ParamsMap.of("report", report));
     }
 
-    public void setWindow(Frame window) {
-        this.window = window;
+    public void setScreen(FrameOwner screen) {
+        this.screen = screen;
+    }
+
+    /**
+     * @deprecated Use {@link #setScreen(FrameOwner)} instead.
+     */
+    @Deprecated
+    public void setWindow(FrameOwner screen) {
+        this.screen = screen;
     }
 
     @Override

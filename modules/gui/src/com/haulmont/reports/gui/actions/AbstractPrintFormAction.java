@@ -8,15 +8,15 @@ package com.haulmont.reports.gui.actions;
 import com.haulmont.bali.util.ParamsMap;
 import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.cuba.core.global.*;
-import com.haulmont.cuba.gui.ComponentsHelper;
 import com.haulmont.cuba.gui.WindowManager;
 import com.haulmont.cuba.gui.components.AbstractAction;
 import com.haulmont.cuba.gui.components.Action;
 import com.haulmont.cuba.gui.components.Frame;
-import com.haulmont.cuba.gui.components.Window;
 import com.haulmont.cuba.gui.config.WindowConfig;
 import com.haulmont.cuba.gui.config.WindowInfo;
+import com.haulmont.cuba.gui.screen.Screen;
 import com.haulmont.cuba.gui.screen.ScreenContext;
+import com.haulmont.cuba.gui.screen.UiControllerUtils;
 import com.haulmont.cuba.security.entity.User;
 import com.haulmont.reports.app.ParameterPrototype;
 import com.haulmont.reports.entity.Report;
@@ -41,16 +41,16 @@ public abstract class AbstractPrintFormAction extends AbstractAction implements 
         super(id);
     }
 
-    protected void openRunReportScreen(Window window, final Object selectedValue, MetaClass inputValueMetaClass) {
-        openRunReportScreen(window, selectedValue, inputValueMetaClass, null);
+    protected void openRunReportScreen(Screen screen, Object selectedValue, MetaClass inputValueMetaClass) {
+        openRunReportScreen(screen, selectedValue, inputValueMetaClass, null);
     }
 
-    protected void openRunReportScreen(Window window, final Object selectedValue, final MetaClass inputValueMetaClass,
-                                       @Nullable final String outputFileName) {
+    protected void openRunReportScreen(Screen screen, Object selectedValue, MetaClass inputValueMetaClass,
+                                       @Nullable String outputFileName) {
         User user = AppBeans.get(UserSessionSource.class).getUserSession().getUser();
-        List<Report> reports = reportGuiManager.getAvailableReports(window.getId(), user, inputValueMetaClass);
+        List<Report> reports = reportGuiManager.getAvailableReports(screen.getId(), user, inputValueMetaClass);
 
-        ScreenContext screenContext = ComponentsHelper.getScreenContext(window);
+        ScreenContext screenContext = UiControllerUtils.getScreenContext(screen);
 
         if (reports.size() > 1) {
             Map<String, Object> params = ParamsMap.of(ReportRun.REPORTS_PARAMETER, reports);
@@ -66,7 +66,7 @@ public abstract class AbstractPrintFormAction extends AbstractAction implements 
                     if (selectedValue instanceof ParameterPrototype) {
                         ((ParameterPrototype) selectedValue).setParamName(parameter.getAlias());
                     }
-                    reportGuiManager.runReport(reloadedReport, window, parameter, selectedValue, null, outputFileName);
+                    reportGuiManager.runReport(reloadedReport, screen, parameter, selectedValue, null, outputFileName);
                 }
             }, WindowManager.OpenType.DIALOG, params);
         } else if (reports.size() == 1) {
@@ -76,7 +76,7 @@ public abstract class AbstractPrintFormAction extends AbstractAction implements 
             if (selectedValue instanceof ParameterPrototype) {
                 ((ParameterPrototype) selectedValue).setParamName(parameter.getAlias());
             }
-            reportGuiManager.runReport(reloadedReport, window, parameter, selectedValue, null, outputFileName);
+            reportGuiManager.runReport(reloadedReport, screen, parameter, selectedValue, null, outputFileName);
         } else {
             Messages messages = AppBeans.get(Messages.NAME);
 

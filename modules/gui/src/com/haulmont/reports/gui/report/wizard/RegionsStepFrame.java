@@ -328,10 +328,13 @@ public class RegionsStepFrame extends StepFrame {
                     wizard.lastGeneratedTmpReport = wizard.buildReport(true);
 
                     if (wizard.lastGeneratedTmpReport != null) {
-                        wizard.reportGuiManager.runReport(wizard.lastGeneratedTmpReport, wizard.stepFrameManager.getCurrentFrame());
+                        wizard.reportGuiManager.runReport(
+                                wizard.lastGeneratedTmpReport,
+                                wizard);
                     }
                 }
             });
+
             showAddRegion();
             wizard.setCorrectReportOutputType();
             wizard.getDialogOptions()

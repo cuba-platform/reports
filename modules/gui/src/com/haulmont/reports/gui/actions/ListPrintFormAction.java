@@ -131,12 +131,11 @@ public class ListPrintFormAction extends AbstractPrintFormAction {
             CollectionDatasource ds = listComponent.getDatasource();
             metaClass = ds.getMetaClass();
         }
-        openRunReportScreen(ComponentsHelper.getWindow(listComponent), selected, metaClass);
+        Window window = ComponentsHelper.getWindowNN(listComponent);
+        openRunReportScreen(window.getFrameOwner(), selected, metaClass);
     }
 
     protected void printAll() {
-
-
         MetaClass metaClass;
         LoadContext loadContext;
 
@@ -158,7 +157,8 @@ public class ListPrintFormAction extends AbstractPrintFormAction {
         parameterPrototype.setQueryString(query.getQueryString());
         parameterPrototype.setQueryParams(query.getParameters());
         parameterPrototype.setViewName(loadContext.getView().getName());
-        openRunReportScreen(ComponentsHelper.getWindow(listComponent), parameterPrototype, metaClass);
+
+        Window window = ComponentsHelper.getWindowNN(listComponent);
+        openRunReportScreen(window.getFrameOwner(), parameterPrototype, metaClass);
     }
 }
-
