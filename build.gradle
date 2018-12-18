@@ -173,6 +173,10 @@ configure(globalModule) {
 		compile(bom['com.haulmont.yarg:yarg-api']) {
             exclude group: 'org.codehaus.groovy', module: 'groovy-all'
         }
+        if (!JavaVersion.current().isJava8()) {
+            runtime('javax.xml.bind:jaxb-api:2.3.1')
+            runtime('org.glassfish.jaxb:jaxb-runtime:2.3.1')
+        }
     }
 
     entitiesEnhancing {
