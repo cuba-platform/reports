@@ -9,6 +9,7 @@ import com.haulmont.cuba.client.ClientConfig;
 import com.haulmont.cuba.core.global.UserSessionSource;
 import com.haulmont.cuba.gui.WindowParam;
 import com.haulmont.cuba.gui.components.*;
+import com.haulmont.cuba.gui.components.actions.BaseAction;
 import com.haulmont.cuba.gui.components.actions.ItemTrackingAction;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
 import com.haulmont.reports.app.service.ReportService;
@@ -28,7 +29,7 @@ public class ReportRun extends AbstractLookup {
     public static final String SCREEN_PARAMETER = "screen";
 
     @Inject
-    protected Table reportsTable;
+    protected Table<Report> reportsTable;
 
     @Inject
     protected ReportGuiManager reportGuiManager;
@@ -80,25 +81,24 @@ public class ReportRun extends AbstractLookup {
             reportDs.includeItem(report);
         }
 
-        Action runAction = new ItemTrackingAction(RUN_ACTION_ID) {
-            @Override
-            public void actionPerform(Component component) {
-                Report report = (Report) target.getSingleSelected();
-                if (report != null) {
-                    report = getDsContext().getDataSupplier().reload(report, ReportService.MAIN_VIEW_NAME);
-                    reportGuiManager.runReport(report, ReportRun.this);
-                }
-            }
-        };
+        Action runAction = new ItemTrackingAction(RUN_ACTION_ID)
+                .withCaption(getMessage("runReport"))
+                .withHandler(e -> {
+                    Report report = reportsTable.getSingleSelected();
+                    if (report != null) {
+                        report = getDsContext().getDataSupplier().reload(report, ReportService.MAIN_VIEW_NAME);
+                        reportGuiManager.runReport(report, ReportRun.this);
+                    }
+                });
+
         reportsTable.addAction(runAction);
         reportsTable.setItemClickAction(runAction);
 
-        addAction(new AbstractAction("applyFilter", clientConfig.getFilterApplyShortcut()) {
-            @Override
-            public void actionPerform(Component component) {
-                filterReports();
-            }
-        });
+        addAction(new BaseAction("applyFilter")
+                .withShortcut(clientConfig.getFilterApplyShortcut())
+                .withHandler(e -> {
+                    filterReports();
+                }));
     }
 
     public void filterReports() {
