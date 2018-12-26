@@ -123,6 +123,7 @@ public class ReportingBean implements ReportingApi {
             try {
                 existingReport = em.find(Report.class, report.getId(), "report.withTemplates");
                 if (existingReport != null) {
+                    storeIndexFields(report);
                     report.setVersion(existingReport.getVersion());
                     report = em.merge(report);
                     if (existingReport.getTemplates() != null) {
@@ -135,11 +136,11 @@ public class ReportingBean implements ReportingApi {
                     report.setDefaultTemplate(null);
                     report.setTemplates(null);
                 } else {
+                    storeIndexFields(report);
                     report.setVersion(0);
                     report = em.merge(report);
                 }
 
-                storeIndexFields(report);
                 dynamicAttributesManagerAPI.storeDynamicAttributes(report);
 
                 if (loadedTemplates != null) {
