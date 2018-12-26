@@ -122,9 +122,9 @@ public class ReportingBean implements ReportingApi {
             List<ReportTemplate> existingTemplates = null;
             try {
                 existingReport = em.find(Report.class, report.getId(), "report.withTemplates");
-                report = em.merge(report);
                 if (existingReport != null) {
                     report.setVersion(existingReport.getVersion());
+                    report = em.merge(report);
                     if (existingReport.getTemplates() != null) {
                         existingTemplates = existingReport.getTemplates();
                     }
@@ -136,6 +136,7 @@ public class ReportingBean implements ReportingApi {
                     report.setTemplates(null);
                 } else {
                     report.setVersion(0);
+                    report = em.merge(report);
                 }
 
                 storeIndexFields(report);
