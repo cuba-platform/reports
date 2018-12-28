@@ -25,7 +25,7 @@
             <fieldGroup id="propertiesFieldGroup" border="hidden" datasource="reportDs" width="AUTO">
                 <column>
                     <field id="name" required="true" requiredMessage="msg://report.nameMsg" width="${widthTemplate}"/>
-                    <field id="defaultTemplate" custom="true" width="${widthTemplate}"/>
+                    <field id="defaultTemplate" required="true" custom="true" width="${widthTemplate}"/>
                 </column>
                 <column>
                     <field id="group" required="true" optionsDatasource="groupsDs"
