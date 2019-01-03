@@ -5,30 +5,26 @@
 
 package com.haulmont.reports.web.report.wizard.region;
 
-import com.haulmont.cuba.core.global.AppBeans;
-import com.haulmont.cuba.core.global.Metadata;
 import com.haulmont.cuba.gui.components.Button;
 import com.haulmont.cuba.gui.components.Table;
 import com.haulmont.cuba.gui.components.Tree;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
-import com.haulmont.cuba.web.gui.data.ItemWrapper;
 import com.haulmont.cuba.web.widgets.CubaTree;
-import com.haulmont.reports.entity.wizard.EntityTreeNode;
 import com.haulmont.reports.entity.wizard.RegionProperty;
 import com.haulmont.reports.gui.report.wizard.region.RegionEditor;
-import org.springframework.cglib.core.CollectionUtils;
-import org.springframework.cglib.core.Transformer;
 
 import java.util.UUID;
 
 public class WebRegionEditorCompanion implements RegionEditor.Companion {
     @Override
-    public void addTreeTableDblClickListener(final Tree entityTree, final CollectionDatasource<RegionProperty, UUID> reportRegionPropertiesTableDs) {
+    public void addTreeTableDblClickListener(Tree entityTree,
+                                             CollectionDatasource<RegionProperty, UUID> reportRegionPropertiesTableDs) {
         CubaTree webTree = entityTree.unwrap(CubaTree.class);
         webTree.addItemClickListener(event -> {
             if (event.getMouseEventDetails().isDoubleClick()) {
                 // TODO: gg, fix
-                if (event.getItem() instanceof ItemWrapper
+                // vaadin8 drag and drop
+                /*if (event.getItem() instanceof ItemWrapper
                         && ((ItemWrapper) event.getItem()).getItem() instanceof EntityTreeNode) {
                     EntityTreeNode entityTreeNode = (EntityTreeNode) ((ItemWrapper) event.getItem()).getItem();
                     if (entityTreeNode.getWrappedMetaClass() != null) {
@@ -59,7 +55,7 @@ public class WebRegionEditorCompanion implements RegionEditor.Companion {
 
                         (propertiesTable.unwrap(com.vaadin.v7.ui.Table.class)).setCurrentPageFirstItemId(regionProperty.getId());
                     }
-                }
+                }*/
             }
         });
     }
