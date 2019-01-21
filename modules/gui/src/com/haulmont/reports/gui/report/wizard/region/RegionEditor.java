@@ -70,6 +70,7 @@ public class RegionEditor extends AbstractEditor<ReportRegion> {
         if (companion != null) {
             if (updatePermission) companion.addTreeTableDblClickListener(entityTree, reportRegionPropertiesTableDs);
             companion.initControlBtnsActions(addItem, propertiesTable);
+            companion.initDragAndDrop(entityTree, propertiesTable, reportRegionPropertiesTableDs);
         }
         isTabulated = ((ReportRegion) WindowParams.ITEM.getEntity(params)).getIsTabulatedRegion();
         asViewEditor = BooleanUtils.isTrue((Boolean) params.get("asViewEditor"));
@@ -269,5 +270,8 @@ public class RegionEditor extends AbstractEditor<ReportRegion> {
         void addTreeTableDblClickListener(Tree<EntityTreeNode> entityTree, final CollectionDatasource<RegionProperty, UUID> reportRegionPropertiesTableDs);
 
         void initControlBtnsActions(Button button, Table table);
+
+        void initDragAndDrop(Tree<EntityTreeNode> entityTree, Table<RegionProperty> propertiesTable,
+                             CollectionDatasource<RegionProperty, UUID> reportRegionPropertiesTableDs);
     }
 }
