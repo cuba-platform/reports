@@ -5,57 +5,59 @@
 
 package com.haulmont.reports.web.report.wizard.region;
 
+import com.haulmont.cuba.core.global.AppBeans;
+import com.haulmont.cuba.core.global.Metadata;
 import com.haulmont.cuba.gui.components.Button;
 import com.haulmont.cuba.gui.components.Table;
 import com.haulmont.cuba.gui.components.Tree;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
 import com.haulmont.cuba.web.widgets.CubaTree;
+import com.haulmont.reports.entity.wizard.EntityTreeNode;
 import com.haulmont.reports.entity.wizard.RegionProperty;
 import com.haulmont.reports.gui.report.wizard.region.RegionEditor;
 
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class WebRegionEditorCompanion implements RegionEditor.Companion {
+
+    @SuppressWarnings("unchecked")
     @Override
-    public void addTreeTableDblClickListener(Tree entityTree,
+    public void addTreeTableDblClickListener(Tree<EntityTreeNode> entityTree,
                                              CollectionDatasource<RegionProperty, UUID> reportRegionPropertiesTableDs) {
-        CubaTree webTree = entityTree.unwrap(CubaTree.class);
+        CubaTree<EntityTreeNode> webTree = entityTree.unwrap(CubaTree.class);
         webTree.addItemClickListener(event -> {
             if (event.getMouseEventDetails().isDoubleClick()) {
-                // TODO: gg, fix
-                // vaadin8 drag and drop
-                /*if (event.getItem() instanceof ItemWrapper
-                        && ((ItemWrapper) event.getItem()).getItem() instanceof EntityTreeNode) {
-                    EntityTreeNode entityTreeNode = (EntityTreeNode) ((ItemWrapper) event.getItem()).getItem();
-                    if (entityTreeNode.getWrappedMetaClass() != null) {
-                        if (webTree.isExpanded(entityTreeNode))
-                            webTree.collapse(entityTreeNode);
-                        else
-                            webTree.expand(entityTreeNode);
-                        return;
-                    }
-                    if (CollectionUtils.transform(reportRegionPropertiesTableDs.getItems(), new Transformer() {
-                        @Override
-                        public Object transform(Object o) {
-                            return ((RegionProperty) o).getEntityTreeNode();
-                        }
-                    }).contains(entityTreeNode)) {
-                        return;
-                    }
-                    Metadata metadata = AppBeans.get(Metadata.NAME);
-                    RegionProperty regionProperty = metadata.create(RegionProperty.class);
-                    regionProperty.setEntityTreeNode(entityTreeNode);
-                    regionProperty.setOrderNum((long) reportRegionPropertiesTableDs.getItemIds().size() + 1);
-                    //first element must be not zero cause later we do sorting by multiplying that values
-                    reportRegionPropertiesTableDs.addItem(regionProperty);
+                EntityTreeNode entityTreeNode = event.getItem();
+                if (entityTreeNode.getWrappedMetaClass() != null) {
+                    if (webTree.isExpanded(entityTreeNode))
+                        webTree.collapse(entityTreeNode);
+                    else
+                        webTree.expand(entityTreeNode);
+                    return;
+                }
 
-                    Table propertiesTable = (Table) entityTree.getFrame().getComponent("propertiesTable");
-                    if (propertiesTable != null) {
-                        propertiesTable.setSelected(regionProperty);
+                boolean isAlreadyAdded = reportRegionPropertiesTableDs.getItems().stream()
+                        .map(regionProperty -> regionProperty.getEntityTreeNode().getId())
+                        .collect(Collectors.toSet())
+                        .contains(entityTreeNode.getId());
+                if (isAlreadyAdded) {
+                    return;
+                }
 
-                        (propertiesTable.unwrap(com.vaadin.v7.ui.Table.class)).setCurrentPageFirstItemId(regionProperty.getId());
-                    }
-                }*/
+                Metadata metadata = AppBeans.get(Metadata.NAME);
+                RegionProperty regionProperty = metadata.create(RegionProperty.class);
+                regionProperty.setEntityTreeNode(entityTreeNode);
+                regionProperty.setOrderNum((long) reportRegionPropertiesTableDs.getItemIds().size() + 1);
+                //first element must be not zero cause later we do sorting by multiplying that values
+                reportRegionPropertiesTableDs.addItem(regionProperty);
+
+                Table propertiesTable = (Table) entityTree.getFrame().getComponent("propertiesTable");
+                if (propertiesTable != null) {
+                    propertiesTable.setSelected(regionProperty);
+
+                    (propertiesTable.unwrap(com.vaadin.v7.ui.Table.class)).setCurrentPageFirstItemId(regionProperty.getId());
+                }
             }
         });
     }

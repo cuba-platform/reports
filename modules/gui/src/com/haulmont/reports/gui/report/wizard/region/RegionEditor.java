@@ -266,7 +266,7 @@ public class RegionEditor extends AbstractEditor<ReportRegion> {
     }
 
     public interface Companion {
-        void addTreeTableDblClickListener(Tree entityTree, final CollectionDatasource<RegionProperty, UUID> reportRegionPropertiesTableDs);
+        void addTreeTableDblClickListener(Tree<EntityTreeNode> entityTree, final CollectionDatasource<RegionProperty, UUID> reportRegionPropertiesTableDs);
 
         void initControlBtnsActions(Button button, Table table);
     }
