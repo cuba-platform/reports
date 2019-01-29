@@ -21,7 +21,8 @@
         messagesPack="com.haulmont.reports.gui.report.run">
 
     <dsContext>
-        <collectionDatasource id="reportsDs" class="com.haulmont.reports.entity.Report">
+        <collectionDatasource id="reportsDs" class="com.haulmont.reports.entity.Report"
+            datasourceClass="com.haulmont.reports.gui.datasource.AvailableForUserReportsDatasource">
             <query>select r from report$Report r, in (r.templates) t where t.reportOutputType = 70</query>
         </collectionDatasource>
     </dsContext>
