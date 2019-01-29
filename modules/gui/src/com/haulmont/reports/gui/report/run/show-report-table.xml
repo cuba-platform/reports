@@ -21,7 +21,8 @@
         messagesPack="com.haulmont.reports.gui.report.run">
 
     <dsContext>
-        <collectionDatasource id="reportsDs" class="com.haulmont.reports.entity.Report">
+        <collectionDatasource id="reportsDs" class="com.haulmont.reports.entity.Report"
+                              datasourceClass="com.haulmont.reports.gui.datasource.AvailableForUserReportsDatasource">
             <query><![CDATA[select r from report$Report r, in (r.templates) t where t.reportOutputType = 90]]></query>
         </collectionDatasource>
         <hierarchicalDatasource id="reportDataDs" class="com.haulmont.cuba.core.entity.KeyValueEntity"
