@@ -11,6 +11,9 @@ before_install:
 install:
   - ./gradlew --no-daemon assemble
 
+before_script:
+  - psql -c 'create user root with password ''root'';alter user root with superuser;' -U postgres
+
 script:
   - ./gradlew --no-daemon test javadoc
 
@@ -23,3 +26,6 @@ addons:
   apt:
     packages:
       - openjdk-8-jdk
+
+services:
+  - postgresql
