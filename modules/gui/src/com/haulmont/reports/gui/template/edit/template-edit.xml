@@ -78,9 +78,10 @@
                             </textField>
                         </row>
                         <row id="row6">
-                            <label id="isGroovyLabel" value="msg://template.isGroovy" align="MIDDLE_LEFT"/>
-                            <checkBox id="groovy" datasource="templateDs" property="groovy"
-                                      width="${width}"/>
+                            <label id="isGroovyLabel" value="msg://template.typeForHtml" align="MIDDLE_LEFT"/>
+                            <radioButtonGroup id="isGroovyRadioButtonGroup"
+                                              datasource="templateDs"
+                                              property="groovy"/>
                         </row>
                         <row id="row7">
                             <label id="isCustomLabel" value="msg://template.isCustom" align="MIDDLE_LEFT"/>

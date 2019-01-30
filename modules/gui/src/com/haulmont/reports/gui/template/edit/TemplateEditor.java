@@ -40,10 +40,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Map;
+import java.util.*;
 
 public class TemplateEditor extends AbstractEditor<ReportTemplate> {
 
@@ -54,10 +51,10 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
     protected FileUploadField templateUploadField;
 
     @Inject
-    private Label isGroovyLabel;
+    protected RadioButtonGroup<Boolean> isGroovyRadioButtonGroup;
 
     @Inject
-    private CheckBox groovy;
+    protected Label<String> isGroovyLabel;
 
     @Inject
     protected TextField customDefinition;
@@ -139,6 +136,11 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
                                 .width(560f));
             }
         });
+
+        Map<String, Boolean> groovyOptions = new HashMap<>();
+        groovyOptions.put(getMessage("template.freemarkerType"), Boolean.FALSE);
+        groovyOptions.put(getMessage("template.groovyType"), Boolean.TRUE);
+        isGroovyRadioButtonGroup.setOptionsMap(groovyOptions);
     }
 
     @Override
@@ -220,16 +222,22 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
         outputNamePatternLabel.setVisible(templateOutputVisibility);
         namePatternTextHelp.setVisible(templateOutputVisibility);
 
-        String extension = "";
-        if (getItem().getDocumentName() != null) {
-            extension = FilenameUtils.getExtension(getItem().getDocumentName()).toUpperCase();
-        }
-        groovy.setVisible(templateOutputVisibility && ReportOutputType.HTML.equals(ReportOutputType.getTypeFromExtension(extension)));
-        isGroovyLabel.setVisible(templateOutputVisibility && ReportOutputType.HTML.equals(ReportOutputType.getTypeFromExtension(extension)));
+        setupTemplateTypeVisibility(templateOutputVisibility);
 
         visibleTemplateEditor(reportOutputType);
 
         setupVisibilityDescriptionEdit(customEnabled, reportOutputType);
+    }
+
+    protected void setupTemplateTypeVisibility(boolean visibility){
+        String extension = "";
+        if (getItem().getDocumentName() != null) {
+            extension = FilenameUtils.getExtension(getItem().getDocumentName()).toUpperCase();
+        }
+        isGroovyRadioButtonGroup.setVisible(visibility
+                && ReportOutputType.HTML.equals(ReportOutputType.getTypeFromExtension(extension)));
+        isGroovyLabel.setVisible(visibility
+                && ReportOutputType.HTML.equals(ReportOutputType.getTypeFromExtension(extension)));
     }
 
     protected void setupVisibilityDescriptionEdit(boolean customEnabled, ReportOutputType reportOutputType) {
@@ -299,6 +307,7 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
                         String.format("An error occurred while uploading file for template [%s]", getItem().getCode()), ex);
             }
             initTemplateEditor(reportTemplate);
+            setupTemplateTypeVisibility(hasTemplateOutput(reportTemplate.getReportOutputType()));
             updateOutputType();
 
             showNotification(getMessage("templateEditor.uploadSuccess"), NotificationType.TRAY);
