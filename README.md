@@ -1,10 +1,12 @@
-# CUBA Full Text Search Add-on
+# CUBA Reports Add-on
 
 [![license](https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg?style=flat)](http://www.apache.org/licenses/LICENSE-2.0)
 [![Build Status](https://travis-ci.org/cuba-platform/reports.svg?branch=master)](https://travis-ci.org/cuba-platform/reports)
-[![Documentation](https://img.shields.io/badge/documentation-online-03a9f4.svg)](https://doc.cuba-platform.com/reports-latest)
+[![Documentation](https://img.shields.io/badge/documentation-online-03a9f4.svg)](https://doc.cuba-platform.com/reporting-latest)
 
-Full Text Search Add-on provides unstructured search within the values of entity attributes and content of uploaded files.
+The Reporting add-on is designed to simplify the report generation in CUBA applications. It enables creating report 
+templates in most popular editors like Microsoft Office and Libre/Open Office and defining data sources at runtime, 
+using CUBA data model, SQL, JPQL or scripts.
 
 For more information see [github.com/cuba-platform/cuba](https://github.com/cuba-platform/cuba).
 
