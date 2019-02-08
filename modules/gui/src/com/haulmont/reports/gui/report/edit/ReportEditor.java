@@ -555,7 +555,9 @@ public class ReportEditor extends AbstractEditor<Report> {
                         ReportTemplate defaultTemplate = getItem().getDefaultTemplate();
                         if (defaultTemplate != null) {
                             if (defaultTemplate.isCustom()) {
-                                showNotification(getMessage("unableToSaveTemplateWhichDefinedWithClass"), NotificationType.WARNING);
+                                showNotification(getMessage("unableToSaveTemplateWhichDefinedWithClass"), NotificationType.HUMANIZED);
+                            } else if (isTemplateWithoutFile(defaultTemplate)) {
+                                showNotification(getMessage("notification.fileIsNotAllowedForSpecificTypes"), NotificationType.HUMANIZED);
                             } else {
                                 ExportDisplay exportDisplay = AppConfig.createExportDisplay(ReportEditor.this);
                                 byte[] reportTemplate = defaultTemplate.getContent();
@@ -590,7 +592,7 @@ public class ReportEditor extends AbstractEditor<Report> {
                     public void actionPerform(Component component) {
                         final ReportTemplate defaultTemplate = getItem().getDefaultTemplate();
                         if (defaultTemplate != null) {
-                            if (defaultTemplate.getOutputType() != CubaReportOutputType.chart) {
+                            if (!isTemplateWithoutFile(defaultTemplate)) {
                                 FileUploadDialog dialog = (FileUploadDialog) openWindow("fileUploadDialog", OpenType.DIALOG);
                                 dialog.addCloseListener(actionId -> {
                                     if (COMMIT_ACTION_ID.equals(actionId)) {
@@ -609,7 +611,7 @@ public class ReportEditor extends AbstractEditor<Report> {
                                     lookupPickerField.focus();
                                 });
                             } else {
-                                showNotification(getMessage("notification.fileIsNotAllowedForChart"), NotificationType.HUMANIZED);
+                                showNotification(getMessage("notification.fileIsNotAllowedForSpecificTypes"), NotificationType.HUMANIZED);
                             }
                         } else {
                             showNotification(getMessage("notification.defaultTemplateIsEmpty"), NotificationType.HUMANIZED);
@@ -1214,5 +1216,13 @@ public class ReportEditor extends AbstractEditor<Report> {
         } else {
             validationScriptGroupBox.setCaption(getMessage("report.validationScriptOff"));
         }
+    }
+
+    protected boolean isTemplateWithoutFile(ReportTemplate template) {
+        return template.getOutputType() == CubaReportOutputType.chart ||
+                template.getOutputType() == CubaReportOutputType.table ||
+                template.getOutputType() == CubaReportOutputType.pivot;
+
+
     }
 }
