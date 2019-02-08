@@ -19,7 +19,10 @@ package com.haulmont.reports.libintegration;
 import com.google.common.base.Strings;
 import com.haulmont.cuba.core.Persistence;
 import com.haulmont.cuba.core.app.execution.ResourceCanceledException;
-import com.haulmont.cuba.core.global.*;
+import com.haulmont.cuba.core.global.AppBeans;
+import com.haulmont.cuba.core.global.Metadata;
+import com.haulmont.cuba.core.global.QueryUtils;
+import com.haulmont.cuba.core.global.Resources;
 import com.haulmont.cuba.core.global.filter.ParametersHelper;
 import com.haulmont.reports.ReportingApi;
 import com.haulmont.reports.entity.ParameterType;
@@ -76,12 +79,10 @@ public class CubaReporting extends Reporting {
                     handleDateTimeRelatedParameterAsNow(paramName, paramValue, reportInputParameter.getType(), handledParams);
                 }
 
-                if (paramValue == null) {
-                    continue;
-                }
-
                 if (reportInputParameter.getPredefinedTransformation() != null) {
-                    handledParams.put(paramName, handlePredefinedTransformation(paramValue, reportInputParameter.getPredefinedTransformation()));
+                    if (paramValue != null) {
+                        handledParams.put(paramName, handlePredefinedTransformation(paramValue, reportInputParameter.getPredefinedTransformation()));
+                    }
                 } else if (!Strings.isNullOrEmpty(reportInputParameter.getTransformationScript())) {
                     handledParams.put(paramName, handleScriptTransformation(paramValue, reportInputParameter.getTransformationScript(), handledParams));
                 }
@@ -92,20 +93,20 @@ public class CubaReporting extends Reporting {
 
     protected void handleDateTimeRelatedParameterAsNow(String paramName, Object paramValue, ParameterType parameterType,
                                                        Map<String, Object> handledParams) {
-         if (Objects.isNull(paramValue)) {
-             paramValue = reportingApi.currentDateOrTime(parameterType);
-             handledParams.put(paramName, paramValue);
-         }
+        if (Objects.isNull(paramValue)) {
+            paramValue = reportingApi.currentDateOrTime(parameterType);
+            handledParams.put(paramName, paramValue);
+        }
     }
 
     protected Object handlePredefinedTransformation(Object value, PredefinedTransformation transformation) {
         switch (transformation) {
             case CONTAINS:
-                return wrapValueForLike(QueryUtils.escapeForLike((String)value), true, true);
+                return wrapValueForLike(QueryUtils.escapeForLike((String) value), true, true);
             case STARTS_WITH:
-                return wrapValueForLike(QueryUtils.escapeForLike((String)value), false, true);
+                return wrapValueForLike(QueryUtils.escapeForLike((String) value), false, true);
             case ENDS_WITH:
-                return wrapValueForLike(QueryUtils.escapeForLike((String)value), true, false);
+                return wrapValueForLike(QueryUtils.escapeForLike((String) value), true, false);
         }
         return value;
     }
