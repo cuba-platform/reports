@@ -467,7 +467,7 @@ public class ReportEditor extends AbstractEditor<Report> {
         invisibleFileUpload.addFileUploadSucceedListener(invisibleUpload -> {
             final ReportTemplate defaultTemplate = getItem().getDefaultTemplate();
             if (defaultTemplate != null) {
-                if (defaultTemplate.getOutputType() != CubaReportOutputType.chart) {
+                if (!isTemplateWithoutFile(defaultTemplate)) {
                     File file = fileUpload.getFile(invisibleFileUpload.getFileId());
                     try {
                         byte[] data = FileUtils.readFileToByteArray(file);
@@ -480,7 +480,7 @@ public class ReportEditor extends AbstractEditor<Report> {
                                 defaultTemplate.getCode()));
                     }
                 } else {
-                    showNotification(getMessage("notification.fileIsNotAllowedForChart"), NotificationType.HUMANIZED);
+                    showNotification(getMessage("notification.fileIsNotAllowedForSpecificTypes"), NotificationType.HUMANIZED);
                 }
             } else {
                 showNotification(getMessage("notification.defaultTemplateIsEmpty"), NotificationType.HUMANIZED);
