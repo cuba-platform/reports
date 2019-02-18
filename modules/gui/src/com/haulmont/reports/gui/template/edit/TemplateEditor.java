@@ -45,10 +45,10 @@ import java.util.*;
 public class TemplateEditor extends AbstractEditor<ReportTemplate> {
 
     @Inject
-    private Label isCustomLabel;
+    protected Label isCustomLabel;
 
     @Inject
-    private CheckBox custom;
+    protected CheckBox custom;
 
     @Inject
     protected Label templateFileLabel;
