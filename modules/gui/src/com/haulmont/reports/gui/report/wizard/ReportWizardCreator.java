@@ -293,7 +293,7 @@ public class ReportWizardCreator extends AbstractWindow implements MainWizardFra
                 return "";
             }
         } else {
-            return reportName.getValue() + "." + fileExtension;
+            return reportName.getValue();
         }
     }
 
