@@ -48,6 +48,12 @@ import java.util.Map;
 public class TemplateEditor extends AbstractEditor<ReportTemplate> {
 
     @Inject
+    protected Label isCustomLabel;
+
+    @Inject
+    protected CheckBox custom;
+
+    @Inject
     protected Label templateFileLabel;
 
     @Inject
@@ -187,6 +193,10 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
                 && reportOutputType != ReportOutputType.PIVOT_TABLE;
     }
 
+    protected boolean hasChartTemplateOutput(ReportOutputType reportOutputType) {
+        return reportOutputType == ReportOutputType.CHART;
+    }
+
     protected boolean hasHtmlCsvTemplateOutput(ReportOutputType reportOutputType) {
         return reportOutputType == ReportOutputType.CSV || reportOutputType == ReportOutputType.HTML;
     }
@@ -194,17 +204,22 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
     protected void setupVisibility(boolean customEnabled, ReportOutputType reportOutputType) {
         boolean templateOutputVisibility = hasTemplateOutput(reportOutputType);
 
-        customDefinedBy.setVisible(customEnabled);
-        customDefinition.setVisible(customEnabled);
-        customDefinedByLabel.setVisible(customEnabled);
-        customDefinitionLabel.setVisible(customEnabled);
+        boolean chartTemplateOutput = hasChartTemplateOutput(reportOutputType);
+        boolean enabled = !chartTemplateOutput && customEnabled;
+        custom.setVisible(!chartTemplateOutput);
+        isCustomLabel.setVisible(!chartTemplateOutput);
 
-        customDefinedBy.setRequired(customEnabled);
+        customDefinedBy.setVisible(enabled);
+        customDefinition.setVisible(enabled);
+        customDefinedByLabel.setVisible(enabled);
+        customDefinitionLabel.setVisible(enabled);
+
+        customDefinedBy.setRequired(enabled);
         customDefinedBy.setRequiredMessage(getMessage("templateEditor.customDefinedBy"));
-        customDefinition.setRequired(customEnabled);
+        customDefinition.setRequired(enabled);
         customDefinition.setRequiredMessage(getMessage("templateEditor.classRequired"));
 
-        boolean supportAlterableForTemplate = templateOutputVisibility && !customEnabled;
+        boolean supportAlterableForTemplate = templateOutputVisibility && !enabled;
         alterable.setVisible(supportAlterableForTemplate);
         alterableLabel.setVisible(supportAlterableForTemplate);
 
@@ -217,7 +232,7 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
 
         visibleTemplateEditor(reportOutputType);
 
-        setupVisibilityDescriptionEdit(customEnabled, reportOutputType);
+        setupVisibilityDescriptionEdit(enabled, reportOutputType);
     }
 
     protected void setupVisibilityDescriptionEdit(boolean customEnabled, ReportOutputType reportOutputType) {
