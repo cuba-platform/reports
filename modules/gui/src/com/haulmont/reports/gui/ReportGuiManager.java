@@ -354,15 +354,19 @@ public class ReportGuiManager {
                 wm.openWindow(windowInfo, OpenType.DIALOG, screenParams);
             }
         } else {
+            ExportDisplay exportDisplay;
             byte[] byteArr = document.getContent();
             com.haulmont.yarg.structure.ReportOutputType finalOutputType =
                     (outputType != null) ? outputType.getOutputType() : document.getReportOutputType();
 
             ExportFormat exportFormat = ReportPrintHelper.getExportFormat(finalOutputType);
 
-            Screen hostScreen = UiControllerUtils.getScreen(screen);
-            ExportDisplay exportDisplay = AppConfig.createExportDisplay(hostScreen.getWindow());
-
+            if(screen != null){
+                Screen hostScreen = UiControllerUtils.getScreen(screen);
+                exportDisplay = AppConfig.createExportDisplay(hostScreen.getWindow());
+            } else {
+                exportDisplay = AppConfig.createExportDisplay(null);
+            }
             String documentName = isNotBlank(outputFileName) ? outputFileName : document.getDocumentName();
             exportDisplay.show(new ByteArrayDataProvider(byteArr), documentName, exportFormat);
         }
