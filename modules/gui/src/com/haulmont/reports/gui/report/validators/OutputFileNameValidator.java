@@ -28,7 +28,7 @@ public class OutputFileNameValidator implements Field.Validator {
 
     @Override
     public void validate(Object value) throws ValidationException {
-        if (StringUtils.isNotEmpty((String) value) && !((String) value).matches(".+\\.([A-z]{0,5})"))
+        if (StringUtils.isNotEmpty((String) value) && !((String) value).matches("^[^/:*<>?\\\\]*$"))
             throw new ValidationException(String.format(
                     messages.getMessage(OutputFileNameValidator.class, "fillCorrectOutputFileNameMsg"),
                     messages.getMessage(ReportWizardCreator.class, "outputFileName")));
