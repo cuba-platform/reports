@@ -18,11 +18,10 @@ package com.haulmont.reports;
 
 import com.haulmont.bali.util.StringHelper;
 import com.haulmont.chile.core.model.MetaClass;
-import com.haulmont.cuba.core.*;
-import com.haulmont.cuba.core.global.AppBeans;
-import com.haulmont.cuba.core.global.Configuration;
-import com.haulmont.cuba.core.global.Metadata;
-import com.haulmont.cuba.core.global.View;
+import com.haulmont.cuba.core.Persistence;
+import com.haulmont.cuba.core.PersistenceSecurity;
+import com.haulmont.cuba.core.Transaction;
+import com.haulmont.cuba.core.global.*;
 import com.haulmont.cuba.security.entity.EntityOp;
 import com.haulmont.reports.app.ParameterPrototype;
 import com.haulmont.reports.exception.ReportingException;
@@ -31,7 +30,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 public class PrototypesLoader {
 
@@ -46,7 +44,7 @@ public class PrototypesLoader {
     public List loadData(ParameterPrototype parameterPrototype) {
         Metadata metadata = AppBeans.get(Metadata.class);
 
-        MetaClass metaClass = metadata.getSession().getClass(parameterPrototype.getMetaClassName());
+        MetaClass metaClass = metadata.getSession().getClassNN(parameterPrototype.getMetaClassName());
 
         PersistenceSecurity security = AppBeans.get(PersistenceSecurity.NAME);
         if (!security.isEntityOpPermitted(metaClass, EntityOp.READ)) {
@@ -54,27 +52,18 @@ public class PrototypesLoader {
             return Collections.emptyList();
         }
 
-        Map<String, Object> queryParams = parameterPrototype.getQueryParams();
-
         View queryView = metadata.getViewRepository().getView(metaClass, parameterPrototype.getViewName());
 
         Persistence persistence = AppBeans.get(Persistence.class);
-        Transaction tx = persistence.createTransaction();
 
-        EntityManager entityManager = persistence.getEntityManager();
-        Query query = entityManager.createQuery(parameterPrototype.getQueryString());
+        DataManager dataManager = AppBeans.get(DataManager.NAME);
+        LoadContext loadContext = LoadContext.create(metaClass.getJavaClass());
 
-        boolean constraintsApplied = security.applyConstraints(query);
-        if (constraintsApplied)
-            log.debug("Constraints applied: " + printQuery(query.getQueryString()));
+        LoadContext.Query query = new LoadContext.Query(parameterPrototype.getQueryString());
 
-        query.setView(queryView);
-        if (queryParams != null) {
-            for (Map.Entry<String, Object> queryParamEntry : queryParams.entrySet()) {
-                query.setParameter(queryParamEntry.getKey(), queryParamEntry.getValue());
-            }
-        }
-
+        query.setParameters(parameterPrototype.getQueryParams());
+        query.setCondition(parameterPrototype.getCondition());
+        query.setSort(parameterPrototype.getSort());
         query.setFirstResult(parameterPrototype.getFirstResult() == null ? 0 : parameterPrototype.getFirstResult());
 
         if (parameterPrototype.getMaxResults() != null && !parameterPrototype.getMaxResults().equals(0)) {
@@ -85,9 +74,13 @@ public class PrototypesLoader {
             query.setMaxResults(config.getParameterPrototypeQueryLimit());
         }
 
+        loadContext.setView(queryView);
+        loadContext.setQuery(query);
         List queryResult;
+
+        Transaction tx = persistence.createTransaction();
         try {
-            queryResult = query.getResultList();
+            queryResult = dataManager.loadList(loadContext);
             tx.commit();
         } catch (Exception e) {
             throw new ReportingException(e);
