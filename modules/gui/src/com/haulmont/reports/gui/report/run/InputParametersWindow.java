@@ -72,11 +72,6 @@ public class InputParametersWindow extends AbstractWindow {
     public void init(Map<String, Object> params) {
         super.init(params);
 
-        //if there is no strong external requirements for width - set auto width, so long parameter names will fit well
-        if (getDialogOptions().getWidth() == null) {
-            getDialogOptions().setWidthAuto();
-        }
-
         //noinspection unchecked
         templateCode = (String) params.get(TEMPLATE_CODE_PARAMETER);
         outputFileName = (String) params.get(OUTPUT_FILE_NAME_PARAMETER);
