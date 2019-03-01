@@ -19,6 +19,8 @@
         messagesPack="com.haulmont.reports.gui.report.run"
         caption="msg://inputParameters">
 
+    <dialogMode width="auto"/>
+
     <layout spacing="true">
         <frame id="inputParametersFrame" screen="report$inputParametersFrame"/>
 
