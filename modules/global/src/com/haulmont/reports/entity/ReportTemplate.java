@@ -78,7 +78,6 @@ public class ReportTemplate extends StandardEntity implements com.haulmont.yarg.
     @Column(name = "NAME", length = 500)
     protected String name;
 
-    @Basic(fetch = FetchType.LAZY)
     @Column(name = "CONTENT")
     protected byte[] content;
 
