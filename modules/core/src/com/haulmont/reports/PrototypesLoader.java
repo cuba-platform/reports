@@ -18,22 +18,13 @@ package com.haulmont.reports;
 
 import com.haulmont.bali.util.StringHelper;
 import com.haulmont.chile.core.model.MetaClass;
-import com.haulmont.cuba.core.Persistence;
-import com.haulmont.cuba.core.PersistenceSecurity;
-import com.haulmont.cuba.core.Transaction;
 import com.haulmont.cuba.core.global.*;
-import com.haulmont.cuba.security.entity.EntityOp;
 import com.haulmont.reports.app.ParameterPrototype;
 import com.haulmont.reports.exception.ReportingException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.util.Collections;
 import java.util.List;
 
 public class PrototypesLoader {
-
-    private static final Logger log = LoggerFactory.getLogger(PrototypesLoader.class);
 
     /**
      * Load parameter data
@@ -45,16 +36,7 @@ public class PrototypesLoader {
         Metadata metadata = AppBeans.get(Metadata.class);
 
         MetaClass metaClass = metadata.getSession().getClassNN(parameterPrototype.getMetaClassName());
-
-        PersistenceSecurity security = AppBeans.get(PersistenceSecurity.NAME);
-        if (!security.isEntityOpPermitted(metaClass, EntityOp.READ)) {
-            log.debug("reading of " + metaClass + " not permitted, returning empty list");
-            return Collections.emptyList();
-        }
-
         View queryView = metadata.getViewRepository().getView(metaClass, parameterPrototype.getViewName());
-
-        Persistence persistence = AppBeans.get(Persistence.class);
 
         DataManager dataManager = AppBeans.get(DataManager.NAME);
         LoadContext loadContext = LoadContext.create(metaClass.getJavaClass());
@@ -77,15 +59,11 @@ public class PrototypesLoader {
         loadContext.setView(queryView);
         loadContext.setQuery(query);
         List queryResult;
-
-        Transaction tx = persistence.createTransaction();
         try {
+            dataManager = dataManager.secure();
             queryResult = dataManager.loadList(loadContext);
-            tx.commit();
         } catch (Exception e) {
             throw new ReportingException(e);
-        } finally {
-            tx.end();
         }
 
         return queryResult;
