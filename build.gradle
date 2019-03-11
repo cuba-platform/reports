@@ -261,6 +261,7 @@ configure(coreModule) {
         testRuntime(bom['javax.servlet:javax.servlet-api'])
 
         testCompile(bom['org.springframework:spring-test'])
+        testCompile(bom['com.fasterxml.jackson.core:jackson-databind'])
         testCompile(bom['com.fasterxml.jackson.dataformat:jackson-dataformat-yaml'])
         testCompile(bom['org.apache.poi:poi-ooxml']) {
             transitive = false
