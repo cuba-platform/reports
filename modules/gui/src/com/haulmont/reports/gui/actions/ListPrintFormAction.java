@@ -168,6 +168,8 @@ public class ListPrintFormAction extends AbstractPrintFormAction {
         parameterPrototype.setQueryString(query.getQueryString());
         parameterPrototype.setQueryParams(query.getParameters());
         parameterPrototype.setViewName(loadContext.getView().getName());
+        parameterPrototype.setCondition(query.getCondition());
+        parameterPrototype.setSort(query.getSort());
 
         Window window = ComponentsHelper.getWindowNN(listComponent);
         openRunReportScreen(window.getFrameOwner(), parameterPrototype, metaClass);
