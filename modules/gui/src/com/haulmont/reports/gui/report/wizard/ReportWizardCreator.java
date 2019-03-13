@@ -190,7 +190,7 @@ public class ReportWizardCreator extends AbstractWindow implements MainWizardFra
                         MessageType.CONFIRMATION_HTML
                                 .modal(false)
                                 .width(560f));
-        }
+            }
         });
     }
 
