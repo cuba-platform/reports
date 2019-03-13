@@ -16,12 +16,14 @@
 
 package com.haulmont.reports.app;
 
+import com.haulmont.cuba.core.global.Sort;
+import com.haulmont.cuba.core.global.queryconditions.Condition;
+
 import java.io.Serializable;
 import java.util.Map;
 
 /**
  * Report parameter for lazy data loading in core module
- *
  */
 public class ParameterPrototype implements Serializable {
 
@@ -39,7 +41,11 @@ public class ParameterPrototype implements Serializable {
 
     protected Integer maxResults;
 
-    private Map<String, Object> queryParams;
+    protected Map<String, Object> queryParams;
+
+    protected Condition condition;
+
+    protected Sort sort;
 
     public ParameterPrototype(String paramName) {
         this.paramName = paramName;
@@ -99,5 +105,21 @@ public class ParameterPrototype implements Serializable {
 
     public void setMaxResults(Integer maxResults) {
         this.maxResults = maxResults;
+    }
+
+    public Condition getCondition() {
+        return condition;
+    }
+
+    public void setCondition(Condition condition) {
+        this.condition = condition;
+    }
+
+    public Sort getSort() {
+        return sort;
+    }
+
+    public void setSort(Sort sort) {
+        this.sort = sort;
     }
 }
