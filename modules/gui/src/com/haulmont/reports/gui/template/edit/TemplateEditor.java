@@ -244,7 +244,7 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
         setupVisibilityDescriptionEdit(enabled, reportOutputType);
     }
 
-    protected void setupTemplateTypeVisibility(boolean visibility){
+    protected void setupTemplateTypeVisibility(boolean visibility) {
         String extension = "";
         if (getItem().getDocumentName() != null) {
             extension = FilenameUtils.getExtension(getItem().getDocumentName()).toUpperCase();
@@ -330,7 +330,7 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
 
         ReportTemplate reportTemplate = getItem();
         byte[] templateFile = reportTemplate.getContent();
-        if (templateFile != null) {
+        if (templateFile != null && !hasChartTemplateOutput(reportTemplate.getReportOutputType())) {
             templateUploadField.setContentProvider(() -> new ByteArrayInputStream(templateFile));
             FileDescriptor fileDescriptor = metadata.create(FileDescriptor.class);
             fileDescriptor.setName(reportTemplate.getName());
