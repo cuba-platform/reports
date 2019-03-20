@@ -19,8 +19,6 @@ package com.haulmont.reports.web.restapi.v1;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.haulmont.cuba.core.global.Resources;
-import com.haulmont.restapi.exception.RestAPIException;
-import com.haulmont.restapi.swagger.SwaggerGenerator;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -35,9 +33,6 @@ public class ReportRestDocsController {
 
     @Inject
     protected Resources resources;
-
-    @Inject
-    protected SwaggerGenerator swaggerGenerator;
 
     @RequestMapping(value = "/swagger.yaml", method = RequestMethod.GET, produces = "application/yaml")
     public String getSwaggerYaml() {

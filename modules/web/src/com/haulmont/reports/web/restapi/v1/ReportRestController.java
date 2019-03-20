@@ -21,7 +21,6 @@ import com.haulmont.bali.util.URLEncodeUtils;
 import com.haulmont.cuba.core.global.FileTypesHelper;
 import com.haulmont.cuba.gui.export.ExportFormat;
 import com.haulmont.reports.gui.ReportPrintHelper;
-import com.haulmont.restapi.exception.RestAPIException;
 import com.haulmont.yarg.structure.ReportOutputType;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.BooleanUtils;

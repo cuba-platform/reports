@@ -310,6 +310,8 @@ configure(webModule) {
     dependencies {
         compile(globalModule)
         compile(guiModule)
+        compile(bom['com.fasterxml.jackson.core:jackson-databind'])
+        compile(bom['com.fasterxml.jackson.dataformat:jackson-dataformat-yaml'])
         compile(group: 'com.haulmont.cuba', name: 'cuba-web', version: baseVersion)
     }
 

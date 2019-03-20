@@ -30,7 +30,6 @@ import com.haulmont.reports.exception.NoOpenOfficeFreePortsException;
 import com.haulmont.reports.exception.ReportingException;
 import com.haulmont.reports.gui.ReportSecurityManager;
 import com.haulmont.reports.gui.report.run.ParameterClassResolver;
-import com.haulmont.restapi.exception.RestAPIException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 

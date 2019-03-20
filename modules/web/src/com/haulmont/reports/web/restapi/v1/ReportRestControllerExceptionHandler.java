@@ -16,9 +16,27 @@
 
 package com.haulmont.reports.web.restapi.v1;
 
-import com.haulmont.restapi.controllers.RestControllerExceptionHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 @ControllerAdvice("com.haulmont.reports.web.restapi.v1")
-public class ReportRestControllerExceptionHandler extends RestControllerExceptionHandler {
+public class ReportRestControllerExceptionHandler {
+
+    private static final Logger log = LoggerFactory.getLogger(ReportRestControllerExceptionHandler.class);
+
+    @ExceptionHandler(RestAPIException.class)
+    @ResponseBody
+    public ResponseEntity<ErrorInfo> handleRestAPIException(RestAPIException e) {
+        if (e.getCause() == null) {
+            log.info("RestAPIException: {}, {}", e.getMessage(), e.getDetails());
+        } else {
+            log.error("RestAPIException: {}, {}", e.getMessage(), e.getDetails(), e.getCause());
+        }
+        ErrorInfo errorInfo = new ErrorInfo(e.getMessage(), e.getDetails());
+        return new ResponseEntity<>(errorInfo, e.getHttpStatus());
+    }
 }
