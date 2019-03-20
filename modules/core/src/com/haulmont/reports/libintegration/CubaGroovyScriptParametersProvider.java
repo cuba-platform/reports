@@ -18,7 +18,9 @@ package com.haulmont.reports.libintegration;
 
 import com.haulmont.cuba.core.Persistence;
 import com.haulmont.cuba.core.Transaction;
+import com.haulmont.cuba.core.TransactionParams;
 import com.haulmont.cuba.core.global.*;
+import com.haulmont.reports.ReportingConfig;
 import com.haulmont.yarg.exception.ValidationException;
 import com.haulmont.yarg.structure.BandData;
 import com.haulmont.yarg.structure.ReportQuery;
@@ -26,11 +28,15 @@ import groovy.lang.Closure;
 import org.codehaus.groovy.runtime.MethodClosure;
 import org.springframework.stereotype.Component;
 
+import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
 
 @Component(GroovyScriptParametersProvider.NAME)
 public class CubaGroovyScriptParametersProvider implements GroovyScriptParametersProvider {
+
+    @Inject
+    protected ReportingConfig reportingConfig;
 
     @Override
     public Map<String, Object> prepareParameters(ReportQuery reportQuery, BandData parentBand, Map<String, Object> reportParameters) {
@@ -59,7 +65,12 @@ public class CubaGroovyScriptParametersProvider implements GroovyScriptParameter
 
     protected void transactional(Closure closure) {
         Persistence persistence = AppBeans.get(Persistence.class);
-        Transaction tx = persistence.getTransaction();
+        Transaction tx;
+        if (!persistence.isInTransaction() && reportingConfig.getUseReadOnlyTransactionForGroovy()) {
+            tx = persistence.createTransaction(new TransactionParams().setReadOnly(true));
+        } else {
+            tx = persistence.getTransaction();
+        }
         try {
             closure.call(persistence.getEntityManager());
             tx.commit();

@@ -178,4 +178,14 @@ public interface ReportingConfig extends Config {
     @DefaultInteger(10)
     Integer getCurlTimeout();
     void setCurlTimeout(Integer value);
+
+    /**
+     * Toggle for Groovy dataset's transactions. If true, transactions are read-only.
+     */
+    @Property("reporting.useReadOnlyTransactionForGroovy")
+    @Source(type = SourceType.DATABASE)
+    @DefaultBoolean(true)
+    Boolean getUseReadOnlyTransactionForGroovy();
+
+    void setUseReadOnlyTransactionForGroovy(Boolean useReadOnlyTransactionForGroovy);
 }
