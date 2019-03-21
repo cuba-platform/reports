@@ -18,10 +18,7 @@ package com.haulmont.reports.gui.valueformat.edit;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.global.Metadata;
 import com.haulmont.cuba.core.global.Security;
-import com.haulmont.cuba.gui.components.AbstractEditor;
-import com.haulmont.cuba.gui.components.Component;
-import com.haulmont.cuba.gui.components.FieldGroup;
-import com.haulmont.cuba.gui.components.LookupField;
+import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.data.Datasource;
 import com.haulmont.cuba.gui.data.impl.DatasourceImplementation;
 import com.haulmont.cuba.gui.xml.layout.ComponentsFactory;
@@ -44,13 +41,20 @@ public class ValueFormatEditor extends AbstractEditor<ReportValueFormat> {
             "${image:WxH}",
             "${bitmap:WxH}",
             "${imageFileId:WxH}",
-            "${html}"
+            "${html}",
+            "class:"
     };
 
     protected LookupField<String> formatField = null;
 
     @Inject
     protected FieldGroup formatFields;
+
+    @Inject
+    protected CheckBox groovyCheckBox;
+
+    @Inject
+    protected SourceCodeEditor groovyCodeEditor;
 
     @Inject
     protected ComponentsFactory componentsFactory;
@@ -92,6 +96,13 @@ public class ValueFormatEditor extends AbstractEditor<ReportValueFormat> {
             }
         });
 
+        groovyCheckBox.addValueChangeListener(booleanValueChangeEvent -> {
+            Boolean visible = booleanValueChangeEvent.getValue();
+
+            groovyCodeEditor.setVisible(Boolean.TRUE.equals(visible));
+            formatField.setVisible(Boolean.FALSE.equals(visible));
+        });
+
         //noinspection unchecked
         valuesFormatsDs.addItemPropertyChangeListener(e ->
                 ((DatasourceImplementation) valuesFormatsDs).modified(e.getItem()));
@@ -124,4 +135,12 @@ public class ValueFormatEditor extends AbstractEditor<ReportValueFormat> {
         ((ReportValueFormat) newItem).setId((UUID) item.getId());
         super.setItem(newItem);
     }
+
+    public void getGroovyHelp() {
+        showMessageDialog(getMessage("valuesFormats.groovyScript"), getMessage("valuesFormats.groovyScriptHelpText"),
+                MessageType.CONFIRMATION_HTML
+                        .modal(false)
+                        .width(700f));
+    }
+
 }
