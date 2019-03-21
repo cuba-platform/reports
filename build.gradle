@@ -312,6 +312,7 @@ configure(webModule) {
         compile(guiModule)
         compile(bom['com.fasterxml.jackson.core:jackson-databind'])
         compile(bom['com.fasterxml.jackson.dataformat:jackson-dataformat-yaml'])
+        compileOnly(bom['javax.servlet:javax.servlet-api'])
         compile(group: 'com.haulmont.cuba', name: 'cuba-web', version: baseVersion)
     }
 
