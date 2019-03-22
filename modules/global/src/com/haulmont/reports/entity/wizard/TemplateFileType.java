@@ -23,7 +23,8 @@ public enum TemplateFileType implements EnumClass<Integer> {
     DOCX(40),
     XLSX(50),
     CHART(60),
-    CSV(70);
+    CSV(70),
+    TABLE(80);
 
     private Integer id;
 
