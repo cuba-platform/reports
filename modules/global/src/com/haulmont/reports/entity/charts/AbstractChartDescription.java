@@ -38,6 +38,8 @@ public abstract class AbstractChartDescription extends BaseUuidEntity {
     protected final String type;
     @MetaProperty
     protected Boolean showLegend;
+    @MetaProperty
+    protected String customJsonConfig;
 
     @Nullable
     public static AbstractChartDescription fromJsonString(String jsonString) {
@@ -89,5 +91,13 @@ public abstract class AbstractChartDescription extends BaseUuidEntity {
 
     public void setShowLegend(Boolean showLegend) {
         this.showLegend = showLegend;
+    }
+
+    public void setCustomJsonConfig(String customJsonConfig) {
+        this.customJsonConfig = customJsonConfig;
+    }
+
+    public String getCustomJsonConfig() {
+        return customJsonConfig;
     }
 }

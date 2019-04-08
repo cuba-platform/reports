@@ -16,6 +16,7 @@
 
 package com.haulmont.reports.entity.charts;
 
+import com.google.common.base.Strings;
 import com.google.gson.*;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.reports.app.EntityMap;
@@ -136,6 +137,11 @@ public class ChartToJsonConverter {
         JsonElement jsonTree = gson.toJsonTree(chart);
         jsonTree.getAsJsonObject().add("dataProvider", serializeData(data, fields));
 
+        String customJsonConfig = description.getCustomJsonConfig();
+        if (!Strings.isNullOrEmpty(customJsonConfig)) {
+            mergeJsonObjects((JsonObject) jsonTree, gson.fromJson(customJsonConfig, JsonObject.class));
+        }
+
         return gson.toJson(jsonTree);
     }
 
@@ -211,7 +217,53 @@ public class ChartToJsonConverter {
         JsonElement jsonTree = gson.toJsonTree(chart);
         jsonTree.getAsJsonObject().add("dataProvider", serializeData(data, fields));
 
+        String customJsonConfig = description.getCustomJsonConfig();
+        if (!Strings.isNullOrEmpty(customJsonConfig)) {
+            mergeJsonObjects((JsonObject) jsonTree, gson.fromJson(customJsonConfig, JsonObject.class));
+        }
+
         return gson.toJson(jsonTree);
+    }
+
+    protected void mergeJsonObjects(JsonObject source, JsonObject config) {
+        Set<String> sourceKeys = source.keySet();
+        for (String key : config.keySet()) {
+            if (sourceKeys.contains(key)) {
+                JsonElement sourceElem = source.get(key);
+                JsonElement configElem = config.get(key);
+                if (areJsonObjects(sourceElem, configElem)) {
+                    mergeJsonObjects((JsonObject) sourceElem, (JsonObject) configElem);
+                } else if (areJsonArrays(sourceElem, configElem)) {
+                    mergeJsonArrays((JsonArray) sourceElem, (JsonArray) configElem);
+                } else {
+                    source.add(key, config.get(key));
+                }
+            } else {
+                source.add(key, config.get(key));
+            }
+        }
+    }
+
+    protected void mergeJsonArrays(JsonArray source, JsonArray config) {
+        for (int i = 0; i < Math.min(source.size(), config.size()); ++i) {
+            JsonElement sourceElem = source.get(i);
+            JsonElement configElem = config.get(i);
+            if (areJsonObjects(sourceElem, configElem)) {
+                mergeJsonObjects((JsonObject) sourceElem, (JsonObject) configElem);
+            } else if (areJsonArrays(sourceElem, configElem)) {
+                mergeJsonArrays((JsonArray) sourceElem, (JsonArray) configElem);
+            } else {
+                source.set(i, configElem);
+            }
+        }
+    }
+
+    protected boolean areJsonObjects(Object first, Object second) {
+        return first instanceof JsonObject && second instanceof JsonObject;
+    }
+
+    protected boolean areJsonArrays(Object first, Object second) {
+        return first instanceof JsonArray && second instanceof JsonArray;
     }
 
     private JsonElement serializeData(List<Map<String, Object>> data, List<String> fields) {

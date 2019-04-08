@@ -34,6 +34,7 @@ import org.apache.commons.collections4.IterableUtils;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class ChartEditFrame extends DescriptionEditFrame {
@@ -53,6 +54,10 @@ public class ChartEditFrame extends DescriptionEditFrame {
     protected FieldGroup pieChartFieldGroup;
     @Inject
     protected FieldGroup serialChartFieldGroup;
+    @Inject
+    private SourceCodeEditor serialJsonConfigEditor;
+    @Inject
+    private SourceCodeEditor pieJsonConfigEditor;
 
     @Override
     @SuppressWarnings("IncorrectCreateEntity")
@@ -66,12 +71,16 @@ public class ChartEditFrame extends DescriptionEditFrame {
             pieChartFieldGroup.setVisible(ChartType.PIE == e.getValue());
             serialChartFieldGroup.setVisible(ChartType.SERIAL == e.getValue());
             seriesBox.setVisible(ChartType.SERIAL == e.getValue());
+            serialJsonConfigEditor.setVisible(ChartType.SERIAL == e.getValue());
+            pieJsonConfigEditor.setVisible(ChartType.PIE == e.getValue());
             showPreview();
         });
 
         pieChartFieldGroup.setVisible(false);
         serialChartFieldGroup.setVisible(false);
         seriesBox.setVisible(false);
+        serialJsonConfigEditor.setVisible(false);
+        pieJsonConfigEditor.setVisible(false);
 
         seriesTable.addAction(new CreateAction(seriesTable) {
             @Override
@@ -94,6 +103,30 @@ public class ChartEditFrame extends DescriptionEditFrame {
             checkSeriesOrder();
             showPreview();
         });
+
+        serialJsonConfigEditor.addValueChangeListener(this::codeEditorChangeListener);
+        pieJsonConfigEditor.addValueChangeListener(this::codeEditorChangeListener);
+
+        Consumer<String> validator = new JsonConfigValidator();
+        serialJsonConfigEditor.addValidator(validator);
+        pieJsonConfigEditor.addValidator(validator);
+
+        serialJsonConfigEditor.setContextHelpIconClickHandler(this::jsonEditorContextHelpIconClickHandler);
+        pieJsonConfigEditor.setContextHelpIconClickHandler(this::jsonEditorContextHelpIconClickHandler);
+    }
+
+    protected void codeEditorChangeListener(HasValue.ValueChangeEvent<String> event) {
+        if (ChartType.SERIAL == type.getValue() && serialJsonConfigEditor.isValid()) {
+            serialChartDs.getItem().setCustomJsonConfig(event.getValue());
+        } else if (ChartType.PIE == type.getValue() && pieJsonConfigEditor.isValid()) {
+            pieChartDs.getItem().setCustomJsonConfig(event.getValue());
+        }
+    }
+
+    protected void jsonEditorContextHelpIconClickHandler(HasContextHelp.ContextHelpIconClickEvent event) {
+        showMessageDialog(getMessage("chartEdit.jsonConfig"),
+                event.getSource().getContextHelpText(),
+                MessageType.CONFIRMATION_HTML);
     }
 
     @Override
@@ -184,8 +217,10 @@ public class ChartEditFrame extends DescriptionEditFrame {
         if (chartDescription != null) {
             if (ChartType.SERIAL == chartDescription.getType()) {
                 serialChartDs.setItem((SerialChartDescription) chartDescription);
+                serialJsonConfigEditor.setValue(chartDescription.getCustomJsonConfig());
             } else if (ChartType.PIE == chartDescription.getType()) {
                 pieChartDs.setItem((PieChartDescription) chartDescription);
+                pieJsonConfigEditor.setValue(chartDescription.getCustomJsonConfig());
             }
             type.setValue(chartDescription.getType());
         }

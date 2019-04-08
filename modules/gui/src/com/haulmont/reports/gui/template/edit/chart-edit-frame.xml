@@ -98,6 +98,26 @@
                         </table>
                     </groupBox>
                 </row>
+                <row>
+                    <groupBox caption="msg://chartEdit.jsonConfig" spacing="true" colspan="2">
+                        <sourceCodeEditor id="serialJsonConfigEditor"
+                                          highlightActiveLine="true"
+                                          handleTabKey="true"
+                                          showGutter="true"
+                                          mode="JavaScript"
+                                          width="100%"
+                                          contextHelpTextHtmlEnabled="true"
+                                          contextHelpText="msg://chartEdit.serialJsonConfigHelp"/>
+                        <sourceCodeEditor id="pieJsonConfigEditor"
+                                          highlightActiveLine="true"
+                                          handleTabKey="true"
+                                          showGutter="true"
+                                          mode="JavaScript"
+                                          width="100%"
+                                          contextHelpTextHtmlEnabled="true"
+                                          contextHelpText="msg://chartEdit.pieJsonConfigHelp"/>
+                    </groupBox>
+                </row>
             </rows>
         </grid>
     </layout>
