@@ -231,9 +231,9 @@ public class ChartToJsonConverter {
             if (sourceKeys.contains(key)) {
                 JsonElement sourceElem = source.get(key);
                 JsonElement configElem = config.get(key);
-                if (areJsonObjects(sourceElem, configElem)) {
+                if (sourceElem.isJsonObject() && configElem.isJsonObject()) {
                     mergeJsonObjects((JsonObject) sourceElem, (JsonObject) configElem);
-                } else if (areJsonArrays(sourceElem, configElem)) {
+                } else if (sourceElem.isJsonArray() && configElem.isJsonArray()) {
                     mergeJsonArrays((JsonArray) sourceElem, (JsonArray) configElem);
                 } else {
                     source.add(key, config.get(key));
@@ -248,22 +248,14 @@ public class ChartToJsonConverter {
         for (int i = 0; i < Math.min(source.size(), config.size()); ++i) {
             JsonElement sourceElem = source.get(i);
             JsonElement configElem = config.get(i);
-            if (areJsonObjects(sourceElem, configElem)) {
+            if (sourceElem.isJsonObject() && configElem.isJsonObject()) {
                 mergeJsonObjects((JsonObject) sourceElem, (JsonObject) configElem);
-            } else if (areJsonArrays(sourceElem, configElem)) {
+            } else if (sourceElem.isJsonArray() && configElem.isJsonArray()) {
                 mergeJsonArrays((JsonArray) sourceElem, (JsonArray) configElem);
             } else {
                 source.set(i, configElem);
             }
         }
-    }
-
-    protected boolean areJsonObjects(Object first, Object second) {
-        return first instanceof JsonObject && second instanceof JsonObject;
-    }
-
-    protected boolean areJsonArrays(Object first, Object second) {
-        return first instanceof JsonArray && second instanceof JsonArray;
     }
 
     private JsonElement serializeData(List<Map<String, Object>> data, List<String> fields) {

@@ -107,7 +107,7 @@ public class ChartEditFrame extends DescriptionEditFrame {
         serialJsonConfigEditor.addValueChangeListener(this::codeEditorChangeListener);
         pieJsonConfigEditor.addValueChangeListener(this::codeEditorChangeListener);
 
-        Consumer<String> validator = new JsonConfigValidator();
+        Consumer<String> validator = getBeanLocator().getPrototype(JsonConfigValidator.NAME, getMessagesPack());
         serialJsonConfigEditor.addValidator(validator);
         pieJsonConfigEditor.addValidator(validator);
 

@@ -21,19 +21,40 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.gui.components.ValidationException;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.Nullable;
+import javax.inject.Inject;
 import java.util.function.Consumer;
 
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Component(JsonConfigValidator.NAME)
 public class JsonConfigValidator implements Consumer<String> {
 
-    protected static Gson gson;
+    public static final String NAME = "cuba_JsonConfigValidator";
 
+    protected static final Gson gson;
+    
     static {
         gson = new GsonBuilder()
                 .setPrettyPrinting()
                 .create();
+    }
+
+    protected String messagePack;
+    protected Messages messages;
+
+    public JsonConfigValidator(String messagePack) {
+        this.messagePack = messagePack;
+    }
+
+    @Inject
+    protected void setMessages(Messages messages) {
+        this.messages = messages;
     }
 
     @Override
@@ -42,7 +63,7 @@ public class JsonConfigValidator implements Consumer<String> {
             try {
                 gson.fromJson(s, JsonObject.class);
             } catch (JsonParseException e) {
-                throw new ValidationException(e.getMessage(), e.getCause());
+                throw new ValidationException(messages.getMessage(messagePack, "chartEdit.invalidJson"));
             }
         }
     }
