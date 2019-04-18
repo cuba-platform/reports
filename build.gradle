@@ -282,6 +282,12 @@ configure(coreModule) {
         includes = ['**/*Test.class']
     }
 
+    entitiesEnhancing {
+        test {
+            enabled = true
+        }
+    }
+
     assembleDbScripts {
         moduleAlias = '20-reports'
     }
