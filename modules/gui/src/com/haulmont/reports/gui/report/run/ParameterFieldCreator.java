@@ -184,8 +184,6 @@ public class ParameterFieldCreator {
                     Collections.addAll(optionsList, constants);
 
                     lookupField.setOptionsList(optionsList);
-                    lookupField.setCaptionMode(CaptionMode.ITEM);
-
                     if (optionsList.size() < 10) {
                         lookupField.setTextInputAllowed(false);
                     }
