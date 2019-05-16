@@ -194,7 +194,7 @@ public class ChartEditFrame extends DescriptionEditFrame {
             chartJson = chartToJsonConverter.convertPieChart(chartDescription, data);
         }
         chartJson = chartJson == null ? "{}" : chartJson;
-        AbstractFrame frame = openFrame(previewBox, ShowChartController.JSON_CHART_SCREEN_ID,
+        Frame frame = openFrame(previewBox, ShowChartController.JSON_CHART_SCREEN_ID,
                 Collections.singletonMap(ShowChartController.CHART_JSON_PARAMETER, chartJson));
         if (ChartType.SERIAL == type.getValue()) {
             frame.setHeight("700px");
