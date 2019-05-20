@@ -225,7 +225,7 @@ public class DetailsStepFrame extends StepFrame {
             Map<String, Object> params = new HashMap<>();
             params.put("filterEntity", filterEntity);
             params.put("filter", filter);
-            params.put("conditions", conditionsTree);
+            params.put("conditionsTree", conditionsTree);
             params.put("useShortConditionForm", true);
             params.put("showConditionHiddenOption", true);
 
