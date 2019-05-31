@@ -28,6 +28,7 @@ import com.haulmont.reports.entity.ReportOutputType;
 import com.haulmont.reports.entity.ReportTemplate;
 import com.haulmont.reports.gui.ReportGuiManager;
 import com.haulmont.reports.gui.ReportPrintHelper;
+import com.haulmont.reports.gui.report.validators.ReportCollectionValidator;
 import com.haulmont.reports.gui.report.validators.ReportParamFieldValidator;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
@@ -156,6 +157,10 @@ public class InputParametersFrame extends AbstractFrame {
             field.addValidator(new ReportParamFieldValidator(parameter));
         }
 
+        if (BooleanUtils.isTrue(field.isRequired())) {
+            field.addValidator(new ReportCollectionValidator(field));
+        }
+
         Label label = parameterFieldCreator.createLabel(parameter, field);
         label.setStyleName("c-report-parameter-caption");
 
@@ -191,8 +196,7 @@ public class InputParametersFrame extends AbstractFrame {
         ReportTemplate template;
         if (report.getTemplates() != null && report.getTemplates().size() > 1) {
             template = templateField.getValue();
-        }
-        else {
+        } else {
             template = report.getDefaultTemplate();
         }
 
