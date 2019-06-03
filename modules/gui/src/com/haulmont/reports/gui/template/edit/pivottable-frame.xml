@@ -51,7 +51,7 @@
                             <field id="renderers">
                                 <optionsList datasource="pivotTableDs"
                                              property="renderers"
-                                             required="true"/>
+                                             required="true" multiselect="true"/>
                             </field>
                         </column>
                     </fieldGroup>
