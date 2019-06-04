@@ -25,6 +25,8 @@ import com.haulmont.cuba.gui.theme.ThemeConstants;
 import com.haulmont.cuba.gui.xml.layout.ComponentsFactory;
 import com.haulmont.reports.entity.PivotTableData;
 import com.haulmont.reports.entity.Report;
+import com.haulmont.reports.entity.ReportOutputType;
+import com.haulmont.reports.entity.ReportTemplate;
 import com.haulmont.reports.gui.ReportGuiManager;
 import com.haulmont.yarg.reporting.ReportOutputDocument;
 
@@ -126,6 +128,14 @@ public class ShowPivotTableController extends AbstractWindow {
             if (validateAll()) {
                 Map<String, Object> parameters = inputParametersFrame.collectParameters();
                 Report report = inputParametersFrame.getReport();
+
+                if (templateCode == null) {
+                    templateCode = report.getTemplates().stream()
+                            .filter(template -> template.getReportOutputType() == ReportOutputType.PIVOT_TABLE)
+                            .findFirst()
+                            .map(ReportTemplate::getCode).orElse(null);
+                }
+
                 ReportOutputDocument document = reportGuiManager.getReportResult(report, parameters, templateCode);
                 PivotTableData result = (PivotTableData) SerializationSupport.deserialize(document.getContent());
                 openPivotTable(result.getPivotTableJson(), result.getValues());
