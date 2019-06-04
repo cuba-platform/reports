@@ -23,6 +23,7 @@ import com.haulmont.cuba.gui.theme.ThemeConstants;
 import com.haulmont.cuba.gui.xml.layout.ComponentsFactory;
 import com.haulmont.reports.entity.Report;
 import com.haulmont.reports.entity.ReportOutputType;
+import com.haulmont.reports.entity.ReportTemplate;
 import com.haulmont.reports.gui.ReportGuiManager;
 import com.haulmont.yarg.reporting.ReportOutputDocument;
 
@@ -166,9 +167,12 @@ public class ShowChartController extends AbstractWindow {
                 Map<String, Object> parameters = inputParametersFrame.collectParameters();
                 Report report = inputParametersFrame.getReport();
 
-                templateCode = report.getTemplates().stream()
-                        .filter(template -> template.getReportOutputType() == ReportOutputType.CHART)
-                        .findFirst().get().getCode();
+                if (templateCode == null) {
+                    templateCode = report.getTemplates().stream()
+                            .filter(template -> template.getReportOutputType() == ReportOutputType.CHART)
+                            .findFirst()
+                            .map(ReportTemplate::getCode).orElse(null);
+                }
 
                 ReportOutputDocument reportResult = reportGuiManager.getReportResult(report, parameters, templateCode);
                 openChart(new String(reportResult.getContent(), StandardCharsets.UTF_8));
