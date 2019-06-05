@@ -100,8 +100,15 @@
                         </row>
                         <row id="row10">
                             <label id="customDefinitionLabel" value="msg://template.customDefinition" align="MIDDLE_LEFT"/>
-                            <textField id="customDefinition" datasource="templateDs" property="customDefinition"
-                                       width="${width}"/>
+                            <vbox spacing="true"
+                                  width="100%">
+                                <linkButton id="fullScreenLinkButton"
+                                            align="MIDDLE_RIGHT"
+                                            caption="msg://dataSet.fullScreen"
+                                            invoke="showGroovyScriptEditorDialog"/>
+                                <textArea id="customDefinition" datasource="templateDs" property="customDefinition"
+                                          width="${width}"/>
+                            </vbox>
                         </row>
                     </rows>
                 </grid>
