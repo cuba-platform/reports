@@ -74,6 +74,9 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
     protected TextArea customDefinition;
 
     @Inject
+    protected LinkButton textHelpGroovy;
+
+    @Inject
     protected LinkButton fullScreenLinkButton;
 
     @Inject
@@ -475,12 +478,21 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
                 WindowManager.OpenType.DIALOG,
                 ParamsMap.of(
                         "mode", SourceCodeEditor.Mode.Groovy,
-                        "scriptValue", customDefinition.getValue()
+                        "scriptValue", customDefinition.getValue(),
+                        "helpVisible", textHelpGroovy.isVisible(),
+                        "helpMsgKey", "templateEditor.textHelpGroovy"
                 ));
-        editorDialog.addCloseListener(actionId -> {
+        editorDialog.addAfterCloseListener(actionId -> {
             if (Window.COMMIT_ACTION_ID.equals(actionId)) {
                 customDefinition.setValue(editorDialog.getValue());
             }
         });
+    }
+
+    public void getTextHelp() {
+        showMessageDialog(getMessage("templateEditor.titleHelpGroovy"), getMessage("templateEditor.textHelpGroovy"),
+                MessageType.CONFIRMATION_HTML
+                        .modal(false)
+                        .width(700f));
     }
 }

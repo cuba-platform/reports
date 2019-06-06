@@ -48,7 +48,8 @@
                         </row>
                         <row id="row2">
                             <label id="templateFileLabel" value="msg://template.file" align="MIDDLE_LEFT"/>
-                            <upload id="templateUploadField" dropZone="createTemplateFields" width="${width}" showFileName="true"/>
+                            <upload id="templateUploadField" dropZone="createTemplateFields" width="${width}"
+                                    showFileName="true"/>
                         </row>
                         <row id="row3">
                             <sourceCodeEditor id="templateFileEditor" width="100%" height="350"
@@ -56,7 +57,7 @@
                                               printMargin="true"
                                               showGutter="true" colspan="2"/>
                         </row>
-                        <row  id="row4">
+                        <row id="row4">
                             <label id="outputTypeLabel" value="msg://template.outputType" align="MIDDLE_LEFT"/>
                             <lookupField id="outputType" datasource="templateDs"
                                          textInputAllowed="false"
@@ -66,7 +67,7 @@
                                          pageLength="20"
                                          requiredMessage="msg://template.outputTypeMsg"/>
                         </row>
-                        <row  id="row5">
+                        <row id="row5">
                             <hbox align="MIDDLE_LEFT">
                                 <label id="outputNamePatternLabel" value="msg://template.outputNamePattern"/>
                                 <linkButton id="namePatternTextHelp" icon="icons/question-white.png"/>
@@ -88,26 +89,32 @@
                             <checkBox id="custom" datasource="templateDs" property="custom"
                                       width="${width}"/>
                         </row>
-                        <row  id="row8">
+                        <row id="row8">
                             <label id="alterableLabel" value="msg://template.isAlterableOutput" align="MIDDLE_LEFT"/>
                             <checkBox id="alterable" datasource="templateDs" property="alterable"
                                       width="${width}"/>
                         </row>
-                        <row  id="row9">
-                            <label id="customDefinedByLabel" value="msg://template.customDefinedBy" align="MIDDLE_LEFT"/>
+                        <row id="row9">
+                            <label id="customDefinedByLabel" value="msg://template.customDefinedBy"
+                                   align="MIDDLE_LEFT"/>
                             <lookupField id="customDefinedBy" datasource="templateDs" property="customDefinedBy"
                                          width="${width}"/>
                         </row>
                         <row id="row10">
-                            <label id="customDefinitionLabel" value="msg://template.customDefinition" align="MIDDLE_LEFT"/>
+                            <label id="customDefinitionLabel" value="msg://template.customDefinition"
+                                   align="MIDDLE_LEFT"/>
                             <vbox spacing="true"
                                   width="100%">
                                 <linkButton id="fullScreenLinkButton"
                                             align="MIDDLE_RIGHT"
                                             caption="msg://dataSet.fullScreen"
                                             invoke="showGroovyScriptEditorDialog"/>
-                                <textArea id="customDefinition" datasource="templateDs" property="customDefinition"
-                                          width="${width}"/>
+                                <hbox width="100%" expand="customDefinition">
+                                    <textArea id="customDefinition" datasource="templateDs" property="customDefinition"
+                                              width="${width}"/>
+                                    <linkButton id="textHelpGroovy" icon="icons/question-white.png"
+                                                invoke="getTextHelp"/>
+                                </hbox>
                             </vbox>
                         </row>
                     </rows>
