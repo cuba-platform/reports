@@ -19,21 +19,49 @@
         messagesPack="com.haulmont.reports.gui"
         datasource="valuesFormatsDs"
         caption="msg://formatsEdit"
-        focusComponent="formatFields">
+        focusComponent="gridLayout">
 
     <dsContext>
         <datasource id="valuesFormatsDs" class="com.haulmont.reports.entity.ReportValueFormat"/>
     </dsContext>
 
     <layout spacing="true">
-        <fieldGroup id="formatFields" datasource="valuesFormatsDs">
-            <column width="200">
-                <field id="valueName" required="true" caption="msg://valuesFormats.name"
-                       requiredMessage="msg://valueNameMsg"/>
-                <field id="formatString" required="true"  caption="msg://valuesFormats.format"
-                       maxLength="255" custom="true" requiredMessage="msg://formatStringMsg"/>
-            </column>
-        </fieldGroup>
+        <grid id="gridLayout" spacing="true" width="500px">
+            <columns count="1"/>
+            <rows>
+                <row>
+                    <fieldGroup id="formatFields" datasource="valuesFormatsDs" width="100%">
+                        <column>
+                            <field id="valueName" property="valueName" required="true" width="100%"
+                                   caption="msg://valuesFormats.name"
+                                   requiredMessage="msg://valueNameMsg"/>
+                            <field id="formatString" required="true" caption="msg://valuesFormats.format" width="100%"
+                                   maxLength="255" custom="true" requiredMessage="msg://formatStringMsg"/>
+                        </column>
+                    </fieldGroup>
+                </row>
+                <row>
+                    <hbox>
+                        <checkBox id="groovyCheckBox" datasource="valuesFormatsDs" property="groovyScript"
+                                  caption="msg://valuesFormats.groovyScript"
+                                  align="MIDDLE_LEFT"/>
+                        <linkButton id="groovyHelp"
+                                    icon="icons/question-white.png"
+                                    invoke="getGroovyHelp"/>
+                    </hbox>
+                </row>
+                <row>
+                    <sourceCodeEditor id="groovyCodeEditor" height="200px" width="100%"
+                                      visible="false"
+                                      required="true"
+                                      caption="msg://valuesFormats.groovyScript"
+                                      requiredMessage="msg://groovyScriptMsg"
+                                      datasource="valuesFormatsDs"
+                                      property="formatString"
+                                      mode="Groovy"/>
+                </row>
+            </rows>
+        </grid>
         <frame id="windowActions" screen="editWindowActions" width="AUTO"/>
     </layout>
 </window>

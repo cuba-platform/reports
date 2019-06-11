@@ -29,6 +29,7 @@ public class CubaFormatterFactory extends DefaultFormatterFactory {
         FormatterCreator ftlCreator = factoryInput -> {
             HtmlFormatter htmlFormatter = new CubaHtmlFormatter(factoryInput);
             htmlFormatter.setDefaultFormatProvider(defaultFormatProvider);
+            htmlFormatter.setScripting(scripting);
             return htmlFormatter;
         };
         formattersMap.put("ftl", ftlCreator);
@@ -41,6 +42,7 @@ public class CubaFormatterFactory extends DefaultFormatterFactory {
                 docxFormatter.setDocumentConverter(documentConverter);
             }
             docxFormatter.setHtmlImportProcessor(htmlImportProcessor);
+            docxFormatter.setScripting(scripting);
             return docxFormatter;
         };
 
@@ -52,6 +54,7 @@ public class CubaFormatterFactory extends DefaultFormatterFactory {
             XlsxFormatter xlsxFormatter = new CubaXlsxFormatter(factoryInput);
             xlsxFormatter.setDefaultFormatProvider(defaultFormatProvider);
             xlsxFormatter.setDocumentConverter(documentConverter);
+            xlsxFormatter.setScripting(scripting);
             return xlsxFormatter;
         };
         formattersMap.put("xlsx", xlsxCreator);

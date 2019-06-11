@@ -74,6 +74,7 @@
         <property name="officeIntegration" ref="reporting_lib_OfficeIntegration"/>
         <property name="defaultFormatProvider" ref="reporting_lib_CubaFieldFormatProvider"/>
         <property name="inlinersProvider" ref="reporting_lib_InlinersProvider"/>
+        <property name="scripting" ref="reporting_lib_Scripting"/>
     </bean>
 
     <bean id="reporting_lib_LoaderFactory" class="com.haulmont.yarg.loaders.factory.DefaultLoaderFactory">
