@@ -38,6 +38,19 @@
                     <field id="description" optionsDatasource="groupsDs" width="${widthBig}" rows="3"/>
                 </column>
             </fieldGroup>
+            <grid id="settingsGrid" spacing="true">
+                <columns count="2"/>
+                <rows>
+                    <row>
+                        <label value="msg://report.restAccess"/>
+                        <checkBox datasource="reportDs" property="restAccess"/>
+                    </row>
+                    <row>
+                        <label value="msg://report.system"/>
+                        <checkBox datasource="reportDs" property="system"/>
+                    </row>
+                </rows>
+            </grid>
             <upload id="invisibleFileUpload" dropZone="reportFields" stylename="c-report-upload-invisible"/>
             <label id="spacer"/>
         </hbox>
