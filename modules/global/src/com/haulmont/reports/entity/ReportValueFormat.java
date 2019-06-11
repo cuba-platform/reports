@@ -36,6 +36,9 @@ public class ReportValueFormat extends BaseUuidEntity implements ReportFieldForm
     @MetaProperty
     protected Report report;
 
+    @MetaProperty
+    protected Boolean groovyScript = false;
+
     public Report getReport() {
         return report;
     }
@@ -60,6 +63,14 @@ public class ReportValueFormat extends BaseUuidEntity implements ReportFieldForm
         this.formatString = formatString;
     }
 
+    public Boolean getGroovyScript() {
+        return groovyScript;
+    }
+
+    public void setGroovyScript(Boolean groovyScript) {
+        this.groovyScript = groovyScript;
+    }
+
     @Override
     public String getName() {
         return valueName;
@@ -68,5 +79,10 @@ public class ReportValueFormat extends BaseUuidEntity implements ReportFieldForm
     @Override
     public String getFormat() {
         return formatString;
+    }
+
+    @Override
+    public Boolean isGroovyScript() {
+        return groovyScript;
     }
 }
