@@ -263,7 +263,7 @@ public class DetailsStepFrame extends StepFrame {
                 protected List<ReportData.Parameter> collectQueryParameters(QueryFilter queryFilter) {
                     List<ReportData.Parameter> newParametersList = new ArrayList<>();
                     int i = 1;
-                    for (ParameterInfo parameterInfo : queryFilter.getParameters()) {
+                    for (ParameterInfo parameterInfo : queryFilter.getCompiledParameters()) {
                         Condition condition = findConditionByParameter(queryFilter.getRoot(), parameterInfo);
                         String conditionName = parameterInfo.getConditionName();
                         if (conditionName == null) {
@@ -299,7 +299,7 @@ public class DetailsStepFrame extends StepFrame {
                 }
 
                 protected String collectQuery(QueryFilter queryFilter) {
-                    Collection<ParameterInfo> parameterDescriptorsFromFilter = queryFilter.getParameters();
+                    Collection<ParameterInfo> parameterDescriptorsFromFilter = queryFilter.getCompiledParameters();
                     Map<String, Object> params = new HashMap<>();
                     for (ParameterInfo parameter : parameterDescriptorsFromFilter) {
                         params.put(parameter.getName(), "___");
@@ -309,7 +309,7 @@ public class DetailsStepFrame extends StepFrame {
 
                 protected Condition findConditionByParameter(Condition condition, ParameterInfo parameterInfo) {
                     if (!(condition instanceof LogicalCondition)) {
-                        Set<ParameterInfo> parameters = condition.getParameters();
+                        Set<ParameterInfo> parameters = condition.getCompiledParameters();
                         if (parameters != null && parameters.contains(parameterInfo)) {
                             return condition;
                         }
