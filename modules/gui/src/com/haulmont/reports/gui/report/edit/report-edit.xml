@@ -14,15 +14,13 @@
   ~ limitations under the License.
   -->
 
-<window
-        xmlns="http://schemas.haulmont.com/cuba/window.xsd"
+<window xmlns="http://schemas.haulmont.com/cuba/window.xsd"
         class="com.haulmont.reports.gui.report.edit.ReportEditor"
         messagesPack="com.haulmont.reports.gui"
         datasource="reportDs"
         caption="msg://reportEditor"
         focusComponent="generalFrame.propertiesFieldGroup"
-        dataSupplier="com.haulmont.reports.gui.report.ReportDataSupplier"
-        >
+        dataSupplier="com.haulmont.reports.gui.report.ReportDataSupplier">
 
     <dsContext>
         <datasource
@@ -31,7 +29,8 @@
                 view="report.edit">
             <collectionDatasource id="parametersDs" property="inputParameters"
                                   datasourceClass="com.haulmont.reports.gui.datasource.InputParametersDataSource"/>
-            <collectionDatasource id="valuesFormatsDs" property="valuesFormats"/>
+            <collectionDatasource id="valuesFormatsDs" property="valuesFormats"
+                                  datasourceClass="com.haulmont.reports.gui.datasource.ValuesFormatsDataSource"/>
             <collectionDatasource id="rolesDs" property="roles"/>
             <collectionDatasource id="reportScreensDs" property="reportScreens"/>
             <collectionDatasource id="templatesDs" property="templates"/>
@@ -68,27 +67,27 @@
         <tabSheet id="tabsheet" width="100%">
             <tab id="generalTab" caption="msg://generalTab">
                 <frame src="/com/haulmont/reports/gui/report/edit/tabs/general.xml" id="generalFrame" width="100%"
-                        height="100%"/>
+                       height="100%"/>
             </tab>
             <tab id="parametersAndFormatsTab" caption="msg://parametersAndFormatsTab">
                 <hbox width="100%" height="100%" spacing="true" margin="false;true;true;true">
                     <frame src="/com/haulmont/reports/gui/report/edit/tabs/parameters.xml" id="parametersFrame"
-                            height="100%" width="100%"/>
+                           height="100%" width="100%"/>
                     <frame src="/com/haulmont/reports/gui/report/edit/tabs/formats.xml" id="formatsFrame" height="100%"
-                            width="100%"/>
+                           width="100%"/>
                 </hbox>
             </tab>
             <tab id="templatesTab" caption="msg://templatesTab">
                 <frame src="/com/haulmont/reports/gui/report/edit/tabs/templates.xml" id="templatesFrame" width="100%"
-                        height="100%"/>
+                       height="100%"/>
             </tab>
             <tab id="securityTab" caption="msg://securityTab">
                 <frame src="/com/haulmont/reports/gui/report/edit/tabs/security.xml" id="securityFrame" width="100%"
-                        height="100%"/>
+                       height="100%"/>
             </tab>
             <tab id="localesTab" caption="msg://localesTab">
                 <frame src="/com/haulmont/reports/gui/report/edit/tabs/locales.xml" id="localesFrame" width="100%"
-                        height="100%"/>
+                       height="100%"/>
             </tab>
         </tabSheet>
         <hbox spacing="true">
