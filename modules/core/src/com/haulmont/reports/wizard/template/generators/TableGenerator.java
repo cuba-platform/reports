@@ -16,39 +16,14 @@
 
 package com.haulmont.reports.wizard.template.generators;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.haulmont.reports.entity.wizard.RegionProperty;
 import com.haulmont.reports.entity.wizard.ReportData;
-import com.haulmont.reports.entity.wizard.ReportRegion;
 import com.haulmont.reports.wizard.template.Generator;
-
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class TableGenerator implements Generator {
 
     @Override
     public byte[] generate(ReportData reportData) {
-        String templateContent = generateTemplate(reportData);
-        return templateContent.getBytes(StandardCharsets.UTF_8);
+        return new byte[0];
     }
 
-    protected String generateTemplate(ReportData reportData) {
-        Gson gson = new Gson();
-        JsonObject jsonTabs = new JsonObject();
-
-        for (ReportRegion reportRegion : reportData.getReportRegions()) {
-            List<String> tabs = reportRegion.getRegionProperties()
-                    .stream()
-                    .map(RegionProperty::getName)
-                    .collect(Collectors.toList());
-            jsonTabs.addProperty(reportRegion.getName(), gson.toJson(tabs));
-        }
-
-        JsonObject jsonResult = new JsonObject();
-        jsonResult.add("bands", jsonTabs);
-        return jsonResult.toString();
-    }
 }
