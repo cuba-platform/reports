@@ -304,6 +304,10 @@ configure(guiModule) {
         compile(group: 'com.haulmont.cuba', name: 'cuba-gui', version: baseVersion)
         compileOnly(bom['javax.servlet:javax.servlet-api'])
     }
+
+    test {
+        jvmArgs "-javaagent:${classpath.find { it.name.contains("jmockit") }.absolutePath}"
+    }
 }
 
 configure(webModule) {
