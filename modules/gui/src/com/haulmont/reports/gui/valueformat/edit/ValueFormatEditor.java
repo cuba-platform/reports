@@ -15,15 +15,21 @@
  */
 package com.haulmont.reports.gui.valueformat.edit;
 
+import com.haulmont.bali.util.ParamsMap;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.global.Metadata;
 import com.haulmont.cuba.core.global.Security;
+import com.haulmont.cuba.gui.ScreenBuilders;
 import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.data.Datasource;
 import com.haulmont.cuba.gui.data.impl.DatasourceImplementation;
+import com.haulmont.cuba.gui.screen.MapScreenOptions;
+import com.haulmont.cuba.gui.screen.OpenMode;
+import com.haulmont.cuba.gui.screen.StandardCloseAction;
 import com.haulmont.cuba.gui.xml.layout.ComponentsFactory;
 import com.haulmont.cuba.security.entity.EntityOp;
 import com.haulmont.reports.entity.ReportValueFormat;
+import com.haulmont.reports.gui.definition.edit.scripteditordialog.ScriptEditorDialog;
 
 import javax.inject.Inject;
 import java.util.HashMap;
@@ -31,6 +37,8 @@ import java.util.Map;
 import java.util.UUID;
 
 public class ValueFormatEditor extends AbstractEditor<ReportValueFormat> {
+
+    public static final String RETURN_VALUE = "return value";
 
     protected String[] defaultFormats = new String[]{
             "#,##0",
@@ -54,6 +62,12 @@ public class ValueFormatEditor extends AbstractEditor<ReportValueFormat> {
     protected CheckBox groovyCheckBox;
 
     @Inject
+    protected LinkButton groovyFullScreenLinkButton;
+
+    @Inject
+    protected VBoxLayout groovyVBox;
+
+    @Inject
     protected SourceCodeEditor groovyCodeEditor;
 
     @Inject
@@ -67,6 +81,11 @@ public class ValueFormatEditor extends AbstractEditor<ReportValueFormat> {
 
     @Inject
     protected Security security;
+
+    @Inject
+    protected ScreenBuilders screenBuilders;
+
+    protected SourceCodeEditor.Mode groovyScriptFieldMode = SourceCodeEditor.Mode.Groovy;
 
     @Override
     public void init(Map<String, Object> params) {
@@ -98,14 +117,28 @@ public class ValueFormatEditor extends AbstractEditor<ReportValueFormat> {
 
         groovyCheckBox.addValueChangeListener(booleanValueChangeEvent -> {
             Boolean visible = booleanValueChangeEvent.getValue();
+            Boolean prevVisible = booleanValueChangeEvent.getPrevValue();
 
-            groovyCodeEditor.setVisible(Boolean.TRUE.equals(visible));
+            Boolean userOriginated = booleanValueChangeEvent.isUserOriginated();
+
+            if (isClickTrueGroovyScript(visible, prevVisible, userOriginated)) {
+                groovyCodeEditor.setValue(RETURN_VALUE);
+            }
+            if (Boolean.FALSE.equals(visible)) {
+                formatField.clear();
+            }
+
+            groovyVBox.setVisible(Boolean.TRUE.equals(visible));
             formatField.setVisible(Boolean.FALSE.equals(visible));
         });
 
         //noinspection unchecked
         valuesFormatsDs.addItemPropertyChangeListener(e ->
                 ((DatasourceImplementation) valuesFormatsDs).modified(e.getItem()));
+    }
+
+    protected boolean isClickTrueGroovyScript(Boolean visible, Boolean prevVisible, Boolean userOriginated) {
+        return Boolean.TRUE.equals(userOriginated) && Boolean.TRUE.equals(visible) && Boolean.FALSE.equals(prevVisible);
     }
 
     protected void addFormatItem(String caption) {
@@ -141,6 +174,27 @@ public class ValueFormatEditor extends AbstractEditor<ReportValueFormat> {
                 MessageType.CONFIRMATION_HTML
                         .modal(false)
                         .width(700f));
+    }
+
+    public void showGroovyEditorDialog() {
+        ScriptEditorDialog editorDialog = (ScriptEditorDialog) screenBuilders.screen(this)
+                .withScreenId("scriptEditorDialog")
+                .withOpenMode(OpenMode.DIALOG)
+                .withOptions(new MapScreenOptions(ParamsMap.of(
+                        "mode", groovyScriptFieldMode,
+                        "suggester", groovyCodeEditor.getSuggester(),
+                        "scriptValue", groovyCodeEditor.getValue(),
+                        "helpVisible", groovyCodeEditor.isVisible(),
+                        "helpMsgKey", "valuesFormats.groovyScriptHelpText"
+                )))
+                .build();
+        editorDialog.addAfterCloseListener(actionId -> {
+            StandardCloseAction closeAction = (StandardCloseAction) actionId.getCloseAction();
+            if (COMMIT_ACTION_ID.equals(closeAction.getActionId())) {
+                groovyCodeEditor.setValue(editorDialog.getValue());
+            }
+        });
+        editorDialog.show();
     }
 
 }
