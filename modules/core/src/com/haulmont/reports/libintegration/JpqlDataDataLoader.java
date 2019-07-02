@@ -110,7 +110,7 @@ public class JpqlDataDataLoader extends AbstractDbDataLoader implements ReportDa
 
     @Override
     protected String insertParameterToQuery(String query, QueryParameter parameter) {
-        query = query.replaceAll(parameter.getParamRegexp(), "?" + parameter.getPosition());
+        query = query.replaceFirst(parameter.getParamRegexp(), "?" + parameter.getPosition());
         return query;
     }
 
