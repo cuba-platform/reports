@@ -26,7 +26,7 @@
     </dsContext>
 
     <layout spacing="true">
-        <grid id="gridLayout" spacing="true" width="500px">
+        <grid id="gridLayout" spacing="true" width="700px">
             <columns count="1"/>
             <rows>
                 <row>
@@ -51,14 +51,22 @@
                     </hbox>
                 </row>
                 <row>
-                    <sourceCodeEditor id="groovyCodeEditor" height="200px" width="100%"
-                                      visible="false"
-                                      required="true"
-                                      caption="msg://valuesFormats.groovyScript"
-                                      requiredMessage="msg://groovyScriptMsg"
-                                      datasource="valuesFormatsDs"
-                                      property="formatString"
-                                      mode="Groovy"/>
+                    <vbox id="groovyVBox"
+                          visible="false">
+                        <hbox width="100%">
+                            <label value="msg://valuesFormats.groovyScript"/>
+                            <linkButton id="groovyFullScreenLinkButton"
+                                        align="MIDDLE_RIGHT"
+                                        caption="msg://dataSet.fullScreen"
+                                        invoke="showGroovyEditorDialog"/>
+                        </hbox>
+                        <sourceCodeEditor id="groovyCodeEditor" height="200px" width="100%"
+                                          required="true"
+                                          requiredMessage="msg://groovyScriptMsg"
+                                          datasource="valuesFormatsDs"
+                                          property="formatString"
+                                          mode="Groovy"/>
+                    </vbox>
                 </row>
             </rows>
         </grid>
