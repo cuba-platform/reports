@@ -18,8 +18,8 @@ package com.haulmont.reports.libintegration;
 import com.haulmont.yarg.loaders.impl.AbstractDbDataLoader;
 import com.haulmont.yarg.structure.BandData;
 import com.haulmont.yarg.structure.ReportQuery;
-import junit.framework.Assert;
 import org.apache.commons.lang3.StringUtils;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.HashMap;
@@ -34,25 +34,19 @@ public class JpqlDataLoaderQueryTransformationTest extends JpqlDataDataLoader {
     }
 
     @Test
-    public void testFindOutputParams() throws Exception {
-        String query = "select \n" +
-                "t.num as num, \n" +
-                "t.id\n" +
-                "as    blabla_id \n" +
-                "from tm$Task t";
+    public void testFindOutputParams() {
+        String query = "select t.num as num, t.id as blabla_id from tm$Task t";
         List<OutputValue> outputFields = parseQueryOutputParametersNames(query);
         Assert.assertEquals(2, outputFields.size());
         for (OutputValue outputField : outputFields) {
-             Assert.assertTrue(outputField.getValueName().equals("blabla_id") || outputField.getValueName().equals("num"));
+            Assert.assertTrue(outputField.getValueName().equals("blabla_id") || outputField.getValueName().equals("num"));
         }
     }
 
     @Test
-    public void testReplaceParamsConditions() throws Exception {
-        String query = "select id as id\n" +
-                "from tm$Task t\n" +
-                "where t.id  =  ${param1} and t.id  >  ${param2} and t1.id like \n" +
-                "${param3} and t1.id = ${Root.parentBandParam}";
+    public void testReplaceParamsConditions() {
+        String query = "select id as id from tm$Task t " +
+                "where t.id = ${param1} and t.id > ${param2} and t1.id like ${param3} and t1.id = ${Root.parentBandParam}";
 
         HashMap<String, Object> params = new HashMap<>();
         params.put("param1", null);
@@ -72,5 +66,18 @@ public class JpqlDataLoaderQueryTransformationTest extends JpqlDataDataLoader {
         queryPack = prepareQuery(query, new BandData(""), params);
         System.out.println(queryPack.getQuery());
         Assert.assertEquals(3, StringUtils.countMatches(queryPack.getQuery(), "?"));
+    }
+
+    @Test
+    public void testReplaceIndenticalConditions() {
+        String query = "select t from tm$Task t where t.dateStart != ${param} and t.dateEnd != ${param}";
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("param", "14.06.2019");
+
+        AbstractDbDataLoader.QueryPack queryPack = prepareQuery(query, new BandData(""), params);
+        Assert.assertEquals(2, queryPack.getParams().length);
+        Assert.assertEquals(1, StringUtils.countMatches(queryPack.getQuery(), "?1"));
+        Assert.assertEquals(1, StringUtils.countMatches(queryPack.getQuery(), "?2"));
     }
 }
