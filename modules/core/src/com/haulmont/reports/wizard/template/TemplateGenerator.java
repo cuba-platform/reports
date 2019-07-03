@@ -66,6 +66,9 @@ public class TemplateGenerator implements TemplateGeneratorApi {
             case CSV:
                 generator = new CsvGenerator();
                 break;
+            case TABLE:
+                generator = new TableGenerator();
+                break;
             default:
                 throw new TemplateGenerationException(templateFileType + " format is unsupported yet");
         }
