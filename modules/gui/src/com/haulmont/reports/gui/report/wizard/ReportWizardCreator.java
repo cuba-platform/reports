@@ -499,6 +499,9 @@ public class ReportWizardCreator extends AbstractWindow implements MainWizardFra
                 .put(TemplateFileType.CSV, new ImmutableMap.Builder<String, ReportOutputType>()
                         .put(messages.getMessage(ReportOutputType.CSV), ReportOutputType.CSV)
                         .build())
+                .put(TemplateFileType.TABLE, new ImmutableMap.Builder<String, ReportOutputType>()
+                        .put(messages.getMessage(ReportOutputType.TABLE), ReportOutputType.TABLE)
+                        .build())
                 .build();
     }
 
