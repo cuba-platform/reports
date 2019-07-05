@@ -154,7 +154,7 @@ public class ValueFormatEditor extends AbstractEditor<ReportValueFormat> {
     protected void postInit() {
         String value = formatField.getValue();
         if (value != null) {
-            if (!formatField.getOptionsMap().containsValue(value)) {
+            if (!formatField.getOptionsMap().containsValue(value) && Boolean.FALSE.equals(groovyCheckBox.isChecked())) {
                 addFormatItem(value);
             }
             formatField.setValue(value);
