@@ -91,7 +91,7 @@ create table REPORT_TEMPLATE
   CUSTOM_CLASS text,
   OUTPUT_NAME_PATTERN varchar(255),
   NAME varchar(500),
-  CONTENT blob,
+  CONTENT mediumblob,
   --
   primary key (ID),
   constraint FK_REPORT_TEMPLATE_TO_REPORT foreign key (REPORT_ID)

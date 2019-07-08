@@ -1,0 +1,1 @@
+alter table REPORT_TEMPLATE change CONTENT CONTENT mediumblob^
