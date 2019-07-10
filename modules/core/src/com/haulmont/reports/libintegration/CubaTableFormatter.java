@@ -56,25 +56,25 @@ public class CubaTableFormatter extends AbstractFormatter {
         try {
             IOUtils.write(serializedData, outputStream);
         } catch (IOException e) {
-            throw new RuntimeException("An error occurred while rendering chart",e);
+            throw new RuntimeException("An error occurred while rendering chart", e);
         }
     }
 
     protected CubaTableData transformData(BandData rootBand) {
         Map<String, List<KeyValueEntity>> transformedData = new LinkedHashMap<>();
-        Map<String, Set<Pair<String, Class>>> headerMap = new HashMap<>();
+        Map<String, List<Pair<String, Class>>> headerMap = new HashMap<>();
         Map<String, List<BandData>> childrenBands = rootBand.getChildrenBands();
         childrenBands.forEach((bandName, bandDataList) -> {
             if (!bandName.startsWith(HEADER_BAND_PREFIX)) {
                 List<KeyValueEntity> entities = new ArrayList<>();
-                Set<Pair<String, Class>> headers = new HashSet<>();
-                Set<String> emptyHeaders = new HashSet<>();
+                Set<Pair<String, Class>> headers = new LinkedHashSet<>();
 
                 bandDataList.forEach(bandData -> {
                     Map<String, Object> data = bandData.getData();
                     final Instance instance;
                     final String pkName;
                     final boolean pkInView;
+
                     if (data instanceof EntityMap) {
                         instance = ((EntityMap) data).getInstance();
                         pkName = metadata.getTools().getPrimaryKeyName(instance.getMetaClass());
@@ -85,13 +85,15 @@ public class CubaTableFormatter extends AbstractFormatter {
                         pkName = null;
                         pkInView = false;
                     }
+
                     KeyValueEntity entityRow = new KeyValueEntity();
 
                     data.forEach((name, value) -> {
                         if (!INSTANCE_NAME_KEY.equals(name)) {
                             if (pkName == null || !pkName.equals(name) || pkInView) {
-                                if (instance != null)
+                                if (instance != null) {
                                     name = messageTools.getPropertyCaption(instance.getMetaClass(), name);
+                                }
                                 checkInstanceNameLoaded(value);
                                 entityRow.setValue(name, value);
                             }
@@ -102,13 +104,17 @@ public class CubaTableFormatter extends AbstractFormatter {
                         data.forEach((name, value) -> {
                             if (!INSTANCE_NAME_KEY.equals(name)) {
                                 if (pkName == null || !pkName.equals(name) || pkInView) {
-                                    if (instance != null)
+                                    if (instance != null) {
                                         name = messageTools.getPropertyCaption(instance.getMetaClass(), name);
+                                    }
 
-                                    if (name != null && value != null)
+                                    if (name != null && value != null) {
                                         headers.add(new Pair<>(name, value.getClass()));
-                                    if (name != null && value == null)
-                                        emptyHeaders.add(name);
+                                    }
+
+                                    if (name != null && value == null) {
+                                        headers.add(new Pair<>(name, String.class));
+                                    }
                                 }
                             }
                         });
@@ -116,15 +122,13 @@ public class CubaTableFormatter extends AbstractFormatter {
                     entities.add(entityRow);
                 });
 
-                emptyHeaders.forEach(header -> {
-                    if (!containsHeader(headers, header))
-                        headers.add(new Pair<>(header, String.class));
-                });
-
                 headers.removeIf(pair -> containsLowerCaseDuplicate(pair, headers));
 
+                List<Pair<String, Class>> headersList = new LinkedList<>(headers);
+                Collections.reverse(headersList);
+
                 transformedData.put(bandName, entities);
-                headerMap.put(bandName, headers);
+                headerMap.put(bandName, headersList);
             }
         });
 
@@ -152,18 +156,9 @@ public class CubaTableFormatter extends AbstractFormatter {
 
         try {
             ((Entity) value).getInstanceName();
-        }
-        catch (RuntimeException e) {
+        } catch (RuntimeException e) {
             throw new ReportFormattingException("Cannot fetch instance name for entity " + value.getClass()
                     + ". Please add all attributes used at instance name to report configuration.", e);
         }
-    }
-
-    protected boolean containsHeader(Set<Pair<String, Class>> headers, String header) {
-        for (Pair<String, Class> pair : headers) {
-            if (pair.getFirst().equals(header))
-                return true;
-        }
-        return false;
     }
 }
