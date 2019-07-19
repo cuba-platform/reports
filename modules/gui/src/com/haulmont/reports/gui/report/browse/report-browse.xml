@@ -63,6 +63,7 @@
                 <button id="import" icon="icons/upload.png" description="msg://button.import"/>
                 <button id="export" icon="icons/download.png" description="msg://export"/>
                 <button id="runReport" icon="icons/run.png"/>
+                <button id="executionsButton" action="table.executions"/>
             </buttonsPanel>
             <rowsCount/>
             <columns>

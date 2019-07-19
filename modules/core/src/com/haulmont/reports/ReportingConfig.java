@@ -21,6 +21,7 @@ import com.haulmont.cuba.core.config.Property;
 import com.haulmont.cuba.core.config.Source;
 import com.haulmont.cuba.core.config.SourceType;
 import com.haulmont.cuba.core.config.defaults.DefaultBoolean;
+import com.haulmont.cuba.core.config.defaults.DefaultInt;
 import com.haulmont.cuba.core.config.defaults.DefaultInteger;
 import com.haulmont.cuba.core.config.defaults.DefaultString;
 import com.haulmont.cuba.core.config.type.CommaSeparatedStringListTypeFactory;
@@ -188,4 +189,34 @@ public interface ReportingConfig extends Config {
     Boolean getUseReadOnlyTransactionForGroovy();
 
     void setUseReadOnlyTransactionForGroovy(Boolean useReadOnlyTransactionForGroovy);
+
+    /**
+     * Flag to enable execution history recording.
+     */
+    @Property("reporting.executionHistory.enabled")
+    @DefaultBoolean(false)
+    @Source(type = SourceType.DATABASE)
+    boolean isHistoryRecordingEnabled();
+    void setHistoryRecordingEnabled(boolean historyRecordingEnabled);
+
+    /**
+     * Report execution history deletes all history items older than this number of days.
+     * Value == 0 means no cleanup by this criteria.
+     */
+    @Property("reporting.executionHistory.cleanup.days")
+    @DefaultInt(2 * 365)
+    @Source(type = SourceType.DATABASE)
+    int getHistoryCleanupMaxDays();
+    void setHistoryCleanupMaxDays(int historyCleanupMaxDays);
+
+    /**
+     * Report execution cleanup leaves only this number of execution history items for each report,
+     * deleting all older items.
+     * Value == 0 means no cleanup by this criteria.
+     */
+    @Property("reporting.executionHistory.cleanup.itemsPerReport")
+    @DefaultInt(1000)
+    @Source(type = SourceType.DATABASE)
+    int getHistoryCleanupMaxItemsPerReport();
+    void setHistoryCleanupMaxItemsPerReport(int historyCleanupMaxItemsPerReport);
 }

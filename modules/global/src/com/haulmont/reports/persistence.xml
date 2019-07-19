@@ -21,6 +21,7 @@
         <class>com.haulmont.reports.entity.ReportTemplate</class>
         <class>com.haulmont.reports.entity.Report</class>
         <class>com.haulmont.reports.entity.ReportGroup</class>
+        <class>com.haulmont.reports.entity.ReportExecution</class>
 
         <properties/>
     </persistence-unit>
