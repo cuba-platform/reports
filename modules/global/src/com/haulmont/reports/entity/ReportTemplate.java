@@ -22,6 +22,7 @@ import com.haulmont.cuba.core.entity.annotation.SystemLevel;
 import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.reports.entity.charts.AbstractChartDescription;
 import com.haulmont.reports.entity.pivottable.PivotTableDescription;
+import com.haulmont.reports.entity.table.TemplateTableDescription;
 import com.haulmont.yarg.formatters.CustomReport;
 import org.apache.commons.lang3.StringUtils;
 
@@ -244,6 +245,20 @@ public class ReportTemplate extends StandardEntity implements com.haulmont.yarg.
             setName(".chart");
         }
     }
+
+    public TemplateTableDescription getTemplateTableDescription() {
+        if (getContent() == null)
+            return null;
+        return TemplateTableDescription.fromJsonString(new String(getContent(), StandardCharsets.UTF_8));
+    }
+
+    public void setTemplateTableDescription(TemplateTableDescription description) {
+        if (description != null && getReportOutputType() == ReportOutputType.TABLE) {
+            setContent(TemplateTableDescription.toJsonString(description).getBytes(StandardCharsets.UTF_8));
+            setName(".table");
+        }
+    }
+
 
     public PivotTableDescription getPivotTableDescription() {
         if (getContent() == null)

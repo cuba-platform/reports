@@ -96,6 +96,9 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
     protected PivotTableEditFrame pivotTableEdit;
 
     @Inject
+    protected TableEditFrame tableEdit;
+
+    @Inject
     protected NotPersistenceDatasource<ReportTemplate> templateDs;
 
     @Inject
@@ -187,6 +190,7 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
         super.ready();
         ReportTemplate reportTemplate = getItem();
         initTemplateEditor(reportTemplate);
+        tableEdit.setItem(reportTemplate);
         getDescriptionEditFrames().forEach(controller -> controller.setItem(reportTemplate));
         setupVisibility(reportTemplate.getCustom(), reportTemplate.getReportOutputType());
     }
@@ -199,6 +203,10 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
         return reportOutputType != ReportOutputType.CHART
                 && reportOutputType != ReportOutputType.TABLE
                 && reportOutputType != ReportOutputType.PIVOT_TABLE;
+    }
+
+    protected boolean hasTableTemplateOutput(ReportOutputType reportOutputType){
+        return reportOutputType == ReportOutputType.TABLE;
     }
 
     protected boolean hasChartTemplateOutput(ReportOutputType reportOutputType) {
@@ -242,6 +250,15 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
         visibleTemplateEditor(reportOutputType);
 
         setupVisibilityDescriptionEdit(enabled, reportOutputType);
+        setupVisibilityTableEdit(reportOutputType);
+    }
+
+    protected void setupVisibilityTableEdit(ReportOutputType reportOutputType) {
+        boolean visible = hasTableTemplateOutput(reportOutputType);
+
+        custom.setVisible(!visible);
+        isCustomLabel.setVisible(!visible);
+        tableEdit.setVisible(visible);
     }
 
     protected void setupTemplateTypeVisibility(boolean visibility) {
@@ -386,8 +403,12 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
             reportTemplate.setCustomDefinition("");
         }
 
-        if (reportTemplate.getReportOutputType() == ReportOutputType.TABLE) {
+        if (hasTableTemplateOutput(reportTemplate.getReportOutputType())) {
             reportTemplate.setName(".table");
+
+            if(!tableEdit.applyChanges(reportTemplate)){
+                return false;
+            }
         }
 
         String extension = FilenameUtils.getExtension(templateUploadField.getFileName());

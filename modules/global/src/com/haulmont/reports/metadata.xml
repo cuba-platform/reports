@@ -34,6 +34,9 @@
         <class>com.haulmont.reports.entity.pivottable.PivotTableAggregation</class>
         <class>com.haulmont.reports.entity.pivottable.PivotTableProperty</class>
         <class>com.haulmont.reports.entity.pivottable.PivotTableDescription</class>
+        <class>com.haulmont.reports.entity.table.TemplateTableDescription</class>
+        <class>com.haulmont.reports.entity.table.TemplateTableBand</class>
+        <class>com.haulmont.reports.entity.table.TemplateTableColumn</class>
     </metadata-model>
 
 </metadata>

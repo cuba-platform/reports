@@ -109,6 +109,9 @@
                     <frame id="chartEdit" screen="report$ChartEdit" visible="false" width="100%"/>
                     <frame id="pivotTableEdit" screen="report$PivotTableEdit" visible="false" width="100%"/>
                 </hbox>
+                <hbox>
+                    <frame id="tableEdit" screen="report$TableEditFrame" visible="false" width="100%"/>
+                </hbox>
             </vbox>
             <vbox id="previewBox" visible="false"/>
         </hbox>
