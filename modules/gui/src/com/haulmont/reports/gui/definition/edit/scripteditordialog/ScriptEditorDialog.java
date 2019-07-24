@@ -22,6 +22,7 @@ import com.haulmont.cuba.gui.components.autocomplete.Suggester;
 
 import javax.inject.Inject;
 import java.util.Map;
+import java.util.function.Consumer;
 
 public class ScriptEditorDialog extends AbstractWindow {
 
@@ -35,16 +36,10 @@ public class ScriptEditorDialog extends AbstractWindow {
     protected String scriptValue;
 
     @WindowParam
-    protected boolean helpVisible;
-
-    @WindowParam
-    protected String helpMsgKey;
+    protected Consumer<HasContextHelp.ContextHelpIconClickEvent> helpHandler;
 
     @Inject
     protected SourceCodeEditor editor;
-
-    @Inject
-    protected LinkButton textHelp;
 
     @Override
     public void init(Map<String, Object> params) {
@@ -52,7 +47,7 @@ public class ScriptEditorDialog extends AbstractWindow {
         editor.setSuggester(suggester);
         editor.setValue(scriptValue);
         editor.setHandleTabKey(true);
-        textHelp.setVisible(helpVisible);
+        editor.setContextHelpIconClickHandler(helpHandler);
 
         addAction(new AbstractAction("windowCommit") {
             @Override
@@ -80,12 +75,5 @@ public class ScriptEditorDialog extends AbstractWindow {
 
     public String getValue() {
         return editor.getValue();
-    }
-
-    public void getTextHelp() {
-        showMessageDialog(getMessage("dataSet.text"), getMessage(helpMsgKey),
-                MessageType.CONFIRMATION_HTML
-                        .modal(false)
-                        .width(700f));
     }
 }

@@ -18,9 +18,11 @@ package com.haulmont.reports.gui.template.edit.pivottable.aggregation.edit;
 
 import com.haulmont.cuba.gui.WindowParam;
 import com.haulmont.cuba.gui.components.AbstractEditor;
+import com.haulmont.cuba.gui.components.SourceCodeEditor;
 import com.haulmont.cuba.gui.components.ValidationErrors;
 import com.haulmont.reports.entity.pivottable.PivotTableAggregation;
 
+import javax.inject.Inject;
 import java.util.Collection;
 import java.util.Objects;
 
@@ -28,6 +30,18 @@ public class PivotTableAggregationEdit extends AbstractEditor<PivotTableAggregat
 
     @WindowParam
     protected Collection<PivotTableAggregation> existingItems;
+    @Inject
+    protected SourceCodeEditor sourceCodeEditor;
+
+    @Override
+    protected void postInit(){
+        super.postInit();
+        sourceCodeEditor.setContextHelpIconClickHandler(e ->
+                showMessageDialog(getMessage("pivotTable.functionHelpCaption"), getMessage("pivotTable.aggregationFunctionHelp"),
+                        MessageType.CONFIRMATION_HTML
+                                .modal(false)
+                                .width(560f)));
+    }
 
     @Override
     protected boolean preCommit() {
@@ -45,13 +59,6 @@ public class PivotTableAggregationEdit extends AbstractEditor<PivotTableAggregat
             return true;
         }
         return false;
-    }
-
-    public void getFunctionHelp() {
-        showMessageDialog(getMessage("pivotTable.functionHelpCaption"), getMessage("pivotTable.aggregationFunctionHelp"),
-                MessageType.CONFIRMATION_HTML
-                        .modal(false)
-                        .width(560f));
     }
 
     @Override

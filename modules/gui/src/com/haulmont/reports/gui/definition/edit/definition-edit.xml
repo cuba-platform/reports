@@ -63,7 +63,7 @@
             </vbox>
             <!-- Split -->
             <vbox id="editPane" margin="false;false;false;true" height="100%" spacing="true">
-                <vbox id="textBox" expand="textHBox" height="100%" spacing="true">
+                <vbox id="textBox" expand="text" height="100%" spacing="true">
                     <hbox spacing="true"
                           width="100%">
                         <label id="dataSetTextLabel"
@@ -72,20 +72,18 @@
                                     caption="msg://dataSet.fullScreen"
                                     invoke="showDataSetScriptEditorDialog"/>
                     </hbox>
-                    <hbox id="textHBox" width="100%" expand="text">
-                        <sourceCodeEditor id="text" datasource="dataSetsDs" property="text"
-                                          mode="Text" height="100%"/>
-                        <linkButton id="textHelp" icon="icons/question-white.png" invoke="getTextHelp"/>
-                    </hbox>
+                    <sourceCodeEditor id="text" datasource="dataSetsDs" property="text"
+                                      mode="Text" width="100%"/>
+
                     <hbox id="textParamsBox" spacing="true">
                         <textField id="linkParameterName" width="${width}"
                                    datasource="dataSetsDs"
                                    property="linkParameterName"
                                    caption="msg://dataSet.linkParameterName"/>
                         <lookupField id="dataStore" width="${width}"
-                                   datasource="dataSetsDs"
-                                   property="dataStore"
-                                   caption="msg://dataSet.dataStore"/>
+                                     datasource="dataSetsDs"
+                                     property="dataStore"
+                                     caption="msg://dataSet.dataStore"/>
                     </hbox>
                     <checkBox id="processTemplate"
                               datasource="dataSetsDs"
@@ -100,11 +98,13 @@
                     <rows>
                         <row>
                             <label id="entitiesParamLabel" align="MIDDLE_LEFT" value="msg://dataSet.entitiesParamName"/>
-                            <lookupField id="entitiesParamLookup" datasource="dataSetsDs" property="listEntitiesParamName"/>
+                            <lookupField id="entitiesParamLookup" datasource="dataSetsDs"
+                                         property="listEntitiesParamName"/>
                         </row>
                         <row>
                             <label id="entityParamLabel" align="MIDDLE_LEFT" value="msg://dataSet.entityParamName"/>
-                            <lookupField id="entityParamLookup" width="${width}" datasource="dataSetsDs" property="entityParamName"/>
+                            <lookupField id="entityParamLookup" width="${width}" datasource="dataSetsDs"
+                                         property="entityParamName"/>
                         </row>
                         <row>
                             <button id="viewEditButton" caption="msg://dataSet.editView"/>
@@ -125,20 +125,19 @@
                 <vbox id="jsonDataSetTypeVBox" spacing="true" height="100%">
                     <label value="msg://dataSet.jsonSourceType"/>
                     <lookupField id="jsonSourceTypeField"
-                                     datasource="dataSetsDs"
-                                     property="jsonSourceType"
-                                     width="${width}"/>
+                                 datasource="dataSetsDs"
+                                 property="jsonSourceType"
+                                 width="${width}"/>
                     <label id="jsonPathQueryLabel" value="msg://dataSet.jsonPathQuery"/>
-                    <hbox id="jsonPathQueryHBox" width="100%" expand="jsonPathQueryTextAreaField">
-                        <textArea id="jsonPathQueryTextAreaField" rows="3"
-                                  datasource="dataSetsDs"
-                                  property="jsonPathQuery"
-                                  required="true"
-                                  requiredMessage="msg://dataSet.jsonPathQueryText"/>
-                        <linkButton id="jsonPathQueryHelp" icon="icons/question-white.png" invoke="getJsonPathQueryHelp"/>
-                    </hbox>
+                    <textArea id="jsonPathQueryTextAreaField" rows="3"
+                              datasource="dataSetsDs"
+                              property="jsonPathQuery"
+                              required="true"
+                              width="100%"
+                              requiredMessage="msg://dataSet.jsonPathQueryText"/>
+
                     <vbox id="jsonSourceGroovyCodeVBox"
-                          expand="jsonSourceGroovyCodeHBox"
+                          expand="jsonGroovyCodeEditor"
                           spacing="true">
                         <hbox width="100%">
                             <label value="msg://dataSet.text"/>
@@ -146,13 +145,10 @@
                                         caption="msg://dataSet.fullScreen"
                                         invoke="showJsonScriptEditorDialog"/>
                         </hbox>
-                        <hbox id="jsonSourceGroovyCodeHBox" expand="jsonGroovyCodeEditor" width="100%">
-                            <sourceCodeEditor id="jsonGroovyCodeEditor" height="100%"
-                                              datasource="dataSetsDs"
-                                              property="jsonSourceText"
-                                              mode="Groovy"/>
-                            <linkButton id="jsonSourceGroovyCodeHelp" icon="icons/question-white.png" invoke="getJsonSourceGroovyCodeHelp"/>
-                        </hbox>
+                        <sourceCodeEditor id="jsonGroovyCodeEditor" width="100%"
+                                          datasource="dataSetsDs"
+                                          property="jsonSourceText"
+                                          mode="Groovy"/>
                     </vbox>
                     <vbox id="jsonSourceURLVBox" spacing="true" expand="jsonSourceURLTextArea">
                         <label value="msg://dataSet.urlJsonSource"/>

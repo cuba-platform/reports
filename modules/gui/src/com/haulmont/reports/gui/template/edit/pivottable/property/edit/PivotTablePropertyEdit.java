@@ -18,6 +18,7 @@ package com.haulmont.reports.gui.template.edit.pivottable.property.edit;
 
 import com.haulmont.cuba.gui.components.AbstractEditor;
 import com.haulmont.cuba.gui.components.FieldGroup;
+import com.haulmont.cuba.gui.components.SourceCodeEditor;
 import com.haulmont.cuba.gui.data.Datasource;
 import com.haulmont.reports.entity.pivottable.PivotTableProperty;
 import com.haulmont.reports.entity.pivottable.PivotTablePropertyType;
@@ -29,6 +30,8 @@ public class PivotTablePropertyEdit extends AbstractEditor<PivotTableProperty> {
     protected FieldGroup editGroup;
     @Inject
     protected Datasource<PivotTableProperty> propertyDs;
+    @Inject
+    protected SourceCodeEditor sourceCodeEditor;
 
     @Override
     protected void postInit() {
@@ -39,19 +42,17 @@ public class PivotTablePropertyEdit extends AbstractEditor<PivotTableProperty> {
                 initFunctionField();
             }
         });
+        sourceCodeEditor.setContextHelpIconClickHandler(e ->
+                showMessageDialog(getMessage("pivotTable.functionHelpCaption"), getMessage("pivotTable.propertyFunctionHelp"),
+                        MessageType.CONFIRMATION_HTML
+                                .modal(false)
+                                .width(560f)));
     }
 
     protected void initFunctionField() {
         PivotTableProperty property = getItem();
         editGroup.getFieldNN("function")
                 .setVisible(property.getType() == PivotTablePropertyType.DERIVED);
-    }
-
-    public void getFunctionHelp() {
-        showMessageDialog(getMessage("pivotTable.functionHelpCaption"), getMessage("pivotTable.propertyFunctionHelp"),
-                MessageType.CONFIRMATION_HTML
-                        .modal(false)
-                        .width(560f));
     }
 
     @Override

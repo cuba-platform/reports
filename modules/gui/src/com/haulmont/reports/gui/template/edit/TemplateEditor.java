@@ -139,9 +139,6 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
     @Inject
     protected ScreenBuilders screenBuilders;
 
-    @Inject
-    private LinkButton namePatternTextHelp;
-
     public TemplateEditor() {
         showSaveNotification = false;
     }
@@ -153,15 +150,11 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
         getDialogOptions()
                 .setWidthAuto()
                 .setResizable(true);
-        namePatternTextHelp.setAction(new AbstractAction("") {
-            @Override
-            public void actionPerform(Component component) {
+        outputNamePattern.setContextHelpIconClickHandler(e ->
                 showMessageDialog(getMessage("template.namePatternText"), getMessage("template.namePatternTextHelp"),
                         MessageType.CONFIRMATION_HTML
                                 .modal(false)
-                                .width(560f));
-            }
-        });
+                                .width(560f)));
 
         Map<String, Boolean> groovyOptions = new HashMap<>();
         groovyOptions.put(getMessage("template.freemarkerType"), Boolean.FALSE);
@@ -274,7 +267,6 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
         templateFileLabel.setVisible(templateOutputVisibility);
         outputNamePattern.setVisible(templateOutputVisibility);
         outputNamePatternLabel.setVisible(templateOutputVisibility);
-        namePatternTextHelp.setVisible(templateOutputVisibility);
 
         setupTemplateTypeVisibility(templateOutputVisibility);
 

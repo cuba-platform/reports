@@ -21,17 +21,9 @@
     <dialogMode height="700"
                 resizable="true"
                 width="1200"/>
-    <layout expand="editorBox"
+    <layout expand="editor"
             spacing="true">
-        <hbox id="editorBox"
-              expand="editor"
-              width="100%">
-            <sourceCodeEditor id="editor"
-                              height="100%"/>
-            <linkButton id="textHelp"
-                        icon="icons/question-white.png"
-                        invoke="getTextHelp"/>
-        </hbox>
+        <sourceCodeEditor id="editor" width="100%"/>
         <frame id="windowActions"
                screen="editWindowActions"/>
     </layout>

@@ -60,10 +60,6 @@ public class BandDefinitionEditor extends AbstractFrame implements Suggester {
     @Inject
     protected SourceCodeEditor jsonGroovyCodeEditor;
     @Inject
-    protected LinkButton jsonSourceGroovyCodeHelp;
-    @Named("textHelp")
-    protected LinkButton dataSetHelpField;
-    @Inject
     protected BoxLayout textBox;
     @Inject
     protected Label entitiesParamLabel;
@@ -77,8 +73,6 @@ public class BandDefinitionEditor extends AbstractFrame implements Suggester {
     protected VBoxLayout jsonDataSetTypeVBox;
     @Inject
     protected Label jsonPathQueryLabel;
-    @Inject
-    protected HBoxLayout jsonPathQueryHBox;
     @Inject
     protected VBoxLayout jsonSourceGroovyCodeVBox;
     @Inject
@@ -131,6 +125,8 @@ public class BandDefinitionEditor extends AbstractFrame implements Suggester {
     protected Configuration configuration;
     @Inject
     private Security security;
+    @Inject
+    protected TextArea jsonPathQueryTextAreaField;
 
     protected SourceCodeEditor.Mode dataSetScriptFieldMode = SourceCodeEditor.Mode.Text;
 
@@ -144,8 +140,7 @@ public class BandDefinitionEditor extends AbstractFrame implements Suggester {
                 WindowManager.OpenType.DIALOG,
                 ParamsMap.of(
                         "scriptValue", jsonGroovyCodeEditor.getValue(),
-                        "helpVisible", jsonSourceGroovyCodeHelp.isVisible(),
-                        "helpMsgKey", "dataSet.jsonSourceGroovyCodeHelp"
+                        "helpHandler", jsonGroovyCodeEditor.getContextHelpIconClickHandler()
                 ));
         editorDialog.addCloseListener(actionId -> {
             if (Window.COMMIT_ACTION_ID.equals(actionId)) {
@@ -162,8 +157,7 @@ public class BandDefinitionEditor extends AbstractFrame implements Suggester {
                         "mode", dataSetScriptFieldMode,
                         "suggester", dataSetScriptField.getSuggester(),
                         "scriptValue", dataSetScriptField.getValue(),
-                        "helpVisible", dataSetHelpField.isVisible(),
-                        "helpMsgKey", "dataSet.textHelp"
+                        "helpHandler", dataSetScriptField.getContextHelpIconClickHandler()
                 ));
         editorDialog.addCloseListener(actionId -> {
             if (Window.COMMIT_ACTION_ID.equals(actionId)) {
@@ -217,6 +211,21 @@ public class BandDefinitionEditor extends AbstractFrame implements Suggester {
         initDataStoreField();
 
         initSourceCodeOptions();
+
+        initHelpButtons();
+    }
+
+    protected void initHelpButtons() {
+        jsonGroovyCodeEditor.setContextHelpIconClickHandler(e ->
+                showMessageDialog(getMessage("dataSet.text"), getMessage("dataSet.jsonSourceGroovyCodeHelp"),
+                        MessageType.CONFIRMATION_HTML
+                                .modal(false)
+                                .width(700f)));
+        jsonPathQueryTextAreaField.setContextHelpIconClickHandler(e ->
+                showMessageDialog(getMessage("dataSet.text"), getMessage("dataSet.jsonPathQueryHelp"),
+                        MessageType.CONFIRMATION_HTML
+                                .modal(false)
+                                .width(700f)));
     }
 
     protected void initSourceCodeOptions() {
@@ -230,7 +239,7 @@ public class BandDefinitionEditor extends AbstractFrame implements Suggester {
         jsonDataSetTypeVBox.removeAll();
         jsonDataSetTypeVBox.add(jsonSourceTypeField);
         jsonDataSetTypeVBox.add(jsonPathQueryLabel);
-        jsonDataSetTypeVBox.add(jsonPathQueryHBox);
+        jsonDataSetTypeVBox.add(jsonPathQueryTextAreaField);
 
         if (dataSet.getJsonSourceType() == null) {
             dataSet.setJsonSourceType(JsonSourceType.GROOVY_SCRIPT);
@@ -251,27 +260,6 @@ public class BandDefinitionEditor extends AbstractFrame implements Suggester {
                 jsonDataSetTypeVBox.expand(spacer);
                 break;
         }
-    }
-
-    public void getTextHelp() {
-        showMessageDialog(getMessage("dataSet.text"), getMessage("dataSet.textHelp"),
-                MessageType.CONFIRMATION_HTML
-                        .modal(false)
-                        .width(700f));
-    }
-
-    public void getJsonSourceGroovyCodeHelp() {
-        showMessageDialog(getMessage("dataSet.text"), getMessage("dataSet.jsonSourceGroovyCodeHelp"),
-                MessageType.CONFIRMATION_HTML
-                        .modal(false)
-                        .width(700f));
-    }
-
-    public void getJsonPathQueryHelp() {
-        showMessageDialog(getMessage("dataSet.text"), getMessage("dataSet.jsonPathQueryHelp"),
-                MessageType.CONFIRMATION_HTML
-                        .modal(false)
-                        .width(700f));
     }
 
     protected void initDataStoreField() {
@@ -491,28 +479,32 @@ public class BandDefinitionEditor extends AbstractFrame implements Suggester {
                     dataSetScriptFieldMode = SourceCodeEditor.Mode.SQL;
                     dataSetScriptField.setMode(SourceCodeEditor.Mode.SQL);
                     dataSetScriptField.setSuggester(null);
-                    dataSetHelpField.setVisible(false);
+                    dataSetScriptField.setContextHelpIconClickHandler(null);
                     break;
 
                 case GROOVY:
                     dataSetScriptFieldMode = SourceCodeEditor.Mode.Groovy;
                     dataSetScriptField.setSuggester(null);
                     dataSetScriptField.setMode(SourceCodeEditor.Mode.Groovy);
-                    dataSetHelpField.setVisible(true);
+                    dataSetScriptField.setContextHelpIconClickHandler(e ->
+                            showMessageDialog(getMessage("dataSet.text"), getMessage("dataSet.textHelp"),
+                                    MessageType.CONFIRMATION_HTML
+                                            .modal(false)
+                                            .width(700f)));
                     break;
 
                 case JPQL:
                     dataSetScriptFieldMode = SourceCodeEditor.Mode.Text;
                     dataSetScriptField.setSuggester(processTemplate.isChecked() ? null : this);
                     dataSetScriptField.setMode(SourceCodeEditor.Mode.Text);
-                    dataSetHelpField.setVisible(false);
+                    dataSetScriptField.setContextHelpIconClickHandler(null);
                     break;
 
                 default:
                     dataSetScriptFieldMode = SourceCodeEditor.Mode.Text;
                     dataSetScriptField.setSuggester(null);
                     dataSetScriptField.setMode(SourceCodeEditor.Mode.Text);
-                    dataSetHelpField.setVisible(false);
+                    dataSetScriptField.setContextHelpIconClickHandler(null);
                     break;
             }
         }

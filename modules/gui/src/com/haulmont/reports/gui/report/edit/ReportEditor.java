@@ -78,6 +78,9 @@ public class ReportEditor extends AbstractEditor<Report> {
     @Named("templatesFrame.templatesTable")
     protected Table<ReportTemplate> templatesTable;
 
+    @Named("localesFrame.localeTextField")
+    protected TextArea localesTextField;
+
     @Named("run")
     protected Button run;
 
@@ -125,6 +128,9 @@ public class ReportEditor extends AbstractEditor<Report> {
 
     @Named("parametersFrame.validationScriptGroupBox")
     protected GroupBoxLayout validationScriptGroupBox;
+
+    @Named("parametersFrame.validationScriptCodeEditor")
+    protected SourceCodeEditor validationScriptCodeEditor;
 
     @Inject
     protected WindowConfig windowConfig;
@@ -241,6 +247,7 @@ public class ReportEditor extends AbstractEditor<Report> {
         initRoles();
         initScreens();
         initValuesFormats();
+        initHelpButtons();
     }
 
     protected void initParameters() {
@@ -404,6 +411,19 @@ public class ReportEditor extends AbstractEditor<Report> {
                 return super.isEnabled() && isUpdatePermitted();
             }
         });
+    }
+
+    protected void initHelpButtons(){
+        localesTextField.setContextHelpIconClickHandler(e ->
+                showMessageDialog(getMessage("localeText"), getMessage("report.localeTextHelp"),
+                        MessageType.CONFIRMATION_HTML
+                                .modal(false)
+                                .width(600f)));
+        validationScriptCodeEditor.setContextHelpIconClickHandler(e ->
+                showMessageDialog(getMessage("validationScript"), getMessage("crossFieldValidationScriptHelp"),
+                        MessageType.CONFIRMATION_HTML
+                                .modal(false)
+                                .width(600f)));
     }
 
     protected void initScreens() {

@@ -68,10 +68,7 @@
                                          requiredMessage="msg://template.outputTypeMsg"/>
                         </row>
                         <row id="row5">
-                            <hbox align="MIDDLE_LEFT">
-                                <label id="outputNamePatternLabel" value="msg://template.outputNamePattern"/>
-                                <linkButton id="namePatternTextHelp" icon="icons/question-white.png"/>
-                            </hbox>
+                            <label id="outputNamePatternLabel" value="msg://template.outputNamePattern" align="MIDDLE_LEFT"/>
                             <textField id="outputNamePattern" datasource="templateDs" property="outputNamePattern"
                                        width="${width}">
                                 <validator

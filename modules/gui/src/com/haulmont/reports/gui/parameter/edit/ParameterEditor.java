@@ -70,6 +70,9 @@ public class ParameterEditor extends AbstractEditor<ReportInputParameter> {
     protected SourceCodeEditor transformationScript;
 
     @Inject
+    protected SourceCodeEditor validationScript;
+
+    @Inject
     protected Label<String> transformationScriptLabel;
 
     @Inject
@@ -107,6 +110,9 @@ public class ParameterEditor extends AbstractEditor<ReportInputParameter> {
     @Inject
     protected ParameterClassResolver parameterClassResolver;
 
+    @Inject
+    protected TextArea localeTextField;
+
     protected ReportInputParameter parameter;
 
     protected ParameterFieldCreator parameterFieldCreator = new ParameterFieldCreator(this);
@@ -138,8 +144,28 @@ public class ParameterEditor extends AbstractEditor<ReportInputParameter> {
         initEnumsLookup();
 
         initListeners();
+
+        initHelpButtons();
     }
 
+    protected void initHelpButtons() {
+        localeTextField.setContextHelpIconClickHandler(e ->
+                showMessageDialog(getMessage("localeText"), getMessage("parameter.localeTextHelp"),
+                        MessageType.CONFIRMATION_HTML
+                                .modal(false)
+                                .width(700f)));
+        transformationScript.setContextHelpIconClickHandler(e ->
+                showMessageDialog(getMessage("transformationScript"), getMessage("parameter.transformationScriptHelp"),
+                        MessageType.CONFIRMATION_HTML
+                                .modal(false)
+                                .width(700f)));
+        validationScript.setContextHelpIconClickHandler(e ->
+                showMessageDialog(getMessage("validationScript"), getMessage("validationScriptHelp"),
+                        MessageType.CONFIRMATION_HTML
+                                .modal(false)
+                                .width(700f)));
+    }
+    
     @Override
     public boolean commit() {
         if (super.commit()) {
@@ -177,8 +203,8 @@ public class ParameterEditor extends AbstractEditor<ReportInputParameter> {
             }
 
             if (defaultDateIsCurrentChanged) {
-               initDefaultValueField();
-               initCurrentDateTimeField();
+                initDefaultValueField();
+                initCurrentDateTimeField();
             }
 
             ((DatasourceImplementation<ReportInputParameter>) parameterDs).modified(e.getItem());
@@ -187,7 +213,7 @@ public class ParameterEditor extends AbstractEditor<ReportInputParameter> {
 
     protected void initScreensLookup() {
         ReportInputParameter parameter = getItem();
-        if (parameter.getType() == ParameterType.ENTITY ||  parameter.getType() == ParameterType.ENTITY_LIST) {
+        if (parameter.getType() == ParameterType.ENTITY || parameter.getType() == ParameterType.ENTITY_LIST) {
             Class clazz = parameterClassResolver.resolveClass(parameter);
             if (clazz != null) {
                 Map<String, String> screensMap = screensHelper.getAvailableBrowserScreens(clazz);
@@ -309,34 +335,13 @@ public class ParameterEditor extends AbstractEditor<ReportInputParameter> {
         wildcardsLabel.setVisible(hasPredefinedTransformation);
     }
 
-    public void getValidationScriptHelp() {
-        showMessageDialog(getMessage("validationScript"), getMessage("validationScriptHelp"),
-                MessageType.CONFIRMATION_HTML
-                        .modal(false)
-                        .width(600f));
-    }
-
-    public void getLocaleTextHelp() {
-        showMessageDialog(getMessage("localeText"), getMessage("parameter.localeTextHelp"),
-                MessageType.CONFIRMATION_HTML
-                        .modal(false)
-                        .width(560f));
-    }
-
-    public void getTransformationScriptHelp() {
-        showMessageDialog(getMessage("transformationScript"), getMessage("parameter.transformationScriptHelp"),
-                MessageType.CONFIRMATION_HTML
-                        .modal(false)
-                        .width(560f));
-    }
-
     protected boolean isParameterDateOrTime() {
         ReportInputParameter parameter = getItem();
         return Optional.ofNullable(parameter)
                 .map(reportInputParameter ->
                         ParameterType.DATE.equals(parameter.getType()) ||
-                        ParameterType.DATETIME.equals(parameter.getType()) ||
-                        ParameterType.TIME.equals(parameter.getType()))
+                                ParameterType.DATETIME.equals(parameter.getType()) ||
+                                ParameterType.TIME.equals(parameter.getType()))
                 .orElse(false);
     }
 }
