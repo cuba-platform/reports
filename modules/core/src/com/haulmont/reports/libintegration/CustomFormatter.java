@@ -37,18 +37,20 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.*;
+import java.util.regex.Pattern;
 
 import static java.lang.String.format;
 
 public class CustomFormatter implements com.haulmont.yarg.formatters.CustomReport {
     private static final Logger log = LoggerFactory.getLogger(CustomFormatter.class);
 
+    public static final String PARAMS = "params";
     private static final String ROOT_BAND = "rootBand";
+    private static final String PATH_GROOVY_FILE = "(\\w[\\w\\d_-]*/)*(\\w[\\w\\d-_]*\\.groovy)";
 
     protected static final ScheduledExecutorService executor =
             Executors.newScheduledThreadPool(3,
@@ -106,14 +108,22 @@ public class CustomFormatter implements com.haulmont.yarg.formatters.CustomRepor
     }
 
     protected byte[] generateReportWithScript(BandData rootBand, String customDefinition) {
+        Object result;
+
         if (customDefinition.startsWith("/")) {
             customDefinition = StringUtils.removeStart(customDefinition, "/");
         }
+
         Map<String, Object> scriptParams = new HashMap<>();
-        scriptParams.put("params", params);
+        scriptParams.put(PARAMS, params);
         scriptParams.put(ROOT_BAND, rootBand);
 
-        Object result = scripting.runGroovyScript(customDefinition, scriptParams);
+        if(Pattern.matches(PATH_GROOVY_FILE, customDefinition)) {
+            result = scripting.runGroovyScript(customDefinition, scriptParams);
+        } else {
+            result = scripting.evaluateGroovy(customDefinition, scriptParams);
+        }
+
         if (result instanceof byte[]) {
             return (byte[]) result;
         } else if (result instanceof CharSequence) {
