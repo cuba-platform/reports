@@ -16,19 +16,26 @@
 
 package com.haulmont.reports.gui.template.edit;
 
+import com.haulmont.bali.util.ParamsMap;
 import com.haulmont.cuba.core.entity.FileDescriptor;
 import com.haulmont.cuba.core.global.Metadata;
 import com.haulmont.cuba.core.global.Security;
+import com.haulmont.cuba.gui.ScreenBuilders;
 import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.config.WindowConfig;
+import com.haulmont.cuba.gui.screen.MapScreenOptions;
+import com.haulmont.cuba.gui.screen.OpenMode;
+import com.haulmont.cuba.gui.screen.StandardCloseAction;
 import com.haulmont.cuba.gui.upload.FileUploadingAPI;
 import com.haulmont.cuba.security.entity.EntityOp;
 import com.haulmont.reports.app.service.ReportService;
+import com.haulmont.reports.entity.CustomTemplateDefinedBy;
 import com.haulmont.reports.entity.Report;
 import com.haulmont.reports.entity.ReportOutputType;
 import com.haulmont.reports.entity.ReportTemplate;
 import com.haulmont.reports.gui.ReportPrintHelper;
 import com.haulmont.reports.gui.datasource.NotPersistenceDatasource;
+import com.haulmont.reports.gui.definition.edit.scripteditordialog.ScriptEditorDialog;
 import com.haulmont.reports.gui.report.run.ShowChartController;
 import com.haulmont.reports.gui.report.run.ShowPivotTableController;
 import org.apache.commons.io.FileUtils;
@@ -47,6 +54,10 @@ import java.util.Map;
 
 public class TemplateEditor extends AbstractEditor<ReportTemplate> {
 
+    public static final String CUSTOM_DEFINE_BY = "customDefinedBy";
+    public static final String CUSTOM = "custom";
+    public static final String REPORT_OUTPUT_TYPE = "reportOutputType";
+
     @Inject
     protected Label isCustomLabel;
 
@@ -60,7 +71,13 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
     protected FileUploadField templateUploadField;
 
     @Inject
-    protected TextField customDefinition;
+    protected TextArea customDefinition;
+
+    @Inject
+    protected LinkButton customDefinitionHelpLinkButton;
+
+    @Inject
+    protected LinkButton fullScreenLinkButton;
 
     @Inject
     protected Label customDefinitionLabel;
@@ -117,6 +134,9 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
     protected FileUploadingAPI fileUploading;
 
     @Inject
+    protected ScreenBuilders screenBuilders;
+
+    @Inject
     private LinkButton namePatternTextHelp;
 
     public TemplateEditor() {
@@ -160,18 +180,33 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
         initUploadField();
         templateDs.addItemPropertyChangeListener(e -> {
             ReportTemplate reportTemplate = getItem();
-            if ("reportOutputType".equals(e.getProperty())) {
-                ReportOutputType prevOutputType = (ReportOutputType) e.getPrevValue();
-                ReportOutputType newOutputType = (ReportOutputType) e.getValue();
-                setupVisibility(reportTemplate.getCustom(), newOutputType);
-                if (hasHtmlCsvTemplateOutput(prevOutputType) && !hasTemplateOutput(newOutputType)) {
-                    showMessageDialog(getMessage("templateEditor.warning"), getMessage("templateEditor.clearTemplateMessage"), MessageType.CONFIRMATION);
+            switch (e.getProperty()) {
+                case REPORT_OUTPUT_TYPE: {
+                    ReportOutputType prevOutputType = (ReportOutputType) e.getPrevValue();
+                    ReportOutputType newOutputType = (ReportOutputType) e.getValue();
+                    setupVisibility(reportTemplate.getCustom(), newOutputType);
+                    if (hasHtmlCsvTemplateOutput(prevOutputType) && !hasTemplateOutput(newOutputType)) {
+                        showMessageDialog(getMessage("templateEditor.warning"), getMessage("templateEditor.clearTemplateMessage"), MessageType.CONFIRMATION);
+                    }
+                    break;
                 }
-            } else if ("custom".equals(e.getProperty())) {
-                setupVisibility(Boolean.TRUE.equals(e.getValue()), reportTemplate.getReportOutputType());
+                case CUSTOM: {
+                    setupVisibility(Boolean.TRUE.equals(e.getValue()), reportTemplate.getReportOutputType());
+                    break;
+                }
+                case CUSTOM_DEFINE_BY: {
+                    boolean isGroovyScript = hasScriptCustomDefinedBy(reportTemplate.getCustomDefinedBy());
+                    fullScreenLinkButton.setVisible(isGroovyScript);
+                    customDefinitionHelpLinkButton.setVisible(isGroovyScript);
+                    break;
+                }
             }
         });
         initOutputTypeList();
+    }
+
+    protected boolean hasScriptCustomDefinedBy(CustomTemplateDefinedBy customTemplateDefinedBy) {
+        return CustomTemplateDefinedBy.SCRIPT == customTemplateDefinedBy;
     }
 
     @Override
@@ -203,9 +238,10 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
 
     protected void setupVisibility(boolean customEnabled, ReportOutputType reportOutputType) {
         boolean templateOutputVisibility = hasTemplateOutput(reportOutputType);
-
         boolean chartTemplateOutput = hasChartTemplateOutput(reportOutputType);
         boolean enabled = !chartTemplateOutput && customEnabled;
+        boolean groovyScriptVisibility = enabled && hasScriptCustomDefinedBy(getItem().getCustomDefinedBy());
+
         custom.setVisible(!chartTemplateOutput);
         isCustomLabel.setVisible(!chartTemplateOutput);
 
@@ -213,6 +249,9 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
         customDefinition.setVisible(enabled);
         customDefinedByLabel.setVisible(enabled);
         customDefinitionLabel.setVisible(enabled);
+
+        customDefinitionHelpLinkButton.setVisible(groovyScriptVisibility);
+        fullScreenLinkButton.setVisible(groovyScriptVisibility);
 
         customDefinedBy.setRequired(enabled);
         customDefinedBy.setRequiredMessage(getMessage("templateEditor.customDefinedBy"));
@@ -422,5 +461,32 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
             return false;
         }
         return true;
+    }
+
+    public void showGroovyScriptEditorDialog() {
+        ScriptEditorDialog editorDialog = (ScriptEditorDialog) screenBuilders.screen(this)
+                .withScreenId("scriptEditorDialog")
+                .withOpenMode(OpenMode.DIALOG)
+                .withOptions(new MapScreenOptions(ParamsMap.of(
+                        "mode", SourceCodeEditor.Mode.Groovy,
+                        "scriptValue", customDefinition.getValue(),
+                        "helpVisible", customDefinitionHelpLinkButton.isVisible(),
+                        "helpMsgKey", "templateEditor.textHelpGroovy"
+                )))
+                .build();
+        editorDialog.addAfterCloseListener(actionId -> {
+            StandardCloseAction closeAction = (StandardCloseAction) actionId.getCloseAction();
+            if (COMMIT_ACTION_ID.equals(closeAction.getActionId())) {
+                customDefinition.setValue(editorDialog.getValue());
+            }
+        });
+        editorDialog.show();
+    }
+
+    public void showCustomDefinitionHelp() {
+        showMessageDialog(getMessage("templateEditor.titleHelpGroovy"), getMessage("templateEditor.textHelpGroovy"),
+                MessageType.CONFIRMATION_HTML
+                        .modal(false)
+                        .width(700f));
     }
 }
