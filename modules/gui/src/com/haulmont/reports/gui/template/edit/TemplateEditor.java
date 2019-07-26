@@ -20,9 +20,12 @@ import com.haulmont.bali.util.ParamsMap;
 import com.haulmont.cuba.core.entity.FileDescriptor;
 import com.haulmont.cuba.core.global.Metadata;
 import com.haulmont.cuba.core.global.Security;
-import com.haulmont.cuba.gui.WindowManager;
+import com.haulmont.cuba.gui.ScreenBuilders;
 import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.config.WindowConfig;
+import com.haulmont.cuba.gui.screen.MapScreenOptions;
+import com.haulmont.cuba.gui.screen.OpenMode;
+import com.haulmont.cuba.gui.screen.StandardCloseAction;
 import com.haulmont.cuba.gui.upload.FileUploadingAPI;
 import com.haulmont.cuba.security.entity.EntityOp;
 import com.haulmont.reports.app.service.ReportService;
@@ -74,7 +77,7 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
     protected TextArea customDefinition;
 
     @Inject
-    protected LinkButton textHelpGroovy;
+    protected LinkButton customDefinitionHelpLinkButton;
 
     @Inject
     protected LinkButton fullScreenLinkButton;
@@ -132,6 +135,9 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
 
     @Inject
     protected FileUploadingAPI fileUploading;
+
+    @Inject
+    protected ScreenBuilders screenBuilders;
 
     @Inject
     private LinkButton namePatternTextHelp;
@@ -197,7 +203,9 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
                     break;
                 }
                 case CUSTOM_DEFINE_BY: {
-                    fullScreenLinkButton.setVisible(hasScriptCustomDefinedBy(reportTemplate.getCustomDefinedBy()));
+                    boolean isGroovyScript = hasScriptCustomDefinedBy(reportTemplate.getCustomDefinedBy());
+                    fullScreenLinkButton.setVisible(isGroovyScript);
+                    customDefinitionHelpLinkButton.setVisible(isGroovyScript);
                     break;
                 }
             }
@@ -238,9 +246,10 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
 
     protected void setupVisibility(boolean customEnabled, ReportOutputType reportOutputType) {
         boolean templateOutputVisibility = hasTemplateOutput(reportOutputType);
-
         boolean chartTemplateOutput = hasChartTemplateOutput(reportOutputType);
         boolean enabled = !chartTemplateOutput && customEnabled;
+        boolean groovyScriptVisibility = enabled && hasScriptCustomDefinedBy(getItem().getCustomDefinedBy());
+
         custom.setVisible(!chartTemplateOutput);
         isCustomLabel.setVisible(!chartTemplateOutput);
 
@@ -248,6 +257,9 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
         customDefinition.setVisible(enabled);
         customDefinedByLabel.setVisible(enabled);
         customDefinitionLabel.setVisible(enabled);
+
+        customDefinitionHelpLinkButton.setVisible(groovyScriptVisibility);
+        fullScreenLinkButton.setVisible(groovyScriptVisibility);
 
         customDefinedBy.setRequired(enabled);
         customDefinedBy.setRequiredMessage(getMessage("templateEditor.customDefinedBy"));
@@ -473,23 +485,26 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
     }
 
     public void showGroovyScriptEditorDialog() {
-        ScriptEditorDialog editorDialog = (ScriptEditorDialog) openWindow(
-                "scriptEditorDialog",
-                WindowManager.OpenType.DIALOG,
-                ParamsMap.of(
+        ScriptEditorDialog editorDialog = (ScriptEditorDialog) screenBuilders.screen(this)
+                .withScreenId("scriptEditorDialog")
+                .withOpenMode(OpenMode.DIALOG)
+                .withOptions(new MapScreenOptions(ParamsMap.of(
                         "mode", SourceCodeEditor.Mode.Groovy,
                         "scriptValue", customDefinition.getValue(),
-                        "helpVisible", textHelpGroovy.isVisible(),
+                        "helpVisible", customDefinitionHelpLinkButton.isVisible(),
                         "helpMsgKey", "templateEditor.textHelpGroovy"
-                ));
+                )))
+                .build();
         editorDialog.addAfterCloseListener(actionId -> {
-            if (Window.COMMIT_ACTION_ID.equals(actionId)) {
+            StandardCloseAction closeAction = (StandardCloseAction) actionId.getCloseAction();
+            if (COMMIT_ACTION_ID.equals(closeAction.getActionId())) {
                 customDefinition.setValue(editorDialog.getValue());
             }
         });
+        editorDialog.show();
     }
 
-    public void getTextHelp() {
+    public void showCustomDefinitionHelp() {
         showMessageDialog(getMessage("templateEditor.titleHelpGroovy"), getMessage("templateEditor.textHelpGroovy"),
                 MessageType.CONFIRMATION_HTML
                         .modal(false)
