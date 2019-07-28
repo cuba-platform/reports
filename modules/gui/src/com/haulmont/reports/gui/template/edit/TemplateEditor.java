@@ -190,13 +190,12 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
         super.ready();
         ReportTemplate reportTemplate = getItem();
         initTemplateEditor(reportTemplate);
-        tableEdit.setItem(reportTemplate);
         getDescriptionEditFrames().forEach(controller -> controller.setItem(reportTemplate));
         setupVisibility(reportTemplate.getCustom(), reportTemplate.getReportOutputType());
     }
 
     protected Collection<DescriptionEditFrame> getDescriptionEditFrames() {
-        return Arrays.asList(chartEdit, pivotTableEdit);
+        return Arrays.asList(chartEdit, pivotTableEdit, tableEdit);
     }
 
     protected boolean hasTemplateOutput(ReportOutputType reportOutputType) {
@@ -205,7 +204,7 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
                 && reportOutputType != ReportOutputType.PIVOT_TABLE;
     }
 
-    protected boolean hasTableTemplateOutput(ReportOutputType reportOutputType){
+    protected boolean hasTableTemplateOutput(ReportOutputType reportOutputType) {
         return reportOutputType == ReportOutputType.TABLE;
     }
 
@@ -286,6 +285,10 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
             } else {
                 applicableFrame.hidePreview();
             }
+        }
+
+        if(applicableFrame != null && applicableFrame.getReportTemplate().getReportOutputType() == ReportOutputType.TABLE){
+            applicableFrame.hidePreview();
         }
 
         for (DescriptionEditFrame frame : getDescriptionEditFrames()) {
@@ -405,10 +408,6 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
 
         if (hasTableTemplateOutput(reportTemplate.getReportOutputType())) {
             reportTemplate.setName(".table");
-
-            if(!tableEdit.applyChanges(reportTemplate)){
-                return false;
-            }
         }
 
         String extension = FilenameUtils.getExtension(templateUploadField.getFileName());
