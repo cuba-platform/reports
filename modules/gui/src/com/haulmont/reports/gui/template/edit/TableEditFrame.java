@@ -20,13 +20,14 @@ import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.chile.core.model.MetaPropertyPath;
 import com.haulmont.cuba.core.global.Metadata;
 import com.haulmont.cuba.gui.components.AbstractAction;
-import com.haulmont.cuba.gui.components.AbstractFrame;
+import com.haulmont.cuba.gui.components.BoxLayout;
 import com.haulmont.cuba.gui.components.Component;
 import com.haulmont.cuba.gui.components.Table;
 import com.haulmont.cuba.gui.components.actions.ListAction;
 import com.haulmont.cuba.gui.components.actions.RemoveAction;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
 import com.haulmont.cuba.gui.data.Datasource;
+import com.haulmont.reports.entity.ReportOutputType;
 import com.haulmont.reports.entity.ReportTemplate;
 import com.haulmont.reports.entity.table.TemplateTableBand;
 import com.haulmont.reports.entity.table.TemplateTableColumn;
@@ -38,7 +39,7 @@ import java.util.Set;
 import java.util.UUID;
 
 
-public class TableEditFrame extends AbstractFrame {
+public class TableEditFrame extends DescriptionEditFrame {
 
     public static final int UP = 1;
     public static final int DOWN = -1;
@@ -280,7 +281,8 @@ public class TableEditFrame extends AbstractFrame {
 
     }
 
-    public boolean applyChanges(ReportTemplate reportTemplate) {
+    @Override
+    public boolean applyChanges() {
         reportTemplate.setTemplateTableDescription(templateTableDs.getItem());
 
         for (TemplateTableBand band : tableBandsDs.getItems()) {
@@ -297,5 +299,14 @@ public class TableEditFrame extends AbstractFrame {
             }
         }
         return true;
+    }
+
+    @Override
+    public boolean isApplicable(ReportOutputType reportOutputType) {
+        return reportOutputType == ReportOutputType.TABLE;
+    }
+
+    @Override
+    protected void initPreviewContent(BoxLayout previewBox) {
     }
 }
