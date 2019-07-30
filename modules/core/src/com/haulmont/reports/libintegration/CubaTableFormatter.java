@@ -170,17 +170,15 @@ public class CubaTableFormatter extends AbstractFormatter {
 
             bandDataList.forEach(bandData -> {
                 Map<String, Object> data = bandData.getData();
-                final Instance instance;
                 final String pkName;
                 final boolean pkInView;
 
                 if (data instanceof EntityMap) {
-                    instance = ((EntityMap) data).getInstance();
+                    Instance instance = ((EntityMap) data).getInstance();
                     pkName = metadata.getTools().getPrimaryKeyName(instance.getMetaClass());
                     View view = ((EntityMap) data).getView();
                     pkInView = view != null && pkName != null && view.containsProperty(pkName);
                 } else {
-                    instance = null;
                     pkName = null;
                     pkInView = false;
                 }
@@ -210,8 +208,7 @@ public class CubaTableFormatter extends AbstractFormatter {
                             return;
                         }
                         if (checkAddHeader(pkName, pkInView, name)) {
-                            if (instance != null)
-                                name = column.getColumnName();
+                            name = column.getColumnName();
 
                             if (name != null && value != null)
                                 headers.add(new Pair<>(name, value.getClass()));

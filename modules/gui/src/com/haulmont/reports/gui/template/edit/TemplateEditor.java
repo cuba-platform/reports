@@ -204,10 +204,6 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
                 && reportOutputType != ReportOutputType.PIVOT_TABLE;
     }
 
-    protected boolean hasTableTemplateOutput(ReportOutputType reportOutputType) {
-        return reportOutputType == ReportOutputType.TABLE;
-    }
-
     protected boolean hasChartTemplateOutput(ReportOutputType reportOutputType) {
         return reportOutputType == ReportOutputType.CHART;
     }
@@ -218,12 +214,10 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
 
     protected void setupVisibility(boolean customEnabled, ReportOutputType reportOutputType) {
         boolean templateOutputVisibility = hasTemplateOutput(reportOutputType);
+        boolean enabled = templateOutputVisibility && customEnabled;
 
-        boolean chartTemplateOutput = hasChartTemplateOutput(reportOutputType);
-        boolean enabled = !chartTemplateOutput && customEnabled;
-
-        custom.setVisible(!chartTemplateOutput);
-        isCustomLabel.setVisible(!chartTemplateOutput);
+        custom.setVisible(templateOutputVisibility);
+        isCustomLabel.setVisible(templateOutputVisibility);
 
         customDefinedBy.setVisible(enabled);
         customDefinition.setVisible(enabled);
@@ -246,18 +240,8 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
         namePatternTextHelp.setVisible(templateOutputVisibility);
 
         setupTemplateTypeVisibility(templateOutputVisibility);
-
         visibleTemplateEditor(reportOutputType);
-
         setupVisibilityDescriptionEdit(enabled, reportOutputType);
-        setupVisibilityTableEdit(reportOutputType);
-    }
-
-    protected void setupVisibilityTableEdit(ReportOutputType reportOutputType) {
-        boolean visible = hasTableTemplateOutput(reportOutputType);
-
-        custom.setVisible(!visible);
-        isCustomLabel.setVisible(!visible);
     }
 
     protected void setupTemplateTypeVisibility(boolean visibility) {
