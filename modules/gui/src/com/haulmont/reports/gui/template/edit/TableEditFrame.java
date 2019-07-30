@@ -291,7 +291,7 @@ public class TableEditFrame extends DescriptionEditFrame {
                 return false;
             }
 
-            for (TemplateTableColumn column : band.getTemplateTableColumns()) {
+            for (TemplateTableColumn column : band.getColumns()) {
                 if (column.getColumn() == null || column.getColumnName() == null) {
                     showNotification(getMessage("template.bandTableOrColumnTableRequired"), NotificationType.TRAY);
                     return false;
@@ -308,5 +308,10 @@ public class TableEditFrame extends DescriptionEditFrame {
 
     @Override
     protected void initPreviewContent(BoxLayout previewBox) {
+    }
+
+    @Override
+    public boolean isSupportPreview() {
+        return false;
     }
 }

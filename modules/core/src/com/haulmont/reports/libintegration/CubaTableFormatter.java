@@ -26,7 +26,6 @@ import com.haulmont.reports.app.EntityMap;
 import com.haulmont.reports.entity.CubaTableData;
 import com.haulmont.reports.entity.ReportTemplate;
 import com.haulmont.reports.entity.table.TemplateTableBand;
-import com.haulmont.reports.entity.table.TemplateTableColumn;
 import com.haulmont.reports.entity.table.TemplateTableDescription;
 import com.haulmont.yarg.exception.ReportFormattingException;
 import com.haulmont.yarg.formatters.factory.FormatterFactoryInput;
@@ -67,109 +66,174 @@ public class CubaTableFormatter extends AbstractFormatter {
         TemplateTableDescription templateTableDescription = ((ReportTemplate) reportTemplate).getTemplateTableDescription();
 
         Map<String, List<KeyValueEntity>> transformedData = new LinkedHashMap<>();
-        Map<String, List<Pair<String, Class>>> headerMap = new HashMap<>();
+        Map<String, Set<Pair<String, Class>>> headerMap = new HashMap<>();
         Map<String, List<BandData>> childrenBands = rootBand.getChildrenBands();
 
-        for (TemplateTableBand templateTableBand : templateTableDescription.getTemplateTableBands()) {
-            String bandName = templateTableBand.getBandName();
+        if (templateTableDescription.getTemplateTableBands().size() > 0) {
+            return getCubaTableData(templateTableDescription, transformedData, headerMap, childrenBands);
+        } else {
+            return getCubaTableData(transformedData, headerMap, childrenBands);
+        }
+    }
 
+    private CubaTableData getCubaTableData(Map<String, List<KeyValueEntity>> transformedData,
+                                           Map<String, Set<Pair<String, Class>>> headerMap,
+                                           Map<String, List<BandData>> childrenBands) {
+        childrenBands.forEach((bandName, bandDataList) -> {
             if (bandName.startsWith(HEADER_BAND_PREFIX)) {
-                break;
+                return;
             }
-
-            List<BandData> bandDataList = childrenBands.get(templateTableBand.getBandName());
-
             List<KeyValueEntity> entities = new ArrayList<>();
-            Set<Pair<String, Class>> headers = new LinkedHashSet<>();
+            Set<Pair<String, Class>> headers = new HashSet<>();
+            Set<String> emptyHeaders = new LinkedHashSet<>();
 
-            for (BandData bandData : bandDataList) {
+            bandDataList.forEach(bandData -> {
                 Map<String, Object> data = bandData.getData();
-                Instance instance = null;
-                String pkName = null;
-                boolean pkInView = false;
+                final Instance instance;
+                final String pkName;
+                final boolean pkInView;
 
                 if (data instanceof EntityMap) {
                     instance = ((EntityMap) data).getInstance();
                     pkName = metadata.getTools().getPrimaryKeyName(instance.getMetaClass());
-
                     View view = ((EntityMap) data).getView();
                     pkInView = view != null && pkName != null && view.containsProperty(pkName);
-                }
-
-                KeyValueEntity entityRow = getKeyValueEntity(data, templateTableBand, pkName, pkInView);
-                entities.add(entityRow);
-
-                if (templateTableBand.getTemplateTableColumns().size() == 0) {
-                    getHeaders(headers, data, instance, pkName, pkInView);
                 } else {
-                    for (TemplateTableColumn templateTableColumn : templateTableBand.getTemplateTableColumns()) {
-                        Object value = data.get(templateTableColumn.getColumn());
-
-                        Pair<String, Class> columnPair = value != null ?
-                                new Pair<>(templateTableColumn.getColumnName(), value.getClass()) :
-                                new Pair<>(templateTableColumn.getColumnName(), String.class);
-
-                        headers.add(columnPair);
-                    }
+                    instance = null;
+                    pkName = null;
+                    pkInView = false;
                 }
-            }
+
+                KeyValueEntity entityRow = new KeyValueEntity();
+
+                data.forEach((name, value) -> {
+                    if (INSTANCE_NAME_KEY.equals(name)) {
+                        return;
+                    }
+                    if (checkAddHeader(pkName, pkInView, name)) {
+                        if (instance != null)
+                            name = messageTools.getPropertyCaption(instance.getMetaClass(), name);
+
+                        checkInstanceNameLoaded(value);
+                        entityRow.setValue(name, value);
+                    }
+                });
+
+                if (headers.isEmpty() || headers.size() < data.size()) {
+                    data.forEach((name, value) -> {
+                        if (INSTANCE_NAME_KEY.equals(name)) {
+                            return;
+                        }
+                        if (checkAddHeader(pkName, pkInView, name)) {
+                            if (instance != null)
+                                name = messageTools.getPropertyCaption(instance.getMetaClass(), name);
+
+                            if (name != null && value != null)
+                                headers.add(new Pair<>(name, value.getClass()));
+                            if (name != null && value == null)
+                                emptyHeaders.add(name);
+                        }
+
+                    });
+                }
+                entities.add(entityRow);
+            });
+
+            emptyHeaders.forEach(header -> {
+                if (!containsHeader(headers, header))
+                    headers.add(new Pair<>(header, String.class));
+            });
 
             headers.removeIf(pair -> containsLowerCaseDuplicate(pair, headers));
-            List<Pair<String, Class>> headersList = new LinkedList<>(headers);
 
             transformedData.put(bandName, entities);
-            headerMap.put(bandName, headersList);
-        }
+            headerMap.put(bandName, headers);
+
+        });
 
         return new CubaTableData(transformedData, headerMap);
     }
 
-    private void getHeaders(Set<Pair<String, Class>> headers, Map<String, Object> data, Instance instance, String pkName, boolean pkInView) {
-        if (headers.isEmpty() || headers.size() < data.size()) {
-            data.forEach((name, value) -> {
-                if (INSTANCE_NAME_KEY.equals(name)) {
-                    return;
-                }
+    protected CubaTableData getCubaTableData(TemplateTableDescription templateTableDescription,
+                                             Map<String, List<KeyValueEntity>> transformedData,
+                                             Map<String, Set<Pair<String, Class>>> headerMap,
+                                             Map<String, List<BandData>> childrenBands) {
+        for (TemplateTableBand band : templateTableDescription.getTemplateTableBands()) {
+            String bandName = band.getBandName();
 
-                if (pkName == null || !pkName.equals(name) || pkInView) {
-
-                    if (instance != null) {
-                        name = messageTools.getPropertyCaption(instance.getMetaClass(), name);
-                    }
-
-                    if (name != null && value != null) {
-                        headers.add(new Pair<>(name, value.getClass()));
-                    }
-
-                    if (name != null && value == null) {
-                        headers.add(new Pair<>(name, String.class));
-                    }
-                }
-            });
-        }
-    }
-
-    private KeyValueEntity getKeyValueEntity(Map<String, Object> data, TemplateTableBand templateTableBand, String pkName, boolean pkInView) {
-        KeyValueEntity entityRow = new KeyValueEntity();
-
-        for (TemplateTableColumn templateTableColumn : templateTableBand.getTemplateTableColumns()) {
-            String name = templateTableColumn.getColumn();
-            Object value = data.get(name);
-
-            if (INSTANCE_NAME_KEY.equals(name)) {
+            if (bandName.startsWith(HEADER_BAND_PREFIX)) {
                 break;
             }
+            List<BandData> bandDataList = childrenBands.get(band.getBandName());
+            List<KeyValueEntity> entities = new ArrayList<>();
+            Set<Pair<String, Class>> headers = new HashSet<>();
 
-            if (pkName == null || !pkName.equals(name) || pkInView) {
-                name = templateTableColumn.getColumnName();
+            bandDataList.forEach(bandData -> {
+                Map<String, Object> data = bandData.getData();
+                final Instance instance;
+                final String pkName;
+                final boolean pkInView;
 
-                checkInstanceNameLoaded(value);
-                entityRow.setValue(name, value);
-            }
+                if (data instanceof EntityMap) {
+                    instance = ((EntityMap) data).getInstance();
+                    pkName = metadata.getTools().getPrimaryKeyName(instance.getMetaClass());
+                    View view = ((EntityMap) data).getView();
+                    pkInView = view != null && pkName != null && view.containsProperty(pkName);
+                } else {
+                    instance = null;
+                    pkName = null;
+                    pkInView = false;
+                }
+
+                KeyValueEntity entityRow = new KeyValueEntity();
+
+                band.getColumns().forEach(column -> {
+                    String name = column.getColumn();
+                    Object value = data.get(name);
+
+                    if (INSTANCE_NAME_KEY.equals(name)) {
+                        return;
+                    }
+
+                    if (checkAddHeader(pkName, pkInView, name)) {
+                        checkInstanceNameLoaded(value);
+                        entityRow.setValue(column.getColumnName(), value);
+                    }
+                });
+
+                if (headers.isEmpty() || headers.size() < data.size()) {
+                    band.getColumns().forEach(column -> {
+                        String name = column.getColumnName();
+                        Object value = data.get(column.getColumn());
+
+                        if (INSTANCE_NAME_KEY.equals(name)) {
+                            return;
+                        }
+                        if (checkAddHeader(pkName, pkInView, name)) {
+                            if (instance != null)
+                                name = column.getColumnName();
+
+                            if (name != null && value != null)
+                                headers.add(new Pair<>(name, value.getClass()));
+                            if (name != null && value == null)
+                                headers.add(new Pair<>(name, String.class));
+                        }
+                    });
+                }
+                entities.add(entityRow);
+            });
+
+            headers.removeIf(pair -> containsLowerCaseDuplicate(pair, headers));
+
+            transformedData.put(bandName, entities);
+            headerMap.put(bandName, headers);
         }
-        return entityRow;
+        return new CubaTableData(transformedData, headerMap);
     }
 
+    private boolean checkAddHeader(String pkName, boolean pkInView, String name) {
+        return pkName == null || !pkName.equals(name) || pkInView;
+    }
 
     protected boolean containsLowerCaseDuplicate(Pair<String, Class> pair, Set<Pair<String, Class>> headers) {
         if (!pair.getFirst().equals(pair.getFirst().toUpperCase()))
@@ -190,10 +254,18 @@ public class CubaTableFormatter extends AbstractFormatter {
             value = ((EntityMap) value).getInstance();
 
         try {
-            metadataTools.getInstanceName((Entity)value);
+            metadataTools.getInstanceName((Entity) value);
         } catch (RuntimeException e) {
             throw new ReportFormattingException("Cannot fetch instance name for entity " + value.getClass()
                     + ". Please add all attributes used at instance name to report configuration.", e);
         }
+    }
+
+    protected boolean containsHeader(Set<Pair<String, Class>> headers, String header) {
+        for (Pair<String, Class> pair : headers) {
+            if (pair.getFirst().equals(header))
+                return true;
+        }
+        return false;
     }
 }

@@ -20,10 +20,12 @@ import com.haulmont.bali.datastruct.Pair;
 import com.haulmont.cuba.core.entity.KeyValueEntity;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-public class CubaTableData implements Serializable {
+public class CubaTableData implements Serializable{
 
     /**
      * Data represents band/group/table name and list of rows as key(column)-value maps.
@@ -33,9 +35,9 @@ public class CubaTableData implements Serializable {
     /**
      * Headers contain band/group/table name and set of pairs 'column name - column type as Class'.
      */
-    protected Map<String, List<Pair<String, Class>>> headers;
+    protected Map<String, Set<Pair<String, Class>>> headers;
 
-    public CubaTableData(Map<String, List<KeyValueEntity>> data, Map<String, List<Pair<String, Class>>> headers) {
+    public CubaTableData(Map<String, List<KeyValueEntity>> data, Map<String, Set<Pair<String, Class>>> headers) {
         this.data = data;
         this.headers = headers;
     }
@@ -48,11 +50,11 @@ public class CubaTableData implements Serializable {
         this.data = data;
     }
 
-    public Map<String, List<Pair<String, Class>>> getHeaders() {
+    public Map<String, Set<Pair<String, Class>>> getHeaders() {
         return headers;
     }
 
-    public void setHeaders(Map<String, List<Pair<String, Class>>> headers) {
+    public void setHeaders(Map<String, Set<Pair<String, Class>>> headers) {
         this.headers = headers;
     }
 }

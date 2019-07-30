@@ -128,6 +128,11 @@ public class PivotTableEditFrame extends DescriptionEditFrame {
         return reportOutputType == ReportOutputType.PIVOT_TABLE;
     }
 
+    @Override
+    public boolean isSupportPreview() {
+        return true;
+    }
+
     protected PivotTableDescription createDefaultPivotTableDescription() {
         PivotTableDescription description = new PivotTableDescription();
         if (description.getDefaultRenderer() == null) {

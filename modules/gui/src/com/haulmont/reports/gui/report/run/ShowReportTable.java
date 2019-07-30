@@ -52,6 +52,7 @@ import javax.inject.Inject;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class ShowReportTable extends AbstractWindow {
     public static final String REPORT_PARAMETER = "report";
@@ -159,7 +160,7 @@ public class ShowReportTable extends AbstractWindow {
 
     protected void drawTables(CubaTableData dto) {
         Map<String, List<KeyValueEntity>> data = dto.getData();
-        Map<String, List<Pair<String, Class>>> headerMap = dto.getHeaders();
+        Map<String, Set<Pair<String, Class>>> headerMap = dto.getHeaders();
         tablesHolderGroup.removeAll();
 
         if (data == null || data.isEmpty())
@@ -176,14 +177,14 @@ public class ShowReportTable extends AbstractWindow {
         });
     }
 
-    protected GroupDatasource createDataSource(String dataSetName, List<KeyValueEntity> keyValueEntities, Map<String, List<Pair<String, Class>>> headerMap) {
+    protected GroupDatasource createDataSource(String dataSetName, List<KeyValueEntity> keyValueEntities, Map<String, Set<Pair<String, Class>>> headerMap) {
         DsBuilder dsBuilder = DsBuilder.create(getDsContext())
                 .setId(dataSetName + "Ds")
                 .setDataSupplier(getDsContext().getDataSupplier());
         ValueGroupDatasourceImpl ds = dsBuilder.buildValuesGroupDatasource();
         ds.setRefreshMode(CollectionDatasource.RefreshMode.NEVER);
 
-        List<Pair<String, Class>> headers = headerMap.get(dataSetName);
+        Set<Pair<String, Class>> headers = headerMap.get(dataSetName);
         for (Pair<String, Class> pair : headers) {
             Class javaClass = pair.getSecond();
             if (Entity.class.isAssignableFrom(javaClass) ||

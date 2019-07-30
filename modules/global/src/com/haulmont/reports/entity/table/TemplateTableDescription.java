@@ -34,8 +34,6 @@ public class TemplateTableDescription extends BaseUuidEntity {
 
     static {
         gson = new GsonBuilder()
-                .registerTypeAdapter(RendererType.class, new TemplateTableDescription.RendererTypeAdapter())
-                .registerTypeAdapter(AggregationMode.class, new TemplateTableDescription.AggregationTypeAdapter())
                 .create();
     }
 
@@ -59,30 +57,6 @@ public class TemplateTableDescription extends BaseUuidEntity {
             return gson.fromJson(json, TemplateTableDescription.class);
         } catch (JsonSyntaxException e) {
             return null;
-        }
-    }
-
-    protected static class RendererTypeAdapter implements JsonSerializer<RendererType>, JsonDeserializer<RendererType> {
-        @Override
-        public JsonElement serialize(RendererType src, Type typeOfSrc, JsonSerializationContext context) {
-            return new JsonPrimitive(src.getId());
-        }
-
-        @Override
-        public RendererType deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-            return RendererType.fromId(json.getAsString());
-        }
-    }
-
-    protected static class AggregationTypeAdapter implements JsonSerializer<AggregationMode>, JsonDeserializer<AggregationMode> {
-        @Override
-        public JsonElement serialize(AggregationMode src, Type typeOfSrc, JsonSerializationContext context) {
-            return new JsonPrimitive(src.getId());
-        }
-
-        @Override
-        public AggregationMode deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-            return AggregationMode.fromId(json.getAsString());
         }
     }
 }

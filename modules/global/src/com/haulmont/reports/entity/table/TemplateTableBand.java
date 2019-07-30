@@ -34,14 +34,14 @@ public class TemplateTableBand extends BaseUuidEntity {
     protected Integer position;
 
     @MetaProperty
-    protected List<TemplateTableColumn> templateTableColumns = new LinkedList<>();
+    protected List<TemplateTableColumn> columns = new LinkedList<>();
 
-    public List<TemplateTableColumn> getTemplateTableColumns() {
-        return templateTableColumns;
+    public List<TemplateTableColumn> getColumns() {
+        return columns;
     }
 
-    public void setTemplateTableColumns(List<TemplateTableColumn> templateTableColumns) {
-        this.templateTableColumns = templateTableColumns;
+    public void setColumns(List<TemplateTableColumn> columns) {
+        this.columns = columns;
     }
 
     public Integer getPosition() {

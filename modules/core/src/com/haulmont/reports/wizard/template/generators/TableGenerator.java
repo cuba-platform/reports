@@ -51,7 +51,7 @@ public class TableGenerator implements Generator {
 
                 columns.add(column);
             }
-            band.setTemplateTableColumns(columns);
+            band.setColumns(columns);
             bands.add(band);
         }
         templateTableDescription.setTemplateTableBands(bands);

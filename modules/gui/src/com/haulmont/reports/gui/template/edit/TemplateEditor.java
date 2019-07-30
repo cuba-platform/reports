@@ -221,6 +221,7 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
 
         boolean chartTemplateOutput = hasChartTemplateOutput(reportOutputType);
         boolean enabled = !chartTemplateOutput && customEnabled;
+
         custom.setVisible(!chartTemplateOutput);
         isCustomLabel.setVisible(!chartTemplateOutput);
 
@@ -257,7 +258,6 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
 
         custom.setVisible(!visible);
         isCustomLabel.setVisible(!visible);
-        tableEdit.setVisible(visible);
     }
 
     protected void setupTemplateTypeVisibility(boolean visibility) {
@@ -280,15 +280,12 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
             descriptionEditBox.setVisible(!customEnabled);
             applicableFrame.setVisible(!customEnabled);
             applicableFrame.setItem(getItem());
-            if (!customEnabled) {
+
+            if (!customEnabled && applicableFrame.isSupportPreview()) {
                 applicableFrame.showPreview();
             } else {
                 applicableFrame.hidePreview();
             }
-        }
-
-        if(applicableFrame != null && applicableFrame.getReportTemplate().getReportOutputType() == ReportOutputType.TABLE){
-            applicableFrame.hidePreview();
         }
 
         for (DescriptionEditFrame frame : getDescriptionEditFrames()) {
@@ -404,10 +401,6 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
 
         if (!Boolean.TRUE.equals(reportTemplate.getCustom())) {
             reportTemplate.setCustomDefinition("");
-        }
-
-        if (hasTableTemplateOutput(reportTemplate.getReportOutputType())) {
-            reportTemplate.setName(".table");
         }
 
         String extension = FilenameUtils.getExtension(templateUploadField.getFileName());

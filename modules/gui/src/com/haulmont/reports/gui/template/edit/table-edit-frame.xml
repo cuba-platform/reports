@@ -21,7 +21,7 @@
     <dsContext>
         <datasource id="templateTableDs" class="com.haulmont.reports.entity.table.TemplateTableDescription" allowCommit="false">
             <collectionDatasource id="tableBandsDs" property="templateTableBands">
-                <collectionDatasource id="tableColumnsDs" property="templateTableColumns"/>
+                <collectionDatasource id="tableColumnsDs" property="columns"/>
             </collectionDatasource>
         </datasource>
     </dsContext>
