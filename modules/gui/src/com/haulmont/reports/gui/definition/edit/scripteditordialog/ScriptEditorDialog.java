@@ -19,12 +19,19 @@ package com.haulmont.reports.gui.definition.edit.scripteditordialog;
 import com.haulmont.cuba.gui.WindowParam;
 import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.components.autocomplete.Suggester;
+import com.haulmont.cuba.security.app.UserSettingService;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.inject.Inject;
 import java.util.Map;
 import java.util.function.Consumer;
 
 public class ScriptEditorDialog extends AbstractWindow {
+
+    public static final String SIZE_SCRIPT_EDITOR_DIALOG = "sizeScriptEditorDialog";
+    public static final String FULL = "full";
+    public static final String DIALOG = "dialog";
 
     @WindowParam
     protected SourceCodeEditor.Mode mode;
@@ -41,14 +48,32 @@ public class ScriptEditorDialog extends AbstractWindow {
     @Inject
     protected SourceCodeEditor editor;
 
+    @Inject
+    protected UserSettingService userSettingService;
+
     @Override
     public void init(Map<String, Object> params) {
+        initEditor();
+        initActions();
+        loadParameterWindow();
+
+        Object caption = params.get("caption");
+        if (ObjectUtils.isNotEmpty(caption)) {
+            setCaption(caption.toString());
+        }
+
+        addAfterCloseListener(afterCloseEvent -> saveParameterWindow());
+    }
+
+    private void initEditor() {
         editor.setMode(mode != null ? mode : SourceCodeEditor.Mode.Text);
         editor.setSuggester(suggester);
         editor.setValue(scriptValue);
         editor.setHandleTabKey(true);
         editor.setContextHelpIconClickHandler(helpHandler);
+    }
 
+    private void initActions() {
         addAction(new AbstractAction("windowCommit") {
             @Override
             public void actionPerform(Component component) {
@@ -72,6 +97,22 @@ public class ScriptEditorDialog extends AbstractWindow {
             }
         });
     }
+
+    private void loadParameterWindow() {
+        String size = userSettingService.loadSetting(SIZE_SCRIPT_EDITOR_DIALOG);
+        if (StringUtils.isNotEmpty(size)) {
+            getDialogOptions().setMaximized(size.equals(FULL));
+        }
+    }
+
+    private void saveParameterWindow() {
+        if (getDialogOptions().getMaximized()) {
+            userSettingService.saveSetting(SIZE_SCRIPT_EDITOR_DIALOG, FULL);
+        } else {
+            userSettingService.saveSetting(SIZE_SCRIPT_EDITOR_DIALOG, DIALOG);
+        }
+    }
+
 
     public String getValue() {
         return editor.getValue();

@@ -36,6 +36,7 @@ import com.haulmont.reports.gui.ReportingClientConfig;
 import com.haulmont.reports.gui.definition.edit.crosstab.CrossTabTableDecorator;
 import com.haulmont.reports.gui.definition.edit.scripteditordialog.ScriptEditorDialog;
 import com.haulmont.reports.util.DataSetFactory;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nullable;
@@ -139,6 +140,7 @@ public class BandDefinitionEditor extends AbstractFrame implements Suggester {
                 "scriptEditorDialog",
                 WindowManager.OpenType.DIALOG,
                 ParamsMap.of(
+                        "caption", getScriptEditorDialogCaption(),
                         "scriptValue", jsonGroovyCodeEditor.getValue(),
                         "helpHandler", jsonGroovyCodeEditor.getContextHelpIconClickHandler()
                 ));
@@ -149,11 +151,23 @@ public class BandDefinitionEditor extends AbstractFrame implements Suggester {
         });
     }
 
+    private String getScriptEditorDialogCaption() {
+        ReportGroup group = reportDs.getItem().getGroup();
+        String report = reportDs.getItem().getName();
+
+        if (ObjectUtils.isNotEmpty(group) && ObjectUtils.isNotEmpty(report)) {
+            return AppBeans.get(Messages.class)
+                    .formatMessage(getClass(), "scriptEditorDialog.captionFormat", group.getLocName(), report);
+        }
+        return null;
+    }
+
     public void showDataSetScriptEditorDialog() {
         ScriptEditorDialog editorDialog = (ScriptEditorDialog) openWindow(
                 "scriptEditorDialog",
                 WindowManager.OpenType.DIALOG,
                 ParamsMap.of(
+                        "caption", getScriptEditorDialogCaption(),
                         "mode", dataSetScriptFieldMode,
                         "suggester", dataSetScriptField.getSuggester(),
                         "scriptValue", dataSetScriptField.getValue(),

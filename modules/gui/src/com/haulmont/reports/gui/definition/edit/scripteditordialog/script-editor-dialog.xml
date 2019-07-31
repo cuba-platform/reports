@@ -23,7 +23,7 @@
                 width="1200"/>
     <layout expand="editor"
             spacing="true">
-        <sourceCodeEditor id="editor" width="100%"/>
+        <sourceCodeEditor id="editor" width="100%" stylename="c-report-source-code-font-size"/>
         <frame id="windowActions"
                screen="editWindowActions"/>
     </layout>
