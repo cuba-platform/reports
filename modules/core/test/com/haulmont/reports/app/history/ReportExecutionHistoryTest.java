@@ -17,10 +17,10 @@
 package com.haulmont.reports.app.history;
 
 import com.haulmont.bali.util.ParamsMap;
+import com.haulmont.cuba.core.app.FileStorageAPI;
+import com.haulmont.cuba.core.entity.FileDescriptor;
 import com.haulmont.cuba.core.entity.contracts.Id;
-import com.haulmont.cuba.core.global.AppBeans;
-import com.haulmont.cuba.core.global.Configuration;
-import com.haulmont.cuba.core.global.DataManager;
+import com.haulmont.cuba.core.global.*;
 import com.haulmont.reports.ReportExecutionHistoryRecorder;
 import com.haulmont.reports.ReportingConfig;
 import com.haulmont.reports.app.service.ReportService;
@@ -53,6 +53,9 @@ public class ReportExecutionHistoryTest {
     protected ReportingConfig reportingConfig;
     protected DataManager dataManager;
     protected ReportExecutionHistoryRecorder executionHistoryRecorder;
+    protected FileStorageAPI fileStorageAPI;
+
+    protected View view;
 
     @Before
     public void setup() {
@@ -62,6 +65,11 @@ public class ReportExecutionHistoryTest {
         reportingConfig = AppBeans.get(Configuration.class).getConfig(ReportingConfig.class);
         dataManager = AppBeans.get(DataManager.NAME);
         executionHistoryRecorder = AppBeans.get(ReportExecutionHistoryRecorder.NAME);
+        fileStorageAPI = AppBeans.get(FileStorageAPI.NAME);
+
+        ViewRepository viewRepository = cont.metadata().getViewRepository();
+        view = viewRepository.getView(ReportExecution.class, View.LOCAL);
+        view.addProperty("outputDocument", viewRepository.getView(FileDescriptor.class, View.LOCAL));
     }
 
     @After
@@ -128,8 +136,45 @@ public class ReportExecutionHistoryTest {
     }
 
     @Test
+    public void testSaveDocumentDisabled() throws Exception {
+        reportingConfig.setHistoryRecordingEnabled(true);
+        reportingConfig.setSaveOutputDocumentsToHistory(false);
+
+        Report report = createReport("working-report.yml");
+        report.setName("TestSaveDocumentDisabled");
+        reportService.createReport(report, Collections.emptyMap());
+
+        ReportExecution execution = loadExecution("TestSaveDocumentDisabled");
+        assertNotNull(execution);
+        assertTrue(execution.getSuccess());
+        assertNull(execution.getOutputDocument());
+    }
+
+    @Test
+    public void testSaveDocumentWithHistory() throws Exception {
+        reportingConfig.setHistoryRecordingEnabled(true);
+        reportingConfig.setSaveOutputDocumentsToHistory(true);
+
+        Report report = createReport("working-report.yml");
+        report.setName("TestSaveDocument");
+        report.getTemplates().iterator().next().setOutputNamePattern("users.xlsx");
+        reportService.createReport(report, Collections.emptyMap());
+
+        ReportExecution execution = loadExecution("TestSaveDocument");
+        assertNotNull(execution);
+        assertTrue(execution.getSuccess());
+        assertNotNull(execution.getOutputDocument());
+        assertEquals("xlsx", execution.getOutputDocument().getExtension());
+        assertEquals("users.xlsx", execution.getOutputDocument().getName());
+
+        byte[] bytes = fileStorageAPI.loadFile(execution.getOutputDocument());
+        assertTrue(bytes.length > 0);
+    }
+
+    @Test
     public void testCleanByDays() throws Exception {
         reportingConfig.setHistoryRecordingEnabled(true);
+        reportingConfig.setSaveOutputDocumentsToHistory(true);
         reportingConfig.setHistoryCleanupMaxDays(2);
         reportingConfig.setHistoryCleanupMaxItemsPerReport(0);
 
@@ -142,6 +187,8 @@ public class ReportExecutionHistoryTest {
         List<ReportExecution> executions = loadExecutions("TestCleanDays");
         assertEquals(2, executions.size());
 
+        assertTrue(fileStorageAPI.fileExists(executions.get(0).getOutputDocument()));
+
         // make first item too old
         executions.get(0).setStartTime(DateUtils.addDays(executions.get(0).getStartTime(), -2));
         dataManager.commit(executions.get(0));
@@ -150,12 +197,16 @@ public class ReportExecutionHistoryTest {
         assertEquals("1", deleted);
 
         assertNull(reload(executions.get(0)));
+        assertFalse(fileStorageAPI.fileExists(executions.get(0).getOutputDocument()));
+
         assertNotNull(reload(executions.get(1)));
+        assertTrue(fileStorageAPI.fileExists(executions.get(1).getOutputDocument()));
     }
 
     @Test
     public void testCleanItemsPerReport() throws Exception {
         reportingConfig.setHistoryRecordingEnabled(true);
+        reportingConfig.setSaveOutputDocumentsToHistory(true);
         reportingConfig.setHistoryCleanupMaxDays(0);
         reportingConfig.setHistoryCleanupMaxItemsPerReport(2);
 
@@ -177,8 +228,13 @@ public class ReportExecutionHistoryTest {
         assertEquals("2", deleted);
 
         assertNull(reload(executions.get(0)));
+        assertFalse(fileStorageAPI.fileExists(executions.get(0).getOutputDocument()));
+
         assertNull(reload(executions.get(1)));
+        assertFalse(fileStorageAPI.fileExists(executions.get(1).getOutputDocument()));
+
         assertNotNull(reload(executions.get(2)));
+        assertTrue(fileStorageAPI.fileExists(executions.get(2).getOutputDocument()));
     }
 
     private void saveReportToDb(Report report) {
@@ -208,6 +264,7 @@ public class ReportExecutionHistoryTest {
         return dataManager.load(ReportExecution.class)
                 .query("select e from report$ReportExecution e where e.reportName = :name")
                 .parameter("name", reportName)
+                .view(view)
                 .optional()
                 .orElse(null);
     }
@@ -216,6 +273,7 @@ public class ReportExecutionHistoryTest {
         return dataManager.load(ReportExecution.class)
                 .query("select e from report$ReportExecution e where e.reportName = :name order by e.startTime asc")
                 .parameter("name", reportName)
+                .view(view)
                 .list();
     }
 

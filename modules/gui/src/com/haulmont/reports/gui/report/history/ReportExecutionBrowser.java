@@ -16,7 +16,11 @@
 
 package com.haulmont.reports.gui.report.history;
 
+import com.haulmont.cuba.gui.components.Component;
 import com.haulmont.cuba.gui.components.Table;
+import com.haulmont.cuba.gui.components.actions.BaseAction;
+import com.haulmont.cuba.gui.export.ExportDisplay;
+import com.haulmont.cuba.gui.icons.CubaIcon;
 import com.haulmont.cuba.gui.model.CollectionLoader;
 import com.haulmont.cuba.gui.screen.*;
 import com.haulmont.reports.entity.Report;
@@ -35,6 +39,8 @@ public class ReportExecutionBrowser extends StandardLookup {
     protected Table<ReportExecution> executionsTable;
     @Inject
     protected MessageBundle messageBundle;
+    @Inject
+    protected ExportDisplay exportDisplay;
 
     protected Function<Long, String> durationFormatter = new SecondsToTextFormatter();
     protected Report filterByReport;
@@ -42,6 +48,11 @@ public class ReportExecutionBrowser extends StandardLookup {
     public ReportExecutionBrowser setFilterByReport(Report filterByReport) {
         this.filterByReport = filterByReport;
         return this;
+    }
+
+    @Subscribe
+    protected void onInit(InitEvent event) {
+        executionsTable.addAction(new DownloadDocumentAction());
     }
 
     @Subscribe
@@ -70,5 +81,38 @@ public class ReportExecutionBrowser extends StandardLookup {
     protected String formatExecutionTimeSec(Long value) {
         String text = durationFormatter.apply(value);
         return text;
+    }
+
+    public class DownloadDocumentAction extends BaseAction {
+        public DownloadDocumentAction() {
+            super("download");
+        }
+
+        @Override
+        protected boolean isApplicable() {
+            if (executionsTable.getSelected().size() != 1) {
+                return false;
+            }
+            ReportExecution execution = executionsTable.getSingleSelected();
+            return execution != null && execution.getOutputDocument() != null;
+        }
+
+        @Override
+        public String getCaption() {
+            return messageBundle.getMessage("report.executionHistory.download");
+        }
+
+        @Override
+        public String getIcon() {
+            return CubaIcon.DOWNLOAD.source();
+        }
+
+        @Override
+        public void actionPerform(Component component) {
+            ReportExecution execution = executionsTable.getSingleSelected();
+            if (execution != null && execution.getOutputDocument() != null) {
+                exportDisplay.show(execution.getOutputDocument(), null);
+            }
+        }
     }
 }

@@ -5,23 +5,29 @@
 
 package com.haulmont.reports;
 
+import com.google.common.collect.Sets;
 import com.haulmont.cuba.core.Persistence;
+import com.haulmont.cuba.core.app.FileStorageAPI;
+import com.haulmont.cuba.core.app.ServerConfig;
 import com.haulmont.cuba.core.app.ServerInfoAPI;
 import com.haulmont.cuba.core.entity.Entity;
+import com.haulmont.cuba.core.entity.FileDescriptor;
 import com.haulmont.cuba.core.entity.contracts.Id;
 import com.haulmont.cuba.core.global.*;
+import com.haulmont.cuba.security.app.Authentication;
+import com.haulmont.reports.entity.CubaReportOutputType;
 import com.haulmont.reports.entity.Report;
 import com.haulmont.reports.entity.ReportExecution;
+import com.haulmont.yarg.reporting.ReportOutputDocument;
+import com.haulmont.yarg.structure.ReportOutputType;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component(ReportExecutionHistoryRecorder.NAME)
@@ -42,6 +48,10 @@ public class ReportExecutionHistoryRecorderBean implements ReportExecutionHistor
     protected ReportingConfig reportingConfig;
     @Inject
     protected Persistence persistence;
+    @Inject
+    protected FileStorageAPI fileStorageAPI;
+    @Inject
+    protected Authentication authentication;
 
     @Override
     public ReportExecution startExecution(Report report, Map<String, Object> params) {
@@ -61,26 +71,40 @@ public class ReportExecutionHistoryRecorderBean implements ReportExecutionHistor
     }
 
     @Override
-    public void markAsSuccess(ReportExecution execution) {
-        execution.setSuccess(true);
-        execution.setFinishTime(timeSource.currentTimestamp());
-        dataManager.commit(execution);
+    public void markAsSuccess(ReportExecution execution, ReportOutputDocument document) {
+        handleSessionExpired(() -> {
+            execution.setSuccess(true);
+            execution.setFinishTime(timeSource.currentTimestamp());
+            if (shouldSaveDocument(execution, document)) {
+                try {
+                    FileDescriptor documentFile = saveDocument(document);
+                    execution.setOutputDocument(documentFile);
+                } catch (FileStorageException e) {
+                    log.error("Failed to save output document", e);
+                }
+            }
+            dataManager.commit(execution);
+        });
     }
 
     @Override
     public void markAsCancelled(ReportExecution execution) {
-        execution.setCancelled(true);
-        execution.setFinishTime(timeSource.currentTimestamp());
-        dataManager.commit(execution);
+        handleSessionExpired(() -> {
+            execution.setCancelled(true);
+            execution.setFinishTime(timeSource.currentTimestamp());
+            dataManager.commit(execution);
+        });
     }
 
     @Override
     public void markAsError(ReportExecution execution, Exception e) {
-        execution.setSuccess(false);
-        execution.setFinishTime(timeSource.currentTimestamp());
-        execution.setErrorMessage(e.getMessage());
+        handleSessionExpired(() -> {
+            execution.setSuccess(false);
+            execution.setFinishTime(timeSource.currentTimestamp());
+            execution.setErrorMessage(e.getMessage());
 
-        dataManager.commit(execution);
+            dataManager.commit(execution);
+        });
     }
 
     protected void setParametersString(ReportExecution reportExecution, Map<String, Object> params) {
@@ -111,6 +135,47 @@ public class ReportExecutionHistoryRecorderBean implements ReportExecutionHistor
         }
     }
 
+    // can be used as extension point
+    @SuppressWarnings("unused")
+    protected boolean shouldSaveDocument(ReportExecution execution, ReportOutputDocument document) {
+        ReportOutputType type = document.getReportOutputType();
+        Set<String> outputTypesWithoutDocument = Sets.newHashSet(
+                CubaReportOutputType.chart.getId(),
+                CubaReportOutputType.table.getId(),
+                CubaReportOutputType.pivot.getId());
+        return reportingConfig.isSaveOutputDocumentsToHistory() && !outputTypesWithoutDocument.contains(type.getId());
+    }
+
+    protected FileDescriptor saveDocument(ReportOutputDocument document) throws FileStorageException {
+        String ext = FilenameUtils.getExtension(document.getDocumentName());
+        FileDescriptor file = metadata.create(FileDescriptor.class);
+        file.setCreateDate(timeSource.currentTimestamp());
+        file.setName(document.getDocumentName());
+        file.setExtension(ext);
+        file.setSize((long) document.getContent().length);
+
+        fileStorageAPI.saveFile(file, document.getContent());
+        file = dataManager.commit(file);
+        return file;
+    }
+
+    /**
+     * It is not rare for large reports to execute longer than {@link ServerConfig#getUserSessionExpirationTimeoutSec()}.
+     * In this case when report is finished - user session is already expired and can't be used to make changes to database.
+     */
+    protected void handleSessionExpired(Runnable action) {
+        boolean userSessionIsValid = userSessionSource.checkCurrentUserSession();
+        if (userSessionIsValid) {
+            action.run();
+        } else {
+            log.debug("No valid user session, record history under system user");
+            authentication.withSystemUser(() -> {
+                action.run();
+                return null;
+            });
+        }
+    }
+
     @Override
     public String cleanupHistory() {
         int deleted = 0;
@@ -129,13 +194,46 @@ public class ReportExecutionHistoryRecorderBean implements ReportExecutionHistor
 
         Date borderDate = DateUtils.addDays(timeSource.currentTimestamp(), -historyCleanupMaxDays);
         log.debug("Deleting report executions older than {}", borderDate);
+
+        List<UUID> fileIds = new ArrayList<>();
+
         int deleted = persistence.callInTransaction(em -> {
+            List<UUID> ids = em.createQuery("select e.outputDocument.id from report$ReportExecution e"
+                    + " where e.outputDocument is not null and e.startTime < :borderDate", UUID.class)
+                    .setParameter("borderDate", borderDate)
+                    .getResultList();
+            fileIds.addAll(ids);
+
             em.setSoftDeletion(false);
             return em.createQuery("delete from report$ReportExecution e where e.startTime < :borderDate")
                     .setParameter("borderDate", borderDate)
                     .executeUpdate();
         });
+
+        deleteFileDescriptorsAndFiles(fileIds);
         return deleted;
+    }
+
+    private void deleteFileDescriptorsAndFiles(List<UUID> fileIds) {
+        if (!fileIds.isEmpty()) {
+            log.debug("Deleting {} output document files", fileIds.size());
+        }
+
+        for (UUID fileId : fileIds) {
+            FileDescriptor file = dataManager.load(FileDescriptor.class)
+                    .id(fileId)
+                    .optional()
+                    .orElse(null);
+
+            if (file != null) {
+                try {
+                    fileStorageAPI.removeFile(file);
+                } catch (FileStorageException e) {
+                    log.error("Failed to remove document from storage " + file, e);
+                }
+                dataManager.remove(file);
+            }
+        }
     }
 
     private int deleteHistoryGroupedByReport() {
@@ -161,7 +259,8 @@ public class ReportExecutionHistoryRecorderBean implements ReportExecutionHistor
     }
 
     private int deleteForOneReport(UUID reportId, int maxItemsPerReport) {
-        return persistence.callInTransaction(em -> {
+        List<UUID> fileIds = new ArrayList<>();
+        int deleted = persistence.callInTransaction(em -> {
             em.setSoftDeletion(false);
             int rows = 0;
             Date borderStartTime = em.createQuery(
@@ -174,6 +273,13 @@ public class ReportExecutionHistoryRecorderBean implements ReportExecutionHistor
                     .getFirstResult();
 
             if (borderStartTime != null) {
+                List<UUID> ids = em.createQuery("select e.outputDocument.id from report$ReportExecution e"
+                        + " where e.outputDocument is not null and e.report.id = :reportId and e.startTime <= :borderTime", UUID.class)
+                        .setParameter("reportId", reportId)
+                        .setParameter("borderTime", borderStartTime)
+                        .getResultList();
+                fileIds.addAll(ids);
+
                 rows = em.createQuery("delete from report$ReportExecution e"
                         + " where e.report.id = :reportId and e.startTime <= :borderTime")
                         .setParameter("reportId", reportId)
@@ -182,5 +288,7 @@ public class ReportExecutionHistoryRecorderBean implements ReportExecutionHistor
             }
             return rows;
         });
+        deleteFileDescriptorsAndFiles(fileIds);
+        return deleted;
     }
 }

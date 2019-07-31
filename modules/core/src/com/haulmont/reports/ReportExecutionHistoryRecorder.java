@@ -7,6 +7,7 @@ package com.haulmont.reports;
 
 import com.haulmont.reports.entity.Report;
 import com.haulmont.reports.entity.ReportExecution;
+import com.haulmont.yarg.reporting.ReportOutputDocument;
 
 import java.util.Map;
 
@@ -15,7 +16,7 @@ public interface ReportExecutionHistoryRecorder {
 
     ReportExecution startExecution(Report report, Map<String, Object> params);
 
-    void markAsSuccess(ReportExecution execution);
+    void markAsSuccess(ReportExecution execution, ReportOutputDocument document);
 
     void markAsError(ReportExecution execution, Exception e);
 

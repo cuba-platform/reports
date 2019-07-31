@@ -46,5 +46,6 @@
 
     <view entity="report$ReportExecution" name="reportExecution.browse" extends="_local">
         <property name="user" view="_minimal"/>
+        <property name="outputDocument" view="_minimal"/>
     </view>
 </views>

@@ -92,11 +92,13 @@ create table REPORT_EXECUTION (
   PARAMS clob,
   ERROR_MESSAGE clob,
   SERVER_ID varchar2(50 char),
+  OUTPUT_DOCUMENT_ID varchar2(32),
   --
   primary key (ID),
 
   constraint FK_REPORT_EXECUTION_TO_REPORT foreign key (REPORT_ID) references REPORT_REPORT(ID) on delete set null,
-  constraint FK_REPORT_EXECUTION_TO_USER foreign key (USER_ID) references SEC_USER(ID)
+  constraint FK_REPORT_EXECUTION_TO_USER foreign key (USER_ID) references SEC_USER(ID),
+  constraint FK_REPORT_EXECUTION_TO_DOCUMEN foreign key (OUTPUT_DOCUMENT_ID) references SYS_FILE(ID)
 )^
 
 create index IDX_REPORT_EXECUTION_REPORT_ID on REPORT_EXECUTION (REPORT_ID)^

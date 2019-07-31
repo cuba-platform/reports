@@ -327,7 +327,7 @@ public class ReportingBean implements ReportingApi {
         ReportExecution reportExecution = executionHistoryRecorder.startExecution(report, params);
         try {
             ReportOutputDocument document = createReportDocumentInternal(report, template, outputType, params);
-            executionHistoryRecorder.markAsSuccess(reportExecution);
+            executionHistoryRecorder.markAsSuccess(reportExecution, document);
             return document;
         } catch (ReportCanceledException e) {
             executionHistoryRecorder.markAsCancelled(reportExecution);

@@ -200,6 +200,16 @@ public interface ReportingConfig extends Config {
     void setHistoryRecordingEnabled(boolean historyRecordingEnabled);
 
     /**
+     * If enabled - then save all output documents to file storage, so they can be downloaded later.
+     * Note that ReportExecution stores file that is independent from the one created by ReportingApi#createAndSaveReport methods.
+     */
+    @Property("reporting.executionHistory.saveOutputDocument")
+    @DefaultBoolean(false)
+    @Source(type = SourceType.DATABASE)
+    boolean isSaveOutputDocumentsToHistory();
+    void setSaveOutputDocumentsToHistory(boolean saveOutputDocumentsToHistory);
+
+    /**
      * Report execution history deletes all history items older than this number of days.
      * Value == 0 means no cleanup by this criteria.
      */

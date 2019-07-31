@@ -8,6 +8,7 @@ package com.haulmont.reports.entity;
 import com.haulmont.chile.core.annotations.MetaProperty;
 import com.haulmont.cuba.core.entity.BaseUuidEntity;
 import com.haulmont.cuba.core.entity.Creatable;
+import com.haulmont.cuba.core.entity.FileDescriptor;
 import com.haulmont.cuba.security.entity.User;
 
 import javax.annotation.PostConstruct;
@@ -56,6 +57,10 @@ public class ReportExecution extends BaseUuidEntity implements Creatable {
 
     @Column(name = "CANCELLED")
     private Boolean cancelled;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "OUTPUT_DOCUMENT_ID")
+    private FileDescriptor outputDocument;
 
     @Column(name = "PARAMS")
     @Lob
@@ -156,6 +161,14 @@ public class ReportExecution extends BaseUuidEntity implements Creatable {
 
     public void setCancelled(Boolean cancelled) {
         this.cancelled = cancelled;
+    }
+
+    public FileDescriptor getOutputDocument() {
+        return outputDocument;
+    }
+
+    public void setOutputDocument(FileDescriptor outputDocument) {
+        this.outputDocument = outputDocument;
     }
 
     public String getParams() {

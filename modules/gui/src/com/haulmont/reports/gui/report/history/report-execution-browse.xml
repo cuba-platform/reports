@@ -17,6 +17,7 @@
             </actions>
             <buttonsPanel>
                 <button id="excel" action="executionsTable.excel"/>
+                <button id="download" action="executionsTable.download"/>
             </buttonsPanel>
             <rowsCount/>
             <columns>
@@ -34,6 +35,8 @@
                 <column id="user"/>
                 <column id="success"/>
                 <column id="cancelled"/>
+                <column id="outputDocument.name"
+                        caption="msg://com.haulmont.reports.entity/ReportExecution.outputDocument"/>
                 <column id="params" maxTextLength="100"/>
                 <column id="errorMessage" maxTextLength="100"/>
                 <column id="serverId"/>
