@@ -30,8 +30,8 @@ import java.util.function.Consumer;
 
 public class ScriptEditorDialog extends AbstractWindow {
 
-    public static final String WIDTH_SCRIPT_EDITOR_DIALOG = "widthScriptEditorDialog";
-    public static final String HEIGHT_SCRIPT_EDITOR_DIALOG = "heightScriptEditorDialog";
+    public static final String WIDTH_SCRIPT_EDITOR_DIALOG = "reporting.widthScriptEditorDialog";
+    public static final String HEIGHT_SCRIPT_EDITOR_DIALOG = "reporting.heightScriptEditorDialog";
     public static final String FULL = "full";
 
     @WindowParam
