@@ -221,6 +221,7 @@ public class ShowReportTable extends AbstractWindow {
 
     protected void createColumns(GroupDatasource dataSource, Table table) {
         Collection<MetaPropertyPath> paths = metadataTools.getPropertyPaths(dataSource.getMetaClass());
+        int i = 0;
         for (MetaPropertyPath metaPropertyPath : paths) {
             MetaProperty property = metaPropertyPath.getMetaProperty();
             if (!property.getRange().getCardinality().isMany() && !metadataTools.isSystem(property)) {
@@ -234,7 +235,8 @@ public class ShowReportTable extends AbstractWindow {
 
                 Element element = DocumentHelper.createElement("column");
                 column.setXmlDescriptor(element);
-                table.addColumn(column);
+                table.addColumn(column, i);
+                i++;
             }
         }
     }

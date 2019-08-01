@@ -166,7 +166,7 @@ public class CubaTableFormatter extends AbstractFormatter {
             }
             List<BandData> bandDataList = childrenBands.get(band.getBandName());
             List<KeyValueEntity> entities = new ArrayList<>();
-            Set<Pair<String, Class>> headers = new HashSet<>();
+            Set<Pair<String, Class>> headers = new LinkedHashSet<>();
 
             bandDataList.forEach(bandData -> {
                 Map<String, Object> data = bandData.getData();
