@@ -22,6 +22,7 @@ import com.haulmont.cuba.gui.components.autocomplete.Suggester;
 import com.haulmont.cuba.security.app.UserSettingService;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
 import javax.inject.Inject;
 import java.util.Map;
@@ -29,9 +30,9 @@ import java.util.function.Consumer;
 
 public class ScriptEditorDialog extends AbstractWindow {
 
-    public static final String SIZE_SCRIPT_EDITOR_DIALOG = "sizeScriptEditorDialog";
+    public static final String WIDTH_SCRIPT_EDITOR_DIALOG = "widthScriptEditorDialog";
+    public static final String HEIGHT_SCRIPT_EDITOR_DIALOG = "heightScriptEditorDialog";
     public static final String FULL = "full";
-    public static final String DIALOG = "dialog";
 
     @WindowParam
     protected SourceCodeEditor.Mode mode;
@@ -65,7 +66,7 @@ public class ScriptEditorDialog extends AbstractWindow {
         addAfterCloseListener(afterCloseEvent -> saveParameterWindow());
     }
 
-    private void initEditor() {
+    protected void initEditor() {
         editor.setMode(mode != null ? mode : SourceCodeEditor.Mode.Text);
         editor.setSuggester(suggester);
         editor.setValue(scriptValue);
@@ -73,7 +74,7 @@ public class ScriptEditorDialog extends AbstractWindow {
         editor.setContextHelpIconClickHandler(helpHandler);
     }
 
-    private void initActions() {
+    protected void initActions() {
         addAction(new AbstractAction("windowCommit") {
             @Override
             public void actionPerform(Component component) {
@@ -98,21 +99,29 @@ public class ScriptEditorDialog extends AbstractWindow {
         });
     }
 
-    private void loadParameterWindow() {
-        String size = userSettingService.loadSetting(SIZE_SCRIPT_EDITOR_DIALOG);
-        if (StringUtils.isNotEmpty(size)) {
-            getDialogOptions().setMaximized(size.equals(FULL));
+    protected void loadParameterWindow() {
+        String width = userSettingService.loadSetting(WIDTH_SCRIPT_EDITOR_DIALOG);
+        String height = userSettingService.loadSetting(HEIGHT_SCRIPT_EDITOR_DIALOG);
+
+        if (StringUtils.equals(FULL, height) && StringUtils.equals(FULL, width)) {
+            getDialogOptions().setMaximized(true);
+            return;
+        }
+        if (NumberUtils.isCreatable(width) && NumberUtils.isCreatable(height)) {
+            getDialogOptions().setWidth(width);
+            getDialogOptions().setHeight(height);
         }
     }
 
-    private void saveParameterWindow() {
+    protected void saveParameterWindow() {
         if (getDialogOptions().getMaximized()) {
-            userSettingService.saveSetting(SIZE_SCRIPT_EDITOR_DIALOG, FULL);
+            userSettingService.saveSetting(WIDTH_SCRIPT_EDITOR_DIALOG, FULL);
+            userSettingService.saveSetting(HEIGHT_SCRIPT_EDITOR_DIALOG, FULL);
         } else {
-            userSettingService.saveSetting(SIZE_SCRIPT_EDITOR_DIALOG, DIALOG);
+            userSettingService.saveSetting(WIDTH_SCRIPT_EDITOR_DIALOG, String.valueOf(getDialogOptions().getWidth()));
+            userSettingService.saveSetting(HEIGHT_SCRIPT_EDITOR_DIALOG, String.valueOf(getDialogOptions().getHeight()));
         }
     }
-
 
     public String getValue() {
         return editor.getValue();

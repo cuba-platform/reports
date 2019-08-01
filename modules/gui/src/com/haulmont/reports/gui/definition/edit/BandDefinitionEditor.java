@@ -151,13 +151,13 @@ public class BandDefinitionEditor extends AbstractFrame implements Suggester {
         });
     }
 
-    private String getScriptEditorDialogCaption() {
+    protected String getScriptEditorDialogCaption() {
         ReportGroup group = reportDs.getItem().getGroup();
         String report = reportDs.getItem().getName();
 
         if (ObjectUtils.isNotEmpty(group) && ObjectUtils.isNotEmpty(report)) {
             return AppBeans.get(Messages.class)
-                    .formatMessage(getClass(), "scriptEditorDialog.captionFormat", group.getLocName(), report);
+                    .formatMessage(getClass(), "scriptEditorDialog.captionFormat", report, bandDefinitionDs.getItem().getName());
         }
         return null;
     }
