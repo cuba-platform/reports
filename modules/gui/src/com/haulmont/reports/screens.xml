@@ -69,7 +69,10 @@
             template="/com/haulmont/reports/gui/template/edit/pivottable/property/edit/pivottable-property-edit.xml"/>
 
     <screen id="report$PivotTableAggregation.edit"
-            template="/com/haulmont/reports/gui/template/edit/pivottable/aggregation/edit/pivottable-aggregation-edit.xml" />
+            template="/com/haulmont/reports/gui/template/edit/pivottable/aggregation/edit/pivottable-aggregation-edit.xml"/>
+
+    <screen id="report$TableEditFrame"
+            template="/com/haulmont/reports/gui/template/edit/table-edit-frame.xml"/>
 
     <screen id="report$showChart"
             template="/com/haulmont/reports/gui/report/run/show-chart.xml"/>

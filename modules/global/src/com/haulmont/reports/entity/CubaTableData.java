@@ -30,12 +30,12 @@ public class CubaTableData implements Serializable{
     /**
      * Data represents band/group/table name and list of rows as key(column)-value maps.
      */
-    protected Map<String, List<KeyValueEntity>> data = Collections.emptyMap();
+    protected Map<String, List<KeyValueEntity>> data;
 
     /**
      * Headers contain band/group/table name and set of pairs 'column name - column type as Class'.
      */
-    protected Map<String, Set<Pair<String, Class>>> headers = Collections.emptyMap();
+    protected Map<String, Set<Pair<String, Class>>> headers;
 
     public CubaTableData(Map<String, List<KeyValueEntity>> data, Map<String, Set<Pair<String, Class>>> headers) {
         this.data = data;

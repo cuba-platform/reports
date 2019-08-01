@@ -154,6 +154,11 @@ public class ChartEditFrame extends DescriptionEditFrame {
         return reportOutputType == ReportOutputType.CHART;
     }
 
+    @Override
+    public boolean isSupportPreview() {
+        return true;
+    }
+
     protected boolean validateChart() {
         AbstractChartDescription chartDescription = getChartDescription();
         if (chartDescription != null && chartDescription.getType() == ChartType.SERIAL) {

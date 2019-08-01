@@ -113,6 +113,9 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
     protected PivotTableEditFrame pivotTableEdit;
 
     @Inject
+    protected TableEditFrame tableEdit;
+
+    @Inject
     protected NotPersistenceDatasource<ReportTemplate> templateDs;
 
     @Inject
@@ -220,7 +223,7 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
     }
 
     protected Collection<DescriptionEditFrame> getDescriptionEditFrames() {
-        return Arrays.asList(chartEdit, pivotTableEdit);
+        return Arrays.asList(chartEdit, pivotTableEdit, tableEdit);
     }
 
     protected boolean hasTemplateOutput(ReportOutputType reportOutputType) {
@@ -239,12 +242,11 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
 
     protected void setupVisibility(boolean customEnabled, ReportOutputType reportOutputType) {
         boolean templateOutputVisibility = hasTemplateOutput(reportOutputType);
-        boolean chartTemplateOutput = hasChartTemplateOutput(reportOutputType);
-        boolean enabled = !chartTemplateOutput && customEnabled;
+        boolean enabled = templateOutputVisibility && customEnabled;
         boolean groovyScriptVisibility = enabled && hasScriptCustomDefinedBy(getItem().getCustomDefinedBy());
 
-        custom.setVisible(!chartTemplateOutput);
-        isCustomLabel.setVisible(!chartTemplateOutput);
+        custom.setVisible(templateOutputVisibility);
+        isCustomLabel.setVisible(templateOutputVisibility);
 
         customDefinedBy.setVisible(enabled);
         customDefinition.setVisible(enabled);
@@ -269,9 +271,7 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
         outputNamePatternLabel.setVisible(templateOutputVisibility);
 
         setupTemplateTypeVisibility(templateOutputVisibility);
-
         visibleTemplateEditor(reportOutputType);
-
         setupVisibilityDescriptionEdit(enabled, reportOutputType);
     }
 
@@ -295,7 +295,8 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
             descriptionEditBox.setVisible(!customEnabled);
             applicableFrame.setVisible(!customEnabled);
             applicableFrame.setItem(getItem());
-            if (!customEnabled) {
+
+            if (!customEnabled && applicableFrame.isSupportPreview()) {
                 applicableFrame.showPreview();
             } else {
                 applicableFrame.hidePreview();
@@ -415,10 +416,6 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
 
         if (!Boolean.TRUE.equals(reportTemplate.getCustom())) {
             reportTemplate.setCustomDefinition("");
-        }
-
-        if (reportTemplate.getReportOutputType() == ReportOutputType.TABLE) {
-            reportTemplate.setName(".table");
         }
 
         String extension = FilenameUtils.getExtension(templateUploadField.getFileName());

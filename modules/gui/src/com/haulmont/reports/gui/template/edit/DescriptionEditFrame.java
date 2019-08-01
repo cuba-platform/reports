@@ -28,6 +28,7 @@ public abstract class DescriptionEditFrame extends AbstractFrame {
 
     protected ReportTemplate reportTemplate;
     protected BoxLayout previewBox;
+    protected boolean supportPreview;
 
     public void init(Map<String, Object> params) {
         super.init(params);
@@ -67,6 +68,8 @@ public abstract class DescriptionEditFrame extends AbstractFrame {
                 .center();
     }
 
+
+    public abstract boolean isSupportPreview();
 
     public abstract boolean isApplicable(ReportOutputType reportOutputType);
 
