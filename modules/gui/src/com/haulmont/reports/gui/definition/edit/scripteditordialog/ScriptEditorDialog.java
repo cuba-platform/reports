@@ -19,12 +19,20 @@ package com.haulmont.reports.gui.definition.edit.scripteditordialog;
 import com.haulmont.cuba.gui.WindowParam;
 import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.components.autocomplete.Suggester;
+import com.haulmont.cuba.security.app.UserSettingService;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
 import javax.inject.Inject;
 import java.util.Map;
 import java.util.function.Consumer;
 
 public class ScriptEditorDialog extends AbstractWindow {
+
+    public static final String WIDTH_SCRIPT_EDITOR_DIALOG = "reporting.widthScriptEditorDialog";
+    public static final String HEIGHT_SCRIPT_EDITOR_DIALOG = "reporting.heightScriptEditorDialog";
+    public static final String FULL = "full";
 
     @WindowParam
     protected SourceCodeEditor.Mode mode;
@@ -41,14 +49,32 @@ public class ScriptEditorDialog extends AbstractWindow {
     @Inject
     protected SourceCodeEditor editor;
 
+    @Inject
+    protected UserSettingService userSettingService;
+
     @Override
     public void init(Map<String, Object> params) {
+        initEditor();
+        initActions();
+        loadParameterWindow();
+
+        Object caption = params.get("caption");
+        if (ObjectUtils.isNotEmpty(caption)) {
+            setCaption(caption.toString());
+        }
+
+        addAfterCloseListener(afterCloseEvent -> saveParameterWindow());
+    }
+
+    protected void initEditor() {
         editor.setMode(mode != null ? mode : SourceCodeEditor.Mode.Text);
         editor.setSuggester(suggester);
         editor.setValue(scriptValue);
         editor.setHandleTabKey(true);
         editor.setContextHelpIconClickHandler(helpHandler);
+    }
 
+    protected void initActions() {
         addAction(new AbstractAction("windowCommit") {
             @Override
             public void actionPerform(Component component) {
@@ -71,6 +97,30 @@ public class ScriptEditorDialog extends AbstractWindow {
                 return messages.getMainMessage("actions.Cancel");
             }
         });
+    }
+
+    protected void loadParameterWindow() {
+        String width = userSettingService.loadSetting(WIDTH_SCRIPT_EDITOR_DIALOG);
+        String height = userSettingService.loadSetting(HEIGHT_SCRIPT_EDITOR_DIALOG);
+
+        if (StringUtils.equals(FULL, height) && StringUtils.equals(FULL, width)) {
+            getDialogOptions().setMaximized(true);
+            return;
+        }
+        if (NumberUtils.isCreatable(width) && NumberUtils.isCreatable(height)) {
+            getDialogOptions().setWidth(width);
+            getDialogOptions().setHeight(height);
+        }
+    }
+
+    protected void saveParameterWindow() {
+        if (getDialogOptions().getMaximized()) {
+            userSettingService.saveSetting(WIDTH_SCRIPT_EDITOR_DIALOG, FULL);
+            userSettingService.saveSetting(HEIGHT_SCRIPT_EDITOR_DIALOG, FULL);
+        } else {
+            userSettingService.saveSetting(WIDTH_SCRIPT_EDITOR_DIALOG, String.valueOf(getDialogOptions().getWidth()));
+            userSettingService.saveSetting(HEIGHT_SCRIPT_EDITOR_DIALOG, String.valueOf(getDialogOptions().getHeight()));
+        }
     }
 
     public String getValue() {
