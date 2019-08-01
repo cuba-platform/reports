@@ -55,6 +55,7 @@ import org.perf4j.slf4j.Slf4JStopWatch;
 import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -82,11 +83,15 @@ public class ReportingBean implements ReportingApi {
     @Inject
     protected ReportImportExportAPI reportImportExport;
     @Inject
+    protected ReportExecutionHistoryRecorder executionHistoryRecorder;
+    @Inject
     protected UuidSource uuidSource;
     @Inject
     protected UserSessionSource userSessionSource;
     @Inject
     protected GlobalConfig globalConfig;
+    @Inject
+    protected ReportingConfig reportingConfig;
     @Inject
     protected DataManager dataManager;
     @Inject
@@ -206,7 +211,7 @@ public class ReportingBean implements ReportingApi {
     public ReportOutputDocument createReport(Report report, Map<String, Object> params) {
         report = reloadEntity(report, REPORT_EDIT_VIEW_NAME);
         ReportTemplate reportTemplate = getDefaultTemplate(report);
-        return createReportDocument(report, reportTemplate, params);
+        return createReportDocument(report, reportTemplate, null, params);
     }
 
     @Override
@@ -220,7 +225,7 @@ public class ReportingBean implements ReportingApi {
     public ReportOutputDocument createReport(Report report, String templateCode, Map<String, Object> params) {
         report = reloadEntity(report, REPORT_EDIT_VIEW_NAME);
         ReportTemplate template = report.getTemplateByCode(templateCode);
-        return createReportDocument(report, template, params);
+        return createReportDocument(report, template, null, params);
     }
 
     @Override
@@ -298,7 +303,7 @@ public class ReportingBean implements ReportingApi {
     @Override
     public ReportOutputDocument createReport(Report report, ReportTemplate template, Map<String, Object> params) {
         report = reloadEntity(report, REPORT_EDIT_VIEW_NAME);
-        return createReportDocument(report, template, params);
+        return createReportDocument(report, template, null, params);
     }
 
     protected void checkPermission(Report report) {
@@ -311,12 +316,31 @@ public class ReportingBean implements ReportingApi {
         }
     }
 
-    protected ReportOutputDocument createReportDocument(Report report, ReportTemplate template, Map<String, Object> params) {
-        return createReportDocument(report, template, null, params);
+    protected ReportOutputDocument createReportDocument(Report report, ReportTemplate template,
+                                                        @Nullable com.haulmont.reports.entity.ReportOutputType outputType,
+                                                        Map<String, Object> params) {
+        if (!reportingConfig.isHistoryRecordingEnabled()) {
+            ReportOutputDocument document = createReportDocumentInternal(report, template, outputType, params);
+            return document;
+        }
+
+        ReportExecution reportExecution = executionHistoryRecorder.startExecution(report, params);
+        try {
+            ReportOutputDocument document = createReportDocumentInternal(report, template, outputType, params);
+            executionHistoryRecorder.markAsSuccess(reportExecution, document);
+            return document;
+        } catch (ReportCanceledException e) {
+            executionHistoryRecorder.markAsCancelled(reportExecution);
+            throw e;
+        } catch (Exception e) {
+            executionHistoryRecorder.markAsError(reportExecution, e);
+            throw e;
+        }
     }
 
-    protected ReportOutputDocument createReportDocument(Report report, ReportTemplate template,
-                                                        com.haulmont.reports.entity.ReportOutputType outputType, Map<String, Object> params) {
+    protected ReportOutputDocument createReportDocumentInternal(Report report, ReportTemplate template,
+                                                        @Nullable com.haulmont.reports.entity.ReportOutputType outputType,
+                                                        Map<String, Object> params) {
         StopWatch stopWatch = null;
         MDC.put("user", userSessionSource.getUserSession().getUser().getLogin());
         MDC.put("webContextName", globalConfig.getWebContextName());
@@ -464,7 +488,7 @@ public class ReportingBean implements ReportingApi {
     }
 
     protected FileDescriptor createAndSaveReportDocument(Report report, ReportTemplate template, Map<String, Object> params, String fileName) {
-        byte[] reportData = createReportDocument(report, template, params).getContent();
+        byte[] reportData = createReportDocument(report, template, null, params).getContent();
         String ext = template.getReportOutputType().toString().toLowerCase();
 
         return saveReport(reportData, fileName, ext);

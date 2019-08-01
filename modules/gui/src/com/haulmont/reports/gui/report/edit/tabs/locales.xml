@@ -14,14 +14,9 @@
   ~ limitations under the License.
   -->
 
-<window xmlns="http://schemas.haulmont.com/cuba/window.xsd"
-        class="com.haulmont.reports.gui.report.edit.tabs.LocalesFrame"
-        messagesPack="com.haulmont.reports.gui">
+<window xmlns="http://schemas.haulmont.com/cuba/window.xsd">
     <layout margin="true" spacing="true">
-        <hbox id="localeTextBox" height="100%" width="100%" expand="localeTextField">
-            <textArea id="localeTextField" datasource="reportDs" property="localeNames"
-                      rows="20" cols="30" height="100%"/>
-            <linkButton id="localeTextHelp" icon="icons/question-white.png" invoke="getLocaleTextHelp"/>
-        </hbox>
+        <textArea id="localeTextField" datasource="reportDs" property="localeNames"
+                  width="100%" height="100%"/>
     </layout>
 </window>

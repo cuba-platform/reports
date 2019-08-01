@@ -22,6 +22,7 @@ import com.haulmont.cuba.core.global.Metadata;
 import com.haulmont.cuba.core.global.PersistenceHelper;
 import com.haulmont.cuba.core.global.Security;
 import com.haulmont.cuba.gui.AppConfig;
+import com.haulmont.cuba.gui.ScreenBuilders;
 import com.haulmont.cuba.gui.WindowManager.OpenType;
 import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.components.actions.BaseAction;
@@ -39,6 +40,7 @@ import com.haulmont.reports.app.service.ReportService;
 import com.haulmont.reports.entity.Report;
 import com.haulmont.reports.gui.ReportGuiManager;
 import com.haulmont.reports.gui.report.edit.ReportEditor;
+import com.haulmont.reports.gui.report.history.ReportExecutionBrowser;
 import com.haulmont.reports.gui.report.wizard.ReportWizardCreator;
 
 import javax.inject.Inject;
@@ -70,6 +72,8 @@ public class ReportBrowser extends AbstractLookup {
     protected Security security;
     @Inject
     protected Metadata metadata;
+    @Inject
+    protected ScreenBuilders screenBuilders;
     @Inject
     protected PopupButton popupCreateBtn;
     @Inject
@@ -150,6 +154,7 @@ public class ReportBrowser extends AbstractLookup {
         reportsTable.addAction(copyReport.getAction());
         reportsTable.addAction(exportReport.getAction());
         reportsTable.addAction(runReport.getAction());
+        reportsTable.addAction(new ShowExecutionsAction());
 
         CreateAction createReportAction = new CreateAction(reportsTable) {
             @Override
@@ -248,5 +253,33 @@ public class ReportBrowser extends AbstractLookup {
                 }
             }
         }));
+    }
+
+    public class ShowExecutionsAction extends BaseAction {
+
+        public ShowExecutionsAction() {
+            super("executions");
+        }
+
+        @Override
+        public String getCaption() {
+            return getMessage("report.browser.showExecutions");
+        }
+
+        @Override
+        protected boolean isApplicable() {
+            // no selection or 1 selected item
+            return reportsTable.getSelected().size() <= 1;
+        }
+
+        @Override
+        public void actionPerform(Component component) {
+            Report selectedReport = reportsTable.getSingleSelected();
+            screenBuilders.screen(ReportBrowser.this)
+                    .withScreenClass(ReportExecutionBrowser.class)
+                    .build()
+                    .setFilterByReport(selectedReport)
+                    .show();
+        }
     }
 }

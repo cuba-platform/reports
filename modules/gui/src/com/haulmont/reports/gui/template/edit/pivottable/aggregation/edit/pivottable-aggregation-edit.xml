@@ -37,16 +37,13 @@
                     <field property="mode" width="337px"/>
                     <field property="caption" width="337px"/>
                     <field id="function" property="function" width="355px">
-                        <hbox expand="sourceCodeEditor">
-                            <sourceCodeEditor
-                                    id="sourceCodeEditor"
-                                    property="function"
-                                    datasource="aggregationDs"
-                                    editable="true"
-                                    mode="JavaScript"
-                                    height="300px"/>
-                            <linkButton id="functionHelp" icon="icons/question-white.png" invoke="getFunctionHelp"/>
-                        </hbox>
+                        <sourceCodeEditor id="sourceCodeEditor"
+                                          property="function"
+                                          datasource="aggregationDs"
+                                          editable="true"
+                                          mode="JavaScript"
+                                          height="300px"
+                                          width="100%"/>
                     </field>
                 </column>
             </fieldGroup>

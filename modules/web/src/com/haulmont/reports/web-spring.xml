@@ -16,7 +16,8 @@
   -->
 
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:context="http://www.springframework.org/schema/context">
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:gui="http://schemas.haulmont.com/cuba/spring/cuba-gui.xsd">
 
     <bean name="reports_DataSetFactory"
           class="com.haulmont.reports.util.DataSetFactory" />
@@ -47,5 +48,5 @@
     </bean>
 
     <context:component-scan base-package="com.haulmont.reports.gui"/>
-
+    <gui:screens base-packages="com.haulmont.reports.gui"/>
 </beans>

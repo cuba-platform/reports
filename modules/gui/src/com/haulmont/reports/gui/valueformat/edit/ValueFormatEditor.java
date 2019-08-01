@@ -115,6 +115,12 @@ public class ValueFormatEditor extends AbstractEditor<ReportValueFormat> {
             }
         });
 
+        groovyCheckBox.setContextHelpIconClickHandler(e ->
+                showMessageDialog(getMessage("valuesFormats.groovyScript"), getMessage("valuesFormats.groovyScriptHelpText"),
+                        MessageType.CONFIRMATION_HTML
+                                .modal(false)
+                                .width(700f)));
+
         groovyCheckBox.addValueChangeListener(booleanValueChangeEvent -> {
             Boolean visible = booleanValueChangeEvent.getValue();
             Boolean prevVisible = booleanValueChangeEvent.getPrevValue();
@@ -154,7 +160,7 @@ public class ValueFormatEditor extends AbstractEditor<ReportValueFormat> {
     protected void postInit() {
         String value = formatField.getValue();
         if (value != null) {
-            if (!formatField.getOptionsMap().containsValue(value)) {
+            if (!formatField.getOptionsMap().containsValue(value) && Boolean.FALSE.equals(groovyCheckBox.isChecked())) {
                 addFormatItem(value);
             }
             formatField.setValue(value);
@@ -167,13 +173,6 @@ public class ValueFormatEditor extends AbstractEditor<ReportValueFormat> {
         metadata.getTools().copy(item, newItem);
         ((ReportValueFormat) newItem).setId((UUID) item.getId());
         super.setItem(newItem);
-    }
-
-    public void getGroovyHelp() {
-        showMessageDialog(getMessage("valuesFormats.groovyScript"), getMessage("valuesFormats.groovyScriptHelpText"),
-                MessageType.CONFIRMATION_HTML
-                        .modal(false)
-                        .width(700f));
     }
 
     public void showGroovyEditorDialog() {
@@ -196,5 +195,4 @@ public class ValueFormatEditor extends AbstractEditor<ReportValueFormat> {
         });
         editorDialog.show();
     }
-
 }

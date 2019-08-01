@@ -41,14 +41,9 @@
                     </fieldGroup>
                 </row>
                 <row>
-                    <hbox>
-                        <checkBox id="groovyCheckBox" datasource="valuesFormatsDs" property="groovyScript"
-                                  caption="msg://valuesFormats.groovyScript"
-                                  align="MIDDLE_LEFT"/>
-                        <linkButton id="groovyHelp"
-                                    icon="icons/question-white.png"
-                                    invoke="getGroovyHelp"/>
-                    </hbox>
+                    <checkBox id="groovyCheckBox" datasource="valuesFormatsDs" property="groovyScript"
+                              caption="msg://valuesFormats.groovyScript"
+                              align="MIDDLE_LEFT"/>
                 </row>
                 <row>
                     <vbox id="groovyVBox"

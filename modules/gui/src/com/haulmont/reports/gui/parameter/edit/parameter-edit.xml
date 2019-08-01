@@ -83,18 +83,17 @@
                             <hbox id="defaultValueBox" width="100%"/>
                         </row>
                         <row>
-                            <label id="defaultDateIsCurrentLabel" value="msg://parameters.defaultDateIsCurrent" align="MIDDLE_LEFT"/>
-                            <checkBox id="defaultDateIsCurrentCheckBox" datasource="parameterDs" property="defaultDateIsCurrent"/>
+                            <label id="defaultDateIsCurrentLabel" value="msg://parameters.defaultDateIsCurrent"
+                                   align="MIDDLE_LEFT"/>
+                            <checkBox id="defaultDateIsCurrentCheckBox" datasource="parameterDs"
+                                      property="defaultDateIsCurrent"/>
                         </row>
                     </rows>
                 </grid>
             </tab>
             <tab id="localesTab" caption="msg://parameters.localesTab" margin="true">
-                <hbox width="100%" expand="localeTextField">
-                    <textArea id="localeTextField" datasource="parameterDs" property="localeNames"
-                              height="240px"/>
-                    <linkButton id="localeTextHelp" icon="icons/question-white.png" invoke="getLocaleTextHelp"/>
-                </hbox>
+                <textArea id="localeTextField" datasource="parameterDs" property="localeNames"
+                          width="100%" height="240px"/>
             </tab>
             <tab id="processParamTab" caption="msg://parameters.transformationTab" margin="true" spacing="true">
                 <grid id="predefinedTransformationBox" spacing="true">
@@ -106,16 +105,14 @@
                         </row>
                         <row>
                             <label id="wildcardsLabel" value="msg://parameters.wildcards" align="MIDDLE_LEFT"/>
-                            <lookupField id="wildcards" datasource="parameterDs" property="predefinedTransformation" width="200px"/>
+                            <lookupField id="wildcards" datasource="parameterDs" property="predefinedTransformation"
+                                         width="200px"/>
                         </row>
                     </rows>
                 </grid>
                 <label id="transformationScriptLabel" value="msg://parameters.groovyScript"/>
-                <hbox width="100%" expand="transformationScript">
-                    <sourceCodeEditor id="transformationScript" datasource="parameterDs" property="transformationScript"
-                                      mode="Groovy" height="240px"/>
-                    <linkButton id="transformationScriptHelp" icon="icons/question-white.png" invoke="getTransformationScriptHelp"/>
-                </hbox>
+                <sourceCodeEditor id="transformationScript" datasource="parameterDs" property="transformationScript"
+                                  mode="Groovy" width="100%" height="240px"/>
             </tab>
             <tab id="validationTab" caption="msg://parameters.validationTab" margin="true" spacing="true">
                 <grid id="includeValidationBox" spacing="true">
@@ -128,11 +125,8 @@
                     </rows>
                 </grid>
                 <label id="validationScriptLabel" value="msg://parameters.groovyScript"/>
-                <hbox width="100%" expand="validationScript">
-                    <sourceCodeEditor id="validationScript" datasource="parameterDs" property="validationScript"
-                                      mode="Groovy" height="240px"/>
-                    <linkButton id="validationScriptHelp" icon="icons/question-white.png" invoke="getValidationScriptHelp"/>
-                </hbox>
+                <sourceCodeEditor id="validationScript" datasource="parameterDs" property="validationScript"
+                                  mode="Groovy" width="100%" height="240px"/>
             </tab>
         </tabSheet>
         <frame id="windowActions" screen="editWindowActions"/>
