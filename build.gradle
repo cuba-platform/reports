@@ -175,12 +175,6 @@ configure([globalModule, coreModule, guiModule, webModule, desktopModule]) {
         source project.fileTree("src")
     }
 
-    test {
-        systemProperties = [
-                'jdk.attach.allowAttachSelf' : 'true'
-        ]
-    }
-
     task pmdReport(dependsOn: pmdMain, group: 'verification', description:
             'Generates a HTML report after executing PMD checks.') {
         doLast {
