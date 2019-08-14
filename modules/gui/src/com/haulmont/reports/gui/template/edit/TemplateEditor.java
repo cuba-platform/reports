@@ -236,6 +236,10 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
         return reportOutputType == ReportOutputType.CHART;
     }
 
+    protected boolean hasPdfTemplateOutput(ReportOutputType reportOutputType){
+        return reportOutputType == ReportOutputType.PDF;
+    }
+
     protected boolean hasHtmlCsvTemplateOutput(ReportOutputType reportOutputType) {
         return reportOutputType == ReportOutputType.CSV || reportOutputType == ReportOutputType.HTML;
     }
@@ -397,7 +401,7 @@ public class TemplateEditor extends AbstractEditor<ReportTemplate> {
             templateFileEditor.setVisible(false);
             return;
         }
-        templateFileEditor.setVisible(hasHtmlCsvTemplateOutput(outputType));
+        templateFileEditor.setVisible(hasHtmlCsvTemplateOutput(outputType) || hasPdfTemplateOutput(outputType));
     }
 
     @Override
