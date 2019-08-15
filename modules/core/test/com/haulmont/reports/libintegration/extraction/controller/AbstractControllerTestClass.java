@@ -114,7 +114,7 @@ public abstract class AbstractControllerTestClass {
         for (int i = 1; i < sheet.getPhysicalNumberOfRows(); i++) {
             Assert.assertTrue(users.contains(sheet.getRow(i).getCell(0).getStringCellValue()));
             for (int j = 1; j <= months.size(); j++) {
-                if (CellType.NUMERIC == CellType.forInt(sheet.getRow(i).getCell(j).getCellType())) {
+                if (CellType.NUMERIC == sheet.getRow(i).getCell(j).getCellType()) {
                     Assert.assertTrue(sheet.getRow(i).getCell(j).getNumericCellValue() >= 0);
                 }
             }
