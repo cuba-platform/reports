@@ -100,7 +100,9 @@ configure([globalModule, coreModule, guiModule, webModule, desktopModule]) {
     dependencies {
         compile(group: 'com.haulmont.cuba', name: 'cuba-global', version: baseVersion)
         testCompile(bom['org.jmockit:jmockit'])
-        testCompile(bom['junit:junit'])
+        testCompile(bom['org.junit.jupiter:junit-jupiter-api'])
+        testCompile(bom['org.junit.jupiter:junit-jupiter-engine'])
+        testCompile(bom['org.junit.vintage:junit-vintage-engine'])
         testCompile(bom['org.hsqldb:hsqldb'])
     }
 
@@ -187,6 +189,10 @@ configure([globalModule, coreModule, guiModule, webModule, desktopModule]) {
 
     check {
         dependsOn += ['pmdReport']
+    }
+
+    test {
+        useJUnitPlatform()
     }
 }
 
