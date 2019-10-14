@@ -190,11 +190,18 @@ public class ReportImportExport implements ReportImportExportAPI, ReportImportEx
         zipOutputStream.putArchiveEntry(zipEntryReportObject);
         zipOutputStream.write(xmlBytes);
 
-        if (report.getTemplates() != null) {
+        Report xmlReport = reportingApi.convertToReport(xml);
+        if (report.getTemplates() != null && xmlReport.getTemplates() != null) {
             for (int i = 0; i < report.getTemplates().size(); i++) {
-                ReportTemplate template = report.getTemplates().get(i);
-
-                if (template.getContent() != null) {
+                ReportTemplate xmlTemplate = xmlReport.getTemplates().get(i);
+                ReportTemplate template = null;
+                for (ReportTemplate it : report.getTemplates()) {
+                    if (xmlTemplate.equals(it)) {
+                        template = it;
+                        break;
+                    }
+                }
+                if (template != null && template.getContent() != null) {
                     byte[] fileBytes = template.getContent();
                     ArchiveEntry zipEntryTemplate = newStoredEntry(
                             "templates/" + i + "/" + template.getName(), fileBytes);
