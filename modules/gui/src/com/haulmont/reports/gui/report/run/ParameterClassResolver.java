@@ -30,6 +30,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.math.BigDecimal;
+import java.time.*;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
@@ -51,6 +52,11 @@ public class ParameterClassResolver {
     protected Map<Class, ParameterType> primitiveParameterClassMapping = new ImmutableMap.Builder<Class, ParameterType>()
             .put(Boolean.class, ParameterType.BOOLEAN)
             .put(Date.class, ParameterType.DATE)
+            .put(LocalDate.class, ParameterType.DATE)
+            .put(LocalTime.class, ParameterType.TIME)
+            .put(OffsetTime.class, ParameterType.TIME)
+            .put(LocalDateTime.class, ParameterType.DATETIME)
+            .put(OffsetDateTime.class, ParameterType.DATETIME)
             .put(String.class, ParameterType.TEXT)
             .put(Double.class, ParameterType.NUMERIC)
             .put(Integer.class, ParameterType.NUMERIC)
