@@ -18,6 +18,7 @@ package com.haulmont.reports.gui.report.wizard;
 
 import com.haulmont.bali.util.Dom4j;
 import com.haulmont.chile.core.model.MetaClass;
+import com.haulmont.chile.core.model.MetaProperty;
 import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.MessageTools;
 import com.haulmont.cuba.core.global.Messages;
@@ -45,6 +46,7 @@ import com.haulmont.reports.gui.report.wizard.step.StepFrame;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Element;
 
+import javax.persistence.TemporalType;
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -271,13 +273,14 @@ public class DetailsStepFrame extends StepFrame {
                         }
 
                         Boolean hiddenConditionPropertyValue = findHiddenPropertyValueByConditionName(conditionName);
+                        Boolean sqlTime = isSqlTime(conditionName);
 
                         conditionName = conditionName.replaceAll("\\.", "_");
 
                         String parameterName = conditionName + i;
                         i++;
                         Class parameterClass = parameterInfo.getJavaClass();
-                        ParameterType parameterType = parameterClassResolver.resolveParameterType(parameterClass);
+                        ParameterType parameterType = sqlTime ? ParameterType.TIME : parameterClassResolver.resolveParameterType(parameterClass);
                         if (parameterType == null) {
                             parameterType = ParameterType.TEXT;
                         }
@@ -315,7 +318,7 @@ public class DetailsStepFrame extends StepFrame {
                         }
                     }
                     if (condition.getConditions() != null) {
-                        for (Condition it: condition.getConditions()) {
+                        for (Condition it : condition.getConditions()) {
                             return findConditionByParameter(it, parameterInfo);
                         }
                     }
@@ -346,6 +349,30 @@ public class DetailsStepFrame extends StepFrame {
                             .filter(condition -> Objects.nonNull(condition.getName()))
                             .filter(condition -> condition.getName().equals(propertyName))
                             .map(AbstractCondition::getHidden)
+                            .findFirst()
+                            .orElse(Boolean.FALSE);
+                }
+
+                protected Boolean isSqlTime(String propertyName) {
+                    return conditionsTree.toConditionsList().stream()
+                            .filter(condition -> Objects.nonNull(condition.getName()))
+                            .filter(condition -> condition.getName().equals(propertyName))
+                            .map(condition -> {
+                                        Param param = condition.getParam();
+                                        if (param == null) {
+                                            return false;
+                                        }
+                                        MetaProperty property = param.getProperty();
+                                        if (property == null) {
+                                            return false;
+                                        }
+                                        Map annotations = property.getAnnotations();
+                                        if (annotations == null) {
+                                            return false;
+                                        }
+                                        return annotations.containsValue(TemporalType.TIME);
+                                    }
+                            )
                             .findFirst()
                             .orElse(Boolean.FALSE);
                 }
