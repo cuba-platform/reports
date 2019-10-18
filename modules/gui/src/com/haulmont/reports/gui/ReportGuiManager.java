@@ -19,11 +19,10 @@ import com.haulmont.bali.util.ParamsMap;
 import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.cuba.core.app.DataService;
 import com.haulmont.cuba.core.global.*;
-import com.haulmont.cuba.gui.AppConfig;
-import com.haulmont.cuba.gui.WindowManager;
+import com.haulmont.cuba.gui.*;
 import com.haulmont.cuba.gui.WindowManager.OpenType;
-import com.haulmont.cuba.gui.WindowManagerProvider;
 import com.haulmont.cuba.gui.backgroundwork.BackgroundWorkWindow;
+import com.haulmont.cuba.gui.components.Window;
 import com.haulmont.cuba.gui.config.WindowConfig;
 import com.haulmont.cuba.gui.config.WindowInfo;
 import com.haulmont.cuba.gui.executors.BackgroundTask;
@@ -39,6 +38,9 @@ import com.haulmont.cuba.security.entity.User;
 import com.haulmont.reports.app.ParameterPrototype;
 import com.haulmont.reports.app.service.ReportService;
 import com.haulmont.reports.entity.*;
+import com.haulmont.reports.exception.FailedToConnectToOpenOfficeException;
+import com.haulmont.reports.exception.NoOpenOfficeFreePortsException;
+import com.haulmont.reports.exception.ReportingException;
 import com.haulmont.reports.gui.report.run.ShowChartController;
 import com.haulmont.reports.gui.report.run.ShowPivotTableController;
 import com.haulmont.reports.gui.report.run.ShowReportTable;
@@ -410,24 +412,57 @@ public class ReportGuiManager {
         BackgroundTask<Void, ReportOutputDocument> task =
                 new BackgroundTask<Void, ReportOutputDocument>(timeout, TimeUnit.MILLISECONDS, hostScreen) {
 
-            @SuppressWarnings("UnnecessaryLocalVariable")
-            @Override
-            public ReportOutputDocument run(TaskLifeCycle<Void> taskLifeCycle) {
-                ReportOutputDocument result = getReportResult(targetReport, params, templateCode, outputType);
-                return result;
-            }
+                    @SuppressWarnings("UnnecessaryLocalVariable")
+                    @Override
+                    public ReportOutputDocument run(TaskLifeCycle<Void> taskLifeCycle) {
+                        ReportOutputDocument result = getReportResult(targetReport, params, templateCode, outputType);
+                        return result;
+                    }
 
-            @Override
-            public void done(ReportOutputDocument document) {
-                showReportResult(document, params, templateCode, outputFileName, outputType, screen);
-            }
+                    @Override
+                    public boolean handleException(Exception ex) {
+                        if (ex instanceof ReportingException) {
+                            if (ex instanceof FailedToConnectToOpenOfficeException) {
+                                String caption = messages.getMessage(ReportGuiManager.class, "reportException.failedConnectToOffice");
+                                return showErrorNotification(caption);
+                            } else if (ex instanceof NoOpenOfficeFreePortsException) {
+                                String caption = messages.getMessage(ReportGuiManager.class, "reportException.noOpenOfficeFreePorts");
+                                return showErrorNotification(caption);
+                            }
+                        }
+                        return super.handleException(ex);
+                    }
 
-            @Override
-            public void canceled() {
-                super.canceled();
-                reportService.cancelReportExecution(userSessionId, report.getId());
-            }
-        };
+                    protected boolean showErrorNotification(String text) {
+                        Screen ownerScreen = this.getOwnerScreen();
+                        if (ownerScreen != null) {
+                            Window window = ownerScreen.getWindow();
+                            if (window != null) {
+                                ScreenContext screenContext = ComponentsHelper.getScreenContext(window);
+                                if (screenContext != null) {
+                                    Notifications notifications = screenContext.getNotifications();
+                                    notifications.create()
+                                            .withCaption(text)
+                                            .withType(Notifications.NotificationType.ERROR)
+                                            .show();
+                                    return true;
+                                }
+                            }
+                        }
+                        return false;
+                    }
+
+                    @Override
+                    public void done(ReportOutputDocument document) {
+                        showReportResult(document, params, templateCode, outputFileName, outputType, screen);
+                    }
+
+                    @Override
+                    public void canceled() {
+                        super.canceled();
+                        reportService.cancelReportExecution(userSessionId, report.getId());
+                    }
+                };
 
         String caption = messages.getMessage(ReportGuiManager.class, "runReportBackgroundTitle");
         String description = messages.getMessage(ReportGuiManager.class, "runReportBackgroundMessage");
