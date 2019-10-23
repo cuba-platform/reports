@@ -30,7 +30,6 @@ public class ReportsTestContainer extends TestContainer {
                 "com.haulmont.cuba"
         ));
         appPropertiesFiles = new ArrayList<>(Arrays.asList(
-                "com/haulmont/cuba/app.properties",
                 "com/haulmont/cuba/testsupport/test-app.properties",
                 "com/haulmont/reports/test-app.properties"
         ));

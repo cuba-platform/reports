@@ -111,7 +111,7 @@ public class ReportExecutionHistoryTest {
         assertFalse(execution.getCancelled());
         assertTrue(execution.getParams().contains("key: k1, value: v1"));
         assertNull(execution.getErrorMessage());
-        assertEquals("localhost:8080/cuba-core", execution.getServerId());
+        assertEquals("localhost:8080/reports-core", execution.getServerId());
     }
 
     @Test

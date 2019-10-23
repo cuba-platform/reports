@@ -30,6 +30,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Arrays;
 
@@ -39,10 +40,12 @@ public class CrosstabControllerTest extends AbstractControllerTestClass {
 
     @Before
     public void construct() throws SQLException {
-        ScriptUtils.executeSqlScript(
-                persistence.getDataSource().getConnection(),
-                resourceLoader
-                .getResource("/com/haulmont/reports/libintegration/extraction/controller/initial-ddl.sql"));
+        try (Connection connection = persistence.getDataSource().getConnection()) {
+            ScriptUtils.executeSqlScript(
+                    connection,
+                    resourceLoader
+                            .getResource("/com/haulmont/reports/libintegration/extraction/controller/initial-ddl.sql"));
+        }
     }
 
     @Test

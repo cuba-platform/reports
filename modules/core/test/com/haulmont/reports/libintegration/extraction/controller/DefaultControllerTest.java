@@ -30,6 +30,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.sql.Connection;
 import java.sql.SQLException;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -38,10 +39,12 @@ public class DefaultControllerTest extends AbstractControllerTestClass {
 
     @Before
     public void construct() throws SQLException {
-        ScriptUtils.executeSqlScript(
-                persistence.getDataSource().getConnection(),
-                resourceLoader
-                .getResource("/com/haulmont/reports/libintegration/extraction/controller/initial-ddl.sql"));
+        try (Connection connection = persistence.getDataSource().getConnection()) {
+            ScriptUtils.executeSqlScript(
+                    connection,
+                    resourceLoader
+                            .getResource("/com/haulmont/reports/libintegration/extraction/controller/initial-ddl.sql"));
+        }
     }
 
     @Test
