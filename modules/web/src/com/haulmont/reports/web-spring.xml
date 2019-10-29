@@ -49,4 +49,5 @@
 
     <context:component-scan base-package="com.haulmont.reports.gui"/>
     <gui:screens base-packages="com.haulmont.reports.gui"/>
+    <gui:actions base-packages="com.haulmont.reports.gui.actions.list"/>
 </beans>
