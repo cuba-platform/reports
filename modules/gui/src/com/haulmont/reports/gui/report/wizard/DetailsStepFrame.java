@@ -286,6 +286,18 @@ public class DetailsStepFrame extends StepFrame {
                             parameterType = ParameterType.TEXT;
                         }
 
+                        if (parameterType == ParameterType.ENTITY) {
+                            boolean inExpr = conditionsTree.toConditionsList().stream()
+                                    .filter(cond -> Objects.nonNull(cond.getParamName()))
+                                    .filter(cond -> cond.getParamName().equals(parameterInfo.getName()))
+                                    .map(AbstractCondition::getInExpr)
+                                    .findFirst()
+                                    .orElse(Boolean.FALSE);
+                            if (inExpr) {
+                                parameterType = ParameterType.ENTITY_LIST;
+                            }
+                        }
+
                         String parameterValue = parameterInfo.getValue();
                         parameterValue = !"NULL".equals(parameterValue) ? parameterValue : null;
 
