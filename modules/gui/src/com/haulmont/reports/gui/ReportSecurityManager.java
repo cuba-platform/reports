@@ -24,16 +24,21 @@ import com.haulmont.cuba.core.global.QueryUtils;
 import com.haulmont.cuba.security.entity.RoleType;
 import com.haulmont.cuba.security.entity.User;
 import com.haulmont.cuba.security.entity.UserRole;
+import com.haulmont.cuba.security.role.RoleDefinition;
+import com.haulmont.cuba.security.role.RolesService;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import java.util.Collection;
 import java.util.List;
 
 @Component("cuba_ReportSecurityManager")
 public class ReportSecurityManager {
     @Inject
     protected QueryTransformerFactory queryTransformerFactory;
+    @Inject
+    protected RolesService rolesService;
 
     /**
      * Apply security constraints for query to select reports available by roles and screen restrictions
@@ -46,7 +51,8 @@ public class ReportSecurityManager {
         }
         if (user != null) {
             List<UserRole> userRoles = user.getUserRoles();
-            boolean superRole = userRoles.stream().anyMatch(userRole -> userRole.getRole().getType() == RoleType.SUPER);
+            Collection<RoleDefinition> roleDefinitions = rolesService.getRoleDefinitions(userRoles);
+            boolean superRole = roleDefinitions.stream().anyMatch(roleDefinition -> roleDefinition.getRoleType() == RoleType.SUPER);
             if (!superRole) {
                 StringBuilder roleCondition = new StringBuilder("r.rolesIdx is null");
                 for (int i = 0; i < userRoles.size(); i++) {
