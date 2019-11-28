@@ -22,6 +22,7 @@ import com.haulmont.chile.core.model.MetaProperty;
 import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.MessageTools;
 import com.haulmont.cuba.core.global.Messages;
+import com.haulmont.cuba.core.global.MetadataTools;
 import com.haulmont.cuba.core.global.filter.*;
 import com.haulmont.cuba.gui.WindowManager.OpenType;
 import com.haulmont.cuba.gui.components.*;
@@ -274,29 +275,14 @@ public class DetailsStepFrame extends StepFrame {
                         }
 
                         Boolean hiddenConditionPropertyValue = findHiddenPropertyValueByConditionName(conditionName);
-                        Boolean sqlTime = isSqlTime(conditionName);
+                        TemporalType temporalType = getTemporalType(conditionName);
 
                         conditionName = conditionName.replaceAll("\\.", "_");
 
                         String parameterName = conditionName + i;
                         i++;
                         Class parameterClass = parameterInfo.getJavaClass();
-                        ParameterType parameterType = sqlTime ? ParameterType.TIME : parameterClassResolver.resolveParameterType(parameterClass);
-                        if (parameterType == null) {
-                            parameterType = ParameterType.TEXT;
-                        }
-
-                        if (parameterType == ParameterType.ENTITY) {
-                            boolean inExpr = conditionsTree.toConditionsList().stream()
-                                    .filter(cond -> Objects.nonNull(cond.getParamName()))
-                                    .filter(cond -> cond.getParamName().equals(parameterInfo.getName()))
-                                    .map(AbstractCondition::getInExpr)
-                                    .findFirst()
-                                    .orElse(Boolean.FALSE);
-                            if (inExpr) {
-                                parameterType = ParameterType.ENTITY_LIST;
-                            }
-                        }
+                        ParameterType parameterType = getParameterType(parameterInfo, temporalType, parameterClass);
 
                         String parameterValue = parameterInfo.getValue();
                         parameterValue = !"NULL".equals(parameterValue) ? parameterValue : null;
@@ -312,6 +298,45 @@ public class DetailsStepFrame extends StepFrame {
                         wizard.query = wizard.query.replace(":" + parameterInfo.getName(), "${" + parameterName + "}");
                     }
                     return newParametersList;
+                }
+
+                protected ParameterType getParameterType(ParameterInfo parameterInfo, TemporalType temporalType, Class parameterClass) {
+                    ParameterType parameterType;
+
+                    if (temporalType != null) {
+                        switch (temporalType) {
+                            case TIME:
+                                parameterType = ParameterType.TIME;
+                                break;
+                            case DATE:
+                                parameterType = ParameterType.DATE;
+                                break;
+                            case TIMESTAMP:
+                                parameterType = ParameterType.DATETIME;
+                                break;
+                            default:
+                                parameterType = parameterClassResolver.resolveParameterType(parameterClass);
+                        }
+                    } else {
+                        parameterType = parameterClassResolver.resolveParameterType(parameterClass);
+                    }
+
+                    if (parameterType == null) {
+                        parameterType = ParameterType.TEXT;
+                    }
+
+                    if (parameterType == ParameterType.ENTITY) {
+                        boolean inExpr = conditionsTree.toConditionsList().stream()
+                                .filter(cond -> Objects.nonNull(cond.getParamName()))
+                                .filter(cond -> cond.getParamName().equals(parameterInfo.getName()))
+                                .map(AbstractCondition::getInExpr)
+                                .findFirst()
+                                .orElse(Boolean.FALSE);
+                        if (inExpr) {
+                            parameterType = ParameterType.ENTITY_LIST;
+                        }
+                    }
+                    return parameterType;
                 }
 
                 protected String collectQuery(QueryFilter queryFilter) {
@@ -366,28 +391,17 @@ public class DetailsStepFrame extends StepFrame {
                             .orElse(Boolean.FALSE);
                 }
 
-                protected Boolean isSqlTime(String propertyName) {
+                protected TemporalType getTemporalType(String propertyName) {
                     return conditionsTree.toConditionsList().stream()
                             .filter(condition -> Objects.nonNull(condition.getName()))
                             .filter(condition -> condition.getName().equals(propertyName))
+                            .filter(condition -> condition.getParam() != null && condition.getParam().getProperty() != null)
                             .map(condition -> {
-                                        Param param = condition.getParam();
-                                        if (param == null) {
-                                            return false;
-                                        }
-                                        MetaProperty property = param.getProperty();
-                                        if (property == null) {
-                                            return false;
-                                        }
-                                        Map annotations = property.getAnnotations();
-                                        if (annotations == null) {
-                                            return false;
-                                        }
-                                        return annotations.containsValue(TemporalType.TIME);
-                                    }
-                            )
+                                Map annotations = condition.getParam().getProperty().getAnnotations();
+                                return (TemporalType) annotations.get(MetadataTools.TEMPORAL_ANN_NAME);
+                            })
                             .findFirst()
-                            .orElse(Boolean.FALSE);
+                            .orElse(null);
                 }
             });
         }
