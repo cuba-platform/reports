@@ -66,7 +66,7 @@ public class RunReportAction extends AbstractAction implements Action.HasBeforeA
 
         this.screen = screen;
         Messages messages = AppBeans.get(Messages.NAME);
-        this.caption = messages.getMessage(getClass(), "actions.Report");
+        this.caption = messages.getMessage(getClass(), "actions.RunReport");
         this.icon = "icons/reports-print.png";
     }
 
@@ -78,7 +78,7 @@ public class RunReportAction extends AbstractAction implements Action.HasBeforeA
         super(id);
 
         Messages messages = AppBeans.get(Messages.NAME);
-        this.caption = messages.getMessage(getClass(), "actions.Report");
+        this.caption = messages.getMessage(getClass(), "actions.RunReport");
         this.icon = "icons/reports-print.png";
     }
 
@@ -94,7 +94,7 @@ public class RunReportAction extends AbstractAction implements Action.HasBeforeA
             FrameOwner screen = ComponentsHelper.getWindowNN((Component.BelongToFrame) component).getFrameOwner();
             openLookup(screen);
         } else {
-            throw new IllegalStateException("Please set window or specified component for performAction call");
+            throw new IllegalStateException("Please set window or specified component for 'RunReportAction' call");
         }
     }
 

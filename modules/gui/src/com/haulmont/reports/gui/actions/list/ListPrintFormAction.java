@@ -45,11 +45,16 @@ import javax.inject.Inject;
 import java.util.Set;
 
 /**
- * Standard action for creating the report associated with a list component.
+ * Standard action for printing reports for a list of entity instances associated with a list component.
  * <p>
  * Should be defined for a list component ({@code Table}, {@code DataGrid}, etc.) in a screen XML descriptor.
+ * <p>
+ * The action only selects reports having an external parameter of the {@code Entity} or the List of entities type
+ * and where the parameter entity type matches the entity type displayed by the list component.
+ * If only one report is available as a result of selection, it is invoked immediately.
+ * If several reports are available, their list is offered to the user for selection.
  */
-@StudioAction(category = "Reports list actions", description = "Creates the report associated with a list component")
+@StudioAction(category = "Reports list actions", description = "Prints the reports for a list of entity instances associated with a list component")
 @ActionType(ListPrintFormAction.ID)
 public class ListPrintFormAction extends AbstractPrintFormAction implements Action.HasTarget {
 
@@ -75,7 +80,7 @@ public class ListPrintFormAction extends AbstractPrintFormAction implements Acti
     @Inject
     public void setMessages(Messages messages) {
         this.messages = messages;
-        this.caption = messages.getMessage(ListPrintFormAction.class, "actions.Report");
+        this.caption = messages.getMessage(ListPrintFormAction.class, "actions.ListPrintForm");
     }
 
     @Override
@@ -95,9 +100,9 @@ public class ListPrintFormAction extends AbstractPrintFormAction implements Acti
         ScreenContext screenContext = ComponentsHelper.getScreenContext(target);
         Preconditions.checkState(screenContext != null, "Component is not attached to window");
 
-        if (beforeActionPerformedHandler != null) {
-            if (!beforeActionPerformedHandler.beforeActionPerformed())
-                return;
+        if (beforeActionPerformedHandler != null
+                && !beforeActionPerformedHandler.beforeActionPerformed()) {
+            return;
         }
 
         Dialogs dialogs = screenContext.getDialogs();

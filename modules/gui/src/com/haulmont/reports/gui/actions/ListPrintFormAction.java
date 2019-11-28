@@ -52,7 +52,7 @@ public class ListPrintFormAction extends AbstractPrintFormAction {
 
         this.listComponent = listComponent;
         Messages messages = AppBeans.get(Messages.NAME);
-        this.caption = messages.getMessage(ListPrintFormAction.class, "actions.Report");
+        this.caption = messages.getMessage(ListPrintFormAction.class, "actions.ListPrintForm");
         this.icon = "icons/reports-print.png";
     }
 

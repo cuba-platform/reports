@@ -33,13 +33,13 @@ import java.util.Collection;
 import java.util.Map;
 
 import static com.haulmont.reports.gui.report.run.InputParametersFrame.PARAMETERS_PARAMETER;
-import static com.haulmont.reports.gui.report.run.InputParametersFrame.REPORT_PARAMETER;
 
 public class InputParametersWindow extends AbstractWindow {
     public static final String TEMPLATE_CODE_PARAMETER = "templateCode";
     public static final String OUTPUT_FILE_NAME_PARAMETER = "outputFileName";
     public static final String INPUT_PARAMETER = "inputParameter";
     public static final String BULK_PRINT = "bulkPrint";
+    public static final String REPORT_PARAMETER = "report";
 
     protected String templateCode;
 

@@ -16,47 +16,45 @@
 
 package com.haulmont.reports.gui.actions.list;
 
-import com.haulmont.chile.core.model.MetaClass;
+import com.haulmont.bali.util.ParamsMap;
 import com.haulmont.cuba.core.global.BeanLocator;
 import com.haulmont.cuba.core.global.DataManager;
 import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.gui.ComponentsHelper;
-import com.haulmont.cuba.gui.Screens;
-import com.haulmont.cuba.gui.actions.list.SecuredListAction;
+import com.haulmont.cuba.gui.ScreenBuilders;
+import com.haulmont.cuba.gui.components.Action;
 import com.haulmont.cuba.gui.components.ActionType;
 import com.haulmont.cuba.gui.components.Component;
-import com.haulmont.cuba.gui.components.Window;
-import com.haulmont.cuba.gui.components.data.meta.ContainerDataUnit;
-import com.haulmont.cuba.gui.components.data.meta.EntityDataUnit;
-import com.haulmont.cuba.gui.data.DataSupplier;
+import com.haulmont.cuba.gui.components.actions.ListAction;
 import com.haulmont.cuba.gui.icons.CubaIcon;
 import com.haulmont.cuba.gui.icons.Icons;
 import com.haulmont.cuba.gui.meta.StudioAction;
-import com.haulmont.cuba.gui.screen.MapScreenOptions;
-import com.haulmont.cuba.gui.screen.OpenMode;
+import com.haulmont.cuba.gui.screen.*;
 import com.haulmont.reports.entity.Report;
-import com.haulmont.reports.entity.ReportInputParameter;
 import com.haulmont.reports.gui.ReportGuiManager;
+import com.haulmont.reports.gui.report.run.InputParametersWindow;
+import com.haulmont.reports.gui.report.run.ReportRun;
 
 import javax.inject.Inject;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
- * Standard action for displaying the list of all available reports.
+ * Standard action for running the reports associated with current screen or list component.
  * <p>
- * Should be defined for a list component ({@code Table}, {@code DataGrid}, etc.) connected to a data container,
- * containing {@link Report} type elements.
+ * Should be defined in the screen that is associated with {@link Report}. Should be defined for a {@code Button}
+ * or a list component ({@code Table}, {@code DataGrid}, etc.).
  */
-@StudioAction(category = "Reports list actions", description = "Shows the list of all available reports")
+@StudioAction(category = "Reports list actions", description = "Runs the reports associated with current screen or list component")
 @ActionType(RunReportAction.ID)
-public class RunReportAction extends SecuredListAction {
+public class RunReportAction extends ListAction implements Action.HasBeforeActionPerformedHandler {
 
     public static final String ID = "runReport";
 
     protected BeanLocator beanLocator;
+    protected ScreenBuilders screenBuilders;
+
+    protected BeforeActionPerformedHandler beforeActionPerformedHandler;
 
     public RunReportAction() {
         this(ID);
@@ -68,7 +66,7 @@ public class RunReportAction extends SecuredListAction {
 
     @Inject
     public void setIcons(Icons icons) {
-        this.icon = icons.get(CubaIcon.ANGLE_DOUBLE_RIGHT);
+        this.icon = icons.get(CubaIcon.PRINT);
     }
 
     @Inject
@@ -77,46 +75,80 @@ public class RunReportAction extends SecuredListAction {
     }
 
     @Inject
-    protected void setBeanLocator(BeanLocator beanLocator) {
+    public void setBeanLocator(BeanLocator beanLocator) {
         this.beanLocator = beanLocator;
+    }
+
+    @Inject
+    public void setScreenBuilders(ScreenBuilders screenBuilders) {
+        this.screenBuilders = screenBuilders;
+    }
+
+    @Override
+    public BeforeActionPerformedHandler getBeforeActionPerformedHandler() {
+        return beforeActionPerformedHandler;
+    }
+
+    @Override
+    public void setBeforeActionPerformedHandler(BeforeActionPerformedHandler handler) {
+        beforeActionPerformedHandler = handler;
     }
 
     @Override
     public void actionPerform(Component component) {
-        MetaClass entityMetaClass;
-        if (target.getItems() instanceof EntityDataUnit) {
-            entityMetaClass = ((EntityDataUnit) target.getItems()).getEntityMetaClass();
+        if (beforeActionPerformedHandler != null
+                && !beforeActionPerformedHandler.beforeActionPerformed()) {
+            return;
+        }
+        if (target != null && target.getFrame() != null) {
+            openLookup(target.getFrame().getFrameOwner());
+        } else if (component instanceof Component.BelongToFrame) {
+            FrameOwner screen = ComponentsHelper.getWindowNN((Component.BelongToFrame) component).getFrameOwner();
+            openLookup(screen);
         } else {
-            throw new UnsupportedOperationException("Unsupported data unit " + target.getItems());
+            throw new IllegalStateException("No target screen or component found for 'RunReportAction'");
+        }
+    }
+
+    protected void openLookup(FrameOwner screen) {
+        Screen hostScreen;
+        if (screen instanceof Screen) {
+            hostScreen = (Screen) screen;
+        } else {
+            hostScreen = UiControllerUtils.getHostScreen((ScreenFragment) screen);
         }
 
-        if (!entityMetaClass.getJavaClass().equals(Report.class)) {
-            throw new UnsupportedOperationException("Unsupported meta class " + entityMetaClass + " for runReport action");
-        }
+        screenBuilders.lookup(Report.class, screen)
+                .withScreenId("report$Report.run")
+                .withOpenMode(OpenMode.DIALOG)
+                .withOptions(new MapScreenOptions(ParamsMap.of(ReportRun.SCREEN_PARAMETER, hostScreen.getId())))
+                .withSelectHandler(reports -> runReports(reports, screen))
+                .show();
+    }
 
-        Report report = (Report) target.getSingleSelected();
-        if (target.getItems() instanceof ContainerDataUnit) {
+    protected void runReports(Collection<Report> reports, FrameOwner screen) {
+        if (reports != null && reports.size() > 0) {
+            Report report = reports.iterator().next();
+
             DataManager dataManager = beanLocator.get(DataManager.NAME);
             report = dataManager.reload(report, "report.edit");
-        } else {
-            DataSupplier dataSupplier = target.getDatasource().getDataSupplier();
-            report = dataSupplier.reload(report, "report.edit");
-        }
 
-        ReportGuiManager reportGuiManager = beanLocator.get(ReportGuiManager.class);
-        List<ReportInputParameter> inputParameters = report.getInputParameters();
-        if (inputParameters != null
-                && inputParameters.size() > 0
-                || reportGuiManager.inputParametersRequiredByTemplates(report)) {
-            Map<String, Object> params = new HashMap<>();
-            params.put("report", report);
-
-            Screens screens = ComponentsHelper.getScreenContext(target).getScreens();
-            screens.create("report$inputParameters", OpenMode.DIALOG, new MapScreenOptions(params))
-                    .show();
-        } else {
-            Window window = ComponentsHelper.getWindowNN(target);
-            reportGuiManager.printReport(report, Collections.emptyMap(), window.getFrameOwner());
+            ReportGuiManager reportGuiManager = beanLocator.get(ReportGuiManager.class);
+            if (report.getInputParameters() != null
+                    && report.getInputParameters().size() > 0
+                    || reportGuiManager.inputParametersRequiredByTemplates(report)) {
+                openReportParamsDialog(report, screen);
+            } else {
+                reportGuiManager.printReport(report, Collections.emptyMap(), screen);
+            }
         }
+    }
+
+    protected void openReportParamsDialog(Report report, FrameOwner screen) {
+        screenBuilders.screen(screen)
+                .withScreenId("report$inputParameters")
+                .withOpenMode(OpenMode.DIALOG)
+                .withOptions(new MapScreenOptions(ParamsMap.of(InputParametersWindow.REPORT_PARAMETER, report)))
+                .show();
     }
 }

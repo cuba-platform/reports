@@ -166,5 +166,6 @@ public class ReportRun extends AbstractLookup {
         codeFilter.setValue(null);
         updatedDateFilter.setValue(null);
         groupFilter.setValue(null);
+        filterReports();
     }
 }

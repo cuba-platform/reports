@@ -35,6 +35,7 @@ import com.haulmont.cuba.gui.data.impl.DatasourceImplementation;
 import com.haulmont.cuba.gui.export.ByteArrayDataProvider;
 import com.haulmont.cuba.gui.export.ExportDisplay;
 import com.haulmont.cuba.gui.export.ExportFormat;
+import com.haulmont.cuba.gui.screen.MapScreenOptions;
 import com.haulmont.cuba.security.entity.EntityOp;
 import com.haulmont.reports.app.service.ReportService;
 import com.haulmont.reports.entity.Report;
@@ -45,6 +46,7 @@ import com.haulmont.reports.gui.report.wizard.ReportWizardCreator;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -267,18 +269,13 @@ public class ReportBrowser extends AbstractLookup {
         }
 
         @Override
-        protected boolean isApplicable() {
-            // no selection or 1 selected item
-            return reportsTable.getSelected().size() <= 1;
-        }
-
-        @Override
         public void actionPerform(Component component) {
-            Report selectedReport = reportsTable.getSingleSelected();
+            Set<Report> selectedReports = reportsTable.getSelected();
             screenBuilders.screen(ReportBrowser.this)
                     .withScreenClass(ReportExecutionBrowser.class)
-                    .build()
-                    .setFilterByReport(selectedReport)
+                    .withOptions(new MapScreenOptions(
+                            ParamsMap.of(ReportExecutionBrowser.REPORTS_PARAMETER, new ArrayList<>(selectedReports))
+                    ))
                     .show();
         }
     }

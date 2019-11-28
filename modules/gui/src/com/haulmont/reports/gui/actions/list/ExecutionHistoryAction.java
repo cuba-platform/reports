@@ -16,31 +16,33 @@
 
 package com.haulmont.reports.gui.actions.list;
 
-import com.haulmont.chile.core.model.MetaClass;
+import com.haulmont.bali.util.ParamsMap;
 import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.gui.ComponentsHelper;
-import com.haulmont.cuba.gui.Screens;
+import com.haulmont.cuba.gui.ScreenBuilders;
 import com.haulmont.cuba.gui.components.ActionType;
 import com.haulmont.cuba.gui.components.Component;
 import com.haulmont.cuba.gui.components.actions.ListAction;
-import com.haulmont.cuba.gui.components.data.meta.EntityDataUnit;
 import com.haulmont.cuba.gui.meta.StudioAction;
+import com.haulmont.cuba.gui.screen.*;
 import com.haulmont.reports.entity.Report;
-import com.haulmont.reports.gui.report.history.ReportExecutionBrowser;
+import com.haulmont.reports.gui.report.history.ReportExecutionDialog;
 
 import javax.inject.Inject;
 
 /**
  * Standard action for displaying the report execution history.
  * <p>
- * Should be defined for a list component ({@code Table}, {@code DataGrid}, etc.) connected to a data container,
- * containing {@link Report} type elements.
+ * Should be defined in the screen that is associated with {@link Report}. Should be defined for a {@code Button}
+ * or a list component ({@code Table}, {@code DataGrid}, etc.).
  */
 @StudioAction(category = "Reports list actions", description = "Shows the report execution history")
 @ActionType(ExecutionHistoryAction.ID)
 public class ExecutionHistoryAction extends ListAction {
 
     public static final String ID = "executionHistory";
+
+    protected ScreenBuilders screenBuilders;
 
     public ExecutionHistoryAction() {
         this(ID);
@@ -55,29 +57,35 @@ public class ExecutionHistoryAction extends ListAction {
         this.caption = messages.getMessage(RunReportAction.class, "actions.ExecutionHistory");
     }
 
-    @Override
-    protected boolean isApplicable() {
-        return target != null
-                && target.getSelected().size() <= 1;
+    @Inject
+    public void setScreenBuilders(ScreenBuilders screenBuilders) {
+        this.screenBuilders = screenBuilders;
     }
 
     @Override
     public void actionPerform(Component component) {
-        MetaClass entityMetaClass;
-        if (target.getItems() instanceof EntityDataUnit) {
-            entityMetaClass = ((EntityDataUnit) target.getItems()).getEntityMetaClass();
+        if (target != null && target.getFrame() != null) {
+            openLookup(target.getFrame().getFrameOwner());
+        } else if (component instanceof Component.BelongToFrame) {
+            FrameOwner screen = ComponentsHelper.getWindowNN((Component.BelongToFrame) component).getFrameOwner();
+            openLookup(screen);
         } else {
-            throw new UnsupportedOperationException("Unsupported data unit " + target.getItems());
+            throw new IllegalStateException("No target screen or component found for 'ExecutionHistoryAction'");
+        }
+    }
+
+    protected void openLookup(FrameOwner screen) {
+        Screen hostScreen;
+        if (screen instanceof Screen) {
+            hostScreen = (Screen) screen;
+        } else {
+            hostScreen = UiControllerUtils.getHostScreen((ScreenFragment) screen);
         }
 
-        if (!entityMetaClass.getJavaClass().equals(Report.class)) {
-            throw new UnsupportedOperationException("Unsupported meta class " + entityMetaClass + " for executionHistory action");
-        }
-
-        Screens screens = ComponentsHelper.getScreenContext(target).getScreens();
-        Report selectedReport = (Report) target.getSingleSelected();
-        screens.create(ReportExecutionBrowser.class)
-                .setFilterByReport(selectedReport)
+        screenBuilders.lookup(Report.class, screen)
+                .withScreenClass(ReportExecutionDialog.class)
+                .withOpenMode(OpenMode.DIALOG)
+                .withOptions(new MapScreenOptions(ParamsMap.of(ReportExecutionDialog.SCREEN_PARAMETER, hostScreen.getId())))
                 .show();
     }
 }

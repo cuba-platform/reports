@@ -78,6 +78,7 @@
                 <column id="locName"/>
                 <column id="description"/>
                 <column id="code"/>
+                <column id="updateTs"/>
             </columns>
             <rows datasource="reportDs"/>
         </groupTable>

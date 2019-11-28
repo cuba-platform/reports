@@ -16,6 +16,7 @@
 
 package com.haulmont.reports.gui.report.history;
 
+import com.haulmont.cuba.gui.WindowParam;
 import com.haulmont.cuba.gui.components.Component;
 import com.haulmont.cuba.gui.components.Table;
 import com.haulmont.cuba.gui.components.actions.BaseAction;
@@ -25,13 +26,18 @@ import com.haulmont.cuba.gui.model.CollectionLoader;
 import com.haulmont.cuba.gui.screen.*;
 import com.haulmont.reports.entity.Report;
 import com.haulmont.reports.entity.ReportExecution;
+import org.springframework.util.CollectionUtils;
 
 import javax.inject.Inject;
+import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @UiController("report$ReportExecution.browse")
 @UiDescriptor("report-execution-browse.xml")
 public class ReportExecutionBrowser extends StandardLookup {
+
+    public static final String REPORTS_PARAMETER = "reports";
 
     @Inject
     protected CollectionLoader<ReportExecution> executionsDl;
@@ -42,13 +48,10 @@ public class ReportExecutionBrowser extends StandardLookup {
     @Inject
     protected ExportDisplay exportDisplay;
 
-    protected Function<Long, String> durationFormatter = new SecondsToTextFormatter();
-    protected Report filterByReport;
+    @WindowParam(name = REPORTS_PARAMETER)
+    protected List<Report> filterByReports;
 
-    public ReportExecutionBrowser setFilterByReport(Report filterByReport) {
-        this.filterByReport = filterByReport;
-        return this;
-    }
+    protected Function<Long, String> durationFormatter = new SecondsToTextFormatter();
 
     @Subscribe
     protected void onInit(InitEvent event) {
@@ -59,21 +62,22 @@ public class ReportExecutionBrowser extends StandardLookup {
     protected void onBeforeShow(BeforeShowEvent event) {
         initDataLoader();
 
-        if (filterByReport != null) {
-            String caption = messageBundle.formatMessage("report.executionHistory.byReport", filterByReport.getName());
+        if (filterByReports != null && !filterByReports.isEmpty()) {
+            String caption = messageBundle.formatMessage("report.executionHistory.byReport", getReportsNames());
             getWindow().setCaption(caption);
         }
     }
 
     protected void initDataLoader() {
-        String queryString = "select e from report$ReportExecution e"
-                + (filterByReport != null ? " where e.report.id = :reportId" : "")
-                + " order by e.startTime desc";
-        executionsDl.setQuery(queryString);
+        StringBuilder query = new StringBuilder("select e from report$ReportExecution e");
 
-        if (filterByReport != null) {
-            executionsDl.setParameter("reportId", filterByReport.getId());
+        if (!CollectionUtils.isEmpty(filterByReports)) {
+            query.append(" where e.report.id in :reportIds");
+            executionsDl.setParameter("reportIds", filterByReports);
         }
+        query.append(" order by e.startTime desc");
+
+        executionsDl.setQuery(query.toString());
         executionsDl.load();
     }
 
@@ -81,6 +85,16 @@ public class ReportExecutionBrowser extends StandardLookup {
     protected String formatExecutionTimeSec(Long value) {
         String text = durationFormatter.apply(value);
         return text;
+    }
+
+    protected String getReportsNames() {
+        if (CollectionUtils.isEmpty(filterByReports)) {
+            return "";
+        }
+
+        return filterByReports.stream()
+                .map(Report::getName)
+                .collect(Collectors.joining(", "));
     }
 
     public class DownloadDocumentAction extends BaseAction {
