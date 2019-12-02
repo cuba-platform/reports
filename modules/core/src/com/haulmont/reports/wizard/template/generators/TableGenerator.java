@@ -37,7 +37,7 @@ public class TableGenerator implements Generator {
         for (int i = 0; i < reportData.getReportRegions().size(); i++) {
             ReportRegion reportRegion = reportData.getReportRegions().get(i);
             TemplateTableBand band = new TemplateTableBand();
-            band.setPosition(i + 1);
+            band.setPosition(i);
             band.setBandName(reportRegion.getNameForBand());
 
             List<TemplateTableColumn> columns = new LinkedList<>();
@@ -45,7 +45,7 @@ public class TableGenerator implements Generator {
                 RegionProperty regionProperty = reportData.getReportRegions().get(i).getRegionProperties().get(j);
 
                 TemplateTableColumn column = new TemplateTableColumn();
-                column.setPosition(j + 1);
+                column.setPosition(j);
                 column.setColumn(regionProperty.getName());
                 column.setColumnName(regionProperty.getName());
 
