@@ -18,7 +18,6 @@ package com.haulmont.reports.gui.report.wizard;
 
 import com.haulmont.bali.util.Dom4j;
 import com.haulmont.chile.core.model.MetaClass;
-import com.haulmont.chile.core.model.MetaProperty;
 import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.MessageTools;
 import com.haulmont.cuba.core.global.Messages;
@@ -392,16 +391,14 @@ public class DetailsStepFrame extends StepFrame {
                 }
 
                 protected TemporalType getTemporalType(String propertyName) {
-                    return conditionsTree.toConditionsList().stream()
-                            .filter(condition -> Objects.nonNull(condition.getName()))
-                            .filter(condition -> condition.getName().equals(propertyName))
-                            .filter(condition -> condition.getParam() != null && condition.getParam().getProperty() != null)
-                            .map(condition -> {
-                                Map annotations = condition.getParam().getProperty().getAnnotations();
-                                return (TemporalType) annotations.get(MetadataTools.TEMPORAL_ANN_NAME);
-                            })
-                            .findFirst()
-                            .orElse(null);
+                    for (AbstractCondition condition : conditionsTree.toConditionsList()) {
+                        if (condition.getName() != null && condition.getName().equals(propertyName)
+                                && condition.getParam() != null && condition.getParam().getProperty() != null) {
+                            Map annotations = condition.getParam().getProperty().getAnnotations();
+                            return (TemporalType) annotations.get(MetadataTools.TEMPORAL_ANN_NAME);
+                        }
+                    }
+                    return null;
                 }
             });
         }
