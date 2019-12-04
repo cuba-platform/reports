@@ -57,6 +57,15 @@ public class ReportInputParameter extends BaseUuidEntity implements ReportParame
     protected String entityMetaClass;
 
     @MetaProperty
+    protected Boolean lookup = false;
+
+    @MetaProperty
+    protected String lookupJoin;
+
+    @MetaProperty
+    protected String lookupWhere;
+
+    @MetaProperty
     protected String enumerationClass;
 
     @MetaProperty
@@ -131,6 +140,30 @@ public class ReportInputParameter extends BaseUuidEntity implements ReportParame
 
     public String getEntityMetaClass() {
         return entityMetaClass;
+    }
+
+    public Boolean getLookup() {
+        return lookup;
+    }
+
+    public void setLookup(Boolean lookup) {
+        this.lookup = lookup;
+    }
+
+    public String getLookupJoin() {
+        return lookupJoin;
+    }
+
+    public void setLookupJoin(String lookupJoin) {
+        this.lookupJoin = lookupJoin;
+    }
+
+    public String getLookupWhere() {
+        return lookupWhere;
+    }
+
+    public void setLookupWhere(String lookupWhere) {
+        this.lookupWhere = lookupWhere;
     }
 
     public void setEntityMetaClass(String entityMetaClass) {
