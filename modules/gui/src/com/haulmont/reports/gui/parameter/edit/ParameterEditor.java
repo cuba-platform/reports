@@ -34,9 +34,12 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.*;
 
 public class ParameterEditor extends AbstractEditor<ReportInputParameter> {
+    protected final static String LOOKUP_SETTINGS_TAB_ID = "lookupSettingsTab";
+
     @Inject
     protected Label<String> defaultValueLabel;
     @Inject
@@ -50,6 +53,18 @@ public class ParameterEditor extends AbstractEditor<ReportInputParameter> {
     protected LookupField<ParameterType> type;
     @Inject
     protected LookupField<String> metaClass;
+    @Inject
+    protected CheckBox lookup;
+    @Inject
+    protected Label<String> lookupLabel;
+    @Inject
+    protected SourceCodeEditor lookupWhere;
+    @Inject
+    protected SourceCodeEditor lookupJoin;
+    @Named("tabsheet.lookupSettingsTab")
+    protected VBoxLayout lookupSettingsTab;
+    @Inject
+    protected TabSheet tabsheet;
 
     @Inject
     protected Label<String> enumerationLabel;
@@ -183,6 +198,18 @@ public class ParameterEditor extends AbstractEditor<ReportInputParameter> {
 
             ((DatasourceImplementation<ReportInputParameter>) parameterDs).modified(e.getItem());
         });
+
+        lookup.addValueChangeListener(e -> {
+            if (Boolean.TRUE.equals(e.getValue())) {
+                if (tabsheet.getTab(LOOKUP_SETTINGS_TAB_ID) == null) {
+                    tabsheet.addTab(LOOKUP_SETTINGS_TAB_ID, lookupSettingsTab);
+                }
+            } else {
+                if (tabsheet.getTab(LOOKUP_SETTINGS_TAB_ID) != null) {
+                    tabsheet.removeTab(LOOKUP_SETTINGS_TAB_ID);
+                }
+            }
+        });
     }
 
     protected void initScreensLookup() {
@@ -215,6 +242,15 @@ public class ParameterEditor extends AbstractEditor<ReportInputParameter> {
             }
         }
         metaClass.setOptionsMap(metaClassesOptionsMap);
+    }
+
+    @Override
+    protected boolean preCommit() {
+        if (!(getEditedEntity().getType() == ParameterType.ENTITY && Boolean.TRUE.equals(lookup.getValue()))) {
+            lookupWhere.setValue(null);
+            lookupJoin.setValue(null);
+        }
+        return super.preCommit();
     }
 
     protected void initDefaultValueField() {
@@ -266,12 +302,25 @@ public class ParameterEditor extends AbstractEditor<ReportInputParameter> {
     }
 
     protected void enableControlsByParamType(ParameterType type) {
-        boolean isEntity = type == ParameterType.ENTITY || type == ParameterType.ENTITY_LIST;
+        boolean isSingleEntity = type == ParameterType.ENTITY;
+        boolean isEntity = isSingleEntity || type == ParameterType.ENTITY_LIST;
         boolean isEnum = type == ParameterType.ENUMERATION;
         boolean isText = type == ParameterType.TEXT;
 
         metaClass.setVisible(isEntity);
         metaClassLabel.setVisible(isEntity);
+
+        lookup.setVisible(isSingleEntity);
+        lookupLabel.setVisible(isSingleEntity);
+        if (isSingleEntity && Boolean.TRUE.equals(lookup.getValue())) {
+            if (tabsheet.getTab(LOOKUP_SETTINGS_TAB_ID) == null) {
+                tabsheet.addTab(LOOKUP_SETTINGS_TAB_ID, lookupSettingsTab);
+            }
+        } else {
+            if (tabsheet.getTab(LOOKUP_SETTINGS_TAB_ID) != null) {
+                tabsheet.removeTab(LOOKUP_SETTINGS_TAB_ID);
+            }
+        }
 
         screen.setVisible(isEntity);
         screenLabel.setVisible(isEntity);
