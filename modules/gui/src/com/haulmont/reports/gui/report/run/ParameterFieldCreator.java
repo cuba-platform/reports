@@ -16,6 +16,7 @@
 
 package com.haulmont.reports.gui.report.run;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import com.haulmont.bali.util.ParamsMap;
 import com.haulmont.chile.core.datatypes.Datatypes;
@@ -29,6 +30,7 @@ import com.haulmont.cuba.gui.components.validators.DoubleValidator;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
 import com.haulmont.cuba.gui.data.CollectionDatasource.RefreshMode;
 import com.haulmont.cuba.gui.data.DsBuilder;
+import com.haulmont.cuba.gui.data.impl.DatasourceImplementation;
 import com.haulmont.cuba.gui.screen.compatibility.LegacyFrame;
 import com.haulmont.cuba.gui.xml.layout.ComponentsFactory;
 import com.haulmont.reports.app.service.ReportService;
@@ -196,13 +198,40 @@ public class ParameterFieldCreator {
     protected class SingleFieldCreator implements FieldCreator {
         @Override
         public Field createField(ReportInputParameter parameter) {
-            PickerField pickerField = componentsFactory.createComponent(PickerField.class);
+            boolean isLookup = Boolean.TRUE.equals(parameter.getLookup());
+            PickerField field;
             MetaClass entityMetaClass = metadata.getClassNN(parameter.getEntityMetaClass());
-            pickerField.setMetaClass(entityMetaClass);
 
-            PickerField.LookupAction pickerLookupAction = pickerField.addLookupAction();
-            pickerField.addAction(pickerLookupAction);
-            pickerField.addClearAction();
+            if (isLookup) {
+                field = componentsFactory.createComponent(LookupPickerField.class);
+
+                CollectionDatasource ds = DsBuilder.create()
+                        .setViewName(View.MINIMAL)
+                        .setMetaClass(entityMetaClass)
+                        .buildCollectionDatasource();
+                ds.setRefreshOnComponentValueChange(true);
+
+                String whereClause = parameter.getLookupWhere();
+                String joinClause = parameter.getLookupJoin();
+                if (!Strings.isNullOrEmpty(whereClause)) {
+                    String query = String.format("select e from %s e", entityMetaClass.getName());
+                    QueryTransformer queryTransformer = QueryTransformerFactory.createTransformer(query);
+                    queryTransformer.addWhere(whereClause);
+                    if (!Strings.isNullOrEmpty(joinClause)) {
+                        queryTransformer.addJoin(joinClause);
+                    }
+                    query = queryTransformer.getResult();
+                    ds.setQuery(query);
+                }
+                ((DatasourceImplementation) ds).initialized();
+                ((LookupPickerField) field).setOptionsDatasource(ds);
+            } else {
+                field = componentsFactory.createComponent(PickerField.class);
+            }
+            field.setMetaClass(entityMetaClass);
+            PickerField.LookupAction pickerLookupAction = field.addLookupAction();
+            field.addAction(pickerLookupAction);
+            field.addClearAction();
 
             String parameterScreen = parameter.getScreen();
 
@@ -222,7 +251,7 @@ public class ParameterFieldCreator {
                 pickerLookupAction.setLookupScreenParams(params);
             }
 
-            return pickerField;
+            return field;
         }
     }
 

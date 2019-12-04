@@ -63,6 +63,11 @@
                             <checkBox id="required" datasource="parameterDs" property="required"/>
                         </row>
                         <row>
+                            <label id="lookupLabel" value="msg://parameters.lookup" align="MIDDLE_LEFT"/>
+                            <checkBox id="lookup" datasource="parameterDs" property="lookup"
+                            contextHelpText="msg://parameters.lookupHelp"/>
+                        </row>
+                        <row>
                             <label id="metaClassLabel" value="msg://parameters.metaClass" align="MIDDLE_LEFT"/>
                             <lookupField id="metaClass" width="100%" datasource="parameterDs"
                                          property="entityMetaClass"
@@ -133,6 +138,32 @@
                                       mode="Groovy" height="240px"/>
                     <linkButton id="validationScriptHelp" icon="icons/question-white.png" invoke="getValidationScriptHelp"/>
                 </hbox>
+            </tab>
+            <tab id="lookupSettingsTab" caption="msg://parameters.lookupSettingsTab" margin="true" spacing="true">
+                <grid id="lookupSettingsBox" spacing="true" width="100%">
+                    <columns>
+                        <column/>
+                        <column flex="1"/>
+                    </columns>
+                    <rows>
+                        <row>
+                            <label id="lookupJoinLabel" value="msg://parameters.lookupJoin" align="MIDDLE_LEFT" width="AUTO"/>
+                            <sourceCodeEditor id="lookupJoin" datasource="parameterDs" property="lookupJoin"
+                                              highlightActiveLine="false" showGutter="false"
+                                              contextHelpText="msg://parameters.lookupJoinHelp"
+                                              contextHelpTextHtmlEnabled="true"
+                                              width="100%"/>
+                        </row>
+                        <row>
+                            <label id="lookupWhereLabel" value="msg://parameters.lookupWhere" align="MIDDLE_LEFT" width="AUTO"/>
+                            <sourceCodeEditor id="lookupWhere" datasource="parameterDs" property="lookupWhere"
+                                              highlightActiveLine="false" showGutter="false"
+                                              contextHelpText="msg://parameters.lookupWhereHelp"
+                                              contextHelpTextHtmlEnabled="true"
+                                              width="100%"/>
+                        </row>
+                    </rows>
+                </grid>
             </tab>
         </tabSheet>
         <frame id="windowActions" screen="editWindowActions"/>
