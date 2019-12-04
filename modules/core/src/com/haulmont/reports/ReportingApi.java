@@ -45,6 +45,8 @@ public interface ReportingApi {
 
     ReportOutputDocument createReport(Report report, ReportTemplate template, Map<String, Object> params);
 
+    ReportOutputDocument createReport(ReportRunParams reportRunParams);
+
     FileDescriptor createAndSaveReport(Report report,
                                               Map<String, Object> params, String fileName);
 
@@ -53,6 +55,8 @@ public interface ReportingApi {
 
     FileDescriptor createAndSaveReport(Report report, ReportTemplate template,
                                               Map<String, Object> params, String fileName);
+
+    FileDescriptor createAndSaveReport(ReportRunParams reportRunParams);
 
     byte[] exportReports(Collection<Report> reports);
 

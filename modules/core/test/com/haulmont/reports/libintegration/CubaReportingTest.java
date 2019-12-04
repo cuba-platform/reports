@@ -19,9 +19,12 @@ package com.haulmont.reports.libintegration;
 import com.haulmont.reports.entity.Report;
 import com.haulmont.reports.entity.ReportOutputType;
 import com.haulmont.reports.entity.ReportTemplate;
+import com.haulmont.yarg.reporting.RunParams;
 import com.haulmont.yarg.structure.BandData;
 import junit.framework.Assert;
 import org.junit.Test;
+
+import java.util.Collections;
 
 public class CubaReportingTest {
     @Test
@@ -31,17 +34,25 @@ public class CubaReportingTest {
         BandData rootBand = new BandData(null);
         String overridenName = "overriddenFileName.txt";
         String basicName = "basicFileName.txt";
-        rootBand.addData(CubaReporting.REPORT_FILE_NAME_KEY, overridenName);
 
         ReportTemplate reportTemplate = new ReportTemplate();
         reportTemplate.setReportOutputType(ReportOutputType.CUSTOM);
         reportTemplate.setName(basicName);
+        reportTemplate.setOutputNamePattern(basicName);
+        Report report = new Report();
+        report.setTemplates(Collections.singletonList(reportTemplate));
 
-        String outputName = cubaReporting.resolveOutputFileName(new Report(), reportTemplate, null, rootBand);
+        RunParams runParams = new RunParams(report).template(reportTemplate);
+
+        String outputName = cubaReporting.resolveOutputFileName(runParams, rootBand);
+        Assert.assertEquals(basicName, outputName);
+
+        rootBand.addData(CubaReporting.REPORT_FILE_NAME_KEY, overridenName);
+        outputName = cubaReporting.resolveOutputFileName(runParams, rootBand);
         Assert.assertEquals(overridenName, outputName);
 
         rootBand.addData(CubaReporting.REPORT_FILE_NAME_KEY, "");
-        outputName = cubaReporting.resolveOutputFileName(new Report(), reportTemplate, null, rootBand);
-        Assert.assertEquals(basicName, outputName);
+        outputName = cubaReporting.resolveOutputFileName(runParams.outputNamePattern(overridenName), rootBand);
+        Assert.assertEquals(overridenName, outputName);
     }
 }

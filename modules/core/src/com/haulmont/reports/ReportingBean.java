@@ -211,28 +211,36 @@ public class ReportingBean implements ReportingApi {
     public ReportOutputDocument createReport(Report report, Map<String, Object> params) {
         report = reloadEntity(report, REPORT_EDIT_VIEW_NAME);
         ReportTemplate reportTemplate = getDefaultTemplate(report);
-        return createReportDocument(report, reportTemplate, null, params);
+        return createReportDocument(new ReportRunParams().setReport(report).setReportTemplate(reportTemplate).setParams(params));
     }
 
     @Override
     public ReportOutputDocument createReport(Report report, Map<String, Object> params, com.haulmont.reports.entity.ReportOutputType outputType) {
         report = reloadEntity(report, REPORT_EDIT_VIEW_NAME);
         ReportTemplate template = getDefaultTemplate(report);
-        return createReportDocument(report, template, outputType, params);
+        return createReportDocument(new ReportRunParams().setReport(report).setReportTemplate(template).setOutputType(outputType).setParams(params));
     }
 
     @Override
     public ReportOutputDocument createReport(Report report, String templateCode, Map<String, Object> params) {
         report = reloadEntity(report, REPORT_EDIT_VIEW_NAME);
         ReportTemplate template = report.getTemplateByCode(templateCode);
-        return createReportDocument(report, template, null, params);
+        return createReportDocument(new ReportRunParams().setReport(report).setReportTemplate(template).setParams(params));
     }
 
     @Override
     public ReportOutputDocument createReport(Report report, String templateCode, Map<String, Object> params, com.haulmont.reports.entity.ReportOutputType outputType) {
         report = reloadEntity(report, REPORT_EDIT_VIEW_NAME);
         ReportTemplate template = report.getTemplateByCode(templateCode);
-        return createReportDocument(report, template, outputType, params);
+        return createReportDocument(new ReportRunParams().setReport(report).setReportTemplate(template).setOutputType(outputType).setParams(params));
+    }
+
+    @Override
+    public ReportOutputDocument createReport(ReportRunParams reportRunParams) {
+        Report report = reportRunParams.getReport();
+        report = reloadEntity(report, REPORT_EDIT_VIEW_NAME);
+        reportRunParams.setReport(report);
+        return createReportDocument(reportRunParams);
     }
 
     @Override
@@ -258,7 +266,8 @@ public class ReportingBean implements ReportingApi {
             Map<String, Integer> alreadyUsedNames = new HashMap<>();
 
             for (Map<String, Object> params : paramsList) {
-                ReportOutputDocument reportDocument = createReportDocument(report, reportTemplate, outputType, params);
+                ReportOutputDocument reportDocument =
+                        createReportDocument(new ReportRunParams().setReport(report).setReportTemplate(reportTemplate).setOutputType(outputType).setParams(params));
 
                 String documentName = reportDocument.getDocumentName();
                 if (alreadyUsedNames.containsKey(documentName)) {
@@ -303,7 +312,7 @@ public class ReportingBean implements ReportingApi {
     @Override
     public ReportOutputDocument createReport(Report report, ReportTemplate template, Map<String, Object> params) {
         report = reloadEntity(report, REPORT_EDIT_VIEW_NAME);
-        return createReportDocument(report, template, null, params);
+        return createReportDocument(new ReportRunParams().setReport(report).setReportTemplate(template).setParams(params));
     }
 
     protected void checkPermission(Report report) {
@@ -316,17 +325,15 @@ public class ReportingBean implements ReportingApi {
         }
     }
 
-    protected ReportOutputDocument createReportDocument(Report report, ReportTemplate template,
-                                                        @Nullable com.haulmont.reports.entity.ReportOutputType outputType,
-                                                        Map<String, Object> params) {
+    protected ReportOutputDocument createReportDocument(ReportRunParams reportRunParams) {
         if (!reportingConfig.isHistoryRecordingEnabled()) {
-            ReportOutputDocument document = createReportDocumentInternal(report, template, outputType, params);
-            return document;
+            return createReportDocumentInternal(reportRunParams);
         }
 
-        ReportExecution reportExecution = executionHistoryRecorder.startExecution(report, params);
+        ReportExecution reportExecution =
+                executionHistoryRecorder.startExecution(reportRunParams.getReport(), reportRunParams.getParams());
         try {
-            ReportOutputDocument document = createReportDocumentInternal(report, template, outputType, params);
+            ReportOutputDocument document = createReportDocumentInternal(reportRunParams);
             executionHistoryRecorder.markAsSuccess(reportExecution, document);
             return document;
         } catch (ReportCanceledException e) {
@@ -338,9 +345,13 @@ public class ReportingBean implements ReportingApi {
         }
     }
 
-    protected ReportOutputDocument createReportDocumentInternal(Report report, ReportTemplate template,
-                                                        @Nullable com.haulmont.reports.entity.ReportOutputType outputType,
-                                                        Map<String, Object> params) {
+    protected ReportOutputDocument createReportDocumentInternal(ReportRunParams reportRunParams) {
+        Report report = reportRunParams.getReport();
+        ReportTemplate template = reportRunParams.getReportTemplate();
+        com.haulmont.reports.entity.ReportOutputType outputType = reportRunParams.getOutputType();
+        Map<String, Object> params = reportRunParams.getParams();
+        String outputNamePattern = reportRunParams.getOutputNamePattern();
+
         StopWatch stopWatch = null;
         MDC.put("user", userSessionSource.getUserSession().getUser().getLogin());
         MDC.put("webContextName", globalConfig.getWebContextName());
@@ -367,7 +378,7 @@ public class ReportingBean implements ReportingApi {
 
             ReportOutputType resultOutputType = (outputType != null) ? outputType.getOutputType() : template.getOutputType();
 
-            return reportingApi.runReport(new RunParams(report).template(template).params(resultParams).output(resultOutputType));
+            return reportingApi.runReport(new RunParams(report).template(template).params(resultParams).output(resultOutputType).outputNamePattern(outputNamePattern));
         } catch (NoFreePortsException nfe) {
             throw new NoOpenOfficeFreePortsException(nfe.getMessage());
         } catch (com.haulmont.yarg.exception.OpenOfficeException ooe) {
@@ -484,14 +495,29 @@ public class ReportingBean implements ReportingApi {
     public FileDescriptor createAndSaveReport(Report report, ReportTemplate template,
                                               Map<String, Object> params, String fileName) {
         report = reloadEntity(report, REPORT_EDIT_VIEW_NAME);
-        return createAndSaveReportDocument(report, template, params, fileName);
+        ReportRunParams reportRunParams = new ReportRunParams()
+                .setReport(report)
+                .setReportTemplate(template)
+                .setParams(params)
+                .setOutputNamePattern(fileName);
+        return createAndSaveReportDocument(reportRunParams);
     }
 
-    protected FileDescriptor createAndSaveReportDocument(Report report, ReportTemplate template, Map<String, Object> params, String fileName) {
-        byte[] reportData = createReportDocument(report, template, null, params).getContent();
-        String ext = template.getReportOutputType().toString().toLowerCase();
+    @Override
+    public FileDescriptor createAndSaveReport(ReportRunParams reportRunParams) {
+        Report report = reportRunParams.getReport();
+        report = reloadEntity(report, REPORT_EDIT_VIEW_NAME);
+        reportRunParams.setReport(report);
+        return createAndSaveReportDocument(reportRunParams);
+    }
 
-        return saveReport(reportData, fileName, ext);
+    protected FileDescriptor createAndSaveReportDocument(ReportRunParams reportRunParams) {
+        ReportOutputDocument reportOutputDocument = createReportDocument(reportRunParams);
+        byte[] reportData = reportOutputDocument.getContent();
+        String documentName = reportOutputDocument.getDocumentName();
+        String ext = reportRunParams.getReportTemplate().getReportOutputType().toString().toLowerCase();
+
+        return saveReport(reportData, documentName, ext);
     }
 
     protected FileDescriptor saveReport(byte[] reportData, String fileName, String ext) {

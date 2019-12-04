@@ -30,6 +30,7 @@ import com.haulmont.reports.entity.PredefinedTransformation;
 import com.haulmont.reports.entity.ReportInputParameter;
 import com.haulmont.yarg.exception.ReportingException;
 import com.haulmont.yarg.reporting.Reporting;
+import com.haulmont.yarg.reporting.RunParams;
 import com.haulmont.yarg.structure.*;
 import com.haulmont.yarg.util.groovy.Scripting;
 import org.apache.commons.lang3.BooleanUtils;
@@ -56,12 +57,12 @@ public class CubaReporting extends Reporting {
     }
 
     @Override
-    protected String resolveOutputFileName(Report report, ReportTemplate reportTemplate, ReportOutputType outputType, BandData rootBand) {
+    protected String resolveOutputFileName(RunParams runParams, BandData rootBand) {
         String generatedReportFileName = (String) rootBand.getData().get(REPORT_FILE_NAME_KEY);
         if (StringUtils.isNotBlank(generatedReportFileName)) {
             return generatedReportFileName;
         } else {
-            return super.resolveOutputFileName(report, reportTemplate, outputType, rootBand);
+            return super.resolveOutputFileName(runParams, rootBand);
         }
     }
 
