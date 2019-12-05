@@ -128,7 +128,7 @@ public class ReportRegion extends BaseUuidEntity implements OrderableEntity {
     }
 
     public boolean isTabulatedRegion() {
-        return isTabulatedRegion;
+        return Boolean.TRUE.equals(isTabulatedRegion);
     }
 
     public void setBandNameFromReport(String bandNameFromReport) {
