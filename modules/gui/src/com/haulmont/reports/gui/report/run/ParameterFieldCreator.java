@@ -218,7 +218,7 @@ public class ParameterFieldCreator {
                     QueryTransformer queryTransformer = QueryTransformerFactory.createTransformer(query);
                     queryTransformer.addWhere(whereClause);
                     if (!Strings.isNullOrEmpty(joinClause)) {
-                        queryTransformer.addJoin(joinClause);
+                        queryTransformer.addJoinAsIs(joinClause);
                     }
                     query = queryTransformer.getResult();
                     ds.setQuery(query);
