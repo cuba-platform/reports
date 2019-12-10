@@ -20,9 +20,12 @@ import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.global.Metadata;
 import com.haulmont.cuba.core.global.Security;
 import com.haulmont.cuba.gui.components.*;
+import com.haulmont.cuba.gui.components.autocomplete.JpqlSuggestionFactory;
+import com.haulmont.cuba.gui.components.autocomplete.Suggestion;
 import com.haulmont.cuba.gui.data.Datasource;
 import com.haulmont.cuba.gui.data.impl.DatasourceImplementation;
 import com.haulmont.cuba.gui.sys.ScreensHelper;
+import com.haulmont.cuba.gui.theme.ThemeConstants;
 import com.haulmont.cuba.security.entity.EntityOp;
 import com.haulmont.reports.app.service.ReportService;
 import com.haulmont.reports.entity.ParameterType;
@@ -37,8 +40,11 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.*;
 
+import static java.lang.String.format;
+
 public class ParameterEditor extends AbstractEditor<ReportInputParameter> {
     protected final static String LOOKUP_SETTINGS_TAB_ID = "lookupSettingsTab";
+    protected final static String WHERE = " where ";
 
     @Inject
     protected Label<String> defaultValueLabel;
@@ -109,6 +115,8 @@ public class ParameterEditor extends AbstractEditor<ReportInputParameter> {
     protected Metadata metadata;
     @Inject
     protected Security security;
+    @Inject
+    protected ThemeConstants themeConstants;
 
     @Inject
     protected ReportService reportService;
@@ -153,6 +161,8 @@ public class ParameterEditor extends AbstractEditor<ReportInputParameter> {
         initEnumsLookup();
 
         initListeners();
+
+        initCodeEditors();
     }
 
     @Override
@@ -212,6 +222,14 @@ public class ParameterEditor extends AbstractEditor<ReportInputParameter> {
         });
     }
 
+    protected void initCodeEditors() {
+        lookupWhere.setSuggester((source, text, cursorPosition) -> requestHint(lookupWhere, cursorPosition));
+        lookupWhere.setHeight(themeConstants.get("cuba.gui.customConditionFrame.whereField.height"));
+
+        lookupJoin.setSuggester((source, text, cursorPosition) -> requestHint(lookupJoin, cursorPosition));
+        lookupJoin.setHeight(themeConstants.get("cuba.gui.customConditionFrame.joinField.height"));
+    }
+
     protected void initScreensLookup() {
         ReportInputParameter parameter = getItem();
         if (parameter.getType() == ParameterType.ENTITY ||  parameter.getType() == ParameterType.ENTITY_LIST) {
@@ -258,7 +276,20 @@ public class ParameterEditor extends AbstractEditor<ReportInputParameter> {
         defaultValueBox.removeAll();
         ReportInputParameter parameter = getItem();
         if (canHaveDefaultValue()) {
-            Field<Object> field = parameterFieldCreator.createField(parameter);
+            Field<Object> field;
+            if (ParameterType.ENTITY.equals(parameter.getType()) && Boolean.TRUE.equals(parameter.getLookup())) {
+                ReportInputParameter entityParam = metadata.create(ReportInputParameter.class);
+                entityParam.setReport(parameter.getReport());
+                entityParam.setType(parameter.getType());
+                entityParam.setEntityMetaClass(parameter.getEntityMetaClass());
+                entityParam.setScreen(parameter.getScreen());
+                entityParam.setAlias(parameter.getAlias());
+                entityParam.setRequired(parameter.getRequired());
+                field = parameterFieldCreator.createField(entityParam);
+            } else {
+                field = parameterFieldCreator.createField(parameter);
+            }
+
             field.addValueChangeListener(e -> {
                 if (e.getValue() != null) {
                     parameter.setDefaultValue(reportService.convertToString(e.getValue().getClass(), e.getValue()));
@@ -387,5 +418,44 @@ public class ParameterEditor extends AbstractEditor<ReportInputParameter> {
                         ParameterType.DATETIME.equals(parameter.getType()) ||
                         ParameterType.TIME.equals(parameter.getType()))
                 .orElse(false);
+    }
+
+    protected List<Suggestion> requestHint(SourceCodeEditor sender, int senderCursorPosition) {
+        String joinStr = lookupJoin.getValue();
+        String whereStr = lookupWhere.getValue();
+
+        // CAUTION: the magic entity name!  The length is three character to match "{E}" length in query
+        String entityAlias = "a39";
+
+        int queryPosition = -1;
+        Class javaClassForEntity = getItem().getParameterClass();
+        if (javaClassForEntity == null) {
+            return new ArrayList<>();
+        }
+
+        String queryStart = format("select %s from %s %s ", entityAlias, metadata.getClassNN(javaClassForEntity), entityAlias);
+
+        StringBuilder queryBuilder = new StringBuilder(queryStart);
+        if (StringUtils.isNotEmpty(joinStr)) {
+            if (sender == lookupJoin) {
+                queryPosition = queryBuilder.length() + senderCursorPosition - 1;
+            }
+            if (!StringUtils.containsIgnoreCase(joinStr, "join") && !StringUtils.contains(joinStr, ",")) {
+                queryBuilder.append("join ").append(joinStr);
+                queryPosition += "join ".length();
+            } else {
+                queryBuilder.append(joinStr);
+            }
+        }
+        if (StringUtils.isNotEmpty(whereStr)) {
+            if (sender == lookupWhere) {
+                queryPosition = queryBuilder.length() + WHERE.length() + senderCursorPosition - 1;
+            }
+            queryBuilder.append(WHERE).append(whereStr);
+        }
+        String query = queryBuilder.toString();
+        query = query.replace("{E}", entityAlias);
+
+        return JpqlSuggestionFactory.requestHint(query, queryPosition, sender.getAutoCompleteSupport(), senderCursorPosition);
     }
 }
