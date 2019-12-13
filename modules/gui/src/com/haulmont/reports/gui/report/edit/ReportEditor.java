@@ -202,8 +202,9 @@ public class ReportEditor extends AbstractEditor<Report> {
         rootDefinition.setReport(report);
 
         groupsDs.refresh();
-        if (groupsDs.getItemIds() != null) {
-            UUID id = groupsDs.getItemIds().iterator().next();
+        Collection<UUID> reportGroupIds = groupsDs.getItemIds();
+        if (reportGroupIds != null && !reportGroupIds.isEmpty()) {
+            UUID id = reportGroupIds.iterator().next();
             report.setGroup(groupsDs.getItem(id));
         }
     }
