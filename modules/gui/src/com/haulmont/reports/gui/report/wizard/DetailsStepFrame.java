@@ -225,12 +225,15 @@ public class DetailsStepFrame extends StepFrame {
                 conditionsTree = fakeFilterSupport.createFakeConditionsTree(filter, filterEntity);
             }
 
+            List<Op> hideOperations = Collections.singletonList(Op.DATE_INTERVAL);
+
             Map<String, Object> params = new HashMap<>();
             params.put("filterEntity", filterEntity);
             params.put("filter", filter);
             params.put("conditionsTree", conditionsTree);
             params.put("useShortConditionForm", true);
             params.put("showConditionHiddenOption", true);
+            params.put("hideOperations", hideOperations);
 
             FilterEditor filterEditor = (FilterEditor) wizard.openWindow("filterEditor", OpenType.DIALOG, params);
             filterEditor.addCloseListener(new Window.CloseListener() {
