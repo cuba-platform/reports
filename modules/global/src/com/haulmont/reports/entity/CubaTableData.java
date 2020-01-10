@@ -16,16 +16,15 @@
 
 package com.haulmont.reports.entity;
 
-import com.haulmont.bali.datastruct.Pair;
 import com.haulmont.cuba.core.entity.KeyValueEntity;
 
 import java.io.Serializable;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
-public class CubaTableData implements Serializable{
+public class CubaTableData implements Serializable {
 
     /**
      * Data represents band/group/table name and list of rows as key(column)-value maps.
@@ -35,9 +34,9 @@ public class CubaTableData implements Serializable{
     /**
      * Headers contain band/group/table name and set of pairs 'column name - column type as Class'.
      */
-    protected Map<String, Set<Pair<String, Class>>> headers;
+    protected Map<String, Set<ColumnInfo>> headers;
 
-    public CubaTableData(Map<String, List<KeyValueEntity>> data, Map<String, Set<Pair<String, Class>>> headers) {
+    public CubaTableData(Map<String, List<KeyValueEntity>> data, Map<String, Set<ColumnInfo>> headers) {
         this.data = data;
         this.headers = headers;
     }
@@ -50,11 +49,81 @@ public class CubaTableData implements Serializable{
         this.data = data;
     }
 
-    public Map<String, Set<Pair<String, Class>>> getHeaders() {
+    public Map<String, Set<ColumnInfo>> getHeaders() {
         return headers;
     }
 
-    public void setHeaders(Map<String, Set<Pair<String, Class>>> headers) {
+    public void setHeaders(Map<String, Set<ColumnInfo>> headers) {
         this.headers = headers;
+    }
+
+    public static class ColumnInfo implements Serializable {
+
+        protected String key;
+
+        protected Class columnClass;
+
+        protected String caption;
+
+        protected Integer position;
+
+        public ColumnInfo(String key, Class columnClass, String caption) {
+            this(key, columnClass, caption, null);
+        }
+
+        public ColumnInfo(String key, Class columnClass, String caption, Integer position) {
+            this.key = key;
+            this.columnClass = columnClass;
+            this.caption = caption;
+            this.position = position;
+        }
+
+        public String getKey() {
+            return key;
+        }
+
+        public void setKey(String key) {
+            this.key = key;
+        }
+
+        public Class getColumnClass() {
+            return columnClass;
+        }
+
+        public void setColumnClass(Class columnClass) {
+            this.columnClass = columnClass;
+        }
+
+        public String getCaption() {
+            return caption;
+        }
+
+        public void setCaption(String caption) {
+            this.caption = caption;
+        }
+
+        public Integer getPosition() {
+            return position;
+        }
+
+        public void setPosition(Integer position) {
+            this.position = position;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof ColumnInfo)) return false;
+            ColumnInfo that = (ColumnInfo) o;
+            return getPosition().equals(that.getPosition()) &&
+                    Objects.equals(getKey(), that.getKey()) &&
+                    Objects.equals(getColumnClass(), that.getColumnClass()) &&
+                    Objects.equals(getCaption(), that.getCaption());
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(getKey(), getColumnClass(), getCaption(), getPosition());
+        }
     }
 }

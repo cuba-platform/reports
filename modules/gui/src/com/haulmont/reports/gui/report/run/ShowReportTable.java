@@ -16,11 +16,9 @@
 
 package com.haulmont.reports.gui.report.run;
 
-import com.haulmont.bali.datastruct.Pair;
 import com.haulmont.bali.util.ParamsMap;
 import com.haulmont.chile.core.datatypes.Datatypes;
 import com.haulmont.chile.core.datatypes.impl.EnumClass;
-import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.chile.core.model.MetaProperty;
 import com.haulmont.chile.core.model.MetaPropertyPath;
 import com.haulmont.cuba.core.entity.Entity;
@@ -160,7 +158,7 @@ public class ShowReportTable extends AbstractWindow {
 
     protected void drawTables(CubaTableData dto) {
         Map<String, List<KeyValueEntity>> data = dto.getData();
-        Map<String, Set<Pair<String, Class>>> headerMap = dto.getHeaders();
+        Map<String, Set<CubaTableData.ColumnInfo>> headerMap = dto.getHeaders();
         tablesHolderGroup.removeAll();
 
         if (data == null || data.isEmpty())
@@ -169,7 +167,7 @@ public class ShowReportTable extends AbstractWindow {
         data.forEach((dataSetName, keyValueEntities) -> {
             if (keyValueEntities != null && !keyValueEntities.isEmpty()) {
                 GroupDatasource dataSource = createDataSource(dataSetName, keyValueEntities, headerMap);
-                Table table = createTable(dataSetName, dataSource);
+                Table table = createTable(dataSetName, dataSource, headerMap);
                 tablesHolderGroup.setCaption(dataSetName);
                 tablesHolderGroup.add(table);
                 tablesHolderGroup.expand(table);
@@ -177,20 +175,20 @@ public class ShowReportTable extends AbstractWindow {
         });
     }
 
-    protected GroupDatasource createDataSource(String dataSetName, List<KeyValueEntity> keyValueEntities, Map<String, Set<Pair<String, Class>>> headerMap) {
+    protected GroupDatasource createDataSource(String dataSetName, List<KeyValueEntity> keyValueEntities, Map<String, Set<CubaTableData.ColumnInfo>> headerMap) {
         DsBuilder dsBuilder = DsBuilder.create(getDsContext())
                 .setId(dataSetName + "Ds")
                 .setDataSupplier(getDsContext().getDataSupplier());
         ValueGroupDatasourceImpl ds = dsBuilder.buildValuesGroupDatasource();
         ds.setRefreshMode(CollectionDatasource.RefreshMode.NEVER);
 
-        Set<Pair<String, Class>> headers = headerMap.get(dataSetName);
-        for (Pair<String, Class> pair : headers) {
-            Class javaClass = pair.getSecond();
+        Set<CubaTableData.ColumnInfo> headers = headerMap.get(dataSetName);
+        for (CubaTableData.ColumnInfo header : headers) {
+            Class javaClass = header.getColumnClass();
             if (Entity.class.isAssignableFrom(javaClass) ||
                     EnumClass.class.isAssignableFrom(javaClass) ||
                     Datatypes.get(javaClass) != null) {
-                ds.addProperty(pair.getFirst(), pair.getSecond());
+                ds.addProperty(createColumnKey(header), javaClass);
             }
         }
 
@@ -199,10 +197,13 @@ public class ShowReportTable extends AbstractWindow {
         return ds;
     }
 
-    protected Table createTable(String dataSetName, GroupDatasource dataSource) {
+    protected Table createTable(String dataSetName, GroupDatasource dataSource, Map<String, Set<CubaTableData.ColumnInfo>> headerMap) {
         Table table = componentsFactory.createComponent(GroupTable.class);
         table.setId(dataSetName + "Table");
-        createColumns(dataSource, table);
+
+        Set<CubaTableData.ColumnInfo> headers = headerMap.get(dataSetName);
+
+        createColumns(dataSource, table, headers);
         table.setDatasource(dataSource);
         table.setWidth("100%");
         table.setMultiSelect(true);
@@ -219,25 +220,38 @@ public class ShowReportTable extends AbstractWindow {
         return table;
     }
 
-    protected void createColumns(GroupDatasource dataSource, Table table) {
+    protected void createColumns(GroupDatasource dataSource, Table table, Set<CubaTableData.ColumnInfo> headers) {
         Collection<MetaPropertyPath> paths = metadataTools.getPropertyPaths(dataSource.getMetaClass());
-        int i = 0;
         for (MetaPropertyPath metaPropertyPath : paths) {
             MetaProperty property = metaPropertyPath.getMetaProperty();
             if (!property.getRange().getCardinality().isMany() && !metadataTools.isSystem(property)) {
                 Table.Column column = new Table.Column(metaPropertyPath);
 
                 String propertyName = property.getName();
-                MetaClass propertyMetaClass = metadataTools.getPropertyEnclosingMetaClass(metaPropertyPath);
 
-                column.setCaption(messageTools.getPropertyCaption(propertyMetaClass, propertyName));
+                CubaTableData.ColumnInfo columnInfo = getColumnInfo(propertyName, headers);
+                column.setCaption(columnInfo.getCaption());
                 column.setType(metaPropertyPath.getRangeJavaClass());
 
                 Element element = DocumentHelper.createElement("column");
                 column.setXmlDescriptor(element);
-                table.addColumn(column, i);
-                i++;
+                if(columnInfo.getPosition() == null) {
+                    table.addColumn(column);
+                } else {
+                    table.addColumn(column, columnInfo.getPosition());
+                }
             }
         }
+    }
+
+    private CubaTableData.ColumnInfo getColumnInfo(String headerKey, Set<CubaTableData.ColumnInfo> headers) {
+        return headers.stream()
+                .filter(header -> headerKey.equals(createColumnKey(header)))
+                .findFirst()
+                .orElse(null);
+    }
+
+    private String createColumnKey(CubaTableData.ColumnInfo header) {
+        return header.getKey().replace('.', '-');
     }
 }

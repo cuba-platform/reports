@@ -57,8 +57,8 @@
                                 <button action="columnsTable.down" icon="icons/down.png"/>
                             </buttonsPanel>
                             <columns>
-                                <column id="column" caption="msg://template.column" editable="true" required="true"/>
-                                <column id="columnName" caption="msg://template.columnName" editable="true" required="true"/>
+                                <column id="key" caption="msg://template.column" editable="true" required="true"/>
+                                <column id="caption" caption="msg://template.columnName" editable="true" required="true"/>
                             </columns>
                             <rows datasource="tableColumnsDs"/>
                         </table>

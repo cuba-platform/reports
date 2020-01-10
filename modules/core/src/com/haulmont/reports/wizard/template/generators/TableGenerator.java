@@ -44,10 +44,12 @@ public class TableGenerator implements Generator {
             for (int j = 0; j < reportRegion.getRegionProperties().size(); j++) {
                 RegionProperty regionProperty = reportData.getReportRegions().get(i).getRegionProperties().get(j);
 
+                String caption = regionProperty.getHierarchicalLocalizedNameExceptRoot().replace('.', ' ');
+
                 TemplateTableColumn column = new TemplateTableColumn();
                 column.setPosition(j);
-                column.setColumn(regionProperty.getName());
-                column.setColumnName(regionProperty.getName());
+                column.setKey(regionProperty.getHierarchicalNameExceptRoot());
+                column.setCaption(caption);
 
                 columns.add(column);
             }

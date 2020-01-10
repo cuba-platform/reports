@@ -24,10 +24,10 @@ import com.haulmont.cuba.core.entity.BaseUuidEntity;
 public class TemplateTableColumn extends BaseUuidEntity {
 
     @MetaProperty
-    protected String column;
+    protected String key;
 
     @MetaProperty
-    protected String columnName;
+    protected String caption;
 
     @MetaProperty
     protected Integer position;
@@ -40,19 +40,19 @@ public class TemplateTableColumn extends BaseUuidEntity {
         this.position = position;
     }
 
-    public String getColumn() {
-        return column;
+    public String getKey() {
+        return key;
     }
 
-    public void setColumn(String column) {
-        this.column = column;
+    public void setKey(String key) {
+        this.key = key;
     }
 
-    public String getColumnName() {
-        return columnName;
+    public String getCaption() {
+        return caption;
     }
 
-    public void setColumnName(String columnName) {
-        this.columnName = columnName;
+    public void setCaption(String caption) {
+        this.caption = caption;
     }
 }

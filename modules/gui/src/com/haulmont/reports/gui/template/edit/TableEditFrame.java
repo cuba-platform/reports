@@ -292,7 +292,7 @@ public class TableEditFrame extends DescriptionEditFrame {
             }
 
             for (TemplateTableColumn column : band.getColumns()) {
-                if (column.getColumn() == null || column.getColumnName() == null) {
+                if (column.getKey() == null || column.getCaption() == null) {
                     showNotification(getMessage("template.bandTableOrColumnTableRequired"), NotificationType.TRAY);
                     return false;
                 }
