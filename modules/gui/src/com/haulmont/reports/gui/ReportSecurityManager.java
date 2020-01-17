@@ -52,16 +52,18 @@ public class ReportSecurityManager {
             List<UserRole> userRoles = user.getUserRoles();
             boolean superRole = false;
             if (reportingClientConfig.getAllReportsAvailableForAdmin()) {
-                Collection<RoleDefinition> roleDefinitions = rolesService.getRoleDefinitions(userRoles);
+                Collection<Role> roleDefinitions = rolesService.getRoles(userRoles);
                 superRole = roleDefinitions.stream().anyMatch(this::isSuperRole);
             }
             if (!superRole) {
                 StringBuilder roleCondition = new StringBuilder("r.rolesIdx is null");
                 for (int i = 0; i < userRoles.size(); i++) {
                     UserRole ur = userRoles.get(i);
-                    String paramName = "role" + (i + 1);
-                    roleCondition.append(" or r.rolesIdx like :").append(paramName).append(" escape '\\'");
-                    lc.getQuery().setParameter(paramName, wrapIdxParameterForSearch(ur.getRole().getId().toString()));
+                    if (ur.getRole() != null) {
+                        String paramName = "role" + (i + 1);
+                        roleCondition.append(" or r.rolesIdx like :").append(paramName).append(" escape '\\'");
+                        lc.getQuery().setParameter(paramName, wrapIdxParameterForSearch(ur.getRole().getId().toString()));
+                    }
                 }
                 transformer.addWhereAsIs(roleCondition.toString());
             }
@@ -93,19 +95,13 @@ public class ReportSecurityManager {
         return "%," + QueryUtils.escapeForLike(value) + ",%";
     }
 
-    protected boolean isSuperRole(RoleDefinition roleDefinition) {
-
-        EntityPermissionsContainer entityPermissions = roleDefinition.entityPermissions();
-        EntityAttributePermissionsContainer entityAttributePermissions = roleDefinition.entityAttributePermissions();
-        ScreenPermissionsContainer screenPermissions = roleDefinition.screenPermissions();
-        SpecificPermissionsContainer specificPermissions = roleDefinition.specificPermissions();
-
-        return entityPermissions.getDefaultEntityCreateAccess() == Access.ALLOW
-                && entityPermissions.getDefaultEntityReadAccess() == Access.ALLOW
-                && entityPermissions.getDefaultEntityUpdateAccess() == Access.ALLOW
-                && entityPermissions.getDefaultEntityDeleteAccess() == Access.ALLOW
-                && entityAttributePermissions.getDefaultEntityAttributeAccess() == EntityAttrAccess.MODIFY
-                && screenPermissions.getDefaultScreenAccess() == Access.ALLOW
-                && specificPermissions.getDefaultSpecificAccess() == Access.ALLOW;
+    protected boolean isSuperRole(Role role) {
+        return role.getDefaultEntityCreateAccess() == Access.ALLOW
+                && role.getDefaultEntityReadAccess() == Access.ALLOW
+                && role.getDefaultEntityUpdateAccess() == Access.ALLOW
+                && role.getDefaultEntityDeleteAccess() == Access.ALLOW
+                && role.getDefaultEntityAttributeAccess() == EntityAttrAccess.MODIFY
+                && role.getDefaultScreenAccess() == Access.ALLOW
+                && role.getDefaultSpecificAccess() == Access.ALLOW;
     }
 }
