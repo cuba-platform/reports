@@ -59,10 +59,12 @@ public class ReportSecurityManager {
                 StringBuilder roleCondition = new StringBuilder("r.rolesIdx is null");
                 for (int i = 0; i < userRoles.size(); i++) {
                     UserRole ur = userRoles.get(i);
+                    String paramName = "role" + (i + 1);
+                    roleCondition.append(" or r.rolesIdx like :").append(paramName).append(" escape '\\'");
                     if (ur.getRole() != null) {
-                        String paramName = "role" + (i + 1);
-                        roleCondition.append(" or r.rolesIdx like :").append(paramName).append(" escape '\\'");
                         lc.getQuery().setParameter(paramName, wrapIdxParameterForSearch(ur.getRole().getId().toString()));
+                    } else {
+                        lc.getQuery().setParameter(paramName, wrapIdxParameterForSearch(ur.getRoleName()));
                     }
                 }
                 transformer.addWhereAsIs(roleCondition.toString());

@@ -719,8 +719,13 @@ public class ReportingBean implements ReportingApi {
             StringBuilder roles = new StringBuilder(IDX_SEPARATOR);
             if (report.getRoles() != null) {
                 for (Role role : report.getRoles()) {
-                    roles.append(role.getId().toString())
-                            .append(IDX_SEPARATOR);
+                    if (role.isPredefined()) {
+                        roles.append(role.getName())
+                                .append(IDX_SEPARATOR);
+                    } else {
+                        roles.append(role.getId().toString())
+                                .append(IDX_SEPARATOR);
+                    }
                 }
             }
             report.setRolesIdx(roles.length() > 1 ? roles.toString() : null);
