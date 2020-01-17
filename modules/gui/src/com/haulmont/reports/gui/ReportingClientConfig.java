@@ -29,20 +29,32 @@ public interface ReportingClientConfig extends Config {
     @Property("reporting.useBackgroundReportProcessing")
     @DefaultBoolean(false)
     boolean getUseBackgroundReportProcessing();
+
     void setUseBackgroundReportProcessing(boolean useBackgroundReportProcessing);
 
     @Property("reporting.backgroundReportProcessingTimeoutMs")
     @DefaultLong(10000)
     long getBackgroundReportProcessingTimeoutMs();
+
     void setBackgroundReportProcessingTimeoutMs(long backgroundReportProcessingTimeoutMs);
 
     /**
      * @return true if Script fields in report editor should handle TAB key as \t symbol instead of focus navigation
-     *
      * @see com.haulmont.reports.gui.definition.edit.BandDefinitionEditor
      */
     @Property("reporting.enableTabSymbolInDataSetEditor")
     @DefaultBoolean(false)
     boolean getEnableTabSymbolInDataSetEditor();
+
     void setEnableTabSymbolInDataSetEditor(boolean enableTabSymbolInDataSetEditor);
+
+    /**
+     * @return true if admin role isn't configured on report and report is visible for admin in run report screen
+     */
+    @Property("reporting.allReportsAvailableForAdmin")
+    @Source(type = SourceType.APP)
+    @DefaultBoolean(false)
+    boolean getAllReportsAvailableForAdmin();
+
+    void setAllReportsAvailableForAdmin(boolean allReportsAvailableForAdmin);
 }

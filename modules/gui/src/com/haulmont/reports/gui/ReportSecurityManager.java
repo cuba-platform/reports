@@ -21,11 +21,8 @@ import com.haulmont.cuba.core.global.LoadContext;
 import com.haulmont.cuba.core.global.QueryTransformer;
 import com.haulmont.cuba.core.global.QueryTransformerFactory;
 import com.haulmont.cuba.core.global.QueryUtils;
-import com.haulmont.cuba.security.entity.RoleType;
-import com.haulmont.cuba.security.entity.User;
-import com.haulmont.cuba.security.entity.UserRole;
-import com.haulmont.cuba.security.role.RoleDefinition;
-import com.haulmont.cuba.security.role.RolesService;
+import com.haulmont.cuba.security.entity.*;
+import com.haulmont.cuba.security.role.*;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Nullable;
@@ -39,6 +36,8 @@ public class ReportSecurityManager {
     protected QueryTransformerFactory queryTransformerFactory;
     @Inject
     protected RolesService rolesService;
+    @Inject
+    protected ReportingClientConfig reportingClientConfig;
 
     /**
      * Apply security constraints for query to select reports available by roles and screen restrictions
@@ -51,9 +50,11 @@ public class ReportSecurityManager {
         }
         if (user != null) {
             List<UserRole> userRoles = user.getUserRoles();
-            Collection<RoleDefinition> roleDefinitions = rolesService.getRoleDefinitions(userRoles);
             boolean superRole = false;
-                    //roleDefinitions.stream().anyMatch(roleDefinition -> roleDefinition.getRoleType() == RoleType.SUPER);
+            if (reportingClientConfig.getAllReportsAvailableForAdmin()) {
+                Collection<RoleDefinition> roleDefinitions = rolesService.getRoleDefinitions(userRoles);
+                superRole = roleDefinitions.stream().anyMatch(this::isSuperRole);
+            }
             if (!superRole) {
                 StringBuilder roleCondition = new StringBuilder("r.rolesIdx is null");
                 for (int i = 0; i < userRoles.size(); i++) {
@@ -90,5 +91,21 @@ public class ReportSecurityManager {
 
     protected String wrapIdxParameterForSearch(String value) {
         return "%," + QueryUtils.escapeForLike(value) + ",%";
+    }
+
+    protected boolean isSuperRole(RoleDefinition roleDefinition) {
+
+        EntityPermissionsContainer entityPermissions = roleDefinition.entityPermissions();
+        EntityAttributePermissionsContainer entityAttributePermissions = roleDefinition.entityAttributePermissions();
+        ScreenPermissionsContainer screenPermissions = roleDefinition.screenPermissions();
+        SpecificPermissionsContainer specificPermissions = roleDefinition.specificPermissions();
+
+        return entityPermissions.getDefaultEntityCreateAccess() == Access.ALLOW
+                && entityPermissions.getDefaultEntityReadAccess() == Access.ALLOW
+                && entityPermissions.getDefaultEntityUpdateAccess() == Access.ALLOW
+                && entityPermissions.getDefaultEntityDeleteAccess() == Access.ALLOW
+                && entityAttributePermissions.getDefaultEntityAttributeAccess() == EntityAttrAccess.MODIFY
+                && screenPermissions.getDefaultScreenAccess() == Access.ALLOW
+                && specificPermissions.getDefaultSpecificAccess() == Access.ALLOW;
     }
 }
