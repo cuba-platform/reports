@@ -16,7 +16,9 @@
 
 package com.haulmont.reports.gui.actions.list;
 
+import com.google.common.collect.ImmutableMap;
 import com.haulmont.bali.util.ParamsMap;
+import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.cuba.core.global.BeanLocator;
 import com.haulmont.cuba.core.global.DataManager;
 import com.haulmont.cuba.core.global.Messages;
@@ -26,18 +28,23 @@ import com.haulmont.cuba.gui.components.Action;
 import com.haulmont.cuba.gui.components.ActionType;
 import com.haulmont.cuba.gui.components.Component;
 import com.haulmont.cuba.gui.components.actions.ListAction;
+import com.haulmont.cuba.gui.components.data.DataUnit;
+import com.haulmont.cuba.gui.components.data.meta.EntityDataUnit;
 import com.haulmont.cuba.gui.icons.CubaIcon;
 import com.haulmont.cuba.gui.icons.Icons;
 import com.haulmont.cuba.gui.meta.StudioAction;
 import com.haulmont.cuba.gui.screen.*;
 import com.haulmont.reports.entity.Report;
 import com.haulmont.reports.gui.ReportGuiManager;
+import com.haulmont.reports.gui.report.run.InputParametersFrame;
 import com.haulmont.reports.gui.report.run.InputParametersWindow;
 import com.haulmont.reports.gui.report.run.ReportRun;
 
 import javax.inject.Inject;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Standard action for running the reports associated with current screen or list component.
@@ -50,6 +57,8 @@ import java.util.Collections;
 public class RunReportAction extends ListAction implements Action.HasBeforeActionPerformedHandler {
 
     public static final String ID = "runReport";
+    public static final String DEFAULT_SINGLE_ENTITY_ALIAS = "entity";
+    public static final String DEFAULT_LIST_OF_ENTITIES_ALIAS = "entities";
 
     protected BeanLocator beanLocator;
     protected ScreenBuilders screenBuilders;
@@ -101,16 +110,22 @@ public class RunReportAction extends ListAction implements Action.HasBeforeActio
             return;
         }
         if (target != null && target.getFrame() != null) {
-            openLookup(target.getFrame().getFrameOwner());
+            MetaClass metaClass = null;
+            DataUnit items = target.getItems();
+            if (items instanceof EntityDataUnit) {
+                metaClass = ((EntityDataUnit) items).getEntityMetaClass();
+            }
+
+            openLookup(target.getFrame().getFrameOwner(), metaClass);
         } else if (component instanceof Component.BelongToFrame) {
             FrameOwner screen = ComponentsHelper.getWindowNN((Component.BelongToFrame) component).getFrameOwner();
-            openLookup(screen);
+            openLookup(screen, null);
         } else {
             throw new IllegalStateException("No target screen or component found for 'RunReportAction'");
         }
     }
 
-    protected void openLookup(FrameOwner screen) {
+    protected void openLookup(FrameOwner screen, MetaClass metaClass) {
         Screen hostScreen;
         if (screen instanceof Screen) {
             hostScreen = (Screen) screen;
@@ -121,7 +136,9 @@ public class RunReportAction extends ListAction implements Action.HasBeforeActio
         screenBuilders.lookup(Report.class, screen)
                 .withScreenId("report$Report.run")
                 .withOpenMode(OpenMode.DIALOG)
-                .withOptions(new MapScreenOptions(ParamsMap.of(ReportRun.SCREEN_PARAMETER, hostScreen.getId())))
+                .withOptions(new MapScreenOptions(ParamsMap.of(
+                        ReportRun.SCREEN_PARAMETER, hostScreen.getId(),
+                        ReportRun.META_CLASS_PARAMETER, metaClass)))
                 .withSelectHandler(reports -> runReports(reports, screen))
                 .show();
     }
@@ -145,10 +162,22 @@ public class RunReportAction extends ListAction implements Action.HasBeforeActio
     }
 
     protected void openReportParamsDialog(Report report, FrameOwner screen) {
+        Map<String, Object> selectedItems = null;
+        if (target != null) {
+            Set items = target.getSelected();
+            if (!items.isEmpty()) {
+                selectedItems = ImmutableMap.of(
+                        DEFAULT_LIST_OF_ENTITIES_ALIAS, items,
+                        DEFAULT_SINGLE_ENTITY_ALIAS, items.stream().findFirst().get());
+            }
+        }
+
         screenBuilders.screen(screen)
                 .withScreenId("report$inputParameters")
                 .withOpenMode(OpenMode.DIALOG)
-                .withOptions(new MapScreenOptions(ParamsMap.of(InputParametersWindow.REPORT_PARAMETER, report)))
+                .withOptions(new MapScreenOptions(ParamsMap.of(
+                        InputParametersWindow.REPORT_PARAMETER, report,
+                        InputParametersFrame.PARAMETERS_PARAMETER, selectedItems)))
                 .show();
     }
 }

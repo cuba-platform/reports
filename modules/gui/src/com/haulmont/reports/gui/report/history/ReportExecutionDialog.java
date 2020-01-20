@@ -17,6 +17,7 @@
 package com.haulmont.reports.gui.report.history;
 
 import com.haulmont.bali.util.ParamsMap;
+import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.cuba.core.global.LoadContext;
 import com.haulmont.cuba.core.global.UserSessionSource;
 import com.haulmont.cuba.gui.ScreenBuilders;
@@ -48,6 +49,7 @@ import java.util.stream.Collectors;
 @LoadDataBeforeShow
 public class ReportExecutionDialog extends StandardLookup<Report> {
 
+    public static final String META_CLASS_PARAMETER = "metaClass";
     public static final String SCREEN_PARAMETER = "screen";
 
     @Inject
@@ -73,13 +75,15 @@ public class ReportExecutionDialog extends StandardLookup<Report> {
     @Inject
     protected DateField<Date> filterUpdatedDate;
 
+    @WindowParam(name = META_CLASS_PARAMETER)
+    protected MetaClass metaClassParameter;
     @WindowParam(name = SCREEN_PARAMETER)
     protected String screenParameter;
 
     @Install(to = "reportsDl", target = Target.DATA_LOADER)
     protected List<Report> reportsDlLoadDelegate(LoadContext<Report> loadContext) {
         User sessionUser = userSessionSource.getUserSession().getUser();
-        return reportGuiManager.getAvailableReports(screenParameter, sessionUser, null);
+        return reportGuiManager.getAvailableReports(screenParameter, sessionUser, metaClassParameter);
     }
 
     @Subscribe("clearFilterBtn")
@@ -111,7 +115,7 @@ public class ReportExecutionDialog extends StandardLookup<Report> {
 
     protected void filterReports() {
         User sessionUser = userSessionSource.getUserSession().getUser();
-        List<Report> reports = reportGuiManager.getAvailableReports(screenParameter, sessionUser, null)
+        List<Report> reports = reportGuiManager.getAvailableReports(screenParameter, sessionUser, metaClassParameter)
                 .stream()
                 .filter(this::filterReport)
                 .collect(Collectors.toList());

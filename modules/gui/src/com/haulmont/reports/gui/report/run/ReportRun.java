@@ -16,6 +16,7 @@
 
 package com.haulmont.reports.gui.report.run;
 
+import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.cuba.client.ClientConfig;
 import com.haulmont.cuba.core.global.UserSessionSource;
 import com.haulmont.cuba.gui.WindowParam;
@@ -36,6 +37,7 @@ import java.util.stream.Collectors;
 public class ReportRun extends AbstractLookup {
 
     protected static final String RUN_ACTION_ID = "runReport";
+    public static final String META_CLASS_PARAMETER = "metaClass";
     public static final String REPORTS_PARAMETER = "reports";
     public static final String SCREEN_PARAMETER = "screen";
 
@@ -72,6 +74,8 @@ public class ReportRun extends AbstractLookup {
     @WindowParam(name = REPORTS_PARAMETER)
     protected List<Report> reportsParameter;
 
+    @WindowParam(name = META_CLASS_PARAMETER)
+    protected MetaClass metaClassParameter;
     @WindowParam(name = SCREEN_PARAMETER)
     protected String screenParameter;
 
@@ -81,7 +85,8 @@ public class ReportRun extends AbstractLookup {
 
         List<Report> reports = reportsParameter;
         if (reports == null) {
-            reports = reportGuiManager.getAvailableReports(screenParameter, userSessionSource.getUserSession().getUser(), null);
+            reports = reportGuiManager.getAvailableReports(screenParameter, userSessionSource.getUserSession().getUser(),
+                    metaClassParameter);
         }
 
         if (reportsParameter != null) {
@@ -119,7 +124,8 @@ public class ReportRun extends AbstractLookup {
         Date dateFilterValue = updatedDateFilter.getValue();
 
         List<Report> reports =
-                reportGuiManager.getAvailableReports(screenParameter, userSessionSource.getUserSession().getUser(), null)
+                reportGuiManager.getAvailableReports(screenParameter, userSessionSource.getUserSession().getUser(),
+                        metaClassParameter)
                         .stream()
                         .filter(report -> {
                             if (nameFilterValue != null
