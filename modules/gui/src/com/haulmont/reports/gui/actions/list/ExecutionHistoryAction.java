@@ -17,12 +17,15 @@
 package com.haulmont.reports.gui.actions.list;
 
 import com.haulmont.bali.util.ParamsMap;
+import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.gui.ComponentsHelper;
 import com.haulmont.cuba.gui.ScreenBuilders;
 import com.haulmont.cuba.gui.components.ActionType;
 import com.haulmont.cuba.gui.components.Component;
 import com.haulmont.cuba.gui.components.actions.ListAction;
+import com.haulmont.cuba.gui.components.data.DataUnit;
+import com.haulmont.cuba.gui.components.data.meta.EntityDataUnit;
 import com.haulmont.cuba.gui.meta.StudioAction;
 import com.haulmont.cuba.gui.screen.*;
 import com.haulmont.reports.entity.Report;
@@ -65,16 +68,22 @@ public class ExecutionHistoryAction extends ListAction {
     @Override
     public void actionPerform(Component component) {
         if (target != null && target.getFrame() != null) {
-            openLookup(target.getFrame().getFrameOwner());
+            MetaClass metaClass = null;
+            DataUnit items = target.getItems();
+            if (items instanceof EntityDataUnit) {
+                metaClass = ((EntityDataUnit) items).getEntityMetaClass();
+            }
+
+            openLookup(target.getFrame().getFrameOwner(), metaClass);
         } else if (component instanceof Component.BelongToFrame) {
             FrameOwner screen = ComponentsHelper.getWindowNN((Component.BelongToFrame) component).getFrameOwner();
-            openLookup(screen);
+            openLookup(screen, null);
         } else {
             throw new IllegalStateException("No target screen or component found for 'ExecutionHistoryAction'");
         }
     }
 
-    protected void openLookup(FrameOwner screen) {
+    protected void openLookup(FrameOwner screen, MetaClass metaClass) {
         Screen hostScreen;
         if (screen instanceof Screen) {
             hostScreen = (Screen) screen;
@@ -85,7 +94,9 @@ public class ExecutionHistoryAction extends ListAction {
         screenBuilders.lookup(Report.class, screen)
                 .withScreenClass(ReportExecutionDialog.class)
                 .withOpenMode(OpenMode.DIALOG)
-                .withOptions(new MapScreenOptions(ParamsMap.of(ReportExecutionDialog.SCREEN_PARAMETER, hostScreen.getId())))
+                .withOptions(new MapScreenOptions(ParamsMap.of(
+                        ReportExecutionDialog.SCREEN_PARAMETER, hostScreen.getId(),
+                        ReportExecutionDialog.META_CLASS_PARAMETER, metaClass)))
                 .show();
     }
 }
