@@ -158,7 +158,7 @@ public class ReportingWizardBean implements ReportingWizardApi {
     }
 
     protected void createJpqlDataSet(ReportData reportData, ReportRegion reportRegion, BandDefinition dataBand) {
-        DataSet dataSet =  dataSetFactory.createEmptyDataSet(dataBand);
+        DataSet dataSet = dataSetFactory.createEmptyDataSet(dataBand);
         dataSet.setName(messages.getMessage(getClass(), "dataSet"));
         dataSet.setType(DataSetType.JPQL);
 
@@ -177,7 +177,7 @@ public class ReportingWizardBean implements ReportingWizardApi {
             dataSet.setListEntitiesParamName(mainParameter.getAlias());
             dataSet.setView(parameterView);
         } else if (ReportData.ReportType.SINGLE_ENTITY == reportData.getReportType()) {
-            if (reportRegion.getIsTabulatedRegion()) {
+            if (reportRegion.isTabulatedRegion()) {
                 dataSet.setType(DataSetType.MULTI);
                 dataSet.setListEntitiesParamName(mainParameter.getAlias() + "#" + reportRegion.getRegionPropertiesRootNode().getName());
             } else {
