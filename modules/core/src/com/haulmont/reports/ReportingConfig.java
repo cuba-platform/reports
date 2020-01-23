@@ -38,21 +38,21 @@ public interface ReportingConfig extends Config {
     /**
      * @return Path to the installed OpenOffice
      */
-    @Property("reporting.openoffice.path")
+    @Property("reporting.office.path")
     @DefaultString("/")
-    String getOpenOfficePath();
+    String getOfficePath();
 
     /**
      * @return The list of ports to start OpenOffice on.
      */
-    @Property("reporting.openoffice.ports")
+    @Property("reporting.office.ports")
     @DefaultString("8100|8101|8102|8103")
-    String getOpenOfficePorts();
+    String getOfficePorts();
 
     /**
      * @return Request to OpenOffice timeout in seconds.
      */
-    @Property("reporting.openoffice.docFormatterTimeout")
+    @Property("reporting.office.docFormatterTimeout")
     @DefaultInteger(20)
     Integer getDocFormatterTimeout();
 

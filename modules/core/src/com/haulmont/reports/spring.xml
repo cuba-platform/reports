@@ -45,21 +45,21 @@
 
     <bean id="reporting_lib_OfficeIntegration"
           class="com.haulmont.reports.libintegration.CubaOfficeIntegration">
-        <constructor-arg value="${reporting.openoffice.path?:/}"/>
+        <constructor-arg value="${reporting.office.path?:/}"/>
         <constructor-arg>
-            <value>#{"${reporting.openoffice.ports?:8100|8101|8102|8103}".split('[,|]')}</value>
+            <value>#{"${reporting.office.ports?:8100|8101|8102|8103}".split('[,|]')}</value>
         </constructor-arg>
         <property name="displayDeviceAvailable">
             <value>${reporting.displayDeviceAvailable?:false}</value>
         </property>
         <property name="timeoutInSeconds">
-            <value>${reporting.openoffice.docFormatterTimeout?:20}</value>
+            <value>${reporting.office.docFormatterTimeout?:20}</value>
         </property>
         <property name="temporaryDirPath">
             <value>${cuba.tempDir}/reporting/</value>
         </property>
         <property name="countOfRetry">
-            <value>${reporting.openoffice.countOfRetry?:3}</value>
+            <value>${reporting.office.countOfRetry?:3}</value>
         </property>
     </bean>
 
@@ -70,7 +70,7 @@
 
     <bean id="reporting_lib_FormatterFactory"
           class="com.haulmont.reports.libintegration.CubaFormatterFactory">
-        <property name="useOfficeForDocumentConversion" value="${reporting.openoffice.docx.useOfficeForDocumentConversion?:false}"/>
+        <property name="useOfficeForDocumentConversion" value="${reporting.office.docx.useOfficeForDocumentConversion?:false}"/>
         <property name="officeIntegration" ref="reporting_lib_OfficeIntegration"/>
         <property name="defaultFormatProvider" ref="reporting_lib_CubaFieldFormatProvider"/>
         <property name="inlinersProvider" ref="reporting_lib_InlinersProvider"/>
