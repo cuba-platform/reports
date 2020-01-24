@@ -52,8 +52,8 @@ public class ReportSecurityManager {
             List<UserRole> userRoles = user.getUserRoles();
             boolean superRole = false;
             if (reportingClientConfig.getAllReportsAvailableForAdmin()) {
-                Collection<Role> roleDefinitions = rolesService.getRoles(userRoles);
-                superRole = roleDefinitions.stream().anyMatch(this::isSuperRole);
+                Collection<Role> roles = rolesService.getRolesForUser(user);
+                superRole = roles.stream().anyMatch(this::isSuperRole);
             }
             if (!superRole) {
                 StringBuilder roleCondition = new StringBuilder("r.rolesIdx is null");
