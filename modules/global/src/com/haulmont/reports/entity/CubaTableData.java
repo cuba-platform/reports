@@ -115,7 +115,7 @@ public class CubaTableData implements Serializable {
             if (this == o) return true;
             if (!(o instanceof ColumnInfo)) return false;
             ColumnInfo that = (ColumnInfo) o;
-            return getPosition().equals(that.getPosition()) &&
+            return Objects.equals(getPosition(), that.getPosition()) &&
                     Objects.equals(getKey(), that.getKey()) &&
                     Objects.equals(getColumnClass(), that.getColumnClass()) &&
                     Objects.equals(getCaption(), that.getCaption());
