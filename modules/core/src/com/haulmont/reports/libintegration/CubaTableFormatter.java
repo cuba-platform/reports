@@ -115,7 +115,7 @@ public class CubaTableFormatter extends AbstractFormatter {
                             name = messageTools.getPropertyCaption(instance.getMetaClass(), name);
 
                         checkInstanceNameLoaded(value);
-                        entityRow.setValue(name, value);
+                        entityRow.setValue(transformationKey(name), value);
                     }
                 });
 
@@ -129,9 +129,9 @@ public class CubaTableFormatter extends AbstractFormatter {
                                 name = messageTools.getPropertyCaption(instance.getMetaClass(), name);
 
                             if (name != null && value != null)
-                                headers.add(new CubaTableData.ColumnInfo(name, value.getClass(), name));
+                                headers.add(new CubaTableData.ColumnInfo(transformationKey(name), value.getClass(), name));
                             if (name != null && value == null)
-                                emptyHeaders.add(name);
+                                emptyHeaders.add(transformationKey(name));
                         }
 
                     });
