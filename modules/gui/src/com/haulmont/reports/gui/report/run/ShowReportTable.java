@@ -188,7 +188,7 @@ public class ShowReportTable extends AbstractWindow {
             if (Entity.class.isAssignableFrom(javaClass) ||
                     EnumClass.class.isAssignableFrom(javaClass) ||
                     Datatypes.get(javaClass) != null) {
-                ds.addProperty(createColumnKey(header), javaClass);
+                ds.addProperty(header.getKey(), javaClass);
             }
         }
 
@@ -235,7 +235,7 @@ public class ShowReportTable extends AbstractWindow {
 
                 Element element = DocumentHelper.createElement("column");
                 column.setXmlDescriptor(element);
-                if(columnInfo.getPosition() == null) {
+                if (columnInfo.getPosition() == null) {
                     table.addColumn(column);
                 } else {
                     table.addColumn(column, columnInfo.getPosition());
@@ -246,12 +246,8 @@ public class ShowReportTable extends AbstractWindow {
 
     private CubaTableData.ColumnInfo getColumnInfo(String headerKey, Set<CubaTableData.ColumnInfo> headers) {
         return headers.stream()
-                .filter(header -> headerKey.equals(createColumnKey(header)))
+                .filter(header -> headerKey.equals(header.getKey()))
                 .findFirst()
                 .orElse(null);
-    }
-
-    private String createColumnKey(CubaTableData.ColumnInfo header) {
-        return header.getKey().replace('.', '-');
     }
 }

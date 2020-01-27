@@ -195,24 +195,20 @@ public class CubaTableFormatter extends AbstractFormatter {
 
                     if (checkAddHeader(pkName, pkInView, key)) {
                         checkInstanceNameLoaded(value);
-                        entityRow.setValue(key, value);
+                        entityRow.setValue(transformationKey(key), value);
                     }
                 }
 
                 if (headers.isEmpty() || headers.size() < data.size()) {
                     for (TemplateTableColumn column : band.getColumns()) {
                         String key = column.getKey();
-                        Object value = data.get(column.getKey());
+                        Object value = data.get(key);
 
                         if (INSTANCE_NAME_KEY.equals(key)) {
                             return;
                         }
-                        if (checkAddHeader(pkName, pkInView, key)) {
-
-                            if (key != null && value != null)
-                                headers.add(new CubaTableData.ColumnInfo(key, value.getClass(), column.getCaption(), column.getPosition()));
-                            if (key != null && value == null)
-                                headers.add(new CubaTableData.ColumnInfo(key, String.class, column.getCaption(), column.getPosition()));
+                        if (key != null && checkAddHeader(pkName, pkInView, key)) {
+                            headers.add(new CubaTableData.ColumnInfo(transformationKey(key), getColumnClass(value), column.getCaption(), column.getPosition()));
                         }
                     }
                 }
@@ -225,6 +221,10 @@ public class CubaTableFormatter extends AbstractFormatter {
             headerMap.put(bandName, headers);
         }
         return new CubaTableData(transformedData, headerMap);
+    }
+
+    private Class getColumnClass(Object value) {
+        return value == null ? String.class : value.getClass();
     }
 
     private boolean checkAddHeader(String pkName, boolean pkInView, String name) {
@@ -265,5 +265,9 @@ public class CubaTableFormatter extends AbstractFormatter {
                 return true;
         }
         return false;
+    }
+
+    private String transformationKey(String key) {
+        return key.replace('.', '-');
     }
 }
