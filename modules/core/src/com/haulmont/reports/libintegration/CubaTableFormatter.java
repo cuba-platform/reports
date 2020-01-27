@@ -111,11 +111,18 @@ public class CubaTableFormatter extends AbstractFormatter {
                         return;
                     }
                     if (checkAddHeader(pkName, pkInView, name)) {
-                        if (instance != null)
+                        if (instance != null) {
                             name = messageTools.getPropertyCaption(instance.getMetaClass(), name);
+                        }
 
                         checkInstanceNameLoaded(value);
-                        entityRow.setValue(transformationKey(name), value);
+                        String transformationKey = transformationKey(name);
+                        if (isFormat(bandName, name)) {
+                            String formattedValue = getFormattedValue(bandData.getName(), name, value);
+                            entityRow.setValue(transformationKey, formattedValue);
+                        } else {
+                            entityRow.setValue(transformationKey, value);
+                        }
                     }
                 });
 
@@ -125,13 +132,17 @@ public class CubaTableFormatter extends AbstractFormatter {
                             return;
                         }
                         if (checkAddHeader(pkName, pkInView, name)) {
-                            if (instance != null)
+                            if (instance != null) {
                                 name = messageTools.getPropertyCaption(instance.getMetaClass(), name);
+                            }
 
-                            if (name != null && value != null)
-                                headers.add(new CubaTableData.ColumnInfo(transformationKey(name), value.getClass(), name));
-                            if (name != null && value == null)
+                            if (name != null && value != null) {
+                                Class valueClass = getColumnClass(bandData.getName(), name, value);
+                                headers.add(new CubaTableData.ColumnInfo(transformationKey(name), valueClass, name));
+                            }
+                            if (name != null && value == null) {
                                 emptyHeaders.add(transformationKey(name));
+                            }
                         }
 
                     });
@@ -195,7 +206,14 @@ public class CubaTableFormatter extends AbstractFormatter {
 
                     if (checkAddHeader(pkName, pkInView, key)) {
                         checkInstanceNameLoaded(value);
-                        entityRow.setValue(transformationKey(key), value);
+
+                        String transformationKey = transformationKey(key);
+                        if (isFormat(bandName, key)) {
+                            String formattedValue = getFormattedValue(bandName, key, value);
+                            entityRow.setValue(transformationKey, formattedValue);
+                        } else {
+                            entityRow.setValue(transformationKey, value);
+                        }
                     }
                 }
 
@@ -207,8 +225,15 @@ public class CubaTableFormatter extends AbstractFormatter {
                         if (INSTANCE_NAME_KEY.equals(key)) {
                             return;
                         }
-                        if (key != null && checkAddHeader(pkName, pkInView, key)) {
-                            headers.add(new CubaTableData.ColumnInfo(transformationKey(key), getColumnClass(value), column.getCaption(), column.getPosition()));
+                        if (checkAddHeader(pkName, pkInView, key)) {
+
+                            String transformationKey = transformationKey(key);
+                            if (value != null) {
+                                Class valueClass = getColumnClass(bandName, key, value);
+                                headers.add(new CubaTableData.ColumnInfo(transformationKey, valueClass, column.getCaption(), column.getPosition()));
+                            } else {
+                                headers.add(new CubaTableData.ColumnInfo(transformationKey, String.class, column.getCaption(), column.getPosition()));
+                            }
                         }
                     }
                 }
@@ -223,8 +248,21 @@ public class CubaTableFormatter extends AbstractFormatter {
         return new CubaTableData(transformedData, headerMap);
     }
 
-    private Class getColumnClass(Object value) {
-        return value == null ? String.class : value.getClass();
+    private String getFormattedValue(String bandName, String name, Object value) {
+        return formatValue(value, name, generateFullParameterName(bandName, name));
+    }
+
+    private Class getColumnClass(String bandName, String parameterName, Object value) {
+        return isFormat(bandName, parameterName) ? String.class : value.getClass();
+    }
+
+    private boolean isFormat(String bandName, String parameterName) {
+        String format = getFormatString(parameterName, generateFullParameterName(bandName, parameterName));
+        return format != null;
+    }
+
+    private String generateFullParameterName(String bandName, String parameterName) {
+        return bandName + "." + parameterName;
     }
 
     private boolean checkAddHeader(String pkName, boolean pkInView, String name) {
