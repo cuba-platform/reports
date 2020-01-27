@@ -258,7 +258,7 @@ public class ReportingWizardBean implements ReportingWizardApi {
                 if (regionProperty.getEntityTreeNode().getWrappedMetaProperty().getJavaType().isAssignableFrom(Date.class)) {
                     ReportValueFormat rvf = new ReportValueFormat();
                     rvf.setReport(report);
-                    rvf.setValueName(reportRegion.getNameForBand() + "." + regionProperty.getEntityTreeNode().getWrappedMetaProperty().getName());
+                    rvf.setValueName(reportRegion.getNameForBand() + "." + regionProperty.getHierarchicalNameExceptRoot());
                     rvf.setFormatString(messages.getMainMessage("dateTimeFormat"));
                     AnnotatedElement annotatedElement = regionProperty.getEntityTreeNode().getWrappedMetaProperty().getAnnotatedElement();
                     if (annotatedElement != null && annotatedElement.isAnnotationPresent(Temporal.class)) {
