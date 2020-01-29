@@ -8,6 +8,7 @@ create table REPORT_GROUP (
   UPDATED_BY varchar(50),
   DELETE_TS datetime,
   DELETED_BY varchar(50),
+  SYS_TENANT_ID varchar(255),
   --
   TITLE varchar(255) not null,
   CODE varchar(255),
@@ -16,7 +17,7 @@ create table REPORT_GROUP (
   primary key (ID)
 )^
 
-create unique index IDX_REPORT_GROUP_UNIQ_TITLE on REPORT_GROUP (TITLE, DELETE_TS)^
+create unique index IDX_REPORT_GROUP_UNIQ_TITLE on REPORT_GROUP (TITLE, SYS_TENANT_ID, DELETE_TS)^
 
 --------------------------------------------------------------------------------------------------------------
 
@@ -30,6 +31,7 @@ create table REPORT_REPORT
   UPDATED_BY varchar(50),
   DELETE_TS datetime,
   DELETED_BY varchar(50),
+  SYS_TENANT_ID varchar(255),
   --
   NAME varchar(255) not null,
   CODE varchar(255),
@@ -50,7 +52,7 @@ create table REPORT_REPORT
       references REPORT_GROUP (ID)
 )^
 
-create unique index IDX_REPORT_REPORT_UNIQ_NAME on REPORT_REPORT (NAME, DELETE_TS)^
+create unique index IDX_REPORT_REPORT_UNIQ_NAME on REPORT_REPORT (NAME, SYS_TENANT_ID, DELETE_TS)^
 
 --------------------------------------------------------------------------------------------------------------
 

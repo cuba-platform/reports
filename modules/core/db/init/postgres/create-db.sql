@@ -12,11 +12,15 @@ create table REPORT_GROUP (
   TITLE varchar(255) not null,
   CODE varchar(255),
   LOCALE_NAMES text,
+  SYS_TENANT_ID varchar(255),
   --
   primary key (ID)
 )^
 
-create unique index IDX_REPORT_GROUP_UNIQ_TITLE on REPORT_GROUP (TITLE) where DELETE_TS is null^
+create unique index IDX_REPORT_GROUP_UNIQ_TITLE on REPORT_GROUP (TITLE) where DELETE_TS is null and SYS_TENANT_ID is null^
+
+create unique index IDX_REPORT_GROUP_UNIQ_TITLE_SYS_TENANT_ID_NN on REPORT_GROUP (TITLE, SYS_TENANT_ID)
+    where DELETE_TS is null and SYS_TENANT_ID is not null^
 
 --------------------------------------------------------------------------------------------------------------
 
@@ -44,13 +48,17 @@ create table REPORT_REPORT
   INPUT_ENTITY_TYPES_IDX varchar(1000),
   REST_ACCESS boolean default false,
   IS_SYSTEM boolean default false,
+  SYS_TENANT_ID varchar(255),
   --
   primary key (ID),
   constraint FK_REPORT_REPORT_TO_REPORT_GROUP foreign key (GROUP_ID)
       references REPORT_GROUP (ID)
 )^
 
-create unique index IDX_REPORT_REPORT_UNIQ_NAME on REPORT_REPORT (NAME) where DELETE_TS is null^
+create unique index IDX_REPORT_REPORT_UNIQ_NAME on REPORT_REPORT (NAME) where DELETE_TS is null and SYS_TENANT_ID is null^
+
+create unique index IDX_REPORT_REPORT_UNIQ_NAME_SYS_TENANT_ID_NN on REPORT_REPORT (NAME, SYS_TENANT_ID)
+    where DELETE_TS is null and SYS_TENANT_ID is not null^
 
 --------------------------------------------------------------------------------------------------------------
 

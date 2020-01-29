@@ -11,10 +11,11 @@ create table REPORT_GROUP (
     TITLE varchar2(255 char) not null,
     CODE varchar2(255 char),
     LOCALE_NAMES clob,
+    SYS_TENANT_ID varchar2(255 char),
     primary key(ID)
 )^
 
-create unique index IDX_REPORT_GROUP_UNIQ_TITLE on REPORT_GROUP(TITLE, DELETE_TS)^
+create unique index IDX_REPORT_GROUP_UNIQ_TITLE on REPORT_GROUP(TITLE, SYS_TENANT_ID, DELETE_TS)^
 
 create table REPORT_REPORT (
     ID varchar2(32) not null,
@@ -37,12 +38,13 @@ create table REPORT_REPORT (
     INPUT_ENTITY_TYPES_IDX varchar2(1000 char),
     REST_ACCESS char(1),
     IS_SYSTEM char(1),
+    SYS_TENANT_ID varchar2(255 char),
 
     REPORT_TYPE integer,
     primary key(ID)
 )^
 
-create unique index IDX_REPORT_REPORT_UNIQ_NAME on REPORT_REPORT(NAME, DELETE_TS)^
+create unique index IDX_REPORT_REPORT_UNIQ_NAME on REPORT_REPORT(NAME, SYS_TENANT_ID, DELETE_TS)^
 
 create table REPORT_TEMPLATE (
     ID varchar2(32) not null,
