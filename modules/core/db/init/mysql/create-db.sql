@@ -9,6 +9,8 @@ create table REPORT_GROUP (
   DELETE_TS datetime(3),
   DELETED_BY varchar(50),
   DELETE_TS_NN datetime(3) not null default '1000-01-01 00:00:00.000',
+  SYS_TENANT_ID varchar(255),
+  SYS_TENANT_ID_NN varchar(255),
   --
   TITLE varchar(190) not null,
   CODE varchar(255),
@@ -17,13 +19,21 @@ create table REPORT_GROUP (
   primary key (ID)
 )^
 
-create unique index IDX_REPORT_GROUP_UNIQ_TITLE on REPORT_GROUP (TITLE, DELETE_TS_NN)^
+create unique index IDX_REPORT_GROUP_UNIQ_TITLE on REPORT_GROUP (TITLE, SYS_TENANT_ID_NN, DELETE_TS_NN)^
 
-create trigger REPORT_GROUP_DELETE_TS_NN_TRIGGER before update on REPORT_GROUP
-  for each row
+create trigger REPORT_GROUP_SYS_TENANT_ID_NN_INSERT_TRIGGER before insert on REPORT_GROUP
+for each row set NEW.SYS_TENANT_ID_NN = if (NEW.SYS_TENANT_ID is null, 'no_tenant', NEW.SYS_TENANT_ID)^
+
+create trigger REPORT_GROUP_SYS_SYS_TENANT_ID_NN_AND_DELETE_TS_NN_UPDATE_TRIGGER before update on REPORT_GROUP
+for each row
+begin
+    if not(NEW.SYS_TENANT_ID <=> OLD.SYS_TENANT_ID) then
+      set NEW.SYS_TENANT_ID_NN = if (NEW.SYS_TENANT_ID is null, 'no_tenant', NEW.SYS_TENANT_ID);
+    end if;
     if not(NEW.DELETE_TS <=> OLD.DELETE_TS) then
       set NEW.DELETE_TS_NN = if (NEW.DELETE_TS is null, '1000-01-01 00:00:00.000', NEW.DELETE_TS);
-    end if^
+    end if;
+end^
 
 /**********************************************************************************************/
 
@@ -52,19 +62,29 @@ create table REPORT_REPORT
   INPUT_ENTITY_TYPES_IDX varchar(1000),
   REST_ACCESS boolean default false,
   IS_SYSTEM boolean default false,
+  SYS_TENANT_ID varchar(255),
+  SYS_TENANT_ID_NN varchar(255),
   --
   primary key (ID),
   constraint FK_REPORT_REPORT_TO_REPORT_GROUP foreign key (GROUP_ID)
       references REPORT_GROUP (ID)
 )^
 
-create unique index IDX_REPORT_REPORT_UNIQ_NAME on REPORT_REPORT (NAME, DELETE_TS_NN)^
+create unique index IDX_REPORT_REPORT_UNIQ_NAME on REPORT_REPORT (NAME, SYS_TENANT_ID_NN, DELETE_TS_NN)^
 
-create trigger REPORT_REPORT_DELETE_TS_NN_TRIGGER before update on REPORT_REPORT
-  for each row
+create trigger REPORT_REPORT_SYS_TENANT_ID_NN_INSERT_TRIGGER before insert on REPORT_REPORT
+for each row set NEW.SYS_TENANT_ID_NN = if (NEW.SYS_TENANT_ID is null, 'no_tenant', NEW.SYS_TENANT_ID)^
+
+create trigger REPORT_REPORT_SYS_TENANT_ID_NN_AND_DELETE_TS_NN_UPDATE_TRIGGER before update on REPORT_REPORT
+for each row
+begin
+    if not(NEW.SYS_TENANT_ID <=> OLD.SYS_TENANT_ID) then
+      set NEW.SYS_TENANT_ID_NN = NEW.SYS_TENANT_ID;
+    end if;
     if not(NEW.DELETE_TS <=> OLD.DELETE_TS) then
       set NEW.DELETE_TS_NN = if (NEW.DELETE_TS is null, '1000-01-01 00:00:00.000', NEW.DELETE_TS);
-    end if^
+    end if;
+end^
 
 /**********************************************************************************************/
 

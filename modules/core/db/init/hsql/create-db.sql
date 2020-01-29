@@ -8,6 +8,7 @@ create table REPORT_GROUP (
   UPDATED_BY varchar(50),
   DELETE_TS timestamp,
   DELETED_BY varchar(50),
+  SYS_TENANT_ID varchar(255),
 
   TITLE varchar(255) not null,
   CODE varchar(255),
@@ -16,7 +17,7 @@ create table REPORT_GROUP (
   primary key (ID)
 )^
 
-alter table REPORT_GROUP add constraint REPORT_GROUP_UNIQ_TITLE unique (TITLE, DELETE_TS)^
+alter table REPORT_GROUP add constraint REPORT_GROUP_UNIQ_TITLE unique (TITLE, SYS_TENANT_ID, DELETE_TS)^
 
 ----------------------------------------------------------------------------------------------------------------
 
@@ -44,13 +45,14 @@ create table REPORT_REPORT
   INPUT_ENTITY_TYPES_IDX varchar(1000),
   REST_ACCESS boolean default false,
   IS_SYSTEM boolean default false,
+  SYS_TENANT_ID varchar(255),
 
   primary key (ID),
   constraint FK_REPORT_REPORT_TO_REPORT_GROUP foreign key (GROUP_ID)
       references REPORT_GROUP (ID)
 )^
 
-alter table REPORT_REPORT add constraint REPORT_REPORT_UNIQ_NAME unique (NAME, DELETE_TS)^
+alter table REPORT_REPORT add constraint REPORT_REPORT_UNIQ_NAME unique (NAME, SYS_TENANT_ID, DELETE_TS)^
 
 --------------------------------------------------------------------------------------------------------------
 
