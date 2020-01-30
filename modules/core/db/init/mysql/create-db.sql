@@ -24,7 +24,7 @@ create unique index IDX_REPORT_GROUP_UNIQ_TITLE on REPORT_GROUP (TITLE, SYS_TENA
 create trigger REPORT_GROUP_SYS_TENANT_ID_NN_INSERT_TRIGGER before insert on REPORT_GROUP
 for each row set NEW.SYS_TENANT_ID_NN = if (NEW.SYS_TENANT_ID is null, 'no_tenant', NEW.SYS_TENANT_ID)^
 
-create trigger REPORT_GROUP_SYS_SYS_TENANT_ID_NN_AND_DELETE_TS_NN_UPDATE_TRIGGER before update on REPORT_GROUP
+create trigger REPORT_GROUP_SYS_TENANT_ID_NN_AND_DELETE_TS_NN_UPDATE_TRIGGER before update on REPORT_GROUP
 for each row
 begin
     if not(NEW.SYS_TENANT_ID <=> OLD.SYS_TENANT_ID) then
