@@ -21,6 +21,7 @@ import com.haulmont.chile.core.annotations.NamePattern;
 import com.haulmont.cuba.core.entity.StandardEntity;
 import com.haulmont.cuba.core.entity.annotation.Listeners;
 import com.haulmont.cuba.core.entity.LocaleHelper;
+import com.haulmont.cuba.core.entity.annotation.SystemLevel;
 import com.haulmont.cuba.security.entity.Role;
 import com.haulmont.yarg.structure.ReportBand;
 import com.haulmont.yarg.structure.ReportFieldFormat;
@@ -81,6 +82,10 @@ public class Report extends StandardEntity implements com.haulmont.yarg.structur
 
     @Column(name = "REST_ACCESS")
     protected Boolean restAccess;
+
+    @SystemLevel
+    @Column(name = "SYS_TENANT_ID")
+    protected String sysTenantId;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "report")
     @Composition
@@ -313,6 +318,14 @@ public class Report extends StandardEntity implements com.haulmont.yarg.structur
 
     public void setRestAccess(Boolean restAccess) {
         this.restAccess = restAccess;
+    }
+
+    public String getSysTenantId() {
+        return sysTenantId;
+    }
+
+    public void setSysTenantId(String sysTenantId) {
+        this.sysTenantId = sysTenantId;
     }
 
     @MetaProperty

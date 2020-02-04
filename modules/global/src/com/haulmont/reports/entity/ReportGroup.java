@@ -20,6 +20,7 @@ import com.haulmont.chile.core.annotations.MetaProperty;
 import com.haulmont.chile.core.annotations.NamePattern;
 import com.haulmont.cuba.core.entity.LocaleHelper;
 import com.haulmont.cuba.core.entity.StandardEntity;
+import com.haulmont.cuba.core.entity.annotation.SystemLevel;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.persistence.Column;
@@ -43,6 +44,10 @@ public class ReportGroup extends StandardEntity {
 
     @Column(name = "LOCALE_NAMES")
     private String localeNames;
+
+    @SystemLevel
+    @Column(name = "SYS_TENANT_ID")
+    private String sysTenantId;
 
     @Transient
     private String localeName;
@@ -69,6 +74,14 @@ public class ReportGroup extends StandardEntity {
 
     public void setLocaleNames(String localeNames) {
         this.localeNames = localeNames;
+    }
+
+    public String getSysTenantId() {
+        return sysTenantId;
+    }
+
+    public void setSysTenantId(String sysTenantId) {
+        this.sysTenantId = sysTenantId;
     }
 
     @MetaProperty
