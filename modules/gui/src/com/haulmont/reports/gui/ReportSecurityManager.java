@@ -50,11 +50,8 @@ public class ReportSecurityManager {
         }
         if (user != null) {
             List<UserRole> userRoles = user.getUserRoles();
-            boolean superRole = false;
-            if (reportingClientConfig.getAllReportsAvailableForAdmin()) {
-                Collection<Role> roles = rolesService.getRolesForUser(user);
-                superRole = roles.stream().anyMatch(this::isSuperRole);
-            }
+            Collection<RoleDefinition> roles = rolesService.getRoleDefinitionsForUser(user);
+            boolean superRole = roles.stream().anyMatch(RoleDefinition::isSuper);
             if (!superRole) {
                 StringBuilder roleCondition = new StringBuilder("r.rolesIdx is null");
                 for (int i = 0; i < userRoles.size(); i++) {
@@ -95,15 +92,5 @@ public class ReportSecurityManager {
 
     protected String wrapIdxParameterForSearch(String value) {
         return "%," + QueryUtils.escapeForLike(value) + ",%";
-    }
-
-    protected boolean isSuperRole(Role role) {
-        return role.getDefaultEntityCreateAccess() == Access.ALLOW
-                && role.getDefaultEntityReadAccess() == Access.ALLOW
-                && role.getDefaultEntityUpdateAccess() == Access.ALLOW
-                && role.getDefaultEntityDeleteAccess() == Access.ALLOW
-                && role.getDefaultEntityAttributeAccess() == EntityAttrAccess.MODIFY
-                && role.getDefaultScreenAccess() == Access.ALLOW
-                && role.getDefaultSpecificAccess() == Access.ALLOW;
     }
 }
