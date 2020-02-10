@@ -48,13 +48,4 @@ public interface ReportingClientConfig extends Config {
 
     void setEnableTabSymbolInDataSetEditor(boolean enableTabSymbolInDataSetEditor);
 
-    /**
-     * @return true if admin role isn't configured on report and report is visible for admin in run report screen
-     */
-    @Property("reporting.allReportsAvailableForAdmin")
-    @Source(type = SourceType.APP)
-    @DefaultBoolean(false)
-    boolean getAllReportsAvailableForAdmin();
-
-    void setAllReportsAvailableForAdmin(boolean allReportsAvailableForAdmin);
 }

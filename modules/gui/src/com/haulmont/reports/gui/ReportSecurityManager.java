@@ -93,14 +93,4 @@ public class ReportSecurityManager {
     protected String wrapIdxParameterForSearch(String value) {
         return "%," + QueryUtils.escapeForLike(value) + ",%";
     }
-
-    protected boolean isSuperRole(Role role) {
-        return role.getDefaultEntityCreateAccess() == Access.ALLOW
-                && role.getDefaultEntityReadAccess() == Access.ALLOW
-                && role.getDefaultEntityUpdateAccess() == Access.ALLOW
-                && role.getDefaultEntityDeleteAccess() == Access.ALLOW
-                && role.getDefaultEntityAttributeAccess() == EntityAttrAccess.MODIFY
-                && role.getDefaultScreenAccess() == Access.ALLOW
-                && role.getDefaultSpecificAccess() == Access.ALLOW;
-    }
 }
