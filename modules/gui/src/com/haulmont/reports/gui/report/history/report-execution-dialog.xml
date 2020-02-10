@@ -86,7 +86,7 @@
                     editable="false"
                     width="100%">
             <actions>
-                <action id="executionHistoryAction" />
+                <action id="executionHistoryAction"/>
             </actions>
             <columns>
                 <column id="group"/>
@@ -96,9 +96,8 @@
                 <column id="updateTs"/>
             </columns>
         </groupTable>
-        <hbox id="lookupActions" spacing="true" visible="true">
-            <button id="openExecutionBrowserBtn"
-                    caption="msg://actions.ExecutionHistory"/>
+        <hbox id="lookupActions" spacing="true" visible="false">
+            <button action="lookupSelectAction"/>
             <button action="lookupCancelAction"/>
         </hbox>
     </layout>

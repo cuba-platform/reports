@@ -29,9 +29,12 @@ import com.haulmont.cuba.gui.components.data.meta.EntityDataUnit;
 import com.haulmont.cuba.gui.meta.StudioAction;
 import com.haulmont.cuba.gui.screen.*;
 import com.haulmont.reports.entity.Report;
+import com.haulmont.reports.gui.report.history.ReportExecutionBrowser;
 import com.haulmont.reports.gui.report.history.ReportExecutionDialog;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Standard action for displaying the report execution history.
@@ -97,6 +100,17 @@ public class ExecutionHistoryAction extends ListAction {
                 .withOptions(new MapScreenOptions(ParamsMap.of(
                         ReportExecutionDialog.SCREEN_PARAMETER, hostScreen.getId(),
                         ReportExecutionDialog.META_CLASS_PARAMETER, metaClass)))
+                .withSelectHandler(reports -> openExecutionBrowser(reports, screen))
                 .show();
+    }
+
+    protected void openExecutionBrowser(Collection<Report> reports, FrameOwner screen) {
+        if (reports != null && reports.size() > 0) {
+            screenBuilders.screen(screen)
+                    .withScreenClass(ReportExecutionBrowser.class)
+                    .withOptions(new MapScreenOptions(ParamsMap.of(
+                            ReportExecutionBrowser.REPORTS_PARAMETER, new ArrayList<>(reports))))
+                    .show();
+        }
     }
 }

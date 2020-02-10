@@ -16,11 +16,9 @@
 
 package com.haulmont.reports.gui.report.history;
 
-import com.haulmont.bali.util.ParamsMap;
 import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.cuba.core.global.LoadContext;
 import com.haulmont.cuba.core.global.UserSessionSource;
-import com.haulmont.cuba.gui.ScreenBuilders;
 import com.haulmont.cuba.gui.WindowParam;
 import com.haulmont.cuba.gui.components.Button;
 import com.haulmont.cuba.gui.components.DateField;
@@ -36,11 +34,9 @@ import com.haulmont.reports.gui.ReportGuiManager;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @UiController("report$ReportExecution.dialog")
@@ -52,8 +48,6 @@ public class ReportExecutionDialog extends StandardLookup<Report> {
     public static final String META_CLASS_PARAMETER = "metaClass";
     public static final String SCREEN_PARAMETER = "screen";
 
-    @Inject
-    protected ScreenBuilders screenBuilders;
     @Inject
     protected ReportGuiManager reportGuiManager;
     @Inject
@@ -93,19 +87,6 @@ public class ReportExecutionDialog extends StandardLookup<Report> {
         filterUpdatedDate.setValue(null);
         filterGroup.setValue(null);
         filterReports();
-    }
-
-    @Subscribe("openExecutionBrowserBtn")
-    public void onOpenExecutionBrowserBtnClick(Button.ClickEvent event) {
-        Set<Report> selectedReports = reportsTable.getSelected();
-        List<Report> reports = selectedReports.isEmpty()
-                ? reportsDc.getItems()
-                : new ArrayList<>(selectedReports);
-
-        screenBuilders.screen(ReportExecutionDialog.this)
-                .withScreenClass(ReportExecutionBrowser.class)
-                .withOptions(new MapScreenOptions(ParamsMap.of(ReportExecutionBrowser.REPORTS_PARAMETER, reports)))
-                .show();
     }
 
     @Subscribe("applyFilterBtn")
