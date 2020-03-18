@@ -34,7 +34,7 @@
                 width="theme://cuba.gui.dialogSize.width.large"
                 resizable="true"/>
 
-    <layout expand="tablesHolderGroup">
+    <layout expand="tablesVBoxLayout">
         <hbox id="reportSelectorBox" spacing="true">
             <label id="reportLookupLabel" align="MIDDLE_CENTER" value="msg://caption.reportForTable"/>
             <lookupField id="reportLookup" optionsDatasource="reportsDs" width="400px"/>
@@ -48,7 +48,6 @@
                     caption="msg://input.printReport" icon="icons/run.png"/>
         </groupBox>
 
-        <groupBox id="tablesHolderGroup" spacing="true">
-        </groupBox>
+        <vbox id="tablesVBoxLayout" spacing="true"/>
     </layout>
 </window>
