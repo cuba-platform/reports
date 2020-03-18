@@ -81,9 +81,9 @@ public class ShowReportTable extends AbstractWindow {
     protected BoxLayout parametersFrameHolder;
     @Inject
     protected HBoxLayout reportSelectorBox;
-    @Inject
-    protected GroupBoxLayout tablesHolderGroup;
 
+    @Inject
+    protected VBoxLayout tablesVBoxLayout;
 
     @WindowParam(name = REPORT_PARAMETER)
     protected Report report;
@@ -159,7 +159,7 @@ public class ShowReportTable extends AbstractWindow {
     protected void drawTables(CubaTableData dto) {
         Map<String, List<KeyValueEntity>> data = dto.getData();
         Map<String, Set<CubaTableData.ColumnInfo>> headerMap = dto.getHeaders();
-        tablesHolderGroup.removeAll();
+        tablesVBoxLayout.removeAll();
 
         if (data == null || data.isEmpty())
             return;
@@ -168,9 +168,14 @@ public class ShowReportTable extends AbstractWindow {
             if (keyValueEntities != null && !keyValueEntities.isEmpty()) {
                 GroupDatasource dataSource = createDataSource(dataSetName, keyValueEntities, headerMap);
                 Table table = createTable(dataSetName, dataSource, headerMap);
-                tablesHolderGroup.setCaption(dataSetName);
-                tablesHolderGroup.add(table);
-                tablesHolderGroup.expand(table);
+
+                GroupBoxLayout groupBox = componentsFactory.createComponent(GroupBoxLayout.class);
+                groupBox.setCaption(dataSetName);
+                groupBox.add(table);
+                groupBox.expand(table);
+
+                tablesVBoxLayout.add(groupBox);
+                tablesVBoxLayout.expand(groupBox);
             }
         });
     }
@@ -207,6 +212,8 @@ public class ShowReportTable extends AbstractWindow {
         table.setDatasource(dataSource);
         table.setWidth("100%");
         table.setMultiSelect(true);
+        table.setColumnControlVisible(false);
+        table.setColumnReorderingAllowed(false);
 
         ExcelAction excelAction = ExcelAction.create(table);
         excelAction.setFileName(dataSetName);
