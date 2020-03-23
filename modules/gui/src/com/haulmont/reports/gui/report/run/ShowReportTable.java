@@ -35,6 +35,7 @@ import com.haulmont.cuba.gui.data.DsBuilder;
 import com.haulmont.cuba.gui.data.GroupDatasource;
 import com.haulmont.cuba.gui.data.impl.DsContextImpl;
 import com.haulmont.cuba.gui.data.impl.ValueGroupDatasourceImpl;
+import com.haulmont.cuba.gui.settings.Settings;
 import com.haulmont.cuba.gui.theme.ThemeConstants;
 import com.haulmont.cuba.gui.xml.layout.ComponentsFactory;
 import com.haulmont.reports.entity.CubaTableData;
@@ -256,5 +257,13 @@ public class ShowReportTable extends AbstractWindow {
                 .filter(header -> headerKey.equals(header.getKey()))
                 .findFirst()
                 .orElse(null);
+    }
+
+    @Override
+    public void applySettings(Settings settings) {
+    }
+
+    @Override
+    public void saveSettings() {
     }
 }
