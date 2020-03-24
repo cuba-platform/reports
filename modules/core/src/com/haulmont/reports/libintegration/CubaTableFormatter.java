@@ -27,6 +27,7 @@ import com.haulmont.reports.entity.ReportTemplate;
 import com.haulmont.reports.entity.table.TemplateTableBand;
 import com.haulmont.reports.entity.table.TemplateTableColumn;
 import com.haulmont.reports.entity.table.TemplateTableDescription;
+import com.haulmont.reports.exception.ReportingException;
 import com.haulmont.yarg.exception.ReportFormattingException;
 import com.haulmont.yarg.formatters.factory.FormatterFactoryInput;
 import com.haulmont.yarg.formatters.impl.AbstractFormatter;
@@ -175,7 +176,11 @@ public class CubaTableFormatter extends AbstractFormatter {
                 break;
             }
 
-            List<BandData> bandDataList = childrenBands.get(band.getBandName());
+            List<BandData> bandDataList = childrenBands.get(bandName);
+            if (bandDataList == null) {
+                throw new ReportingException(String.format("Report template has an unknown band [%s]", bandName));
+            }
+
             List<KeyValueEntity> entities = new ArrayList<>();
             Set<CubaTableData.ColumnInfo> headers = new LinkedHashSet<>();
 
