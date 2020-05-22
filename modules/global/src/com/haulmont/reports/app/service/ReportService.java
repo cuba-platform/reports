@@ -30,22 +30,94 @@ public interface ReportService {
 
     String DEFAULT_TEMPLATE_CODE = "DEFAULT";
 
+    /**
+     * Saves Report entity to the database.
+     *
+     * @param report report entity instance
+     * @return saved instance
+     */
     Report storeReportEntity(Report report);
 
+    /**
+     * Generates a report.
+     *
+     * @param report entity instance defining the report
+     * @param params report parameters
+     * @return report output
+     */
     ReportOutputDocument createReport(Report report, Map<String, Object> params);
 
+    /**
+     * Generates a report.
+     *
+     * @param report entity instance defining the report
+     * @param params report parameters
+     * @param outputType desired report output type
+     * @return report output
+     */
     ReportOutputDocument createReport(Report report, Map<String, Object> params, ReportOutputType outputType);
 
+    /**
+     * Generates a report.
+     *
+     * @param report entity instance defining the report
+     * @param templateCode code of a template to use
+     * @param params report parameters
+     * @return report output
+     */
     ReportOutputDocument createReport(Report report, String templateCode, Map<String, Object> params);
 
+    /**
+     * Generates a report.
+     *
+     * @param report entity instance defining the report
+     * @param templateCode code of a template to use
+     * @param params report parameters
+     * @param outputType desired report output type
+     * @return report output
+     */
     ReportOutputDocument createReport(Report report, String templateCode, Map<String, Object> params, ReportOutputType outputType);
 
+    /**
+     * Generates a report.
+     *
+     * @param report entity instance defining the report
+     * @param template template to use
+     * @param params report parameters
+     * @return report output
+     */
     ReportOutputDocument createReport(Report report, ReportTemplate template, Map<String, Object> params);
 
+    /**
+     * Generates a report and saves its output to the file storage.
+     *
+     * @param report entity instance defining the report
+     * @param params report parameters
+     * @param fileName output file name
+     * @return FileDescriptor instance pointing to the report output
+     */
     FileDescriptor createAndSaveReport(Report report, Map<String, Object> params, String fileName);
 
+    /**
+     * Generates a report and saves its output to the file storage.
+     *
+     * @param report entity instance defining the report
+     * @param templateCode code of a template to use
+     * @param params report parameters
+     * @param fileName output file name
+     * @return FileDescriptor instance pointing to the report output
+     */
     FileDescriptor createAndSaveReport(Report report, String templateCode, Map<String, Object> params, String fileName);
 
+    /**
+     * Generates a report and saves its output to the file storage.
+     *
+     * @param report entity instance defining the report
+     * @param template template to use
+     * @param params report parameters
+     * @param fileName output file name
+     * @return FileDescriptor instance pointing to the report output
+     */
     FileDescriptor createAndSaveReport(Report report, ReportTemplate template, Map<String, Object> params, String fileName);
 
     /**
