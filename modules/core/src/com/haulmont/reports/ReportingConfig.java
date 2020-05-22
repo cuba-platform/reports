@@ -57,11 +57,11 @@ public interface ReportingConfig extends Config {
     Integer getDocFormatterTimeout();
 
     /**
-     * @return Has to be true if using OpenOffice reporting formatter on a *nix server without X server running
+     * @return Has to be false if using OpenOffice reporting formatter on a *nix server without X server running
      */
     @Property("reporting.displayDeviceUnavailable")
     @DefaultBoolean(false)
-    boolean getDisplayDeviceUnavailable();
+    boolean getDisplayDeviceAvailable();
 
     /**
      * @return Directory with fonts for generate PDF from HTML
