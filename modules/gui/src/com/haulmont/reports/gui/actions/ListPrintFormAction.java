@@ -28,15 +28,13 @@ import com.haulmont.cuba.gui.components.data.BindingState;
 import com.haulmont.cuba.gui.components.data.meta.ContainerDataUnit;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
 import com.haulmont.cuba.gui.data.Datasource;
-import com.haulmont.cuba.gui.model.CollectionContainer;
-import com.haulmont.cuba.gui.model.CollectionLoader;
-import com.haulmont.cuba.gui.model.HasLoader;
-import com.haulmont.cuba.gui.model.InstanceContainer;
+import com.haulmont.cuba.gui.model.*;
 import com.haulmont.cuba.gui.screen.ScreenContext;
 import com.haulmont.reports.app.ParameterPrototype;
 import com.haulmont.reports.gui.ReportGuiManager;
 import org.apache.commons.collections4.CollectionUtils;
 
+import java.util.HashSet;
 import java.util.Set;
 
 public class ListPrintFormAction extends AbstractPrintFormAction {
@@ -153,6 +151,12 @@ public class ListPrintFormAction extends AbstractPrintFormAction {
         if (listComponent.getItems() instanceof ContainerDataUnit) {
             ContainerDataUnit unit = (ContainerDataUnit) listComponent.getItems();
             CollectionContainer container = unit.getContainer();
+            if (container instanceof CollectionPropertyContainer) {
+                // as CollectionPropertyContainer does not have loader it always fetches all records,
+                // so print these records as selected
+                printSelected(new HashSet(container.getMutableItems()));
+                return;
+            }
             CollectionLoader loader = (CollectionLoader) ((HasLoader) unit.getContainer()).getLoader();
             metaClass = container.getEntityMetaClass();
             loadContext = loader.createLoadContext();
