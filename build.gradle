@@ -292,9 +292,10 @@ configure(coreModule) {
     
     task createTestDb(dependsOn: assemble, description: 'Creates local Postgres database for tests', type: CubaDbCreation) {
         dbms = 'postgres'
-        dbName = 'reports_test'
-        dbUser = 'root'
-        dbPassword = 'root'
+        dbName = System.getProperty('dbName') ? System.getProperty('dbName') : 'reports_test'
+        dbUser = System.getProperty('dbUser') ? System.getProperty('dbUser') : 'root'
+        dbPassword = System.getProperty('dbPass') ? System.getProperty('dbPass') : 'root'
+        host = System.getProperty('dbHost') ? System.getProperty('dbHost') : 'localhost'
     }
 }
 
