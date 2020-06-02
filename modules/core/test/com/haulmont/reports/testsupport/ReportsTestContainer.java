@@ -17,7 +17,7 @@
 package com.haulmont.reports.testsupport;
 
 import com.haulmont.cuba.testsupport.TestContainer;
-import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,10 +33,29 @@ public class ReportsTestContainer extends TestContainer {
                 "com/haulmont/cuba/testsupport/test-app.properties",
                 "com/haulmont/reports/test-app.properties"
         ));
-        dbDriver = ObjectUtils.defaultIfNull(System.getenv("dbDriver"), "org.postgresql.Driver");
-        dbUrl = ObjectUtils.defaultIfNull(System.getenv("dbUrlParam"), "jdbc:postgresql://localhost/reports_test");
-        dbUser = ObjectUtils.defaultIfNull(System.getenv("dbUserParam"), "root");
-        dbPassword = ObjectUtils.defaultIfNull(System.getenv("dbPasswordParam"), "root");
+        dbDriver = "org.postgresql.Driver";
+
+        String dbHost = System.getProperty("dbHost");
+        if (StringUtils.isEmpty(dbHost)) {
+            dbHost = "localhost";
+        }
+
+        String dbName = System.getProperty("dbName");
+        if (StringUtils.isEmpty(dbName)) {
+            dbName = "reports_test";
+        }
+
+        dbUrl = "jdbc:postgresql://" + dbHost + "/" + dbName;
+
+        dbUser = System.getProperty("dbUser");
+        if (StringUtils.isEmpty(dbUser)) {
+            dbUser = "root";
+        }
+
+        dbPassword = System.getProperty("dbPass");
+        if (StringUtils.isEmpty(dbPassword)) {
+            dbPassword = "root";
+        }
     }
 
     public static class Common extends ReportsTestContainer {
