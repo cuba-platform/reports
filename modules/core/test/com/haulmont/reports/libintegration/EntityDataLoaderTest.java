@@ -19,7 +19,6 @@ package com.haulmont.reports.libintegration;
 import com.haulmont.cuba.core.Transaction;
 import com.haulmont.cuba.security.entity.Group;
 import com.haulmont.cuba.security.entity.User;
-import com.haulmont.reports.core.ReportsTestCase;
 import com.haulmont.reports.entity.DataSet;
 import com.haulmont.reports.testsupport.ReportsTestContainer;
 import com.haulmont.yarg.structure.BandData;
@@ -28,11 +27,12 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 public class EntityDataLoaderTest {
 

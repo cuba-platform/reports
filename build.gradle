@@ -274,6 +274,10 @@ configure(coreModule) {
     test {
         scanForTestClasses = false
         includes = ['**/*Test.class']
+        systemProperty 'dbHost', System.getProperty('dbHost')
+        systemProperty 'dbName', System.getProperty('dbName')
+        systemProperty 'dbUser', System.getProperty('dbUser')
+        systemProperty 'dbPass', System.getProperty('dbPass')
     }
 
     entitiesEnhancing {
