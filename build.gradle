@@ -274,6 +274,10 @@ configure(coreModule) {
     test {
         scanForTestClasses = false
         includes = ['**/*Test.class']
+        systemProperty 'dbHost', System.getProperty('dbHost')
+        systemProperty 'dbName', System.getProperty('dbName')
+        systemProperty 'dbUser', System.getProperty('dbUser')
+        systemProperty 'dbPass', System.getProperty('dbPass')
     }
 
     assembleDbScripts {
@@ -286,9 +290,10 @@ configure(coreModule) {
     
     task createTestDb(dependsOn: assemble, description: 'Creates local Postgres database for tests', type: CubaDbCreation) {
         dbms = 'postgres'
-        dbName = 'reports_test'
-        dbUser = 'root'
-        dbPassword = 'root'
+        dbName = System.getProperty('dbName') ? System.getProperty('dbName') : 'reports_test'
+        dbUser = System.getProperty('dbUser') ? System.getProperty('dbUser') : 'root'
+        dbPassword = System.getProperty('dbPass') ? System.getProperty('dbPass') : 'root'
+        host = System.getProperty('dbHost') ? System.getProperty('dbHost') : 'localhost'
     }
 }
 
