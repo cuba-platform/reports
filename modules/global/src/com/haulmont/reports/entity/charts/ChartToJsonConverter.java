@@ -128,11 +128,7 @@ public class ChartToJsonConverter {
             graphs.add(graph);
         }
 
-        Optional.ofNullable(data.get(0)).ifPresent(map -> {
-            if (map instanceof EntityMap) {
-                sortByCategoryField(data, description.getCategoryField());
-            }
-        });
+        sortByCategoryFieldIfNeed(data, description.getCategoryField());
 
         JsonElement jsonTree = gson.toJsonTree(chart);
         jsonTree.getAsJsonObject().add("dataProvider", serializeData(data, fields));
@@ -145,7 +141,10 @@ public class ChartToJsonConverter {
         return gson.toJson(jsonTree);
     }
 
-    private void sortByCategoryField(List<Map<String, Object>> data, String categoryField) {
+    private void sortByCategoryFieldIfNeed(List<Map<String, Object>> data, String categoryField) {
+        if (data.isEmpty() || !(data.get(0) instanceof EntityMap))
+            return;
+
         data.sort((entityMap1, entityMap2) -> {
             int compareResult;
 
