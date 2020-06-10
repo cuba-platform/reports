@@ -196,10 +196,21 @@ public class ReportRestControllerManager {
                 return entities;
             }
         } else if (paramValue.value != null) {
-            Class paramClass = parameterClassResolver.resolveClass(inputParam);
+            Class paramClass = resolveDatatypeActualClass(inputParam);
             return reportService.convertFromString(paramClass, paramValue.value);
         }
         return null;
+    }
+
+    protected Class resolveDatatypeActualClass(ReportInputParameter inputParam) {
+        switch (inputParam.getType()){
+            case DATE:
+                return java.sql.Date.class;
+            case TIME:
+                return java.sql.Time.class;
+            default:
+                return parameterClassResolver.resolveClass(inputParam);
+        }
     }
 
     protected ReportInfo mapToReportInfo(Report report) {
