@@ -65,7 +65,8 @@ public class ReportRestControllerManager {
                 new View(Report.class)
                         .addProperty("id")
                         .addProperty("name")
-                        .addProperty("code"))
+                        .addProperty("code")
+                        .addProperty("group"))
                 .setQueryString("select r from report$Report r where r.restAccess = true");
         reportSecurityManager.applySecurityPolicies(loadContext, null, userSessionSource.getUserSession().getCurrentOrSubstitutedUser());
         List<Report> reports = dataManager.loadList(loadContext);
@@ -218,6 +219,7 @@ public class ReportRestControllerManager {
         reportInfo.id = report.getId().toString();
         reportInfo.code = report.getCode();
         reportInfo.name = report.getName();
+        reportInfo.group = report.getGroup().getId().toString();
 
         if (entityStates.isLoaded(report, "templates")) {
             if (report.getTemplates() != null) {
@@ -259,7 +261,25 @@ public class ReportRestControllerManager {
         if (parameter.getEnumerationClass() != null) {
             inputParameterInfo.enumerationClass = parameter.getEnumerationClass();
         }
+
+        if (parameter.getDefaultValue() != null) {
+            inputParameterInfo.defaultValue =  transformDefaultValue(parameter);
+        }
         return inputParameterInfo;
+    }
+
+    protected String transformDefaultValue(ReportInputParameter parameter) {
+        switch (parameter.getType()){
+            case ENTITY:
+                EntityLoadInfo info = EntityLoadInfo.parse(parameter.getDefaultValue());
+                if (info != null) return info.getId().toString();
+                break;
+            case DATE:
+            case TIME:
+                Object defParamValue = reportService.convertFromString(parameter.getParameterClass(), parameter.getDefaultValue());
+                return reportService.convertToString(resolveDatatypeActualClass(parameter), defParamValue);
+        }
+        return parameter.getDefaultValue();
     }
 
     protected UUID getReportIdFromString(String entityId) {
@@ -349,6 +369,7 @@ public class ReportRestControllerManager {
         protected String id;
         protected String name;
         protected String code;
+        protected String group;
 
         protected List<TemplateInfo> templates;
         protected List<InputParameterInfo> inputParameters;
@@ -367,6 +388,7 @@ public class ReportRestControllerManager {
         protected boolean hidden;
         protected String entityMetaClass;
         protected String enumerationClass;
+        protected String defaultValue;
     }
 
     protected static class ParameterValueInfo {
