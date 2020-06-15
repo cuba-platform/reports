@@ -56,6 +56,11 @@ public class ReportRestController {
         return controllerManager.loadReport(entityId);
     }
 
+    @GetMapping(value = "/group/{entityId}")
+    public String loadGroup(@PathVariable String entityId){
+        return controllerManager.loadGroup(entityId);
+    }
+
     @PostMapping(value = "/run/{entityId}")
     public void runReport(@PathVariable String entityId,
                           @RequestBody(required = false) String body, HttpServletResponse response) {
