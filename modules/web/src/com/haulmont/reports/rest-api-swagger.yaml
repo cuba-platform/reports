@@ -11,6 +11,7 @@ info:
 
     * Getting list of avaliable reports
     * Getting report metadata (parameters, templates)
+    * Getting report group details
     * Execution of report
 
     The Reports REST API is available at the URL `/rest/reports/v1` in the web module, e.g. `http://localhost:8080/app/rest/reports/v1/report`
@@ -38,6 +39,13 @@ parameters:
     in: path
     type: string
     description: Report identifier
+    required: true
+    default: ""
+  groupIdParam:
+    name: groupId
+    in: path
+    type: string
+    description: Report Group identifier
     required: true
     default: ""
   entityJsonParam:
@@ -72,6 +80,9 @@ definitions:
       code:
         type: string
         description: Report code
+      group:
+        type: string
+        description: Group id
 
   reportFull:
     type: object
@@ -85,6 +96,9 @@ definitions:
       code:
         type: string
         description: Report code
+      group:
+        type: string
+        description: Group id
       inputParameters:
         type: array
         items:
@@ -119,6 +133,10 @@ definitions:
               type: string
               description: |
                 For ENUMERATION type there will be a java class for enumeration here
+            defaultValue:
+              type: string
+              description: |
+                Default value of parameter in string form
       templates:
         type: array
         items:
@@ -159,6 +177,19 @@ definitions:
               type: array
               items:
                 type: string
+
+  group:
+    type: object
+    properties:
+      id:
+        type: string
+        description: Group id
+      title:
+        type: string
+        description: Group title
+      code:
+        type: string
+        description: Group code
 
 ################################################################################
 #                                   Tags                                       #
@@ -223,6 +254,25 @@ paths:
           description: Success. The report is returned in the response body.
           schema:
             $ref: '#/definitions/reportFull'
+        403:
+          description: Forbidden. The user doesn't have permissions to read the report
+          schema:
+            $ref: '#/definitions/error'
+
+  /group/{groupId}:
+    parameters:
+      - $ref: '#/parameters/groupIdParam'
+    get:
+      tags:
+        - Group
+      summary: Get a single group by id
+      description: |
+        Gets a single group by identifier
+      responses:
+        200:
+          description: Success. The group is returned in the response body.
+          schema:
+            $ref: '#/definitions/group'
         403:
           description: Forbidden. The user doesn't have permissions to read the report
           schema:

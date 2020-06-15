@@ -57,6 +57,30 @@ public class ReportRestControllerManager {
     @Inject
     protected ParameterClassResolver parameterClassResolver;
 
+    public String loadGroup(String entityId) {
+        checkCanReadEntity(metadata.getClassNN(ReportGroup.class));
+
+        LoadContext<ReportGroup> loadContext = new LoadContext<>(ReportGroup.class);
+        loadContext.setView(
+                new View(ReportGroup.class)
+                        .addProperty("id")
+                        .addProperty("title")
+                        .addProperty("code"))
+                .setQueryString("select g from report$ReportGroup g where g.id = :id")
+                .setParameter("id", getIdFromString(entityId, metadata.getClassNN(ReportGroup.class)));
+
+        ReportGroup group = dataManager.load(loadContext);
+        checkEntityIsNotNull(metadata.getClassNN(ReportGroup.class).getName(), entityId, group);
+
+        GroupInfo info = new GroupInfo();
+        //noinspection ConstantConditions
+        info.id = group.getId().toString();
+        info.code = group.getCode();
+        info.title = group.getTitle();
+
+        return createGson().toJson(info);
+    }
+
     public String loadReportsList() {
         checkCanReadEntity(metadata.getClassNN(Report.class));
 
@@ -204,7 +228,7 @@ public class ReportRestControllerManager {
     }
 
     protected Class resolveDatatypeActualClass(ReportInputParameter inputParam) {
-        switch (inputParam.getType()){
+        switch (inputParam.getType()) {
             case DATE:
                 return java.sql.Date.class;
             case TIME:
@@ -263,13 +287,13 @@ public class ReportRestControllerManager {
         }
 
         if (parameter.getDefaultValue() != null) {
-            inputParameterInfo.defaultValue =  transformDefaultValue(parameter);
+            inputParameterInfo.defaultValue = transformDefaultValue(parameter);
         }
         return inputParameterInfo;
     }
 
     protected String transformDefaultValue(ReportInputParameter parameter) {
-        switch (parameter.getType()){
+        switch (parameter.getType()) {
             case ENTITY:
                 EntityLoadInfo info = EntityLoadInfo.parse(parameter.getDefaultValue());
                 if (info != null) return info.getId().toString();
@@ -373,6 +397,12 @@ public class ReportRestControllerManager {
 
         protected List<TemplateInfo> templates;
         protected List<InputParameterInfo> inputParameters;
+    }
+
+    protected static class GroupInfo {
+        protected String id;
+        protected String title;
+        protected String code;
     }
 
     protected static class TemplateInfo {
