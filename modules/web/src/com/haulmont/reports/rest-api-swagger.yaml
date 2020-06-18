@@ -274,7 +274,7 @@ paths:
           schema:
             $ref: '#/definitions/group'
         403:
-          description: Forbidden. The user doesn't have permissions to read the report
+          description: Forbidden. The user doesn't have permissions to read the report group
           schema:
             $ref: '#/definitions/error'
 

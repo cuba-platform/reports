@@ -66,8 +66,7 @@ public class ReportRestControllerManager {
                         .addProperty("id")
                         .addProperty("title")
                         .addProperty("code"))
-                .setQueryString("select g from report$ReportGroup g where g.id = :id")
-                .setParameter("id", getIdFromString(entityId, metadata.getClassNN(ReportGroup.class)));
+                .setId(getIdFromString(entityId, metadata.getClassNN(ReportGroup.class)));
 
         ReportGroup group = dataManager.load(loadContext);
         checkEntityIsNotNull(metadata.getClassNN(ReportGroup.class).getName(), entityId, group);
