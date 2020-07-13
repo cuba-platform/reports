@@ -22,6 +22,7 @@ import com.haulmont.cuba.core.global.*;
 import com.haulmont.cuba.gui.*;
 import com.haulmont.cuba.gui.WindowManager.OpenType;
 import com.haulmont.cuba.gui.backgroundwork.BackgroundWorkWindow;
+import com.haulmont.cuba.gui.components.Frame;
 import com.haulmont.cuba.gui.components.Window;
 import com.haulmont.cuba.gui.config.WindowConfig;
 import com.haulmont.cuba.gui.config.WindowInfo;
@@ -141,7 +142,7 @@ public class ReportGuiManager {
             boolean bulkPrint = reportTypeIsSingleEntity && moreThanOneEntitySelected;
             openReportParamsDialog(screen, report,
                     ParamsMap.of(parameter.getAlias(), resultingParamValue),
-                    parameter, templateCode, outputFileName,bulkPrint);
+                    parameter, templateCode, outputFileName, bulkPrint);
         } else {
             if (reportTypeIsSingleEntity) {
                 Collection selectedEntities = (Collection) resultingParamValue;
@@ -356,20 +357,14 @@ public class ReportGuiManager {
                 wm.openWindow(windowInfo, OpenType.DIALOG, screenParams);
             }
         } else {
-            ExportDisplay exportDisplay;
             byte[] byteArr = document.getContent();
             com.haulmont.yarg.structure.ReportOutputType finalOutputType =
                     (outputType != null) ? outputType.getOutputType() : document.getReportOutputType();
 
             ExportFormat exportFormat = ReportPrintHelper.getExportFormat(finalOutputType);
-
-            if(screen != null){
-                Screen hostScreen = UiControllerUtils.getScreen(screen);
-                exportDisplay = AppConfig.createExportDisplay(hostScreen.getWindow());
-            } else {
-                exportDisplay = AppConfig.createExportDisplay(null);
-            }
             String documentName = isNotBlank(outputFileName) ? outputFileName : document.getDocumentName();
+
+            ExportDisplay exportDisplay = createExportDisplay(screen);
             exportDisplay.show(new ByteArrayDataProvider(byteArr), documentName, exportFormat);
         }
     }
@@ -600,11 +595,10 @@ public class ReportGuiManager {
             paramsList.add(map);
         }
 
-        Screen hostScreen = UiControllerUtils.getScreen(screen);
-
         ReportOutputDocument reportOutputDocument = reportService.bulkPrint(report, templateCode, outputType, paramsList);
-        ExportDisplay exportDisplay = AppConfig.createExportDisplay(hostScreen.getWindow());
         String documentName = reportOutputDocument.getDocumentName();
+
+        ExportDisplay exportDisplay = createExportDisplay(screen);
         exportDisplay.show(new ByteArrayDataProvider(reportOutputDocument.getContent()), documentName, ExportFormat.ZIP);
     }
 
@@ -674,20 +668,20 @@ public class ReportGuiManager {
 
         BackgroundTask<Void, ReportOutputDocument> task =
                 new BackgroundTask<Void, ReportOutputDocument>(timeout, TimeUnit.MILLISECONDS, hostScreen) {
-            @SuppressWarnings("UnnecessaryLocalVariable")
-            @Override
-            public ReportOutputDocument run(TaskLifeCycle<Void> taskLifeCycle) {
-                ReportOutputDocument result = reportService.bulkPrint(targetReport, templateCode, outputType, paramsList);
-                return result;
-            }
+                    @SuppressWarnings("UnnecessaryLocalVariable")
+                    @Override
+                    public ReportOutputDocument run(TaskLifeCycle<Void> taskLifeCycle) {
+                        ReportOutputDocument result = reportService.bulkPrint(targetReport, templateCode, outputType, paramsList);
+                        return result;
+                    }
 
-            @Override
-            public void done(ReportOutputDocument result) {
-                ExportDisplay exportDisplay = AppConfig.createExportDisplay(hostScreen.getWindow());
-                String documentName = result.getDocumentName();
-                exportDisplay.show(new ByteArrayDataProvider(result.getContent()), documentName, ExportFormat.ZIP);
-            }
-        };
+                    @Override
+                    public void done(ReportOutputDocument result) {
+                        ExportDisplay exportDisplay = AppConfig.createExportDisplay(hostScreen.getWindow());
+                        String documentName = result.getDocumentName();
+                        exportDisplay.show(new ByteArrayDataProvider(result.getContent()), documentName, ExportFormat.ZIP);
+                    }
+                };
 
         String caption = messages.getMessage(getClass(), "runReportBackgroundTitle");
         String description = messages.getMessage(getClass(), "runReportBackgroundMessage");
@@ -821,5 +815,15 @@ public class ReportGuiManager {
             return false;
         }
         return BooleanUtils.isTrue(template.getAlterable());
+    }
+
+    protected ExportDisplay createExportDisplay(@Nullable FrameOwner screen) {
+        Frame frame = null;
+        if (screen != null) {
+            Screen hostScreen = UiControllerUtils.getScreen(screen);
+            frame = hostScreen.getWindow();
+        }
+
+        return AppConfig.createExportDisplay(frame);
     }
 }
