@@ -36,7 +36,10 @@ public class PrototypesLoader {
         Metadata metadata = AppBeans.get(Metadata.class);
 
         MetaClass metaClass = metadata.getSession().getClassNN(parameterPrototype.getMetaClassName());
-        View queryView = metadata.getViewRepository().getView(metaClass, parameterPrototype.getViewName());
+
+        View queryView = parameterPrototype.getView();
+        if (queryView == null)
+            queryView = metadata.getViewRepository().getView(metaClass, parameterPrototype.getViewName());
 
         DataManager dataManager = AppBeans.get(DataManager.NAME);
         LoadContext loadContext = LoadContext.create(metaClass.getJavaClass());
