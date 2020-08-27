@@ -21,6 +21,7 @@ import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.LoadContext;
 import com.haulmont.cuba.core.global.Messages;
+import com.haulmont.cuba.core.global.View;
 import com.haulmont.cuba.gui.ComponentsHelper;
 import com.haulmont.cuba.gui.WindowManager;
 import com.haulmont.cuba.gui.components.*;
@@ -171,9 +172,14 @@ public class ListPrintFormAction extends AbstractPrintFormAction {
         LoadContext.Query query = loadContext.getQuery();
         parameterPrototype.setQueryString(query.getQueryString());
         parameterPrototype.setQueryParams(query.getParameters());
-        parameterPrototype.setViewName(loadContext.getView().getName());
         parameterPrototype.setCondition(query.getCondition());
         parameterPrototype.setSort(query.getSort());
+
+        if (!loadContext.getView().getName().equals("")) {
+            parameterPrototype.setViewName(loadContext.getView().getName());
+        } else {
+            parameterPrototype.setView(View.copy(loadContext.getView()));
+        }
 
         Window window = ComponentsHelper.getWindowNN(listComponent);
         openRunReportScreen(window.getFrameOwner(), parameterPrototype, metaClass);

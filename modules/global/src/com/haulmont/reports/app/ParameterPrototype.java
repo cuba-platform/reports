@@ -17,6 +17,7 @@
 package com.haulmont.reports.app;
 
 import com.haulmont.cuba.core.global.Sort;
+import com.haulmont.cuba.core.global.View;
 import com.haulmont.cuba.core.global.queryconditions.Condition;
 
 import java.io.Serializable;
@@ -34,6 +35,8 @@ public class ParameterPrototype implements Serializable {
     protected String queryString;
 
     protected String viewName;
+
+    protected View view;
 
     protected String metaClassName;
 
@@ -73,6 +76,14 @@ public class ParameterPrototype implements Serializable {
 
     public void setViewName(String viewName) {
         this.viewName = viewName;
+    }
+
+    public View getView() {
+        return view;
+    }
+
+    public void setView(View view) {
+        this.view = view;
     }
 
     public String getMetaClassName() {
