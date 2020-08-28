@@ -17,6 +17,7 @@
 package com.haulmont.reports.gui.actions.list;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.cuba.core.global.LoadContext;
 import com.haulmont.cuba.core.global.Messages;
@@ -218,7 +219,7 @@ public class ListPrintFormAction extends AbstractPrintFormAction implements Acti
         parameterPrototype.setCondition(query.getCondition());
         parameterPrototype.setSort(query.getSort());
 
-        if (!loadContext.getView().getName().equals("")) {
+        if (!Strings.isNullOrEmpty(loadContext.getView().getName())) {
             parameterPrototype.setViewName(loadContext.getView().getName());
         } else {
             parameterPrototype.setView(View.copy(loadContext.getView()));
