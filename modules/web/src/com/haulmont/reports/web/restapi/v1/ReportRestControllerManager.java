@@ -19,6 +19,7 @@ package com.haulmont.reports.web.restapi.v1;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
+import com.google.gson.annotations.SerializedName;
 import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.cuba.core.entity.*;
 import com.haulmont.cuba.core.global.*;
@@ -266,6 +267,7 @@ public class ReportRestControllerManager {
         TemplateInfo templateInfo = new TemplateInfo();
         templateInfo.code = template.getCode();
         templateInfo.outputType = template.getReportOutputType().toString();
+        templateInfo.isDefault = Objects.equals(template.getReport().getDefaultTemplate(), template);
         return templateInfo;
     }
 
@@ -407,6 +409,8 @@ public class ReportRestControllerManager {
     protected static class TemplateInfo {
         protected String code;
         protected String outputType;
+        @SerializedName(value = "default")
+        protected Boolean isDefault;
     }
 
     protected static class InputParameterInfo {
