@@ -143,7 +143,6 @@ public class ReportWizardCreator extends AbstractWindow implements MainWizardFra
     protected String dataStore;
     protected List<ReportData.Parameter> queryParameters;
     protected int wizardWidth;
-    protected int wizardHeight;
 
     @Override
     @SuppressWarnings("unchecked")
@@ -152,11 +151,8 @@ public class ReportWizardCreator extends AbstractWindow implements MainWizardFra
 
         reportDataDs.setItem(metadata.create(ReportData.class));
 
-        wizardWidth = themeConstants.getInt("cuba.gui.report.ReportWizard.width");
-        wizardHeight = themeConstants.getInt("cuba.gui.report.ReportWizard.height");
-        getDialogOptions()
-                .setWidth(wizardWidth).setWidthUnit(SizeUnit.PIXELS)
-                .setHeight(wizardHeight).setHeightUnit(SizeUnit.PIXELS);
+        getWindow().setHeightAuto();
+        getWindow().setWidthFull();
 
         stepFrameManager = new StepFrameManager(this, getStepFrames());
 
