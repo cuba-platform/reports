@@ -463,9 +463,9 @@ public class DetailsStepFrame extends StepFrame {
     protected class BeforeShowDetailsStepFrameHandler implements BeforeShowStepFrameHandler {
         @Override
         public void beforeShowFrame() {
-            wizard.getDialogOptions()
-                    .setHeight(wizard.wizardHeight).setHeightUnit(SizeUnit.PIXELS)
-                    .center();
+            wizard.getWindow()
+                    .setHeightAuto();
+            wizard.getDialogOptions().center();
         }
     }
 }
