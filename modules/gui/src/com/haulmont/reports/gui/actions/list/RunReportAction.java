@@ -110,22 +110,16 @@ public class RunReportAction extends ListAction implements Action.HasBeforeActio
             return;
         }
         if (target != null && target.getFrame() != null) {
-            MetaClass metaClass = null;
-            DataUnit items = target.getItems();
-            if (items instanceof EntityDataUnit) {
-                metaClass = ((EntityDataUnit) items).getEntityMetaClass();
-            }
-
-            openLookup(target.getFrame().getFrameOwner(), metaClass);
+            openLookup(target.getFrame().getFrameOwner());
         } else if (component instanceof Component.BelongToFrame) {
             FrameOwner screen = ComponentsHelper.getWindowNN((Component.BelongToFrame) component).getFrameOwner();
-            openLookup(screen, null);
+            openLookup(screen);
         } else {
             throw new IllegalStateException("No target screen or component found for 'RunReportAction'");
         }
     }
 
-    protected void openLookup(FrameOwner screen, MetaClass metaClass) {
+    protected void openLookup(FrameOwner screen) {
         Screen hostScreen;
         if (screen instanceof Screen) {
             hostScreen = (Screen) screen;
@@ -137,8 +131,7 @@ public class RunReportAction extends ListAction implements Action.HasBeforeActio
                 .withScreenId("report$Report.run")
                 .withOpenMode(OpenMode.DIALOG)
                 .withOptions(new MapScreenOptions(ParamsMap.of(
-                        ReportRun.SCREEN_PARAMETER, hostScreen.getId(),
-                        ReportRun.META_CLASS_PARAMETER, metaClass)))
+                        ReportRun.SCREEN_PARAMETER, hostScreen.getId())))
                 .withSelectHandler(reports -> runReports(reports, screen))
                 .show();
     }
