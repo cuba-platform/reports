@@ -20,10 +20,7 @@ import com.haulmont.cuba.core.config.Config;
 import com.haulmont.cuba.core.config.Property;
 import com.haulmont.cuba.core.config.Source;
 import com.haulmont.cuba.core.config.SourceType;
-import com.haulmont.cuba.core.config.defaults.DefaultBoolean;
-import com.haulmont.cuba.core.config.defaults.DefaultInt;
-import com.haulmont.cuba.core.config.defaults.DefaultInteger;
-import com.haulmont.cuba.core.config.defaults.DefaultString;
+import com.haulmont.cuba.core.config.defaults.*;
 import com.haulmont.cuba.core.config.type.CommaSeparatedStringListTypeFactory;
 import com.haulmont.cuba.core.config.type.Factory;
 
@@ -50,11 +47,34 @@ public interface ReportingConfig extends Config {
     String getOfficePorts();
 
     /**
-     * @return Request to OpenOffice timeout in seconds.
+     * @return timeout in seconds for executing office task
+     * (document generation or pdf conversation).
      */
     @Property("reporting.office.docFormatterTimeout")
-    @DefaultInteger(20)
+    @DefaultInteger(30)
     Integer getDocFormatterTimeout();
+
+    /**
+     * @return the number of times for executing office task
+     * after unsuccessful execution.
+     */
+    @Property("reporting.office.countOfRetry")
+    @DefaultInteger(5)
+    Integer getCountOfRetry();
+
+    /**
+     * @return timeout in milliseconds between retries.
+     */
+    @Property("reporting.office.countOfRetry")
+    @DefaultLong(2000)
+    Long getRetryIntervalMs();
+
+    /**
+     * @return timeout in seconds for connecting to new office process.
+     */
+    @Property("reporting.office.connectionTimeoutSec")
+    @DefaultInteger(15)
+    Integer getOfficeConnectionTimeout();
 
     /**
      * @return Has to be false if using OpenOffice reporting formatter on a *nix server without X server running
