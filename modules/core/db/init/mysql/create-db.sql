@@ -151,7 +151,7 @@ create table REPORT_EXECUTION (
   constraint FK_REPORT_EXECUTION_TO_DOCUMENT foreign key (OUTPUT_DOCUMENT_ID) references SYS_FILE(ID)
 )^
 
-create index IDX_REPORT_EXECUTION_REPORT_ID on REPORT_EXECUTION (REPORT_ID);
+create index IDX_REPORT_EXECUTION_REPORT_ID on REPORT_EXECUTION (REPORT_ID)^
 create index IDX_REPORT_EXECUTION_START_TIME on REPORT_EXECUTION (START_TIME)^
 
 /**********************************************************************************************/
