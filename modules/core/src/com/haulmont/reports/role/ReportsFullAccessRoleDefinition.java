@@ -1,5 +1,6 @@
 package com.haulmont.reports.role;
 
+import com.haulmont.cuba.core.entity.FileDescriptor;
 import com.haulmont.cuba.security.app.role.AnnotatedRoleDefinition;
 import com.haulmont.cuba.security.app.role.annotation.EntityAccess;
 import com.haulmont.cuba.security.app.role.annotation.EntityAttributeAccess;
@@ -46,6 +47,8 @@ public class ReportsFullAccessRoleDefinition extends AnnotatedRoleDefinition {
         return super.screenPermissions();
     }
 
+    @EntityAccess(entityClass = com.haulmont.cuba.security.entity.Role.class, operations = {EntityOp.READ})
+    @EntityAccess(entityClass = FileDescriptor.class, operations = {EntityOp.READ, EntityOp.CREATE, EntityOp.UPDATE, EntityOp.DELETE})
     @EntityAccess(entityClass = Report.class, operations = {EntityOp.READ, EntityOp.CREATE, EntityOp.UPDATE, EntityOp.DELETE})
     @EntityAccess(entityClass = ReportGroup.class, operations = {EntityOp.READ, EntityOp.CREATE, EntityOp.UPDATE, EntityOp.DELETE})
     @EntityAccess(entityClass = ReportTemplate.class, operations = {EntityOp.READ, EntityOp.CREATE, EntityOp.UPDATE, EntityOp.DELETE})
@@ -73,6 +76,8 @@ public class ReportsFullAccessRoleDefinition extends AnnotatedRoleDefinition {
         return super.entityPermissions();
     }
 
+    @EntityAttributeAccess(entityClass = com.haulmont.cuba.security.entity.Role.class, view = "*")
+    @EntityAttributeAccess(entityClass = FileDescriptor.class, modify = "*")
     @EntityAttributeAccess(entityClass = Report.class, modify = "*")
     @EntityAttributeAccess(entityClass = ReportGroup.class, modify = "*")
     @EntityAttributeAccess(entityClass = ReportTemplate.class, modify = "*")
