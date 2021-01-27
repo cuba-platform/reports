@@ -85,7 +85,7 @@ public class ReportRun extends AbstractLookup {
 
         List<Report> reports = reportsParameter;
         if (reports == null) {
-            reports = reportGuiManager.getAvailableReports(screenParameter, userSessionSource.getUserSession().getUser(),
+            reports = reportGuiManager.getAvailableReports(screenParameter, userSessionSource.getUserSession().getCurrentOrSubstitutedUser(),
                     metaClassParameter);
         }
 
@@ -124,7 +124,7 @@ public class ReportRun extends AbstractLookup {
         Date dateFilterValue = updatedDateFilter.getValue();
 
         List<Report> reports =
-                reportGuiManager.getAvailableReports(screenParameter, userSessionSource.getUserSession().getUser(),
+                reportGuiManager.getAvailableReports(screenParameter, userSessionSource.getUserSession().getCurrentOrSubstitutedUser(),
                         metaClassParameter)
                         .stream()
                         .filter(report -> {
