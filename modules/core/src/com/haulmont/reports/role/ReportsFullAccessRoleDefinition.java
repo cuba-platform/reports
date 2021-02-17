@@ -41,7 +41,7 @@ public class ReportsFullAccessRoleDefinition extends AnnotatedRoleDefinition {
             "report$Report.regionEditor", "report$Report.wizard", "report$ReportEntityTree.lookup",
             "report$ReportExecution.browse", "report$ReportExecution.dialog", "report$ReportGroup.edit",
             "report$ReportInputParameter.edit", "report$ReportTemplate.edit", "report$ReportValueFormat.edit",
-            "report$TableEditFrame"})
+            "report$TableEditFrame", "scriptEditorDialog"})
     @Override
     public ScreenPermissionsContainer screenPermissions() {
         return super.screenPermissions();
