@@ -81,7 +81,7 @@ public class ReportRun extends AbstractLookup {
 
         List<Report> reports = reportsParameter;
         if (reports == null) {
-            reports = reportGuiManager.getAvailableReports(screenParameter, userSessionSource.getUserSession().getUser(), null);
+            reports = reportGuiManager.getAvailableReports(screenParameter, userSessionSource.getUserSession().getCurrentOrSubstitutedUser(), null);
         }
 
         if (reportsParameter != null) {
