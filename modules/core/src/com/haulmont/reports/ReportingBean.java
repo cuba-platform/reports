@@ -523,7 +523,7 @@ public class ReportingBean implements ReportingApi {
     protected FileDescriptor saveReport(byte[] reportData, String fileName, String ext) {
         FileDescriptor file = metadata.create(FileDescriptor.class);
         file.setCreateDate(timeSource.currentTimestamp());
-        file.setName(fileName + "." + ext);
+        file.setName(getFileDescriptorName(fileName, ext));
         file.setExtension(ext);
         file.setSize((long) reportData.length);
 
@@ -749,5 +749,13 @@ public class ReportingBean implements ReportingApi {
         cal.set(Calendar.MONTH, 0);
         cal.set(Calendar.DAY_OF_MONTH, 1);
         return cal.getTime();
+    }
+
+    protected String getFileDescriptorName(String fileName, String ext) {
+        if (fileName != null && ext != null
+                && !fileName.toLowerCase(Locale.ROOT).endsWith("." + ext.toLowerCase(Locale.ROOT))) {
+            return fileName + "." + ext;
+        }
+        return fileName;
     }
 }
