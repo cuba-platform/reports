@@ -15,6 +15,8 @@
  */
 package com.haulmont.reports.gui.definition.edit;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.ImmutableBiMap;
 import com.haulmont.bali.util.ParamsMap;
 import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.cuba.core.global.*;
@@ -25,6 +27,7 @@ import com.haulmont.cuba.gui.components.autocomplete.AutoCompleteSupport;
 import com.haulmont.cuba.gui.components.autocomplete.JpqlSuggestionFactory;
 import com.haulmont.cuba.gui.components.autocomplete.Suggester;
 import com.haulmont.cuba.gui.components.autocomplete.Suggestion;
+import com.haulmont.cuba.gui.components.data.options.MapOptions;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
 import com.haulmont.cuba.gui.data.Datasource;
 import com.haulmont.cuba.gui.data.impl.DatasourceImplementation;
@@ -349,13 +352,18 @@ public class BandDefinitionEditor extends AbstractFrame implements Suggester {
 
     protected void initParametersListeners() {
         parametersDs.addCollectionChangeListener(e -> {
-            Map<String, Object> paramAliases = new HashMap<>();
+            Map<String, String> paramAliases = new HashMap<>();
 
             for (ReportInputParameter item : e.getDs().getItems()) {
                 paramAliases.put(item.getName(), item.getAlias());
             }
-            entitiesParamLookup.setOptionsMap(paramAliases);
-            entityParamLookup.setOptionsMap(paramAliases);
+            BiMap<String, String> biMap = ImmutableBiMap.copyOf(paramAliases);
+
+            entitiesParamLookup.setOptions(new MapOptions<>(biMap));
+            entitiesParamLookup.setOptionCaptionProvider(o -> biMap.inverse().getOrDefault(o, (String) o));
+
+            entityParamLookup.setOptions(new MapOptions(biMap));
+            entityParamLookup.setOptionCaptionProvider(o -> biMap.inverse().getOrDefault(o, (String) o));
         });
     }
 
