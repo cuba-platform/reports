@@ -64,7 +64,6 @@ public class SaveStepFrame extends StepFrame {
         protected void initChartPreview() {
             if (wizard.outputFileFormat.getValue() == ReportOutputType.CHART) {
                 wizard.chartPreviewBox.setVisible(true);
-                wizard.diagramTypeLabel.setVisible(true);
                 wizard.diagramType.setVisible(true);
 
                 showChart();
@@ -83,7 +82,6 @@ public class SaveStepFrame extends StepFrame {
                 });
             } else {
                 wizard.chartPreviewBox.setVisible(false);
-                wizard.diagramTypeLabel.setVisible(false);
                 wizard.diagramType.setVisible(false);
             }
         }
