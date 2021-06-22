@@ -38,6 +38,9 @@
         </collectionDatasource>
     </dsContext>
 
+    <dialogMode width="640"
+                height="AUTO"/>
+
     <layout expand="editAreaVbox" spacing="true">
         <label id="tipLabel"
                stylename="report-wizard-tip-label"
