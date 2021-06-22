@@ -107,8 +107,6 @@ public class ReportWizardCreator extends AbstractWindow implements MainWizardFra
     protected TextField<String> outputFileName;
     @Named("saveStep.downloadTemplateFile")
     protected Button downloadTemplateFile;
-    @Named("saveStep.diagramTypeLabel")
-    protected Label diagramTypeLabel;
     @Named("saveStep.diagramType")
     protected LookupField<ChartType> diagramType;
     @Named("saveStep.chartPreviewBox")

@@ -17,36 +17,27 @@
 <window xmlns="http://schemas.haulmont.com/cuba/window.xsd">
     <layout expand="props" width="100%">
         <vbox id="props" expand="chartPreviewBox">
-            <grid spacing="true" width="100%">
-                <columns>
-                    <column flex="0"/>
-                    <column flex="1"/>
-                </columns>
-                <rows>
-                    <row>
-                        <label value="msg://downloadTemplateFile"/>
-                        <button id="downloadTemplateFile" stylename="link"
+            <form width="100%">
+                <column width="100%">
+                    <hbox caption="msg://downloadTemplateFile" width="100%">
+                        <button id="downloadTemplateFile" stylename="link" width="100%"
                                 description="msg://templateHintMsg" align="MIDDLE_LEFT"/>
-                    </row>
-                    <row>
-                        <label value="msg://outputFileName" align="MIDDLE_LEFT"/>
-                        <textField id="outputFileName" width="100%" required="true"
-                                   description="msg://outputFileNameHintMsg" maxLength="255">
-                            <validator
-                                    class="com.haulmont.reports.gui.report.validators.OutputFileNameValidator"/>
-                        </textField>
-                    </row>
-                    <row>
-                        <label value="msg://outputFileFormat" align="MIDDLE_LEFT"/>
-                        <lookupField id="outputFileFormat" required="true" width="100%"
-                                     description="msg://outputFileTypeHintMsg"/>
-                    </row>
-                    <row>
-                        <label id="diagramTypeLabel" value="msg://diagramType" visible="false" align="MIDDLE_LEFT"/>
-                        <lookupField id="diagramType" required="true" width="100%" visible="false"/>
-                    </row>
-                </rows>
-            </grid>
+                    </hbox>
+                    <textField id="outputFileName" width="100%" required="true"
+                               caption="msg://outputFileName"
+                               description="msg://outputFileNameHintMsg" maxLength="255">
+                        <validator class="com.haulmont.reports.gui.report.validators.OutputFileNameValidator"/>
+                    </textField>
+
+                    <lookupField id="outputFileFormat" required="true" width="100%"
+                                 caption="msg://outputFileFormat"
+                                 description="msg://outputFileTypeHintMsg"/>
+
+                    <lookupField id="diagramType"
+                                 caption="msg://diagramType"
+                                 required="true" width="100%" visible="false"/>
+                </column>
+            </form>
             <vbox id="chartPreviewBox" visible="false">
             </vbox>
         </vbox>
