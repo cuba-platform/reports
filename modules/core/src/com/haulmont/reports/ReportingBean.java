@@ -125,15 +125,38 @@ public class ReportingBean implements ReportingApi {
             report.setDefaultTemplate(null);
             report.setTemplates(null);
 
-            if (report.getGroup() != null) {
-                ReportGroup existingGroup = em.find(ReportGroup.class, report.getGroup().getId(), View.MINIMAL);
+            em.setSoftDeletion(false);
+            ReportGroup group = report.getGroup();
+            if (group != null) {
+                ReportGroup existingGroup = em.find(ReportGroup.class, group.getId(), View.LOCAL);
+                if (existingGroup == null) {
+                    em.setSoftDeletion(true);
+                    existingGroup = em.createQuery(
+                            "select g from report$ReportGroup g where g.title = :title", ReportGroup.class)
+                            .setParameter("title", group.getTitle())
+                            .setViewName(View.LOCAL)
+                            .getFirstResult();
+                    em.setSoftDeletion(false);
+                }
                 if (existingGroup != null) {
-                    report.setGroup(existingGroup);
+                    if (!entityStates.isDeleted(existingGroup)) {
+                        report.setGroup(existingGroup);
+                    }
+                    else {
+                        group = dataManager.create(ReportGroup.class);
+                        UUID newId = group.getId();
+                        group = metadata.getTools().copy(existingGroup);
+                        group.setVersion(0);
+                        group.setDeleteTs(null);
+                        group.setDeletedBy(null);
+                        group.setId(newId);
+                        report.setGroup(group);
+                    }
                 } else {
-                    em.persist(report.getGroup());
+                    em.persist(group);
                 }
             }
-            em.setSoftDeletion(false);
+
             Report existingReport;
             List<ReportTemplate> existingTemplates = null;
             try {
