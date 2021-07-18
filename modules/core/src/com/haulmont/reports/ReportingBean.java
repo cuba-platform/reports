@@ -55,7 +55,6 @@ import org.perf4j.slf4j.Slf4JStopWatch;
 import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -125,38 +124,38 @@ public class ReportingBean implements ReportingApi {
             report.setDefaultTemplate(null);
             report.setTemplates(null);
 
-            em.setSoftDeletion(false);
-            ReportGroup group = report.getGroup();
-            if (group != null) {
-                ReportGroup existingGroup = em.find(ReportGroup.class, group.getId(), View.LOCAL);
+            ReportGroup reportGroup = report.getGroup();
+            if (reportGroup != null) {
+                ReportGroup existingGroup = em.createQuery(
+                        "select g from report$ReportGroup g where g.title = :title", ReportGroup.class)
+                        .setParameter("title", reportGroup.getTitle())
+                        .setViewName(View.LOCAL)
+                        .getFirstResult();
                 if (existingGroup == null) {
-                    em.setSoftDeletion(true);
-                    existingGroup = em.createQuery(
-                            "select g from report$ReportGroup g where g.title = :title", ReportGroup.class)
-                            .setParameter("title", group.getTitle())
-                            .setViewName(View.LOCAL)
-                            .getFirstResult();
                     em.setSoftDeletion(false);
+                    existingGroup = em.find(ReportGroup.class, reportGroup.getId(), View.LOCAL);
+                    em.setSoftDeletion(true);
                 }
                 if (existingGroup != null) {
                     if (!entityStates.isDeleted(existingGroup)) {
                         report.setGroup(existingGroup);
                     }
                     else {
-                        group = dataManager.create(ReportGroup.class);
-                        UUID newId = group.getId();
-                        group = metadata.getTools().copy(existingGroup);
-                        group.setVersion(0);
-                        group.setDeleteTs(null);
-                        group.setDeletedBy(null);
-                        group.setId(newId);
-                        report.setGroup(group);
+                        reportGroup = dataManager.create(ReportGroup.class);
+                        UUID newId = reportGroup.getId();
+                        reportGroup = metadata.getTools().copy(existingGroup);
+                        reportGroup.setVersion(0);
+                        reportGroup.setDeleteTs(null);
+                        reportGroup.setDeletedBy(null);
+                        reportGroup.setId(newId);
+                        report.setGroup(reportGroup);
                     }
                 } else {
-                    em.persist(group);
+                    em.persist(reportGroup);
                 }
             }
 
+            em.setSoftDeletion(false);
             Report existingReport;
             List<ReportTemplate> existingTemplates = null;
             try {
