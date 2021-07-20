@@ -179,6 +179,7 @@ public class InputParametersFrame extends AbstractFrame {
     public void initTemplateAndOutputSelect() {
         if (report != null) {
             if (report.getTemplates() != null && report.getTemplates().size() > 1) {
+                report.getTemplates().forEach(template -> templateReportsDs.includeItem(template));
                 templateField.setValue(report.getDefaultTemplate());
                 setTemplateVisible(true);
             }
