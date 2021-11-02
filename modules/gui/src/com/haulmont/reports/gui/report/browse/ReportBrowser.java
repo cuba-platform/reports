@@ -16,6 +16,7 @@
 package com.haulmont.reports.gui.report.browse;
 
 import com.haulmont.bali.util.ParamsMap;
+import com.haulmont.cuba.core.app.PersistenceManagerService;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.global.ClientType;
 import com.haulmont.cuba.core.global.Metadata;
@@ -82,6 +83,8 @@ public class ReportBrowser extends AbstractLookup {
     protected Button createBtn;
     @Inject
     protected CollectionDatasource<Report, UUID> reportDs;
+    @Inject
+    protected PersistenceManagerService persistenceManagerService;
 
     @Override
     public void init(Map<String, Object> params) {
@@ -238,6 +241,15 @@ public class ReportBrowser extends AbstractLookup {
                 }
             }
         });
+
+        initReportsTableSorting();
+    }
+
+    protected void initReportsTableSorting() {
+        //sorting by group causes errors in Oracle database
+        if ("oracle".equals(persistenceManagerService.getDbmsType())) {
+            reportsTable.getColumn("group").setSortable(false);
+        }
     }
 
     protected void subscribeCreateActionCloseHandler(CreateAction createAction) {
