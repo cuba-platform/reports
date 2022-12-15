@@ -249,4 +249,10 @@ public interface ReportingConfig extends Config {
     @Source(type = SourceType.DATABASE)
     int getHistoryCleanupMaxItemsPerReport();
     void setHistoryCleanupMaxItemsPerReport(int historyCleanupMaxItemsPerReport);
+
+    @Property("reporting.formulasPostProcessingEvaluationEnabled")
+    @DefaultBoolean(true)
+    boolean isFormulasPostProcessingEvaluationEnabled();
+
+    void setFormulasPostProcessingEvaluationEnabled(boolean formulasPostProcessingEvaluationEnabled);
 }
