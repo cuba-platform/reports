@@ -16,13 +16,19 @@
 
 package com.haulmont.reports.libintegration;
 
+import com.haulmont.reports.ReportingConfig;
 import com.haulmont.yarg.formatters.factory.DefaultFormatterFactory;
 import com.haulmont.yarg.formatters.impl.DocxFormatter;
 import com.haulmont.yarg.formatters.impl.HtmlFormatter;
 import com.haulmont.yarg.formatters.impl.XlsxFormatter;
 
+import javax.inject.Inject;
+
 public class CubaFormatterFactory extends DefaultFormatterFactory {
     protected boolean useOfficeForDocumentConversion = true;
+
+    @Inject
+    protected ReportingConfig reportingConfig;
 
     public CubaFormatterFactory() {
         super();
@@ -55,6 +61,7 @@ public class CubaFormatterFactory extends DefaultFormatterFactory {
             xlsxFormatter.setDefaultFormatProvider(defaultFormatProvider);
             xlsxFormatter.setDocumentConverter(documentConverter);
             xlsxFormatter.setScripting(scripting);
+            xlsxFormatter.setFormulasPostProcessingEvaluationEnabled(reportingConfig.isFormulasPostProcessingEvaluationEnabled());
             return xlsxFormatter;
         };
         formattersMap.put("xlsx", xlsxCreator);
