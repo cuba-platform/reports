@@ -50,7 +50,7 @@ public class CustomFormatter implements com.haulmont.yarg.formatters.CustomRepor
 
     public static final String PARAMS = "params";
     private static final String ROOT_BAND = "rootBand";
-    private static final String PATH_GROOVY_FILE = "(\\w[\\w\\d_-]*/)*(\\w[\\w\\d-_]*\\.groovy)";
+    private static final String PATH_GROOVY_FILE = "(\\w[\\w\\d_-]*/)*(\\w[\\w\\d-_()]*\\.groovy)";
 
     protected static final ScheduledExecutorService executor =
             Executors.newScheduledThreadPool(3,
