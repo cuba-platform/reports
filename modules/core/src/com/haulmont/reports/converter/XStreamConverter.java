@@ -16,7 +16,6 @@
 
 package com.haulmont.reports.converter;
 
-import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.global.View;
 import com.haulmont.cuba.core.global.ViewProperty;
 import com.haulmont.cuba.core.sys.CubaXStream;
@@ -101,8 +100,6 @@ public class XStreamConverter {
         xStream.aliasField("uuid", ReportScreen.class, "id");
         xStream.aliasField("definedBy", ReportTemplate.class, "customDefinedBy");
         xStream.aliasField("uuid", ReportValueFormat.class, "id");
-
-        xStream.allowTypeHierarchy(Entity.class);
 
         return xStream;
     }
