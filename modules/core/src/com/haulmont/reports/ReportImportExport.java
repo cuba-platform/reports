@@ -26,7 +26,6 @@ import com.haulmont.reports.entity.ReportImportOption;
 import com.haulmont.reports.entity.ReportImportResult;
 import com.haulmont.reports.entity.ReportTemplate;
 import com.haulmont.reports.exception.ReportingException;
-import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
@@ -69,7 +68,7 @@ public class ReportImportExport implements ReportImportExportAPI, ReportImportEx
             for (Report report : reports) {
                 try {
                     byte[] reportBytes = exportReport(report);
-                    ArchiveEntry singleReportEntry = newStoredEntry(replaceForbiddenCharacters(report.getName()) + ".zip", reportBytes);
+                    ZipArchiveEntry singleReportEntry = newStoredEntry(replaceForbiddenCharacters(report.getName()) + ".zip", reportBytes);
                     zipOutputStream.putArchiveEntry(singleReportEntry);
                     zipOutputStream.write(reportBytes);
                     zipOutputStream.closeArchiveEntry();
@@ -186,7 +185,7 @@ public class ReportImportExport implements ReportImportExportAPI, ReportImportEx
 
         String xml = report.getXml();
         byte[] xmlBytes = xml.getBytes(StandardCharsets.UTF_8);
-        ArchiveEntry zipEntryReportObject = newStoredEntry("report.structure", xmlBytes);
+        ZipArchiveEntry zipEntryReportObject = newStoredEntry("report.structure", xmlBytes);
         zipOutputStream.putArchiveEntry(zipEntryReportObject);
         zipOutputStream.write(xmlBytes);
 
@@ -203,7 +202,7 @@ public class ReportImportExport implements ReportImportExportAPI, ReportImportEx
                 }
                 if (template != null && template.getContent() != null) {
                     byte[] fileBytes = template.getContent();
-                    ArchiveEntry zipEntryTemplate = newStoredEntry(
+                    ZipArchiveEntry zipEntryTemplate = newStoredEntry(
                             "templates/" + i + "/" + template.getName(), fileBytes);
                     zipOutputStream.putArchiveEntry(zipEntryTemplate);
                     zipOutputStream.write(fileBytes);
@@ -340,7 +339,7 @@ public class ReportImportExport implements ReportImportExportAPI, ReportImportEx
 
         for (Map.Entry<String, Object> entry : stringObjectMap.entrySet()) {
             byte[] data = (byte[]) entry.getValue();
-            ArchiveEntry archiveEntry = newStoredEntry(entry.getKey(), data);
+            ZipArchiveEntry archiveEntry = newStoredEntry(entry.getKey(), data);
             zipOutputStream.putArchiveEntry(archiveEntry);
             zipOutputStream.write(data);
             zipOutputStream.closeArchiveEntry();
@@ -350,7 +349,7 @@ public class ReportImportExport implements ReportImportExportAPI, ReportImportEx
         return byteArrayOutputStream.toByteArray();
     }
 
-    protected ArchiveEntry newStoredEntry(String name, byte[] data) {
+    protected ZipArchiveEntry newStoredEntry(String name, byte[] data) {
         ZipArchiveEntry zipEntry = new ZipArchiveEntry(name);
         zipEntry.setSize(data.length);
         zipEntry.setCompressedSize(zipEntry.getSize());
