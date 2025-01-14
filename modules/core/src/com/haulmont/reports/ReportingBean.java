@@ -45,7 +45,6 @@ import com.haulmont.yarg.reporting.RunParams;
 import com.haulmont.yarg.structure.ReportOutputType;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.Predicate;
-import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import org.apache.commons.lang3.StringUtils;
@@ -304,7 +303,7 @@ public class ReportingBean implements ReportingApi {
                     alreadyUsedNames.put(documentName, 1);
                 }
 
-                ArchiveEntry singleReportEntry = newStoredEntry(documentName, reportDocument.getContent());
+                ZipArchiveEntry singleReportEntry = newStoredEntry(documentName, reportDocument.getContent());
                 zipOutputStream.putArchiveEntry(singleReportEntry);
                 zipOutputStream.write(reportDocument.getContent());
             }
@@ -321,7 +320,7 @@ public class ReportingBean implements ReportingApi {
         }
     }
 
-    protected ArchiveEntry newStoredEntry(String name, byte[] data) {
+    protected ZipArchiveEntry newStoredEntry(String name, byte[] data) {
         ZipArchiveEntry zipEntry = new ZipArchiveEntry(name);
         zipEntry.setSize(data.length);
         zipEntry.setCompressedSize(zipEntry.getSize());

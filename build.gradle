@@ -208,6 +208,10 @@ configure(globalModule) {
 		compile(bom['com.haulmont.yarg:yarg-api']) {
             exclude group: 'org.codehaus.groovy', module: 'groovy-all'
         }
+        compile(bom['com.fasterxml.jackson.core:jackson-databind'])
+        compile(bom['com.fasterxml.jackson.dataformat:jackson-dataformat-yaml'])
+        compile(bom['com.fasterxml.jackson.dataformat:jackson-dataformat-xml'])
+
         if (!JavaVersion.current().isJava8()) {
             runtime('javax.xml.bind:jaxb-api:2.3.1')
             runtime('org.glassfish.jaxb:jaxb-runtime:2.3.1')
@@ -252,7 +256,9 @@ configure(coreModule) {
             exclude group: 'commons-dbcp', module: 'commons-dbcp'
         }
         compile(bom['com.fasterxml.jackson.core:jackson-annotations']) // use the same version as BPM
-		
+        compile(bom['com.fasterxml.jackson.core:jackson-databind'])
+        compile(bom['com.fasterxml.jackson.dataformat:jackson-dataformat-yaml'])
+
         testCompile(group: 'com.haulmont.cuba', name: 'cuba-core-tests', version: baseVersion)
         testCompile(bom['org.apache.commons:commons-dbcp2'])
         compileOnly(bom['javax.servlet:javax.servlet-api'])
